@@ -1,0 +1,36 @@
+@extends('template_machine.v_template')
+@section('content') 
+<div class="page-content">
+    <div class="container-fluid" style="max-width: 100%">
+        <div class="row mb-3 pb-1">
+            <div class="col-12">
+                <div class="d-flex align-items-lg-center flex-lg-row flex-column">
+                    <div class="flex-grow-1">
+                        <h4 class="fs-16 mb-1">Konfigurasi Keuangan</h4>
+                        <p class="text-muted mb-0">Keuangan > Konfigurasi</p>
+                    </div>
+                    @livewire('parameter.jenjang-tahun-ajar')   
+                </div><!-- end card header -->
+            </div>
+            <!--end col-->
+        </div>
+        <div class="row">
+            <!--end col-->
+            <div class="col-xxl-4 pe-1">
+                @livewire('kategori-tagihan-siswa.index')   
+                @livewire('kategori-tagihan-siswa.create')   
+                @livewire('kategori-tagihan-siswa.edit')   
+                @livewire('kategori-tagihan-siswa.delete')   
+            </div>
+            <div class="col-xxl-8 ps-0">
+                @livewire('jenis-tagihan-siswa.index')   
+                @livewire('jenis-tagihan-siswa.create')   
+                @livewire('jenis-tagihan-siswa.edit')   
+                @livewire('jenis-tagihan-siswa.delete')   
+                @livewire('jenis-tagihan-siswa.import')   
+            </div>
+        </div>        
+    </div>
+</div>
+@endsection
+
