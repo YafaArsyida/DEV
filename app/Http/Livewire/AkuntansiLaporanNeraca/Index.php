@@ -6,6 +6,7 @@ use App\Models\AkuntansiJurnalDetail;
 use App\Models\AkuntansiKelompokRekening;
 use App\Models\AkuntansiRekening;
 use App\Models\Jenjang;
+use App\Models\TahunAjar;
 use Livewire\Component;
 
 class Index extends Component
@@ -37,6 +38,12 @@ class Index extends Component
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
     }
 
+    public function isTahunAjaranSudahTutupBuku()
+    {
+        $tahunAjar = TahunAjar::find($this->selectedTahunAjar);
+        return $tahunAjar && $tahunAjar->tutup_buku === 'sudah';
+    }
+
     public function render()
     {
         $transaksi = AkuntansiJurnalDetail::with('akuntansi_rekening')
@@ -55,6 +62,11 @@ class Index extends Component
         ];
 
         foreach ($transaksi->groupBy('kode_rekening') as $kode => $transaksiRek) {
+            // Abaikan akun 32001 jika tahun ajaran sudah ditutup buku
+            if ($kode === '32001') {
+                continue;
+            }
+
             $rekening = $transaksiRek->first()->akuntansi_rekening;
             $namaRekening = $rekening->nama_rekening;
             $posisiNormal = $rekening->posisi_normal;

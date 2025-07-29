@@ -35,7 +35,7 @@
                 </div>
             @else
                 <!-- Tabel Data Ekstrakurikuler -->
-                <div data-simplebar data-simplebar-auto-hide="false" style="max-height: 400px;" class="table-responsive">
+                <div class="table-responsive">
                     <table class="table table-hover nowrap align-middle" style="width:100%">
                     {{-- <div class="text-center my-3">
                         <h4 class="mb-0">Data Ekstrakurikuler Jenjang {{ $namaJenjang }}</h4>
@@ -55,7 +55,7 @@
                         </thead>
                         <tbody>
                             @forelse ($data as $item)
-                                <tr style="white-space: nowrap;">
+                                <tr>
                                     <td>
                                         <a href="#deleteEkstrakurikuler" data-bs-toggle="modal" class="btn btn-sm btn-soft-danger d-inline-flex align-items-center gap-1" wire:click.prevent="$emit('confirmDelete', {{ $item->ms_ekstrakurikuler_id }})" data-bs-trigger="hover" data-bs-placement="top" title="Hapus">
                                             <i class="ri-delete-bin-5-line"></i>
@@ -68,15 +68,15 @@
                                         </span>
                                         <p class="text-muted mb-0">{{ $item->deskripsi }}</p>
                                     </td>
-                                    <td class="">
+                                    <td class="" style="white-space: nowrap;">
                                         <span class="fw-medium fs-14 text-success">
                                             RP{{ number_format($item->biaya, 0, ',', '.') }}
                                         </span>
                                     </td>
-                                    <td>{{ $item->kuota ?? '0' }} siswa</td>
-                                    <td>{{ $item->total_penempatan_siswa() ?? '0' }} siswa</td>
-                                    <td>{{ $item->kuota_tersedia() ?? '0' }} siswa</td>
-                                    <td>
+                                    <td style="white-space: nowrap;">{{ $item->kuota ?? '0' }} siswa</td>
+                                    <td style="white-space: nowrap;">{{ $item->total_penempatan_siswa() ?? '0' }} siswa</td>
+                                    <td style="white-space: nowrap;">{{ $item->kuota_tersedia() ?? '0' }} siswa</td>
+                                    <td style="white-space: nowrap;">
                                         <div class="hstack gap-2">
                                             {{-- Tombol Edit Ekstrakurikuler --}}
                                             <button class="btn btn-sm btn-primary d-inline-flex align-items-center"
@@ -85,6 +85,20 @@
                                                     title="Edit Ekstrakurikuler"
                                                     wire:click.prevent="$emit('loadEkstrakurikuler', {{ $item->ms_ekstrakurikuler_id }})">
                                                 <i class="ri-quill-pen-line align-bottom me-1"></i> Edit
+                                            </button>
+                                            {{-- Tombol Detail Tagihan --}}
+                                            <button class="btn btn-sm btn-secondary d-inline-flex align-items-center"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#detailEkstrakurikuler"
+                                                    title="Detail Ekstrakurikuler"
+                                                    wire:click.prevent="$emit('detailEkstrakurikuler', {{ $item->ms_ekstrakurikuler_id }})">
+                                                <i class="ri-eye-line align-bottom me-1"></i> Detail
+                                            </button>
+                                           {{-- cetak PDF --}}
+                                            <button class="btn btn-sm btn-danger d-inline-flex align-items-center"
+                                                    title="Cetak Ekstrakurikuler"
+                                                    wire:click.prevent="$emit('cetakEkstrakurikuler', {{ $item->ms_ekstrakurikuler_id }})">
+                                                <i class="ri-printer-line align-bottom me-1"></i> Cetak PDF
                                             </button>
                                         </div>
                                     </td>                                    

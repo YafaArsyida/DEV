@@ -18,7 +18,6 @@
             </div><!-- end card header -->
             <div class="card-body">
                 <div class="row g-3 mb-3">
-                   
                     <div class="col-xxl-12 col-sm-12"> 
                         <div class="row g-2 align-items-center">
                             <!-- Label di sisi kiri -->

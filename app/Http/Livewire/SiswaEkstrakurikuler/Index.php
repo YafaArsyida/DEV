@@ -53,6 +53,25 @@ class Index extends Component
         $this->resetPage(); // Reset pagination ketika parameter berubah
     }
 
+    public function cetakSiswaEkstrakurikuler()
+    {
+        if (!$this->selectedJenjang || !$this->selectedTahunAjar) {
+            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Pilih jenjang dan tahun ajar terlebih dahulu.']);
+            return;
+        }
+
+        $this->dispatchBrowserEvent('alertify-success', ['message' => 'laporan diproses.']);
+
+        $url = route('administrasi.ekstrakurikuler-siswa.siswapdf', [
+            'jenjang' => $this->selectedJenjang,
+            'tahun' => $this->selectedTahunAjar,
+            'kelas' => $this->selectedKelas,
+            'search' => $this->search
+        ]);
+
+        $this->emit('openNewTab', $url);
+    }
+
     public function render()
     {
         $select_kelas = [];

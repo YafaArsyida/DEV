@@ -14,6 +14,18 @@
 @endpush
 <div class="page-content">
     <div class="container-fluid" style="max-width: 100%">
+        <div class="row mb-3 pb-1">
+            <div class="col-12">
+                <div class="d-flex align-items-lg-center flex-lg-row flex-column">
+                    <div class="flex-grow-1">
+                        <h4 class="fs-16 mb-1">Dashboard Tata Usaha</h4>
+                        <p class="text-muted mb-0">Dashboard > Tata Usaha</p>
+                    </div>
+                    @livewire('parameter.jenjang-tahun-ajar')   
+                </div><!-- end card header -->
+            </div>
+            <!--end col-->
+        </div>
         <div class="row">
             <div class="col-xxl-3 col-md-6">
                 <div class="card card-animate">
@@ -144,6 +156,14 @@
             <!--end col-->
         </div>
         <!--end row-->
+        <div class="row">
+            <div class="col-xxl-6">
+                @livewire('laporan-pembayaran-tagihan-siswa.kategori')   
+            </div>
+            <div class="col-xxl-6">
+                @livewire('laporan-pembayaran-tagihan-siswa.jenis')   
+            </div>
+        </div>
     </div>
 </div>
 

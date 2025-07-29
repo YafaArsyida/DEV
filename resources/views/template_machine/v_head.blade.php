@@ -1,8 +1,8 @@
 <meta charset="utf-8" />
 <title>TemanSekolah | Advance - Sistem Administrasi Terintegrasi untuk Sekolah</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta content="Premium Multipurpose Sistem Administrasi Terintegrasi untuk Sekolah" name="description" />
-<meta content="Themesbrand" name="author" />
+<meta content="Sistem Administrasi Terintegrasi untuk Sekolah" name="description" />
+<meta content="ManekaromaTeknologi" name="author" />
 <!-- App favicon -->
 <link rel="shortcut icon" href="{{asset('assets')}}/logo/hero.png">
 

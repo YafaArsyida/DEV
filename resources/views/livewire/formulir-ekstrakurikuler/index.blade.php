@@ -1,7 +1,7 @@
 <div class="container">
-    <div class="row align-items-start justify-content-lg-between justify-content-center gy-4">
+    <div class="row align-items-start justify-content-center gy-4">
         <!-- Kolom Foto & Dummy Card -->
-        <div class="col-lg-5 col-sm-7">
+        {{-- <div class="col-lg-5 col-sm-7">
             <div class="about-img-section mb-4 mb-lg-0 text-center">
                 <div class="card feedback-box shadow">
                     <div class="card-body d-flex">
@@ -15,7 +15,7 @@
                 <img src="{{ asset('assets/images/about.jpg') }}" alt="About"
                     class="img-fluid mx-auto rounded-3 mt-3" />
             </div>
-        </div>
+        </div> --}}
 
         <!-- Form -->
         <div class="col-lg-6">
@@ -56,16 +56,16 @@
                             </div>
                         </div>
                         <div class="flex-grow-1">
-                            <p class="mb-0">Siswa {{ $nama_siswa }}</p>
+                            <p class="mb-0">Siswa {{ $nama_siswa }} - Kelas <strong>{{ $nama_kelas }}</strong></p>
                         </div>
                     </div>
-                    <input type="text" class="form-control" placeholder="Pilih siswa..."  value="{{ $nama_siswa }}" wire:model.debounce.300ms="search">
+                     <input type="text" class="form-control" placeholder="Pilih siswa..."  value="{{ $nama_siswa }}" wire:model.debounce.300ms="search">
                     {{-- Hasil Pencarian --}}
                     @if (!empty($search))
                         <div class="list-group mt-2 shadow-sm">
                             @forelse ($siswa as $siswa)
-                                <button type="button" class="list-group-item list-group-item-action" wire:click="siswaSelected('{{ $siswa->ms_siswa_id }}')">
-                                    {{ $siswa->nama_siswa }}
+                                <button type="button" class="list-group-item list-group-item-action" wire:click="siswaSelected('{{ $siswa->ms_penempatan_siswa_id }}')">
+                                    {{ $siswa->ms_siswa->nama_siswa }} - Kelas {{ $siswa->ms_kelas->nama_kelas }}
                                 </button>
                             @empty
                                 <div class="list-group-item text-muted">Tidak ada hasil</div>
@@ -91,8 +91,13 @@
                     <select wire:model="selectedEkstrakurikuler" class="form-select">
                         <option value="">-- Pilih --</option>
                         @foreach ($select_ekstrakurikuler as $item)
-                            <option value="{{ $item->ms_ekstrakurikuler_id }}">{{ $item->nama_ekstrakurikuler }}</option>
-                            {{-- <option value="{{ $item->ms_ekstrakurikuler_id }}">{{ $item->nama_ekstrakurikuler }} <b>RP{{ number_format($item->biaya ?? 0, 0, ',', '.') }}</b></option> --}}
+                            <option value="{{ $item->ms_ekstrakurikuler_id }}"
+                                @if(in_array($ms_kelas_id, [8,9,10,11]) && $item->ms_ekstrakurikuler_id == 1) disabled @endif>
+                                {{ $item->nama_ekstrakurikuler }} 
+                                @if(in_array($ms_kelas_id, [8,9,10,11]) && $item->ms_ekstrakurikuler_id == 1)
+                                    (Tidak tersedia untuk kelas 1-2)
+                                @endif
+                            </option>
                         @endforeach
                     </select>
                 </div>

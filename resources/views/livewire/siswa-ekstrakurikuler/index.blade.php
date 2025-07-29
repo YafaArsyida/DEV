@@ -2,10 +2,10 @@
     <div class="card-header border-0 pb-0">
         <div class="d-flex align-items-center">
             <h5 class="card-title mb-0 flex-grow-1"> Siswa</h5>
-            {{-- @if ($selectedJenjang && $selectedTahunAjar)
+            @if ($selectedJenjang && $selectedTahunAjar)
             <div class="flex-shrink-0">
                 <div class="d-flex gap-2 flex-wrap">
-                    <button 
+                    {{-- <button 
                         class="btn btn-primary"
                         data-bs-toggle="modal" 
                         data-bs-target="#addPenempatan" 
@@ -13,10 +13,14 @@
                         data-bs-placement="top" 
                         title="Petugas Baru">
                         <i class="ri-group-line"></i> Petugas Baru
+                    </button> --}}
+                    <button wire:click="cetakSiswaEkstrakurikuler" class="btn btn-danger d-inline-flex align-items-center gap-1">
+                        <i class="ri-printer-line align-bottom"></i>
+                        <span>Cetak Data Siswa</span>
                     </button>
                 </div>
             </div>
-            @endif --}}
+            @endif
         </div>
     </div>
     <div class="card-body">

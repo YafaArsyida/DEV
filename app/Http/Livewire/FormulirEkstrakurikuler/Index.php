@@ -5,6 +5,7 @@ namespace App\Http\Livewire\FormulirEkstrakurikuler;
 use App\Models\Ekstrakurikuler;
 use App\Models\Jenjang;
 use App\Models\PenempatanEkstrakurikuler;
+use App\Models\PenempatanSiswa;
 use App\Models\Siswa;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
@@ -15,9 +16,12 @@ class Index extends Component
     public $selectedJenjang, $ms_siswa_id, $ms_ekstrakurikuler_id;
     public $selectedEkstrakurikuler = null;
     public $siswaSelected = null;
+    public $ms_penempatan_siswa_id = null;
+    public $ms_kelas_id = null;
 
     public $search = '';
     public $nama_siswa = null;
+    public $nama_kelas = null;
     public $nama_jenjang = null;
 
     public function updatedSelectedJenjang()
@@ -38,15 +42,18 @@ class Index extends Component
         $this->nama_jenjang = $firstJenjang->nama_jenjang ?? '';
     }
 
-    public function siswaSelected($ms_siswa_id)
+    public function siswaSelected($ms_penempatan_siswa_id)
     {
-        $siswa = Siswa::find($ms_siswa_id);
+        // $siswa = Siswa::find($ms_penempatan_siswa_id);
+        $penempatanSiswa = PenempatanSiswa::find($ms_penempatan_siswa_id);
 
-        if ($siswa) {
-            $this->siswaSelected = $siswa->ms_siswa_id;
-            $this->nama_siswa = $siswa->nama_siswa;
+        if ($penempatanSiswa) {
+            $this->siswaSelected = $penempatanSiswa->ms_siswa_id;
+            $this->ms_penempatan_siswa_id = $penempatanSiswa->ms_penempatan_siswa_id;
+            $this->ms_kelas_id = $penempatanSiswa->ms_kelas_id;
+            $this->nama_siswa = $penempatanSiswa->ms_siswa->nama_siswa;
+            $this->nama_kelas = $penempatanSiswa->ms_kelas->nama_kelas;
 
-            // Kosongkan pencarian & hasil
             $this->search = '';
         }
     }
@@ -67,15 +74,31 @@ class Index extends Component
             return;
         }
 
+        $penempatan = PenempatanSiswa::with('ms_kelas')->find($this->ms_penempatan_siswa_id);
+
+        if (!$penempatan) {
+            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Penempatan siswa tidak ditemukan.']);
+            return;
+        }
+
+        // $kelasId = $penempatan->ms_kelas_id;
+        // $ekskulId = $this->selectedEkstrakurikuler;
+
+        // // Validasi khusus: TIK hanya untuk kelas 3-6
+        // if ($ekskulId == 1 && in_array($kelasId, [8, 9, 10, 11])) {
+        //     $this->dispatchBrowserEvent('alertify-error', ['message' => 'Ekstrakurikuler TIK hanya tersedia untuk siswa kelas 3 sampai 6.']);
+        //     return;
+        // }
+
         // Cek apakah siswa sudah terdaftar di ekstrakurikuler yang sama
         $exists = PenempatanEkstrakurikuler::where([
-            'ms_ekstrakurikuler_id' => $this->selectedEkstrakurikuler,
             'ms_siswa_id' => $this->siswaSelected,
+            'ms_ekstrakurikuler_id' => $this->selectedEkstrakurikuler,
             'ms_jenjang_id' => $this->selectedJenjang,
         ])->exists();
 
         if ($exists) {
-            $this->dispatchBrowserEvent('alertify-success', ['message' => 'Siswa sudah terdaftar dalam ekstrakurikuler ini.']);
+            $this->dispatchBrowserEvent('alertify-success', ['message' => 'Siswa sudah terdaftar dalam ekstrakurikuler.']);
             return;
         }
 
@@ -109,12 +132,32 @@ class Index extends Component
     }
     public function render()
     {
-        $select_ekstrakurikuler = Ekstrakurikuler::where('ms_jenjang_id', $this->selectedJenjang)
-            ->get();
+        $select_ekstrakurikuler = collect(); // ← Tambahkan ini
+        if ($this->siswaSelected) {
+            $select_ekstrakurikuler = Ekstrakurikuler::where('ms_jenjang_id', $this->selectedJenjang)
+                ->get();
+
+            // Jika siswa sudah dipilih
+            if (in_array($this->ms_kelas_id, [8, 9, 10, 11])) {
+                $select_ekstrakurikuler->where('ms_ekstrakurikuler_id', '!=', 1);
+            }
+        }
 
         $siswas = collect();
-        if ($this->search) {
-            $siswas = Siswa::where('nama_siswa', 'like', '%' . $this->search . '%')
+        if ($this->search && $this->selectedJenjang) {
+            $siswas = PenempatanSiswa::with([
+                'ms_kelas',
+                'ms_tahun_ajar',
+                'ms_jenjang',
+                'ms_siswa.ms_penempatan_ekstrakurikuler.ms_ekstrakurikuler',
+            ])
+                ->join('ms_siswa', 'ms_penempatan_siswa.ms_siswa_id', '=', 'ms_siswa.ms_siswa_id')
+                ->where('ms_jenjang_id', $this->selectedJenjang)
+                ->where(function ($query) {
+                    $query->whereHas('ms_siswa', function ($query) {
+                        $query->where('nama_siswa', 'like', '%' . $this->search . '%');
+                    });
+                })
                 ->limit(10)
                 ->get();
         }

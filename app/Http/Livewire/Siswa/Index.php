@@ -148,7 +148,7 @@ class Index extends Component
             }
 
             $siswas = $query->orderBy('ms_penempatan_siswa.ms_kelas_id')
-                ->orderBy('ms_siswa.nama_siswa')->paginate(50);
+                ->orderBy('ms_siswa.nama_siswa')->paginate(500);
 
             $this->siswasOnPage = $siswas->items();
         }

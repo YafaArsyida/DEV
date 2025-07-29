@@ -4,7 +4,7 @@
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-light p-3">
-                    <h5 class="modal-title">Tambah Ekstrakurikuler</h5>
+                    <h5 class="modal-title">Edit Ekstrakurikuler</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="close-modal"></button>
                 </div>
                 <form wire:submit.prevent="updateEkstrakurikuler">

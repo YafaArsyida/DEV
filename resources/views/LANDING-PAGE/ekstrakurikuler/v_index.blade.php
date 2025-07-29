@@ -60,12 +60,12 @@
                         <li class="nav-item">
                             <a class="nav-link fs-14" href="#alur">Alur Pendaftaran</a>
                         </li>
-                         <li class="nav-item">
+                         {{-- <li class="nav-item">
                             <a class="nav-link fs-14" href="#cerita">Cerita Mereka</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link fs-14" href="#pembimbing">Pembimbing</a>
-                        </li>
+                        </li> --}}
                         <li class="nav-item">
                             <a class="nav-link fs-14" href="#formulir">Formulir</a>
                         </li>
@@ -172,44 +172,9 @@
 
           <!-- start counter -->
         <section class="py-5 position-relative bg-light">
-            <div class="container">
-                <div class="row text-center gy-4">
-                    <div class="col-lg-3 col-6">
-                        <div>
-                            <h2 class="mb-2"><span class="counter-value" data-target="40">0</span></h2>
-                            <div class="text-muted">Kuota Pramuka</div>
-                        </div>
-                    </div>
-                    <!-- end col -->
-
-                    <div class="col-lg-3 col-6">
-                        <div>
-                            <h2 class="mb-2"><span class="counter-value" data-target="30">0</span></h2>
-                            <div class="text-muted">Kuota Futsal</div>
-                        </div>
-                    </div>
-                    <!-- end col -->
-
-                    <div class="col-lg-3 col-6">
-                        <div>
-                            <h2 class="mb-2"><span class="counter-value" data-target="25">0</span></h2>
-                            <div class="text-muted">Kuota Tari Tradisional</div>
-                        </div>
-                    </div>
-                    <!-- end col -->
-
-                    <div class="col-lg-3 col-6">
-                        <div>
-                            <h2 class="mb-2"><span class="counter-value" data-target="20">0</span></h2>
-                            <div class="text-muted">Kuota Paduan Suara</div>
-                        </div>
-                    </div>
-                    <!-- end col -->
-                </div>
-                <!-- end row -->
-            </div>
-            <!-- end container -->
+            @livewire('ekstrakurikuler.informasi-kuota')   
         </section>
+
         <!-- end counter -->
 
         <section class="section" id="ekstrakurikuler">
@@ -461,6 +426,7 @@
                         </div>
                     </div>
                     <!-- end col -->
+
                     <div class="col-lg-4">
                         <div class="process-card mt-4">
                             <div class="process-arrow-img d-none d-lg-block">
@@ -468,15 +434,16 @@
                             </div>
                             <div class="avatar-sm icon-effect mx-auto mb-4">
                                 <div class="avatar-title bg-transparent text-success rounded-circle h1">
-                                    <i class="ri-wallet-3-line"></i>
+                                    <i class="ri-notification-2-line"></i>
                                 </div>
                             </div>
 
-                            <h5>Pembayaran di Administrasi</h5>
-                            <p class="text-muted ff-secondary">Lakukan pembayaran sesuai ketentuan melalui bagian administrasi sekolah.</p>
+                            <h5>Pengumuman Peserta Terpilih</h5>
+                            <p class="text-muted ff-secondary">Pantau pengumuman dari administrasi untuk mengetahui apakah kamu terpilih sebagai peserta ekskul.</p>
                         </div>
                     </div>
                     <!-- end col -->
+
                     <div class="col-lg-4">
                         <div class="process-card mt-4">
                             <div class="avatar-sm icon-effect mx-auto mb-4">
@@ -497,8 +464,9 @@
         </section>
         <!-- end Work Process -->
 
+
         <!-- start review -->
-        <section class="section bg-primary" id="cerita">
+        {{-- <section class="section bg-primary" id="cerita">
             <div class="bg-overlay bg-overlay-pattern"></div>
             <div class="container">
                 <div class="row justify-content-center">
@@ -595,11 +563,11 @@
                 <!-- end row -->
             </div>
             <!-- end container -->
-        </section>
+        </section> --}}
         <!-- end review -->
 
         <!-- start team -->
-        <section class="section bg-light" id="pembimbing">
+        {{-- <section class="section bg-light" id="pembimbing">
             <div class="container">
                 <div class="row justify-content-center">
                     <div class="col-lg-8">
@@ -662,7 +630,7 @@
                     </div>
                 </div>
             </div>
-        </section>
+        </section> --}}
         <!-- end team -->
 
 

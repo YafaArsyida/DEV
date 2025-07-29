@@ -45,6 +45,13 @@
                     <!-- ADMINISTRASI -->
                     <li class="menu-title"><span data-key="t-administrasi">Administrasi</span></li>
 
+                    <li class="nav-item">
+                        <a href="{{ route('akuntansi.konfigurasi') }}"
+                        class="nav-link menu-link {{ request()->routeIs('akuntansi.konfigurasi') ? 'active' : '' }}">
+                            <i class="mdi mdi-school-outline"></i>
+                            <span data-key="t-kelas-siswa">Konfigurasi Akuntansi</span>
+                        </a>
+                    </li>
                     <!-- Single Menus -->
                     <li class="nav-item">
                         <a href="{{ route('administrasi.kelas-siswa') }}"

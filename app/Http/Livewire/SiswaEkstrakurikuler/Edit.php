@@ -68,7 +68,7 @@ class Edit extends Component
 
             if ($jumlah_terdaftar >= $ekskul->kuota) {
                 $this->dispatchBrowserEvent('alertify-error', [
-                    'message' => 'Kuota untuk ekstrakurikuler ' . $ekskul->nama_ekstrakurikuler . ' sudah penuh.'
+                    'message' => 'EKuota untuk ekstrakurikuler ' . $ekskul->nama_ekstrakurikuler . ' sudah penuh.'
                 ]);
                 return;
             }
