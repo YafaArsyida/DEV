@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Livewire\KuitansiPembayaran;
+namespace App\Http\Livewire\KuitansiPembayaranTagihanSiswa;
 
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
 
 use App\Models\Jenjang;
 use App\Models\KuitansiPembayaran;
+use App\Models\KuitansiPembayaranTagihanSiswa;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Str; // Untuk membantu slugifikasi nama jenjang
 
@@ -75,7 +76,7 @@ class Create extends Component
 
         try {
             // Cek apakah surat sudah ada untuk jenjang yang dipilih
-            $exist = KuitansiPembayaran::where('ms_jenjang_id', $this->selectedJenjang)->first();
+            $exist = KuitansiPembayaranTagihanSiswa::where('ms_jenjang_id', $this->selectedJenjang)->first();
 
             if ($exist) {
                 $this->dispatchBrowserEvent('alertify-error', ['message' => 'Kuitansi sudah ada']);
@@ -94,7 +95,7 @@ class Create extends Component
             }
 
             // Buat surat baru
-            KuitansiPembayaran::create([
+            KuitansiPembayaranTagihanSiswa::create([
                 'ms_jenjang_id' => $this->selectedJenjang,
                 'logo' => $logoPath,
                 'nama_institusi' => $this->nama_institusi,
@@ -121,6 +122,6 @@ class Create extends Component
 
     public function render()
     {
-        return view('livewire.kuitansi-pembayaran.create');
+        return view('livewire.kuitansi-pembayaran-tagihan-siswa.create');
     }
 }

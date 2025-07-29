@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Livewire\KuitansiPembayaran;
+namespace App\Http\Livewire\KuitansiPembayaranTagihanSiswa;
 
 use App\Models\KuitansiPembayaran;
+use App\Models\KuitansiPembayaranTagihanSiswa;
 use Livewire\Component;
 
 class Index extends Component
@@ -23,9 +24,9 @@ class Index extends Component
         $kuitansi = null;
 
         if ($this->selectedJenjang) {
-            $kuitansi = KuitansiPembayaran::where('ms_jenjang_id', $this->selectedJenjang)->first();
+            $kuitansi = KuitansiPembayaranTagihanSiswa::where('ms_jenjang_id', $this->selectedJenjang)->first();
         }
 
-        return view('livewire.kuitansi-pembayaran.index', compact('kuitansi'));
+        return view('livewire.kuitansi-pembayaran-tagihan-siswa.index', compact('kuitansi'));
     }
 }

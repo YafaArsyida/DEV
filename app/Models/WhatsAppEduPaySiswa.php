@@ -11,8 +11,8 @@ class WhatsAppEduPaySiswa extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $table = 'ms_whatsapp_edupay'; // Nama tabel
-    protected $primaryKey = 'ms_whatsapp_edupay_id'; // Nama kolom primary key
+    protected $table = 'ms_whatsapp_edupay_siswa'; // Nama tabel
+    protected $primaryKey = 'ms_whatsapp_edupay_siswa_id'; // Nama kolom primary key
 
     // Kolom yang dapat diisi melalui mass assignment
     protected $fillable = [

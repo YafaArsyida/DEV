@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\KuitansiPembayaran;
+namespace App\Http\Livewire\KuitansiPembayaranTagihanSiswa;
 
 use App\Models\Jenjang;
 use Livewire\Component;
@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str; // Untuk membantu slugifikasi nama jenjang
 
 use App\Models\KuitansiPembayaran;
+use App\Models\KuitansiPembayaranTagihanSiswa;
 
 class Edit extends Component
 {
@@ -19,7 +20,7 @@ class Edit extends Component
 
     public $logo_baru;
 
-    public $ms_kuitansi_pembayaran_id;
+    public $ms_kuitansi_pembayaran_tagihan_siswa_id;
     public $logo;
     public $nama_institusi;
     public $alamat;
@@ -30,13 +31,13 @@ class Edit extends Component
 
     protected $listeners = ['loadKuitansiTransaksi'];
 
-    public function loadKuitansiTransaksi($ms_kuitansi_pembayaran_id, $selectedJenjang)
+    public function loadKuitansiTransaksi($ms_kuitansi_pembayaran_tagihan_siswa_id, $selectedJenjang)
     {
         $this->selectedJenjang = $selectedJenjang;
 
-        $surat = KuitansiPembayaran::findOrFail($ms_kuitansi_pembayaran_id);
+        $surat = KuitansiPembayaranTagihanSiswa::findOrFail($ms_kuitansi_pembayaran_tagihan_siswa_id);
 
-        $this->ms_kuitansi_pembayaran_id = $surat->ms_kuitansi_pembayaran_id;
+        $this->ms_kuitansi_pembayaran_tagihan_siswa_id = $surat->ms_kuitansi_pembayaran_tagihan_siswa_id;
         $this->logo = $surat->logo;
         $this->logo_baru = null;
         $this->nama_institusi = $surat->nama_institusi;
@@ -77,7 +78,7 @@ class Edit extends Component
         DB::beginTransaction();
 
         try {
-            $surat = KuitansiPembayaran::findOrFail($this->ms_kuitansi_pembayaran_id);
+            $surat = KuitansiPembayaranTagihanSiswa::findOrFail($this->ms_kuitansi_pembayaran_tagihan_siswa_id);
 
             if ($this->logo_baru) {
                 // Hapus file lama jika ada
@@ -125,6 +126,6 @@ class Edit extends Component
 
     public function render()
     {
-        return view('livewire.kuitansi-pembayaran.edit');
+        return view('livewire.kuitansi-pembayaran-tagihan-siswa.edit');
     }
 }

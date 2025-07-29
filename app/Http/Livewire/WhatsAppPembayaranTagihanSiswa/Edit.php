@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Livewire\WhatsAppHistoriTagihan;
+namespace App\Http\Livewire\WhatsAppPembayaranTagihanSiswa;
 
 use Livewire\Component;
 use App\Models\WhatsAppHistoriTagihan;
-
+use App\Models\WhatsAppPembayaranTagihanSiswa;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -22,7 +22,7 @@ class Edit extends Component
 
     public function loadPesanTransaksi($ms_whatsapp_histori_tagihan_id)
     {
-        $pesan = WhatsAppHistoriTagihan::findOrFail($ms_whatsapp_histori_tagihan_id);
+        $pesan = WhatsAppPembayaranTagihanSiswa::findOrFail($ms_whatsapp_histori_tagihan_id);
 
         $this->ms_whatsapp_histori_tagihan_id = $pesan->ms_whatsapp_histori_tagihan_id;
         $this->judul = $pesan->judul;
@@ -74,7 +74,7 @@ class Edit extends Component
 
         try {
             // Cari data pesan yang akan diperbarui
-            $pesan = WhatsAppHistoriTagihan::withTrashed()->findOrFail($this->ms_whatsapp_histori_tagihan_id);
+            $pesan = WhatsAppPembayaranTagihanSiswa::withTrashed()->findOrFail($this->ms_whatsapp_histori_tagihan_id);
 
             // Perbarui data pesan
             $pesan->update([
@@ -101,6 +101,6 @@ class Edit extends Component
 
     public function render()
     {
-        return view('livewire.whats-app-histori-tagihan.edit');
+        return view('livewire.whats-app-pembayaran-tagihan-siswa.edit');
     }
 }

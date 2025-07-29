@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Livewire\WhatsAppEduPay;
+namespace App\Http\Livewire\WhatsAppPembayaranTagihanSiswa;
 
-use Illuminate\Support\Facades\DB;
 use Livewire\Component;
+use Illuminate\Support\Facades\DB;
 
-use App\Models\WhatsAppEduPay;
+use App\Models\WhatsAppHistoriTagihan;
+use App\Models\WhatsAppPembayaranTagihanSiswa;
 
 class Create extends Component
 {
@@ -16,9 +17,9 @@ class Create extends Component
     public $kalimat_penutup;
     public $salam_penutup;
 
-    protected $listeners = ['createPesanEduPay'];
+    protected $listeners = ['createPesanTransaksi'];
 
-    public function createPesanEduPay($ms_jenjang_id)
+    public function createPesanTransaksi($ms_jenjang_id)
     {
         $this->resetInputFields(); // Reset input field setiap kali modal dibuka
         $this->ms_jenjang_id = $ms_jenjang_id;
@@ -76,7 +77,7 @@ class Create extends Component
 
         try {
             // Buat pesan baru
-            WhatsAppEduPay::create([
+            WhatsAppPembayaranTagihanSiswa::create([
                 'ms_jenjang_id' => $this->ms_jenjang_id,
                 'judul' => $this->judul,
                 'salam_pembuka' => $this->salam_pembuka,
@@ -89,8 +90,8 @@ class Create extends Component
 
             // Kirim notifikasi sukses
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'Pesan berhasil dibuat.']);
-            $this->dispatchBrowserEvent('hide-create-modal', ['modalId' => 'createPesanEduPay']);
-            $this->emit('UpdatePesanTransaksiEduPay');
+            $this->dispatchBrowserEvent('hide-create-modal', ['modalId' => 'createPesanTransaksi']);
+            $this->emit('UpdatePesanTransaksiTagihan');
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -101,6 +102,6 @@ class Create extends Component
 
     public function render()
     {
-        return view('livewire.whats-app-edu-pay.create');
+        return view('livewire.whats-app-pembayaran-tagihan-siswa.create');
     }
 }

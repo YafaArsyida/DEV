@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Livewire\WhatsAppHistoriTagihan;
+namespace App\Http\Livewire\WhatsAppPembayaranTagihanSiswa;
 
 use App\Models\WhatsAppHistoriTagihan;
+use App\Models\WhatsAppPembayaranTagihanSiswa;
 use Livewire\Component;
 
 class Index extends Component
@@ -29,11 +30,11 @@ class Index extends Component
         $pesans = null;
 
         if ($this->selectedJenjang) {
-            $pesans = WhatsAppHistoriTagihan::where('ms_jenjang_id', $this->selectedJenjang)->first();
+            $pesans = WhatsAppPembayaranTagihanSiswa::where('ms_jenjang_id', $this->selectedJenjang)->first();
         }
-        return view('livewire.whats-app-histori-tagihan.index', [
+        return view('livewire.whats-app-pembayaran-tagihan-siswa.index', [
             'selectedJenjang' => $this->selectedJenjang,
-            'ms_pesan_id' => $pesans ? $pesans->ms_whatsapp_histori_tagihan_id : null,
+            'ms_pesan_id' => $pesans ? $pesans->ms_whatsapp_pembayaran_tagihan_siswa_id : null,
             'pesans' => $pesans,
         ]);
     }

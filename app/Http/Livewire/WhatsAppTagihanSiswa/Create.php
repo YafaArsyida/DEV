@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\WhatsAppTagihanSiswa;
 
 use App\Models\SuratTagihan;
+use App\Models\SuratTagihanSiswa;
 use App\Models\WhatsAppTagihanSiswa;
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
@@ -101,7 +102,7 @@ class Create extends Component
 
     public function render()
     {
-        $surat = SuratTagihan::first();
+        $surat = SuratTagihanSiswa::first();
         return view('livewire.whats-app-tagihan-siswa.create', compact('surat'));
     }
 }

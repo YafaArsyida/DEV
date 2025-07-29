@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Livewire\WhatsAppEduPay;
+namespace App\Http\Livewire\WhatsAppEduPaySiswa;
 
 use App\Models\WhatsAppEduPay;
+use App\Models\WhatsAppEduPaySiswa;
 use Livewire\Component;
 
 class Index extends Component
@@ -29,10 +30,10 @@ class Index extends Component
         $pesans = null;
 
         if ($this->selectedJenjang) {
-            $pesans = WhatsAppEduPay::where('ms_jenjang_id', $this->selectedJenjang)->first();
+            $pesans = WhatsAppEduPaySiswa::where('ms_jenjang_id', $this->selectedJenjang)->first();
         }
 
-        return view('livewire.whats-app-edu-pay.index', [
+        return view('livewire.whats-app-edu-pay-siswa.index', [
             'selectedJenjang' => $this->selectedJenjang,
             'ms_pesan_id' => $pesans ? $pesans->ms_whatsapp_edupay_id : null,
             'pesans' => $pesans,

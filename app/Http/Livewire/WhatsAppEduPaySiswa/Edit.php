@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Livewire\WhatsAppEduPay;
+namespace App\Http\Livewire\WhatsAppEduPaySiswa;
 
 use Illuminate\Support\Facades\DB;
 use App\Models\WhatsAppEduPay;
+use App\Models\WhatsAppEduPaySiswa;
 use Livewire\Component;
 
 class Edit extends Component
@@ -20,7 +21,7 @@ class Edit extends Component
 
     public function loadPesanEduPay($ms_whatsapp_edupay_id)
     {
-        $pesan = WhatsAppEduPay::findOrFail($ms_whatsapp_edupay_id);
+        $pesan = WhatsAppEduPaySiswa::findOrFail($ms_whatsapp_edupay_id);
 
         $this->ms_whatsapp_edupay_id = $pesan->ms_whatsapp_edupay_id;
         $this->judul = $pesan->judul;
@@ -72,7 +73,7 @@ class Edit extends Component
 
         try {
             // Cari data pesan yang akan diperbarui
-            $pesan = WhatsAppEduPay::withTrashed()->findOrFail($this->ms_whatsapp_edupay_id);
+            $pesan = WhatsAppEduPaySiswa::withTrashed()->findOrFail($this->ms_whatsapp_edupay_id);
 
             // Perbarui data pesan
             $pesan->update([
@@ -99,6 +100,6 @@ class Edit extends Component
 
     public function render()
     {
-        return view('livewire.whats-app-edu-pay.edit');
+        return view('livewire.whats-app-edu-pay-siswa.edit');
     }
 }

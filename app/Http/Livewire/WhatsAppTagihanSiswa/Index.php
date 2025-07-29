@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\WhatsAppTagihanSiswa;
 
 use App\Models\SuratTagihan;
+use App\Models\SuratTagihanSiswa;
 use App\Models\WhatsAppTagihanSiswa;
 use Livewire\Component;
 
@@ -27,7 +28,7 @@ class Index extends Component
 
     public function render()
     {
-        $surat = SuratTagihan::first();
+        $surat = SuratTagihanSiswa::first();
 
         $pesans = null;
 
