@@ -58,7 +58,7 @@ class AkuntansiLaporanLabaRugi extends Controller
         $bulanIndo = $bulanHeaders->mapWithKeys(fn($b) => [$b => HelperController::formatTanggalIndonesia($b . '-01', 'F Y')]);
 
         $judul = 'Laporan Laba Rugi';
-        $yayasan = 'Yayasan Drul Khukama Unit ' . ($jenjang->nama_jenjang ?? '-');
+        $yayasan = 'Yayasan Drul Khukama Unit ' . ($jenjang->nama_jenjang ?? '-') . ' Tahun Ajaran ' . ($tahunAjar->nama_tahun_ajar ?? '-');
 
         if ($request->start_date && $request->end_date) {
             $periode = 'Periode ' . \App\Http\Controllers\HelperController::formatTanggalIndonesia($request->start_date, 'F Y') .
@@ -75,14 +75,16 @@ class AkuntansiLaporanLabaRugi extends Controller
         $pdf::Cell(0, 5, $judul, 0, 1, 'C');
         $pdf::SetFont('times', '', 11);
         $pdf::Cell(0, 5, $yayasan, 0, 1, 'C');
+        $pdf::SetFont('times', '', 10);
+        $pdf::MultiCell(0, 6, ($jenjang->deskripsi ?? '-'), 0, 'C');
         $pdf::Cell(0, 5, $periode, 0, 1, 'C');
         $pdf::Ln(3);
         $pdf::SetFont('times', '', 9);
 
-        $html = '<table border="0.5" cellspacing="0" cellpadding="2" width="100%">';
+        $html = '<table border="0.5" cellspacing="0" cellpadding="4" width="100%">';
 
         // HEAD
-        $html .= '<tr><th align="left">Nama Rekening</th>';
+        $html .= '<tr style="background-color:#f2f2f2;"><th align="left">Nama Rekening</th>';
         foreach ($bulanIndo as $b) $html .= "<th>$b</th>";
         $html .= '<th>Total</th></tr>';
 
@@ -100,7 +102,7 @@ class AkuntansiLaporanLabaRugi extends Controller
         }
 
         // Total Pendapatan per Bulan
-        $html .= '<tr><td><strong>Total Pendapatan</strong></td>';
+        $html .= '<tr style="background-color:#d1d1d1;"><td><strong>Total Pendapatan</strong></td>';
         $grandPendapatan = 0;
         foreach ($bulanIndo as $key => $_) {
             $bulanSum = $pendapatan->reduce(fn($c, $pb) => $c + optional($pb[$key] ?? null)->sum('nominal'), 0);
@@ -123,7 +125,7 @@ class AkuntansiLaporanLabaRugi extends Controller
         }
 
         // Total Beban per Bulan
-        $html .= '<tr><td><strong>Total Beban</strong></td>';
+        $html .= '<tr style="background-color:#d1d1d1;"><td><strong>Total Beban</strong></td>';
         $grandBeban = 0;
         foreach ($bulanIndo as $key => $_) {
             $bulanSum = $beban->reduce(fn($c, $pb) => $c + optional($pb[$key] ?? null)->sum('nominal'), 0);
@@ -133,7 +135,7 @@ class AkuntansiLaporanLabaRugi extends Controller
         $html .= '<td><strong>Rp' . number_format($grandBeban, 0, ',', '.') . '</strong></td></tr>';
 
         // Laba Rugi
-        $html .= '<tr><td><strong>Laba (Rugi)</strong></td>';
+        $html .= '<tr style="background-color:#f2f2f2;"><td><strong>LABA (RUGI)</strong></td>';
         $totalLaba = 0;
         foreach ($bulanIndo as $bulan => $_) {
             $pend = $pendapatan->map(fn($rek) => optional($rek[$bulan] ?? null)->sum('nominal'))->sum();

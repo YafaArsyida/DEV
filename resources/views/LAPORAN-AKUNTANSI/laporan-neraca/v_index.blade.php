@@ -2,8 +2,8 @@
 @section('content') 
 <div class="page-content">
     <div class="container-fluid" style="max-width: 100%">
-        <div class="row mb-3 pb-1">
-            <div class="col-12">
+        <div class="row mb-3 pb-1 justify-content-center">
+            <div class="col-xxl-10">
                 <div class="d-flex align-items-lg-center flex-lg-row flex-column">
                     <div class="flex-grow-1">
                         <h4 class="fs-16 mb-1">Laporan Neraca</h4>

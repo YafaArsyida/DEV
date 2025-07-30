@@ -63,7 +63,7 @@ class AkuntansiLaporanPendapatan extends Controller
         } else {
             $periode = 'Semua Periode';
         }
-        
+
         // Mulai PDF
         $pdf = new TCPDF('L', 'mm', 'A4', true, 'UTF-8', false);
         $pdf::SetTitle($judul);
@@ -74,6 +74,9 @@ class AkuntansiLaporanPendapatan extends Controller
         $pdf::SetFont('times', '', 11);
         $pdf::Cell(0, 5, $yayasan, 0, 1, 'C');
         $pdf::Cell(0, 5, $periode, 0, 1, 'C');
+        $pdf::Cell(0, 6, 'Tahun Ajaran: ' . ($tahunAjar->nama_tahun_ajar ?? '-'), 0, 1, 'C');
+        $pdf::SetFont('times', '', 10);
+        $pdf::MultiCell(0, 6, ($jenjang->deskripsi ?? '-'), 0, 'C');
         $pdf::Ln(3);
 
         $pdf::SetFont('times', '', 9);

@@ -17,6 +17,8 @@ class Index extends Component
     public $endDate = null;
 
     public $namaJenjang = '';
+    public $labaRugi = 0;
+    public $tutupBuku = 'belum';
 
     protected $listeners = [
         'parameterUpdated' => 'updateParameters',
@@ -44,8 +46,32 @@ class Index extends Component
         return $tahunAjar && $tahunAjar->tutup_buku === 'sudah';
     }
 
+    public function cetakLaporan()
+    {
+        if (!$this->selectedJenjang || !$this->selectedTahunAjar) {
+            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Jenjang dan Tahun Ajar wajib dipilih']);
+            return;
+        }
+
+        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Laporan diproses.']);
+
+        $url = route('akuntansi.laporan-neraca.pdf', [
+            'jenjang' => $this->selectedJenjang,
+            'tahun' => $this->selectedTahunAjar,
+            'end_date' => $this->endDate,
+        ]);
+
+        $this->emit('openNewTab', $url);
+    }
+
     public function render()
     {
+        if ($this->selectedTahunAjar) {
+            $tahunAjar = TahunAjar::findOrFail($this->selectedTahunAjar);
+            $this->labaRugi = $tahunAjar->hitungLabaRugi($this->selectedJenjang);
+            $this->tutupBuku = $tahunAjar->tutup_buku;
+        }
+
         $transaksi = AkuntansiJurnalDetail::with('akuntansi_rekening')
             ->where('ms_jenjang_id', $this->selectedJenjang)
             ->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
@@ -63,7 +89,7 @@ class Index extends Component
 
         foreach ($transaksi->groupBy('kode_rekening') as $kode => $transaksiRek) {
             // Abaikan akun 32001 jika tahun ajaran sudah ditutup buku
-            if ($kode === '32001') {
+            if ($kode == '32001' || $kode == '33001') {
                 continue;
             }
 

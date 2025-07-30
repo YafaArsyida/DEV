@@ -75,7 +75,7 @@ class Index extends Component
             ->get()
             ->groupBy(['deskripsi', 'nominal']);
 
-        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
+        // $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
 
         return view('livewire.akuntansi-laporan-jurnal-umum.index', [
             // 'select_bulan' => $select_bulan,

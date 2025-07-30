@@ -135,8 +135,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/akuntansi/laporan-jurnal-umum/pdf', [AkuntansiLaporanJurnalUmum::class, 'cetakPDF'])->name('akuntansi.laporan-jurnal-umum.pdf');
     // jurnal keuangan
 
-
+    // neraca
     Route::get('/akuntansi/laporan-neraca',  [AkuntansiLaporanNeraca::class, 'index'])->name('akuntansi.laporan-neraca');
+    Route::get('/akuntansi/laporan-neraca/pdf',  [AkuntansiLaporanNeraca::class, 'cetakPDF'])->name('akuntansi.laporan-neraca.pdf');
+    // neraca
 
     // LAPORAN PENDAPATAN
     Route::get('/akuntansi/laporan-pendapatan',  [AkuntansiLaporanPendapatan::class, 'index'])->name('akuntansi.laporan-pendapatan');

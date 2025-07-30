@@ -40,9 +40,7 @@
                             <span data-key="t-jenis-tagihan">Dashboard</span>
                         </a>
                     </li>
-                @if ($peran === 'tata usaha' || $peran === 'superadmin')
-                    {{-- TATA USAHA --}}
-                    <!-- ADMINISTRASI -->
+                {{-- @if ($peran === 'tata usaha' || $peran === 'superadmin') --}}
                     <li class="menu-title"><span data-key="t-administrasi">Administrasi</span></li>
 
                     <li class="nav-item">
@@ -391,7 +389,7 @@
                             <i class="mdi mdi-view-list-outline"></i> <span data-key="t-menu-submenu">Menu & Sub-Menu</span>
                         </a>
                     </li>               
-                @endif
+                {{-- @endif --}}
             </ul>
         </div>
         <!-- Sidebar -->

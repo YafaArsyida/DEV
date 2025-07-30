@@ -56,7 +56,7 @@
                             <th class="text-uppercase">selesai</th>
                             <th class="text-uppercase">status</th>
                             <th class="text-uppercase">laba/rugi</th>
-                            <th class="text-uppercase">tutup buku</th>
+                            {{-- <th class="text-uppercase">tutup buku</th> --}}
                             <th class="text-uppercase">aksi</th>
                         </tr>
                     </thead>
@@ -87,13 +87,13 @@
                                         <span class="text-muted fs-14 fw-medium">Imbang</span>
                                     @endif
                                 </td>
-                                <td>
+                                {{-- <td>
                                     @if($item->tutup_buku === 'belum')
                                         <button wire:click="tutupBuku({{ $item->ms_tahun_ajar_id }})" class="btn btn-danger btn-sm">Tutup Buku</button>
                                     @else
                                         <span class="badge bg-success">Ditutup</span>
                                     @endif
-                                </td>
+                                </td> --}}
                                 <td>
                                     <ul class="list-inline hstack gap-2 mb-0">
                                         <li class="list-inline-item edit" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Edit Jenjang">
