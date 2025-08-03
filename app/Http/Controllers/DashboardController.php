@@ -18,17 +18,7 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        // $jumlah_perangkat = ModelPerangkatPembaca::count();
-        // $jumlah_video = ModelVideo::count();
-        // $jumlah_peraga = ModelPeraga::count();
-        // $jumlah_pemutaran = ModelLogPeraga::where('keterangan', 'memutar video')->count();
-
-        return view('DASHBOARD.v_index', [
-            'jumlah_perangkat' => 1,
-            'jumlah_video' => 2,
-            'jumlah_peraga' => 3,
-            'jumlah_pemutaran' => 4,
-        ]);
+        return view('DASHBOARD.v_index');
     }
 
     /**
