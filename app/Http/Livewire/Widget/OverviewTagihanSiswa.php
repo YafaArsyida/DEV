@@ -49,7 +49,7 @@ class OverviewTagihanSiswa extends Component
         }
 
         $laporans = $query->orderBy('ms_kategori_tagihan_siswa_id')
-            ->orderBy('nama_jenis_tagihan_siswa')
+            ->orderBy('ms_kategori_tagihan_siswa_id')
             ->paginate(10);
         return view('livewire.widget.overview-tagihan-siswa', [
             'laporans' => $laporans,

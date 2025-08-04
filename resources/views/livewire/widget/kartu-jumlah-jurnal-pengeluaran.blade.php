@@ -21,11 +21,11 @@
                     <h2 class="mt-4 ff-secondary fw-semibold text-danger">
                         Rp{{ number_format($totalPengeluaran, 0, ',', '.') }}
                     </h2>
-                    <p class="mb-0 text-muted">
+                    {{-- <p class="mb-0 text-muted">
                         Jenjang: <strong>{{ $namaJenjang }}</strong>,
                         Tahun Ajar: <strong>{{ $namaTahunAjar }}</strong>
-                    </p>
-                    <p class="text-muted mb-0">Periode: <strong>{{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($startDate, 'd F Y') }}</strong> - <strong>{{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($endDate, 'd F Y') }}</strong></p>
+                    </p> --}}
+                    <p class="text-muted mb-0">Periode: <br><strong>{{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($startDate, 'd F Y') }}</strong> - <strong>{{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($endDate, 'd F Y') }}</strong></p>
                 </div>
                 <div>
                     <div class="avatar-sm flex-shrink-0">

@@ -1,4 +1,4 @@
-<div class="col-xl-6">
+<div class="col-xl-8">
     <div class="card card-height-100">
         <div class="card-header align-items-center d-flex">
             <h4 class="card-title mb-0 flex-grow-1">Overview Tagihan Siswa</h4>
@@ -21,7 +21,7 @@
                         <tr>
                             <th>No</th>
                             <th>Jenis Tagihan</th>
-                            <th>Kategori</th>
+                            {{-- <th>Kategori</th> --}}
                             <th class="text-center">Estimasi</th>
                             <th class="text-center">Dibayarkan</th>
                             <th class="text-center">Kekurangan</th>
@@ -39,7 +39,7 @@
                             <tr>
                                 <td>{{ $laporans->firstItem() + $index }}</td>
                                 <td>{{ $item->nama_jenis_tagihan_siswa }}</td>
-                                <td>{{ $item->ms_kategori_tagihan_siswa->nama_kategori_tagihan_siswa ?? '-' }}</td>
+                                {{-- <td>{{ $item->ms_kategori_tagihan_siswa->nama_kategori_tagihan_siswa ?? '-' }}</td> --}}
                                 <td class="text-center text-info">Rp{{ number_format($estimasi, 0, ',', '.') }}</td>
                                 <td class="text-center text-success">Rp{{ number_format($dibayarkan, 0, ',', '.') }}</td>
                                 <td class="text-center text-danger">Rp{{ number_format($kekurangan, 0, ',', '.') }}</td>
@@ -53,10 +53,9 @@
                     </tbody>
                 </table>
             </div>
-
-            <div class="mt-3 d-flex justify-content-end">
-                {{ $laporans->links() }}
-            </div>
+        </div>
+        <div class="mt-3 d-flex justify-content-end">
+            {{ $laporans->links() }}
         </div>
     </div>
 </div>

@@ -21,7 +21,7 @@
                                         </div>
                                     </div>
                                     <div class="flex-grow-1">
-                                        <p class="text-muted mb-1">Total Operasional :</p>
+                                        <p class="text-muted mb-1">Total Pengeluaran :</p>
                                         <h5 class="mb-0">RP{{ number_format($totalPengeluaran, 0, ',', '.') }}</h5>
                                     </div>
                                 </div>

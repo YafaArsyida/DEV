@@ -3,16 +3,19 @@
         <div class="card-body">
             <div class="d-flex justify-content-between">
                 <div>
-                    {{-- <h4 class="card-title mb-0 flex-grow-1">
-                        @if ($jenisRekapitulasi === 'tagihan')
-                            Estimasi Tagihan Siswa
-                        @elseif ($jenisRekapitulasi === 'dibayar')
-                            Pembayaran Tagihan Siswa
-                        @elseif ($jenisRekapitulasi === 'kekurangan')
-                            Kekurangan Tagihan Siswa
-                        @endif
-                    </h4> --}}
-                    <h4 class="card-title mb-0 flex-grow-1">Total Tagihan Siswa</h4>
+                    @php
+                        $textClass = match($jenisRekapitulasi) {
+                            'dibayar' => 'text-success',
+                            'kekurangan' => 'text-danger',
+                            default => 'text-info',
+                        };
+                        $bgClass = match($jenisRekapitulasi) {
+                            'dibayar' => 'bg-success',
+                            'kekurangan' => 'bg-danger',
+                            default => 'bg-info',
+                        };
+                    @endphp
+                    <h4 class="card-title mb-0 flex-grow-1">Rekapitulasi Tagihan Siswa</h4>
                     <div class="dropdown">
                         <a href="#" class="text-reset dropdown-btn" data-bs-toggle="dropdown">
                             <span class="fw-semibold text-uppercase fs-12">by:</span>
@@ -31,17 +34,19 @@
                         </div>
                     </div>
 
-                    <h2 class="mt-4 ff-secondary fw-semibold">
+                    <h2 class="mt-4 ff-secondary fw-semibold {{ $textClass }}">
                         Rp{{ number_format($totalTagihan, 0, ',', '.') }}
                     </h2>
                     <p class="mb-0 text-muted">
-                        Jenjang: <strong>{{ $namaJenjang }}</strong>,
-                        Tahun Ajar: <strong>{{ $namaTahunAjar }}</strong>
+                        @if($jenisRekapitulasi === 'tagihan') Total Estimasi
+                            @elseif($jenisRekapitulasi === 'dibayar') Dana Dibayarkan
+                            @elseif($jenisRekapitulasi === 'kekurangan') Belum Dibayarkan
+                        @endif
                     </p>
                 </div>
                 <div>
                     <div class="avatar-sm flex-shrink-0">
-                        <span class="avatar-title bg-warning rounded-circle fs-2">
+                        <span class="avatar-title {{ $bgClass }} rounded-circle fs-2">
                             <i class="bx bx-receipt"></i>
                         </span>
                     </div>

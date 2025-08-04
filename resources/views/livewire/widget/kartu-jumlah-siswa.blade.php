@@ -8,7 +8,7 @@
                         {{ number_format($jumlahSiswa) }}
                     </h2>
                     <p class="mb-0 text-muted">
-                        Jenjang: <strong>{{ $namaJenjang }}</strong>,
+                        Jenjang: <strong>{{ $namaJenjang }}</strong> <br>
                         Tahun Ajar: <strong>{{ $namaTahunAjar }}</strong>
                     </p>
                 </div>
