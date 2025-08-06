@@ -19,7 +19,7 @@
                         </div>
                     </div>
 
-                    <h2 class="mt-4 ff-secondary fw-semibold">
+                    <h2 class="mt-4 ff-secondary fw-semibold text-success">
                         Rp{{ number_format($totalPendapatan, 0, ',', '.') }}
                     </h2>
                     {{-- <p class="mb-0 text-muted">

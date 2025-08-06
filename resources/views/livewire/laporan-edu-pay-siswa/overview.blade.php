@@ -18,24 +18,24 @@
                 <div class="p-3 border border-dashed border-start-0">
                     <h5 class="mb-1">
                         <span class="fw-semibold text-success">
-                            RP{{ number_format($total_topup, 0, ',', '.') }}
+                            RP{{ number_format($total_topup_tunai, 0, ',', '.') }}
                         </span>
                     </h5>
                     <p class="text-muted mb-0">
                         <i class="ri-pulse-line display-8 text-success"></i>
-                        Top Up Offline
+                        Top Up Tunai
                     </p>
                 </div>
             </div>
             <div class="col-6 col-sm-4">
                 <div class="p-3 border border-dashed border-start-0">
                     <h5 class="mb-1">
-                        <span class="fw-semibold text-warning">
+                        <span class="fw-semibold text-success">
                             RP{{ number_format($total_topup_online, 0, ',', '.') }}
                         </span>
                     </h5>
                     <p class="text-muted mb-0">
-                        <i class="ri-pulse-line display-8 text-warning"></i>
+                        <i class="ri-pulse-line display-8 text-success"></i>
                         Top Up Online
                     </p>
                 </div>
@@ -43,12 +43,12 @@
             <div class="col-6 col-sm-4">
                 <div class="p-3 border border-dashed border-start-0">
                     <h5 class="mb-1">
-                        <span class="fw-semibold text-secondary">
+                        <span class="fw-semibold text-success">
                             RP{{ number_format($total_pengembalian_dana, 0, ',', '.') }}
                         </span>
                     </h5>
                     <p class="text-muted mb-0">
-                        <i class="ri-pulse-line display-8 text-secondary"></i>
+                        <i class="ri-pulse-line display-8 text-success"></i>
                         Pengembalian dana
                     </p>
                 </div>

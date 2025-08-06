@@ -52,8 +52,8 @@ class Overview extends Component
         }
 
         // Hitung total pemasukan, pengeluaran, dan saldo untuk setiap jenis transaksi
-        $total_topup = (clone $query)
-            ->where('jenis_transaksi', 'topup')
+        $total_topup_tunai = (clone $query)
+            ->where('jenis_transaksi', 'topup tunai')
             ->sum('nominal');
 
         $total_topup_online = (clone $query)
@@ -72,12 +72,12 @@ class Overview extends Component
             ->where('jenis_transaksi', 'pembayaran')
             ->sum('nominal');
 
-        $saldo = $total_topup + $total_topup_online + $total_pengembalian_dana - $total_penarikan - $total_pembayaran;
+        $saldo = $total_topup_tunai + $total_topup_online + $total_pengembalian_dana - $total_penarikan - $total_pembayaran;
 
         // Return masing-masing variabel
         return view('livewire.laporan-edu-pay-siswa.overview', [
             'select_kelas' => $select_kelas,
-            'total_topup' => $total_topup,
+            'total_topup_tunai' => $total_topup_tunai,
             'total_topup_online' => $total_topup_online,
             'total_pengembalian_dana' => $total_pengembalian_dana,
             'total_penarikan' => $total_penarikan,

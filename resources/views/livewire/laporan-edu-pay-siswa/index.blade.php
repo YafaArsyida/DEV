@@ -67,7 +67,7 @@
                                 <td style="white-space: nowrap;">{{ $item->ms_pengguna->nama ?? '-' }}</td>
                                 <td>
                                     <span class="fs-14 text-success">
-                                        {{ in_array($item->jenis_transaksi, ['topup', 'topup online', 'pengembalian dana']) 
+                                        {{ in_array($item->jenis_transaksi, ['topup tunai', 'topup online', 'pengembalian dana']) 
                                             ? 'RP' . number_format($item->nominal, 0, ',', '.') 
                                             : '-' }}
                                     </span>

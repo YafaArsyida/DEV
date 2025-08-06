@@ -4,7 +4,7 @@
             <div class="d-flex justify-content-between">
                 <div>
                     <h4 class="card-title mb-0 flex-grow-1">Total Siswa</h4>
-                    <h2 class="mt-4 ff-secondary fw-semibold">
+                    <h2 class="mt-4 ff-secondary fw-semibold text-primary">
                         {{ number_format($jumlahSiswa) }}
                     </h2>
                     <p class="mb-0 text-muted">

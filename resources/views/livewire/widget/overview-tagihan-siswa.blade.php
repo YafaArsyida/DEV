@@ -25,7 +25,7 @@
                             <th class="text-center">Estimasi</th>
                             <th class="text-center">Dibayarkan</th>
                             <th class="text-center">Kekurangan</th>
-                            <th class="text-center">%</th>
+                            <th class="text-left">%</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -43,8 +43,11 @@
                                 <td class="text-center text-info">Rp{{ number_format($estimasi, 0, ',', '.') }}</td>
                                 <td class="text-center text-success">Rp{{ number_format($dibayarkan, 0, ',', '.') }}</td>
                                 <td class="text-center text-danger">Rp{{ number_format($kekurangan, 0, ',', '.') }}</td>
-                                <td class="text-center">
+                                {{-- <td class="text-center">
                                     <span class="badge bg-success-subtle text-success">{{ $presentase }}%</span>
+                                </td> --}}
+                                <td class="text-left">
+                                    <h5 class="fs-12 mb-0">{{ $presentase }}%<i class="ri-bar-chart-fill text-success fs-14 align-middle ms-2"></i></h5>
                                 </td>
                             </tr>
                         @empty

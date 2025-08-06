@@ -5,6 +5,7 @@ namespace App\Http\Livewire\Widget;
 use App\Models\AkuntansiJurnalDetail;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Carbon\Carbon;
 
 class KartuJurnalDetail extends Component
 {
@@ -17,9 +18,15 @@ class KartuJurnalDetail extends Component
 
     protected $listeners = [
         'parameterUpdated' => 'updateParameters',
+        'refreshJurnalHariIni'
     ];
 
     public function updatingSearch()
+    {
+        $this->emitSelf('$refresh'); //ringan
+    }
+
+    public function refreshJurnalHariIni()
     {
         $this->emitSelf('$refresh'); //ringan
     }
@@ -36,8 +43,9 @@ class KartuJurnalDetail extends Component
         $transaksiJurnal = AkuntansiJurnalDetail::with('akuntansi_rekening', 'ms_pengguna')
             ->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
             ->where('ms_jenjang_id', $this->selectedJenjang)
+            ->whereDate('tanggal_transaksi', Carbon::today())
             ->orderBy('tanggal_transaksi')
-            ->paginate(10)
+            ->get()
             ->groupBy(['deskripsi', 'nominal']);
 
         return view('livewire.widget.kartu-jurnal-detail', [

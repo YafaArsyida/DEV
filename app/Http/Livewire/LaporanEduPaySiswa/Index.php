@@ -99,7 +99,7 @@ class Index extends Component
         // Filter berdasarkan jenis transaksi (jika relevan)
         if ($this->selectedJenisTransaksi) {
             if (in_array('pemasukan', $this->selectedJenisTransaksi)) {
-                $query->whereIn('jenis_transaksi', ['topup', 'topup online', 'pengembalian dana']);
+                $query->whereIn('jenis_transaksi', ['topup tunai', 'topup online', 'pengembalian dana']);
             } elseif (in_array('pengeluaran', $this->selectedJenisTransaksi)) {
                 $query->whereIn('jenis_transaksi', ['penarikan', 'pembayaran']);
             }
@@ -107,7 +107,7 @@ class Index extends Component
 
         // Total nominal transaksi
         $totalPemasukan = $query->clone()
-            ->whereIn('jenis_transaksi', ['topup online', 'topup', 'pengembalian dana'])
+            ->whereIn('jenis_transaksi', ['topup online', 'topup tunai', 'pengembalian dana'])
             ->sum('nominal');
 
         $totalPengeluaran = $query->clone()
@@ -166,7 +166,7 @@ class Index extends Component
         // Filter berdasarkan jenis transaksi (jika relevan)
         if ($this->selectedJenisTransaksi) {
             if (in_array('pemasukan', $this->selectedJenisTransaksi)) {
-                $query->whereIn('jenis_transaksi', ['topup', 'topup online', 'pengembalian dana']);
+                $query->whereIn('jenis_transaksi', ['topup tunai', 'topup online', 'pengembalian dana']);
             } elseif (in_array('pengeluaran', $this->selectedJenisTransaksi)) {
                 $query->whereIn('jenis_transaksi', ['penarikan', 'pembayaran']);
             }
@@ -174,7 +174,7 @@ class Index extends Component
 
         // Total nominal transaksi
         $totalPemasukan = $query->clone()
-            ->whereIn('jenis_transaksi', ['topup online', 'topup', 'pengembalian dana'])
+            ->whereIn('jenis_transaksi', ['topup online', 'topup tunai', 'pengembalian dana'])
             ->sum('nominal');
 
         $totalPengeluaran = $query->clone()
