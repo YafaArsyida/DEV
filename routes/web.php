@@ -53,10 +53,11 @@ use App\Http\Controllers\TransaksiTagihanSiswa;
 //     return view('v_home');
 // });
 
-Route::get('/', [LandingEkstrakurikuler::class, 'index'])->name('landing.ekstrakurikuler');
+// Route::get('/', [LandingEkstrakurikuler::class, 'index'])->name('landing.ekstrakurikuler');
+Route::get('/', [LoginController::class, 'index'])->name('login.index')->middleware('guest');
 
 // login
-Route::get('/login', [LoginController::class, 'index'])->name('login.index')->middleware('guest');
+// Route::get('/login', [LoginController::class, 'index'])->name('login.index')->middleware('guest');
 // Route::get('/', [LoginController::class, 'index'])->name('login.index')->middleware('guest');
 Route::post('/login', [LoginController::class, 'authenticate'])->name('login.authenticate');
 Route::post('/logout', [LoginController::class, 'logOut'])->name('logout');

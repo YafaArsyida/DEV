@@ -45,7 +45,7 @@
                             <!-- App Search-->
                             <div class="app-search d-none d-md-flex header-item">
                                 <div class="position-relative">
-                                    <h3 class='mb-0'>SMP 1 Development</h3>
+                                    <h3 class='mb-0'>Yayasan Pandanaran</h3>
                                 </div>
                             </div>
                         </div>

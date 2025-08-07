@@ -2,7 +2,7 @@
     <!-- LOGO -->
     <div class="navbar-brand-box">
         <!-- Dark Logo-->
-        <a href="index.html" class="logo logo-dark">
+        {{-- <a href="index.html" class="logo logo-dark">
             <span class="logo-sm">
                 <img src="{{asset('assets')}}/logo/atas.jpg" alt="" height="30">
             </span>
@@ -17,6 +17,24 @@
             </span>
             <span class="logo-lg">
                 <img src="{{asset('assets')}}/logo/atas.jpg" alt="" height="40">
+            </span>
+        </a> --}}
+        <!-- Dark Logo-->
+        <a href="index.html" class="logo logo-dark">
+            <span class="logo-sm">
+                <span class="fw-bold fs-5">TemanSekolah</span>
+            </span>
+            <span class="logo-lg">
+                <span class="fw-bold fs-4">TemanSekolah</span>
+            </span>
+        </a>
+        <!-- Light Logo-->
+        <a href="index.html" class="logo logo-light">
+            <span class="logo-sm">
+                <span class="fw-bold fs-5">TemanSekolah</span>
+            </span>
+            <span class="logo-lg">
+                <span class="fw-bold fs-4">TemanSekolah</span>
             </span>
         </a>
         <button type="button" class="btn btn-sm p-0 fs-20 header-item float-end btn-vertical-sm-hover" id="vertical-hover">
