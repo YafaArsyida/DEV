@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AkuntansiJurnalDetail;
 use App\Http\Controllers\AkuntansiKonfigurasi;
+use App\Http\Controllers\AkuntansiLaporanArusKas;
 use App\Http\Controllers\AkuntansiLaporanBukuBesar;
 use App\Http\Controllers\AkuntansiLaporanJurnalUmum;
 use App\Http\Controllers\AkuntansiLaporanLabaRugi;
@@ -49,15 +50,14 @@ use App\Http\Controllers\TransaksiTagihanSiswa;
 |
 */
 
-// Route::get('/', function () {
-//     return view('v_home');
-// });
+Route::get('/', function () {
+    return view('v_home');
+});
 
 // Route::get('/', [LandingEkstrakurikuler::class, 'index'])->name('landing.ekstrakurikuler');
-Route::get('/', [LoginController::class, 'index'])->name('login.index')->middleware('guest');
 
 // login
-// Route::get('/login', [LoginController::class, 'index'])->name('login.index')->middleware('guest');
+Route::get('/login', [LoginController::class, 'index'])->name('login.index')->middleware('guest');
 // Route::get('/', [LoginController::class, 'index'])->name('login.index')->middleware('guest');
 Route::post('/login', [LoginController::class, 'authenticate'])->name('login.authenticate');
 Route::post('/logout', [LoginController::class, 'logOut'])->name('logout');
@@ -153,6 +153,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/akuntansi/laporan-laba-rugi',  [AkuntansiLaporanLabaRugi::class, 'index'])->name('akuntansi.laporan-laba-rugi');
     Route::get('/akuntansi/laporan-laba-rugi/pdf', [AkuntansiLaporanLabaRugi::class, 'cetakPDF'])->name('akuntansi.laporan-laba-rugi.pdf');
     // Laba rugi
+
+    // Arus Kas
+    Route::get('/akuntansi/laporan-arus-kas', [AkuntansiLaporanArusKas::class, 'index'])->name('akuntansi.laporan-arus-kas');
+    Route::get('/akuntansi/laporan-arus-kas/pdf',  [AkuntansiLaporanArusKas::class, 'cetakPDF'])->name('akuntansi.laporan-arus-kas.pdf');
+    // Arus Kas
 
     Route::get('/akuntansi/transaksi-pendapatan',  [AkuntansiTransaksiPendapatan::class, 'index'])->name('akuntansi.transaksi-pendapatan');
 });

@@ -22,7 +22,7 @@
         <!-- Dark Logo-->
         <a href="index.html" class="logo logo-dark">
             <span class="logo-sm">
-                <span class="fw-bold fs-5">TemanSekolah</span>
+                <span class="fw-bold fs-5">Teman</span>
             </span>
             <span class="logo-lg">
                 <span class="fw-bold fs-4">TemanSekolah</span>
@@ -31,7 +31,7 @@
         <!-- Light Logo-->
         <a href="index.html" class="logo logo-light">
             <span class="logo-sm">
-                <span class="fw-bold fs-5">TemanSekolah</span>
+                <span class="fw-bold fs-5">Teman</span>
             </span>
             <span class="logo-lg">
                 <span class="fw-bold fs-4">TemanSekolah</span>
@@ -366,7 +366,8 @@
                     </li>
                     
                     <li class="nav-item">
-                        <a class="nav-link menu-link" href="">
+                        <a class="nav-link menu-link {{ request()->routeIs('akuntansi.laporan-arus-kas') ? 'active' : '' }}"
+                             href="{{ route('akuntansi.laporan-arus-kas') }}">
                             <i class="mdi mdi-cash"></i> 
                             <span data-key="t-arus-kas">Laporan Arus Kas</span>
                         </a>
