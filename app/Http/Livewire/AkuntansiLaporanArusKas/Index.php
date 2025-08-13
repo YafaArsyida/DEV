@@ -95,9 +95,6 @@ class Index extends Component
                     // Jika tidak ada pilihan, tampilkan semua Kas/Bank
                     $query->whereIn('kode_rekening', $akunKasBank);
                 })
-                ->when($this->startDate && $this->endDate, function ($query) {
-                    $query->whereBetween('tanggal_transaksi', [$this->startDate, $this->endDate]);
-                })
                 ->when($this->startDate, function ($query) {
                     $query->where('tanggal_transaksi', '<', $this->startDate);
                 })

@@ -56,7 +56,11 @@ class AkuntansiLaporanArusKas extends Controller
         if ($startDate && $endDate) {
             $saldoAwal = AkuntansiJurnalDetail::where('ms_tahun_ajaran_id', $selectedTahunAjar)
                 ->where('ms_jenjang_id', $selectedJenjang)
-                ->whereIn('kode_rekening', $akunKasBank)
+                ->when($rekening, function ($query) use ($rekening) {
+                    $query->where('kode_rekening', $rekening);
+                }, function ($query) use ($akunKasBank) {
+                    $query->whereIn('kode_rekening', $akunKasBank);
+                })
                 ->where('tanggal_transaksi', '<', $startDate)
                 ->selectRaw("
                 SUM(CASE WHEN posisi = 'debit' THEN nominal ELSE 0 END) -
