@@ -88,7 +88,16 @@ class Index extends Component
         if ($this->startDate != null && $this->endDate != null) {
             $saldoAwal = AkuntansiJurnalDetail::where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
                 ->where('ms_jenjang_id', $this->selectedJenjang)
-                ->whereIn('kode_rekening', $akunKasBank)
+                ->when($this->selectedRekening, function ($query) {
+                    // Jika user memilih rekening tertentu
+                    $query->where('kode_rekening', $this->selectedRekening);
+                }, function ($query) use ($akunKasBank) {
+                    // Jika tidak ada pilihan, tampilkan semua Kas/Bank
+                    $query->whereIn('kode_rekening', $akunKasBank);
+                })
+                ->when($this->startDate && $this->endDate, function ($query) {
+                    $query->whereBetween('tanggal_transaksi', [$this->startDate, $this->endDate]);
+                })
                 ->when($this->startDate, function ($query) {
                     $query->where('tanggal_transaksi', '<', $this->startDate);
                 })
