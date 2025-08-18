@@ -37,6 +37,7 @@ class Edit extends Component
         $this->transaksi = $transaksi;
         $this->tanggal = $transaksi->tanggal;
         $this->nominal = $transaksi->nominal;
+        $this->deskripsi = $transaksi->deskripsi;
     }
 
     protected $rules = [
@@ -55,7 +56,7 @@ class Edit extends Component
 
         $newTanggalTransaksi = Carbon::parse($this->tanggal)->format('Y-m-d H:i:s');
         $this->transaksi->tanggal = $newTanggalTransaksi;
-        $deskripsiJurnal =  "Pengeluaran Operasional " . $this->nominal . ", " . $this->deskripsi;
+        $deskripsiJurnal = $this->deskripsi;
 
         // Perbarui deskripsi jika ada perubahan
         if (!empty($this->deskripsi)) {
@@ -63,8 +64,6 @@ class Edit extends Component
         }
 
         $this->transaksi->save();
-
-        $this->deskripsi = '';
 
         $jurnalIds = [
             $this->transaksi->akuntansi_jurnal_detail_debit_id,
@@ -76,6 +75,8 @@ class Edit extends Component
                 'tanggal_transaksi' => $newTanggalTransaksi,
                 'deskripsi' => $deskripsiJurnal
             ]);
+
+        $this->deskripsi = '';
 
         $this->emit('refreshTransaksiPengeluaran');
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Transaksi berhasil diperbarui.']);

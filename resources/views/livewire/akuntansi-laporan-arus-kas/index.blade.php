@@ -29,7 +29,7 @@
                     </div>
 
                     <!-- Input Pencarian -->
-                    <div class="col-xxl-6 col-md-6">
+                    <div class="col-xxl-5 col-md-5">
                         <label for="searchInput" class="form-label">Pencarian</label>
                         <div class="position-relative">
                             <input type="text" id="searchInput" class="form-control ps-4" wire:model.debounce.300ms="search" placeholder="Cari nama, deskripsi, atau lainnya...">
@@ -38,16 +38,21 @@
                     </div>
 
                     <!-- Filter Periode -->
-                    <div class="col-xxl-4">
+                    <div class="col-xxl-5">
                         <div class="row">
                             <div class="col-12">
                                 <label class="form-label">Periode</label>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-5">
                                 <input type="date" id="startDate" class="form-control" wire:model="startDate" placeholder="Mulai">
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-5">
                                 <input type="date" id="endDate" class="form-control" wire:model="endDate" placeholder="Sampai">
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" class="btn btn-soft-secondary btn-icon rounded-circle" wire:click="resetTanggal" title="Reset Tanggal">
+                                    <i class="ri-refresh-line fs-16"></i>
+                                </button>    
                             </div>
                         </div>
                     </div>

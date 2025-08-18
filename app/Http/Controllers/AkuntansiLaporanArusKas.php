@@ -100,13 +100,13 @@ class AkuntansiLaporanArusKas extends Controller
         $html = '<table border="0.5" cellpadding="4">
         <thead>
             <tr style="background-color:#f2f2f2;">
-                <th width="30" align="center"><b>No</b></th>
-                <th width="80"><b>Tanggal</b></th>
-                <th width="100"><b>Akun</b></th>
-                <th width="80"><b>Petugas</b></th>
-                <th width="240"><b>Deskripsi Transaksi</b></th>
-                <th width="70" align="center"><b>Pemasukan</b></th>
-                <th width="70" align="center"><b>Pengeluaran</b></th>
+                <th width="3%" align="center"><b>No</b></th>
+                <th width="10%"><b>Tanggal</b></th>
+                <th width="10%"><b>Akun</b></th>
+                <th width="10%"><b>Petugas</b></th>
+                <th width="47%"><b>Deskripsi</b></th>
+                <th width="10%" align="center"><b>Pemasukan</b></th>
+                <th width="10%" align="center"><b>Pengeluaran</b></th>
             </tr>
         </thead>
         <tbody>';
@@ -114,13 +114,13 @@ class AkuntansiLaporanArusKas extends Controller
         $no = 1;
         foreach ($transaksiJurnal as $trx) {
             $html .= '<tr>
-            <td align="center">' . $no++ . '</td>
-            <td>' . HelperController::formatTanggalIndonesia($trx->tanggal_transaksi, 'd F Y') . '</td>
-            <td>' . $trx->akuntansi_rekening->nama_rekening . '</td>
-            <td>' . $trx->ms_pengguna->nama . '</td>
-            <td>' . $trx->deskripsi . '</td>
-            <td align="right">' . ($trx->posisi == 'debit' ? 'RP' . number_format($trx->nominal, 0, ',', '.') : '-') . '</td>
-            <td align="right">' . ($trx->posisi == 'kredit' ? 'RP' . number_format($trx->nominal, 0, ',', '.') : '-') . '</td>
+            <td width="3%" align="center">' . $no++ . '.</td>
+            <td width="10%">' . HelperController::formatTanggalIndonesia($trx->tanggal_transaksi, 'd F Y') . '</td>
+            <td width="10%">' . $trx->akuntansi_rekening->nama_rekening . '</td>
+            <td width="10%">' . $trx->ms_pengguna->nama . '</td>
+            <td width="47%">' . $trx->deskripsi . '</td>
+            <td width="10%" align="center">' . ($trx->posisi == 'debit' ? 'RP' . number_format($trx->nominal, 0, ',', '.') : '-') . '</td>
+            <td width="10%" align="center">' . ($trx->posisi == 'kredit' ? 'RP' . number_format($trx->nominal, 0, ',', '.') : '-') . '</td>
         </tr>';
         }
 

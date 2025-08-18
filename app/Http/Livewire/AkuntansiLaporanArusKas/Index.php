@@ -34,6 +34,14 @@ class Index extends Component
         $this->selectedTahunAjar = $tahunAjar;
     }
 
+    public function resetTanggal()
+    {
+        $this->endDate = null;
+        $this->startDate = null;
+        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
+    }
+
+
     public function cetakLaporan()
     {
         if (!$this->selectedJenjang || !$this->selectedTahunAjar) {
@@ -47,7 +55,7 @@ class Index extends Component
             'jenjang' => $this->selectedJenjang,
             'tahun' => $this->selectedTahunAjar,
             'rekening' => $this->selectedRekening,
-            'start_date' => $this->endDate,
+            'start_date' => $this->startDate,
             'end_date' => $this->endDate,
         ]);
 

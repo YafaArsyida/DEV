@@ -31,6 +31,7 @@ use App\Http\Controllers\LaporanTabunganSiswa;
 use App\Http\Controllers\LaporanTagihanSiswa;
 use App\Http\Controllers\ManajemenKepegawaian;
 use App\Http\Controllers\PenggunaJenjang;
+use App\Http\Controllers\SmartCanteen;
 use App\Http\Controllers\TagihanJenis;
 use App\Http\Controllers\TagihanSiswa;
 use App\Http\Controllers\TransaksiEduPaySiswa;
@@ -55,6 +56,7 @@ Route::get('/', function () {
 });
 
 // Route::get('/', [LandingEkstrakurikuler::class, 'index'])->name('landing.ekstrakurikuler');
+Route::get('/smartcanteen', [SmartCanteen::class, 'index'])->name('smartcanteen');
 
 // login
 Route::get('/login', [LoginController::class, 'index'])->name('login.index')->middleware('guest');
