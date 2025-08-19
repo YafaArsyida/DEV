@@ -59,11 +59,11 @@ class Withdraw extends Component
         }, 0);
 
         // Cek saldo kas
-        $this->saldoKas = AkuntansiJurnalDetail::where('kode_rekening', 101) // Rekening kas
+        $this->saldoKas = AkuntansiJurnalDetail::where('kode_rekening', 11001) // Rekening kas
             ->where('posisi', 'debit') // Saldo masuk
             ->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
             ->where('ms_jenjang_id', $this->selectedJenjang)
-            ->sum('nominal') - AkuntansiJurnalDetail::where('kode_rekening', 101) // Rekening kas
+            ->sum('nominal') - AkuntansiJurnalDetail::where('kode_rekening', 11001) // Rekening kas
             ->where('posisi', 'kredit') // Saldo keluar
             ->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
             ->where('ms_jenjang_id', $this->selectedJenjang)
@@ -102,8 +102,8 @@ class Withdraw extends Component
                 // Cek jika saldo positif
                 if ($saldoSekarang > 0) {
                     // jurnal ges
-                    $kode_kas = 101;
-                    $kode_saldo_tabungan_siswa = 203;
+                    $kode_kas = 11001;
+                    $kode_saldo_tabungan_siswa = 22001;
 
                     // Data untuk jurnal debit
                     $jurnalDebit = [
