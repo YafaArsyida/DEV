@@ -9,6 +9,6 @@ class SmartCanteen extends Controller
 {
     public function index()
     {
-        return view('SMARTCANTEEN.marketplace.v_index');
+        return view('SMARTCANTEEN.v_index');
     }
 }

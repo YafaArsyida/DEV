@@ -18,7 +18,7 @@
                                         </a>
                                     @else
                                     <a href="#editKuitansiTransaksi" data-bs-toggle="modal" class="btn btn-ghost-secondary btn-icon shadow-none" 
-                                    wire:click="$emit('loadKuitansiTransaksi', {{ $kuitansi->ms_kuitansi_pembayaran_id }}, {{ $selectedJenjang }})">
+                                    wire:click="$emit('loadKuitansiTransaksi', {{ $kuitansi->ms_kuitansi_pembayaran_tagihan_siswa_id }}, {{ $selectedJenjang }})">
                                         <i class="ri-quill-pen-line fs-20" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Edit Kuitansi"></i>
                                     </a>
                                     @endif
@@ -90,11 +90,11 @@
                             </table> 
                              <!-- Catatan -->
                             <div class="my-4 px-2 pe-4" style="font-family: 'Times New Roman', Times, serif; font-size: 14pt;">
-                                <p align='justify'>{{ $kuitansi->pesan }}</p>
-                                <p>{{ $kuitansi->tempat }}, 26-05-2025</p>
+                                <p align='center'>{{ $kuitansi->pesan }}</p>
+                                <p align='center'>{{ $kuitansi->tempat }}, 26-05-2025</p>
                             </div>
 
-                            <div class="pt-4 px-2" style="font-family: 'Times New Roman', Times, serif; font-size: 14pt;">
+                            <div class="pt-4 px-2 text-center" style="font-family: 'Times New Roman', Times, serif; font-size: 14pt;">
                                 <p class="mb-0">Nama Petugas S.Kom</p>
                             </div>
                         </div>
