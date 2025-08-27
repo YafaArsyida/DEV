@@ -113,7 +113,7 @@
                                                                 Rp{{ number_format($item->jumlah_tagihan_siswa - $item->jumlah_sudah_dibayar(), 0, ',', '.') }}
                                                             </span>
                                                         </td>
-                                                        <td>{{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($item->tanggal_jatuh_tempo, 'd F Y') }}</td>
+                                                        <td>{{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($item->ms_jenis_tagihan_siswa->tanggal_jatuh_tempo, 'd F Y') }}</td>
                                                         <td class="
                                                             {{ $item->status === 'Belum Dibayar' ? 'text-warning' : '' }}
                                                             {{ $item->status === 'Masih Dicicil' ? 'text-info' : '' }}

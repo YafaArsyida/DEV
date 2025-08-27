@@ -31,7 +31,9 @@ use App\Http\Controllers\LaporanTabunganSiswa;
 use App\Http\Controllers\LaporanTagihanSiswa;
 use App\Http\Controllers\ManajemenKepegawaian;
 use App\Http\Controllers\PenggunaJenjang;
-use App\Http\Controllers\SmartCanteen;
+use App\Http\Controllers\SmartCanteenAdministrasiProduk;
+use App\Http\Controllers\SmartCanteenDashboard;
+use App\Http\Controllers\SmartCanteenTransaksiProduk;
 use App\Http\Controllers\TagihanJenis;
 use App\Http\Controllers\TagihanSiswa;
 use App\Http\Controllers\TransaksiEduPaySiswa;
@@ -56,7 +58,6 @@ Route::get('/', function () {
 });
 
 // Route::get('/', [LandingEkstrakurikuler::class, 'index'])->name('landing.ekstrakurikuler');
-Route::get('/smartcanteen', [SmartCanteen::class, 'index'])->name('smartcanteen');
 
 // login
 Route::get('/login', [LoginController::class, 'index'])->name('login.index')->middleware('guest');
@@ -69,6 +70,12 @@ Route::middleware(['auth'])->get('/dashboard', [DashboardController::class, 'ind
 // SISTEM
 // JENJANG TAHUN AJAR
 Route::middleware(['auth'])->group(function () {
+    // SMARTCANTEEN 
+    Route::get('/smartCanteen/dashboard', [SmartCanteenDashboard::class, 'index'])->name('smartCanteen.dashboard');
+    Route::get('/smartCanteen/administrasi/produk', [SmartCanteenAdministrasiProduk::class, 'index'])->name('smartCanteen.administrasi.produk');
+    Route::get('/smartCanteen/transaksi/produk', [SmartCanteenTransaksiProduk::class, 'index'])->name('smartCanteen.transaksi.produk');
+    // END SMARTCANTEEN 
+
     Route::get('/sistem/jenjang-tahun-ajar',  [JenjangTahunAjar::class, 'index'])->name('sistem.jenjang-tahun-ajar');
     Route::get('/sistem/dokumen-administrasi',  [DokumenAdministrasi::class, 'index'])->name('sistem.dokumen-administrasi');
     Route::get('/sistem/pengguna-jenjang',  [PenggunaJenjang::class, 'index'])->name('sistem.pengguna-jenjang');

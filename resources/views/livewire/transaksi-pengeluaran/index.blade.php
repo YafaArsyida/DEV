@@ -16,8 +16,8 @@
                             <div class="p-2 border border-dashed rounded">
                                 <div class="d-flex align-items-center">
                                     <div class="avatar-sm me-2">
-                                        <div class="avatar-title rounded bg-transparent text-info fs-24">
-                                            <i class="ri-inbox-archive-fill"></i>
+                                        <div class="avatar-title rounded bg-transparent text-danger fs-24">
+                                            <i class="ri-exchange-box-fill"></i>
                                         </div>
                                     </div>
                                     <div class="flex-grow-1">

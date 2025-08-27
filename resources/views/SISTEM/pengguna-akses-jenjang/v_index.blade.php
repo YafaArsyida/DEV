@@ -21,7 +21,7 @@
         <!-- end page title -->
         <div class="row">
             {{-- PENGGUNA --}}
-            <div class="col-xxl-6">
+            <div class="col-xxl-10">
                 @livewire('akses-jenjang.index')   
                 {{-- @livewire('pengguna.index')    --}}
                 @livewire('pengguna.create')

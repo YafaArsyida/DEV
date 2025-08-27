@@ -65,7 +65,11 @@ class Index extends Component
                 $kode_rekening_debit = $kode_rekening_kas;
             }
 
-            $deskripsi = "Pendapatan Lainnya Rp {$this->nominal}, " . $this->deskripsi;
+            $nama_transaksi = AkuntansiRekening::where('kode_rekening', $this->kode_rekening)
+                ->pluck('nama_rekening')
+                ->first();
+
+            $deskripsi = "{$nama_transaksi} Rp {$this->nominal}, {$this->deskripsi}";
 
             // Data untuk jurnal debit
             $jurnalDebit = [

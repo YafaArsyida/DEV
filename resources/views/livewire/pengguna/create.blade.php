@@ -12,7 +12,7 @@
                         <div class="row g-3">
                             <div class="col-lg-6">
                                 <label for="nama" class="form-label">Nama</label>
-                                <input type="text" wire:model="nama" id="nama" class="form-control" placeholder="Nama lengkap petugas" />
+                                <input type="text" wire:model.defer="nama" id="nama" class="form-control" placeholder="Nama lengkap petugas" />
                                 @error('nama') 
                                     <footer class="text-danger mt-0">{{ $message }}</footer>
                                 @enderror
@@ -21,8 +21,9 @@
                                 <label for="peran" class="form-label">Peran</label>
                                 <select id="peran" wire:model="peran" class="form-select">
                                     <option value="">Pilih Peran</option>
-                                    <option value="administrasi">Administrasi</option>
                                     <option value="superadmin">Super Admin</option>
+                                    <option value="administrasi">Administrasi</option>
+                                    <option value="kantin">Petugas Kantin</option>
                                 </select>
                                 @error('peran') 
                                     <footer class="text-danger mt-0">{{ $message }}</footer>
@@ -51,14 +52,14 @@
                             </div>
                             <div class="col-lg-6">
                                 <label for="email" class="form-label">Email/Username</label>
-                                <input type="text" wire:model="email" id="email" class="form-control" placeholder="user@example.com/jajangsukma" />
+                                <input type="text" wire:model.defer="email" id="email" class="form-control" placeholder="user@example.com/jajangsukma" />
                                 @error('email') 
                                     <footer class="text-danger mt-0">{{ $message }}</footer>
                                 @enderror
                             </div>
                             <div class="col-lg-6">
                                 <label for="password" class="form-label">Password</label>
-                                <input type="password" wire:model="password" id="password" class="form-control" placeholder="Minimal 6 karakter" />
+                                <input type="password" wire:model.defer="password" id="password" class="form-control" placeholder="Minimal 6 karakter" />
                                 @error('password') 
                                     <footer class="text-danger mt-0">{{ $message }}</footer>
                                 @enderror

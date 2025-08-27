@@ -407,7 +407,14 @@
                         <a class="nav-link menu-link" href="menu-submenu.html">
                             <i class="mdi mdi-view-list-outline"></i> <span data-key="t-menu-submenu">Menu & Sub-Menu</span>
                         </a>
-                    </li>               
+                    </li>       
+                    <li class="menu-title"><span data-key="t-menu">modul</span></li>
+                    <!-- Jenjang & Tahun Ajaran -->
+                    <li class="nav-item">
+                        <a class="nav-link menu-link" href="{{ route('smartCanteen.dashboard') }}">
+                            <i class="mdi mdi-calendar-outline"></i> <span data-key="t-tahun-ajaran">SmartCanteen - Self Service</span>
+                        </a>
+                    </li>
                 {{-- @endif --}}
             </ul>
         </div>
