@@ -16,6 +16,7 @@ class KategoriProdukKantin extends Model
     protected $fillable = [
         'ms_jenjang_id',
         'nama_kategori_produk_kantin',
+        'icon',
         'deskripsi',
     ];
 

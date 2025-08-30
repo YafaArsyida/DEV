@@ -943,6 +943,16 @@
                     }
                 }
             });
+            window.addEventListener('hide-modal', (event) => {
+                let modalId = event.detail.modalId;
+                let modal = document.getElementById(modalId);
+                if (modal) {
+                    let bootstrapModal = bootstrap.Modal.getInstance(modal);
+                    if (bootstrapModal) {
+                        bootstrapModal.hide();
+                    }
+                }
+            });
             // modal
             Livewire.on('openNewTab', (url) => {
                 setTimeout(function() {

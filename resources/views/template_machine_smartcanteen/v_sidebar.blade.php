@@ -43,8 +43,8 @@
                 <li class="menu-title"><span data-key="t-administrasi">Administrasi</span></li>
                 
                 <li class="nav-item">
-                    <a href="{{ route('akuntansi.konfigurasi') }}"
-                    class="nav-link menu-link {{ request()->routeIs('akuntansi.konfigurasi') ? 'active' : '' }}">
+                    <a href="{{ route('smartCanteen.administrasi.produk') }}"
+                    class="nav-link menu-link {{ request()->routeIs('smartCanteen.administrasi.produk') ? 'active' : '' }}">
                         <i class="mdi mdi-school-outline"></i>
                         <span data-key="t-kelas-siswa">Master Produk</span>
                     </a>

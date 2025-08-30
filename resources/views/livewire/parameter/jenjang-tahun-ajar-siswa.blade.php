@@ -65,7 +65,7 @@
                 </div>
             </div>
             <div class="col-xl-12">
-                    <div class="mt-4">
+                <div class="mt-4">
                     <div class="live-preview">
                     <!-- Jika Jenjang atau Tahun Ajar belum dipilih -->
                     @if (!$selectedJenjang || !$selectedTahunAjar)

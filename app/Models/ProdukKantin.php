@@ -20,7 +20,9 @@ class ProdukKantin extends Model
         'stok',
         'satuan',
         'status',
-        'deskripsi'
+        'deskripsi',
+        'icon',
+        'icon_color',
     ];
 
     /**
