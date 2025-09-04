@@ -1,5 +1,5 @@
 <!doctype html>
-<html data-layout="vertical" data-topbar="light" data-sidebar="light" data-bs-theme="light" data-sidebar-size="lg" data-sidebar-image="none" data-preloader="disable">
+<html data-layout="horizontal" data-topbar="light" data-sidebar="light" data-bs-theme="light" data-sidebar-size="lg" data-sidebar-image="none" data-preloader="disable">
 
     <head>
         @include('template_machine.v_head')

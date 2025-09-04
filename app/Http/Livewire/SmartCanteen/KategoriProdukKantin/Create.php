@@ -4,6 +4,7 @@ namespace App\Http\Livewire\SmartCanteen\KategoriProdukKantin;
 
 use App\Models\KategoriProdukKantin;
 use Livewire\Component;
+use Illuminate\Support\Facades\DB;
 
 class Create extends Component
 {
@@ -39,8 +40,10 @@ class Create extends Component
 
     public function save()
     {
+        $validatedData = $this->validate();
+        DB::beginTransaction();
+
         try {
-            $validatedData = $this->validate();
 
             KategoriProdukKantin::create([
                 'ms_jenjang_id' => $this->ms_jenjang_id,
@@ -49,8 +52,12 @@ class Create extends Component
                 'icon'       => $this->icon,
             ]);
 
+            DB::commit();
+
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'Berhasil menambah kategori!']);
         } catch (\Exception $e) {
+            DB::rollBack();
+
             $this->dispatchBrowserEvent('alertify-error', ['message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
         $this->resetInput();

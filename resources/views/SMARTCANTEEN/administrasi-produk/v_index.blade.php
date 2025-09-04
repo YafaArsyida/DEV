@@ -19,6 +19,7 @@
             <div class="col-xxl-12">
                 @livewire('smart-canteen.produk-kantin.index')   
                 @livewire('smart-canteen.produk-kantin.create')   
+                @livewire('smart-canteen.produk-kantin.detail')   
                 @livewire('smart-canteen.produk-kantin.edit')   
                 @livewire('smart-canteen.produk-kantin.delete')
 

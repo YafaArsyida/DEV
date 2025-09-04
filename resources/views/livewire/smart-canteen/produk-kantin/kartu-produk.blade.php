@@ -7,9 +7,20 @@
                     <i class="{{ $item->icon ?? 'mdi mdi-cube-outline' }} {{ $item->icon_color ?? 'text-primary' }} mb-2"
                     style="font-size: 35px;" data-bs-toggle="dropdown"></i>
                     <div class="dropdown-menu dropdown-menu-end">
-                        <a class="dropdown-item" href="#">Edit</a>
-                        <a class="dropdown-item" href="#">Remove</a>
-                        <a class="dropdown-item" href="#">Detail</a>
+                        <a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="modal" 
+                        data-bs-target="#ModalDetailProduk" wire:click="$emit('showDetailProduk', {{ $item->ms_produk_kantin_id }})">
+                            Detail
+                        </a>
+                        <a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="modal" 
+                            data-bs-target="#ModalEditProduk" 
+                            wire:click="$emit('showEditProduk', {{ $item->ms_produk_kantin_id }})">
+                            Edit
+                        </a>
+                        <a class="dropdown-item text-danger" href="javascript:void(0);"
+                            data-bs-toggle="modal" data-bs-target="#ModalDeleteProduk"
+                            wire:click="$emit('confirmDeleteProduk', {{ $item->ms_produk_kantin_id }})">
+                            Hapus
+                        </a>
                     </div>
                 </div>
 

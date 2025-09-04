@@ -4,6 +4,7 @@ namespace App\Http\Livewire\SmartCanteen\KategoriProdukKantin;
 
 use App\Models\KategoriProdukKantin;
 use Livewire\Component;
+use Illuminate\Support\Facades\DB;
 
 class Edit extends Component
 {
@@ -40,8 +41,10 @@ class Edit extends Component
 
     public function update()
     {
+        $validatedData = $this->validate();
+        DB::beginTransaction();
+
         try {
-            $validated = $this->validate();
 
             $kategori = KategoriProdukKantin::findOrFail($this->ms_kategori_produk_kantin_id);
             $kategori->update([
@@ -50,12 +53,15 @@ class Edit extends Component
                 'deskripsi' => $this->deskripsi,
                 'icon' => $this->icon,
             ]);
+            DB::commit();
 
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'Berhasil mengubah kategori!']);
             $this->dispatchBrowserEvent('hide-modal', ['modalId' => 'ModalEditKategori']);
             $this->emit('refreshKategori');
             $this->emit('refreshProduk');
         } catch (\Exception $e) {
+            DB::rollBack();
+
             $this->dispatchBrowserEvent('alertify-error', ['message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
     }

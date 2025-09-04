@@ -6,7 +6,9 @@
             </div>
             <div class="col-sm-auto">
                 <div class="d-flex gap-1 flex-wrap">
-                    <button type="button" class="btn btn-success add-btn" data-bs-toggle="modal" id="create-btn" data-bs-target="#modalTambah">
+                    <button type="button" class="btn btn-success add-btn" data-bs-toggle="modal" 
+                        data-bs-target="#ModalTambahProduk"
+                        wire:click="$emit('showCreateProduk', {{ $selectedJenjang ?? 'null' }})">
                         <i class="ri-add-line align-bottom me-1"></i> Tambah Produk
                     </button>
                     <button type="button" class="btn btn-info">

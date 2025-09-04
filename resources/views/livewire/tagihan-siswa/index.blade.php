@@ -76,17 +76,17 @@
                             <td>{{ $item->jumlah_jenis_tagihan_siswa() }} item</td>
                             <td>
                                 <span class="fs-14 fw-medium text-info">
-                                Rp{{ number_format($item->total_tagihan_siswa(), 0, ',', '.') }}
+                                RP{{ number_format($item->total_tagihan_siswa(), 0, ',', '.') }}
                                 </span>
                             </td>
                             <td>
                                 <span class="fs-14 fw-medium text-success">
-                                    Rp{{ number_format($item->total_dibayarkan(), 0, ',', '.') }}</td>
+                                    RP{{ number_format($item->total_dibayarkan(), 0, ',', '.') }}</td>
                                 </span>
                             </td>
                             <td>
                                 <span class="fs-14 fw-medium text-danger">
-                                    Rp{{ number_format($item->total_tagihan_siswa() - $item->total_dibayarkan(), 0, ',', '.') }}
+                                    RP{{ number_format($item->total_tagihan_siswa() - $item->total_dibayarkan(), 0, ',', '.') }}
                                 </span>
                             </td>
                             <td class="text-start">
@@ -171,17 +171,17 @@
                             </td>
                             <td>
                                 <span class="fs-14 fw-medium text-info">
-                                    Rp{{ number_format($totalTagihan, 0, ',', '.') }}
+                                    RP{{ number_format($totalTagihan, 0, ',', '.') }}
                                 </span>
                             </td>
                             <td>
                                 <span class="fs-14 fw-medium text-success">
-                                    Rp{{ number_format($totalDibayarkan, 0, ',', '.') }}
+                                    RP{{ number_format($totalDibayarkan, 0, ',', '.') }}
                                 </span>
                             </td>
                             <td>
                                 <span class="fs-14 fw-medium text-danger">
-                                    Rp{{ number_format($totalKekurangan, 0, ',', '.') }}
+                                    RP{{ number_format($totalKekurangan, 0, ',', '.') }}
                                 </span>
                             </td>
                             <td>

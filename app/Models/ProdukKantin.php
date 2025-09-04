@@ -14,6 +14,7 @@ class ProdukKantin extends Model
     protected $primaryKey = 'ms_produk_kantin_id';
     protected $fillable = [
         'ms_jenjang_id',
+        'ms_produk_id',
         'ms_kategori_produk_kantin_id',
         'nama_produk_kantin',
         'harga',

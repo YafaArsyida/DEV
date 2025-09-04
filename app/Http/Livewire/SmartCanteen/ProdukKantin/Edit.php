@@ -2,12 +2,134 @@
 
 namespace App\Http\Livewire\SmartCanteen\ProdukKantin;
 
+use App\Models\KategoriProdukKantin;
+use App\Models\ProdukKantin;
 use Livewire\Component;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class Edit extends Component
 {
+    public $ms_jenjang_id;
+    public $ms_kategori_produk_kantin_id;
+    public $nama_produk_kantin;
+    public $harga;
+    public $stok;
+    public $satuan;
+    public $status;
+    public $deskripsi;
+    public $icon;
+    public $icon_color;
+
+    protected $listeners = [
+        'showEditProduk'
+    ];
+
+    public $ms_produk_kantin_id; // buat simpan id produk yang sedang di-edit
+
+    public function showEditProduk($ms_produk_kantin_id)
+    {
+        $produk = ProdukKantin::findOrFail($ms_produk_kantin_id);
+        $this->ms_produk_kantin_id = $produk->ms_produk_kantin_id;
+
+        $this->ms_jenjang_id = $produk->ms_jenjang_id;
+        $this->ms_kategori_produk_kantin_id = $produk->ms_kategori_produk_kantin_id;
+        $this->nama_produk_kantin = $produk->nama_produk_kantin;
+        $this->harga = $produk->harga;
+        $this->stok = $produk->stok;
+        $this->satuan = $produk->satuan;
+        $this->status = $produk->status;
+        $this->deskripsi = $produk->deskripsi;
+        $this->icon = $produk->icon;
+        $this->icon_color = $produk->icon_color;
+    }
+    protected function rules()
+    {
+        return [
+            'ms_jenjang_id' => 'required|exists:ms_jenjang,ms_jenjang_id',
+            'ms_kategori_produk_kantin_id' => 'required|exists:ms_kategori_produk_kantin,ms_kategori_produk_kantin_id',
+            'nama_produk_kantin' => 'required|string|max:255',
+            'harga' => 'required|numeric|min:100',
+            'stok' => 'required|integer|min:1',
+            'satuan' => 'required|string|max:20',
+            'status' => 'required|boolean',
+            'deskripsi' => 'nullable|string|max:1000',
+            'icon' => 'nullable|string|max:100',
+            'icon_color' => 'nullable|string|max:50',
+        ];
+    }
+
+    protected $messages = [
+        'ms_jenjang_id.required' => 'Jenjang wajib dipilih.',
+        'ms_jenjang_id.exists' => 'Jenjang tidak valid.',
+
+        'ms_kategori_produk_kantin_id.required' => 'Kategori wajib dipilih.',
+        'ms_kategori_produk_kantin_id.exists' => 'Kategori tidak valid.',
+
+        'nama_produk_kantin.required' => 'Nama produk tidak boleh kosong.',
+        'nama_produk_kantin.max' => 'Nama produk maksimal 255 karakter.',
+
+        'harga.required' => 'Harga wajib diisi.',
+        'harga.numeric' => 'Harga harus berupa angka.',
+        'harga.min' => 'Harga minimal Rp 100.',
+
+        'stok.required' => 'Stok wajib diisi.',
+        'stok.integer' => 'Stok harus berupa angka bulat.',
+        'stok.min' => 'Minimal stok adalah 1.',
+
+        'satuan.required' => 'Satuan wajib diisi.',
+        'satuan.max' => 'Satuan maksimal 20 karakter.',
+
+        'status.required' => 'Status wajib diisi.',
+        'status.boolean' => 'Status hanya boleh aktif atau non-aktif.',
+
+        'deskripsi.string' => 'Deskripsi harus berupa teks.',
+        'deskripsi.max' => 'Deskripsi maksimal 1000 karakter.',
+
+        'icon.string' => 'Icon harus berupa teks.',
+        'icon.max' => 'Icon maksimal 100 karakter.',
+
+        'icon_color.string' => 'Warna icon harus berupa teks.',
+        'icon_color.max' => 'Warna icon maksimal 50 karakter.',
+    ];
+
+    public function update()
+    {
+        $validatedData = $this->validate();
+        DB::beginTransaction();
+
+        try {
+
+            $produk = ProdukKantin::findOrFail($this->ms_produk_kantin_id);
+            $produk->update([
+                'ms_jenjang_id' => $this->ms_jenjang_id,
+                'ms_kategori_produk_kantin_id' => $this->ms_kategori_produk_kantin_id,
+                'nama_produk_kantin' => $this->nama_produk_kantin,
+                'harga' => $this->harga,
+                'stok' => $this->stok,
+                'satuan' => $this->satuan,
+                'status' => $this->status,
+                'deskripsi' => $this->deskripsi,
+                'icon' => $this->icon,
+                'icon_color' => $this->icon_color,
+            ]);
+
+            DB::commit();
+
+            $this->dispatchBrowserEvent('alertify-success', ['message' => 'Produk berhasil diupdate!']);
+            $this->dispatchBrowserEvent('hide-modal', ['modalId' => 'ModalEditProduk']);
+            $this->emit('refreshProduk');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Gagal update: ' . $e->getMessage()]);
+        }
+    }
+
     public function render()
     {
-        return view('livewire.smart-canteen.produk-kantin.edit');
+        return view('livewire.smart-canteen.produk-kantin.edit', [
+            'kategoriList' => KategoriProdukKantin::all(),
+        ]);
     }
 }
