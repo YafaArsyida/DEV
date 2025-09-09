@@ -9,6 +9,6 @@ class SmartCanteenTransaksiProduk extends Controller
 {
     public function index()
     {
-        return view('SMARTCANTEEN.dashboard.v_index');
+        return view('SMARTCANTEEN.transaksi-produk.v_index');
     }
 }

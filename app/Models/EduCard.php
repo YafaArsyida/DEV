@@ -21,4 +21,9 @@ class EduCard extends Model
         'status_kartu',
         'deskripsi',
     ];
+    // 🔗 Relasi balik ke siswa
+    public function ms_siswa()
+    {
+        return $this->belongsTo(Siswa::class, 'ms_siswa_id', 'ms_siswa_id');
+    }
 }

@@ -5,12 +5,6 @@
             <div class="col-sm-4">
                 <p class="text-muted mb-2 text-uppercase fw-semibold">KERANJANG</p>
             </div>
-            {{-- <div class="col-sm-auto ms-auto">
-                <div class="hstack gap-2">
-                    <button type="button" class="btn btn-primary btn-label waves-effect waves-light"><i class="ri-user-smile-line label-icon align-middle align-bottom me-2"></i> Simpan</button>
-                    <button type="button" class="btn btn-primary btn-label waves-effect waves-light"><i class="ri-user-smile-line label-icon align-middle align-bottom me-2"></i> Cetak</button>
-                </div>
-            </div> --}}
         </div>
         <div class="table-responsive">
             <table class="table table-borderless table-hover text-center table-nowrap align-middle mb-0">
@@ -103,8 +97,6 @@
                     <i class="ri-printer-line align-bottom"></i> Cetak
                 </a>
             @endif
-            {{-- <a href="javascript:void(0);" class="btn btn-primary"><i class="ri-download-2-line align-bottom me-1"></i> Download</a> --}}
         </div>
-
     </div>
 </div>

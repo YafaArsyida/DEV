@@ -45,40 +45,53 @@
 
                     </div>
                     <div class="row">
-                    <!-- Pilih Icon -->
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Icon Produk</label>
-                        <select class="form-select" wire:model.defer="icon">
-                            <option value="">-- Pilih Icon --</option>
-                            <option value="mdi mdi-pizza">🍕 Pizza</option>
-                            <option value="mdi mdi-cup-water">🥤 Minuman</option>
-                            <option value="mdi mdi-candy">🍬 Permen</option>
-                            <option value="mdi mdi-ice-cream">🍦 Es Krim</option>
-                            <option value="mdi mdi-hamburger">🍔 Burger</option>
-                            <option value="mdi mdi-food-apple">🍎 Buah</option>
-                            <option value="mdi mdi-noodles">🍜 Mie</option>
-                            <option value="mdi mdi-fish">🐟 Ikan</option>
-                        </select>
-                        @error('icon') <span class="text-danger">{{ $message }}</span> @enderror
-                    </div>
+                        <!-- Pilih Icon -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Icon Produk</label>
+                            <select class="form-select" wire:model.defer="icon">
+                                <option value="">-- Pilih Icon --</option>
+                                <option value="mdi mdi-pizza">🍕 Pizza</option>
+                                <option value="mdi mdi-cup-water">🥤 Minuman</option>
+                                <option value="mdi mdi-candy">🍬 Permen</option>
+                                <option value="mdi mdi-ice-cream">🍦 Es Krim</option>
+                                <option value="mdi mdi-hamburger">🍔 Burger</option>
+                                <option value="mdi mdi-food-apple">🍎 Buah</option>
+                                <option value="mdi mdi-noodles">🍜 Mie</option>
+                                <option value="mdi mdi-fish">🐟 Ikan</option>
+                            </select>
+                            @error('icon') <span class="text-danger">{{ $message }}</span> @enderror
+                        </div>
 
-                    <!-- Pilih Warna -->
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Warna Icon</label>
-                        <select class="form-select" wire:model.defer="icon_color">
-                            <option value="">-- Pilih Warna --</option>
-                            <option value="text-primary">Biru Tua</option>
-                            <option value="text-info">Biru Muda</option>
-                            <option value="text-success">Hijau</option>
-                            <option value="text-danger">Merah</option>
-                            <option value="text-warning">Kuning</option>
-                            <option value="text-secondary">Abu-abu</option>
-                            <option value="text-dark">Hitam</option>
-                        </select>
-                        @error('icon_color') <span class="text-danger">{{ $message }}</span> @enderror
-                    </div>
-                </div>
+                        <!-- Pilih Warna -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Warna Icon</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                @php
+                                    $colors = [
+                                        'text-primary' => 'Biru Tua',
+                                        'text-info' => 'Biru Muda',
+                                        'text-success' => 'Hijau',
+                                        'text-danger' => 'Merah',
+                                        'text-warning' => 'Kuning',
+                                        'text-secondary' => 'Abu-abu',
+                                        'text-dark' => 'Hitam',
+                                    ];
+                                @endphp
 
+                                @foreach($colors as $class => $label)
+                                    <button type="button"
+                                        class="btn avatar-xs p-0 d-flex align-items-center justify-content-center border rounded-circle fs-20 
+                                        {{ $icon_color === $class ? 'border-2 border-dark' : '' }}"
+                                        wire:click="$set('icon_color', '{{ $class }}')"
+                                        data-bs-toggle="tooltip"
+                                        title="{{ $label }}">
+                                        <i class="ri-checkbox-blank-circle-fill {{ $class }}"></i>
+                                    </button>
+                                @endforeach
+                            </div>
+                            @error('icon_color') <span class="text-danger">{{ $message }}</span> @enderror
+                        </div>
+                    </div>
                     
                     <div class="mb-3">
                         <label>Deskripsi</label>

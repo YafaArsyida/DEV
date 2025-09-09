@@ -51,8 +51,8 @@
                 </li>
                 <li class="menu-title"><span data-key="t-administrasi">Transaksi</span></li>
                 <li class="nav-item">
-                    <a href="{{ route('akuntansi.konfigurasi') }}"
-                    class="nav-link menu-link {{ request()->routeIs('akuntansi.konfigurasi') ? 'active' : '' }}">
+                    <a href="{{ route('smartCanteen.transaksi.produk') }}"
+                    class="nav-link menu-link {{ request()->routeIs('smartCanteen.transaksi.produk') ? 'active' : '' }}">
                         <i class="mdi mdi-school-outline"></i>
                         <span data-key="t-kelas-siswa">Pembelian Produk</span>
                     </a>

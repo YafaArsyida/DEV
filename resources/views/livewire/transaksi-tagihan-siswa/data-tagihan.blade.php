@@ -102,7 +102,7 @@
                         </div>
                     </div>
                     <div class="flex-grow-1">
-                        <a href="" class="text-muted mb-1" data-bs-toggle="offcanvas" data-bs-target="#offcanvasEduPay" aria-controls="offcanvasEduPay">EduPay smart payment :
+                        <a href="" class="text-muted mb-1" data-bs-toggle="offcanvas" data-bs-target="#offcanvasEduPay" aria-controls="offcanvasEduPay">EduPay Uang Digital :
                             <i class="ri-money-dollar-circle-line text-success fs-24 float-end align-bottom" 
                             role="button"
                             wire:click.prevent="$emitTo('transaksi-edu-pay-siswa.index', 'showEduPay', {
