@@ -7,11 +7,11 @@ use Livewire\Component;
 
 class ScanSmartCard extends Component
 {
+    public $user_type;
+    public $user_id;
+    public $nama;
     public $educard;
-    public $nama_siswa;
-    public $ms_siswa_id;
     public $saldo_edupay;
-    public $smartcard;
 
     protected $listeners = [
         'openScanModal'
@@ -20,29 +20,49 @@ class ScanSmartCard extends Component
     // Reset saat modal dibuka
     public function openScanModal()
     {
-        $this->reset(['educard', 'nama_siswa', 'saldo_edupay', 'smartcard']);
+        $this->reset([
+            'user_type',
+            'user_id',
+            'nama',
+            'educard',
+            'saldo_edupay',
+        ]);
     }
 
     // Jalankan ketika kode kartu diinputkan
-    public function updatedEducard($value)
+    public function updatedEduCard($value)
     {
-        $card = EduCard::with('ms_siswa')
+        $card = EduCard::with(['ms_siswa', 'ms_pegawai'])
             ->where('kode_kartu', $value)
             ->first();
 
-        if ($card && $card->ms_siswa) {
-            $this->ms_siswa_id = $card->ms_siswa->ms_siswa_id;
-            $this->nama_siswa = $card->ms_siswa->nama_siswa;
-            $this->educard  = $card->kode_kartu;
-            $this->saldo_edupay      = $card->ms_siswa->saldo_edupay_siswa();
+        if ($card) {
+            if ($card->ms_siswa) {
+                // Jika pemilik kartu adalah siswa
+                $this->user_type    = 'siswa';
+                $this->user_id      = $card->ms_siswa->ms_siswa_id;
+                $this->nama         = $card->ms_siswa->nama_siswa;
+                $this->educard      = $card->kode_kartu;
+                $this->saldo_edupay = $card->ms_siswa->saldo_edupay_siswa();
+            } elseif ($card->ms_pegawai) {
+                // Jika pemilik kartu adalah pegawai
+                $this->user_type    = 'pegawai';
+                $this->user_id      = $card->ms_pegawai->ms_pegawai_id;
+                $this->nama         = $card->ms_pegawai->nama_pegawai;
+                $this->educard      = $card->kode_kartu;
+                $this->saldo_edupay = 1234;
+                // $this->saldo_edupay = $card->ms_pegawai->saldo_edupay_pegawai();
+            }
 
             // Emit ke parent / komponen lain kalau perlu
             $this->emit('scanSuccess', [
-                'ms_siswa_id'   => $this->ms_siswa_id,
-                'nama_siswa'   => $this->nama_siswa,
-                'educard'  => $this->educard,
+                'user_type'     => $this->user_type,
+                'user_id'       => $this->user_id,
+                'nama'          => $this->nama,
+                'educard'       => $this->educard,
                 'saldo_edupay'  => $this->saldo_edupay,
             ]);
+
             $this->dispatchBrowserEvent('hide-delete-modal', ['modalId' => 'ModalScanRFID']);
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'Kartu sukses.']);
         } else {

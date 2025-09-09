@@ -25,23 +25,12 @@
 
                             {{-- Input Smart Card --}}
                             <input type="text" 
-                                id="rfidInput" wire:model="educard"
+                                id="rfidInput" wire:model.debounce.500ms="educard"
                                 class="form-control text-center fs-5 fw-bold" 
                                 placeholder="Tempel kartu di sini..."
                                 autocomplete="off">
-
-                            {{-- Tombol --}}
-                            <div class="hstack gap-2 justify-content-center mt-4">
-                                <button type="button" class="btn btn-link link-secondary fw-medium text-decoration-none shadow-none" data-bs-dismiss="modal">
-                                    <i class="ri-close-line me-1 align-middle"></i> Batal
-                                </button>
-                                <button type="button" class="btn btn-success">
-                                    <i class="ri-check-line me-1 align-middle"></i> Konfirmasi
-                                </button>
-                            </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>

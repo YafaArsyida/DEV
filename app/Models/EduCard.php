@@ -26,4 +26,9 @@ class EduCard extends Model
     {
         return $this->belongsTo(Siswa::class, 'ms_siswa_id', 'ms_siswa_id');
     }
+
+    public function ms_pegawai()
+    {
+        return $this->belongsTo(Pegawai::class, 'ms_pegawai_id', 'ms_pegawai_id');
+    }
 }

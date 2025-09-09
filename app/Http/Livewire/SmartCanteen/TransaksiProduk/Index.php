@@ -4,7 +4,9 @@ namespace App\Http\Livewire\SmartCanteen\TransaksiProduk;
 
 use App\Models\Jenjang;
 use App\Models\KategoriProdukKantin;
+use App\Models\KategoriProdukSmartCanteen;
 use App\Models\ProdukKantin;
+use App\Models\ProdukSmartCanteen;
 use Livewire\Component;
 
 class Index extends Component
@@ -14,8 +16,9 @@ class Index extends Component
     public $namaJenjang = '';
     public $selectedKategori = null;
 
-    public $ms_siswa_id;
-    public $nama_siswa;
+    public $user_type;
+    public $user_id;
+    public $nama;
     public $educard;
     public $saldo_edupay;
 
@@ -48,15 +51,16 @@ class Index extends Component
 
     public function scanSuccess($data)
     {
-        $this->ms_siswa_id = $data['ms_siswa_id'];
-        $this->nama_siswa  = $data['nama_siswa'];
-        $this->educard     = $data['educard'];
+        $this->user_type    = $data['user_type'];   // 'siswa' atau 'pegawai'
+        $this->user_id      = $data['user_id'];     // ms_siswa_id atau ms_pegawai_id
+        $this->nama         = $data['nama'];        // nama siswa/pegawai
+        $this->educard      = $data['educard'];
         $this->saldo_edupay = $data['saldo_edupay'];
     }
-    
+
     public function render()
     {
-        $query = ProdukKantin::query();
+        $query = ProdukSmartCanteen::query();
 
         if ($this->selectedJenjang) {
             $query->where('ms_jenjang_id', $this->selectedJenjang);
@@ -68,10 +72,9 @@ class Index extends Component
 
         // ini ambil SEMUA produk sesuai jenjang + search
         $allProduk = $query->get();
-        // dd($allProduk->toArray());
 
         // ambil kategori
-        $kategori = KategoriProdukKantin::where('ms_jenjang_id', $this->selectedJenjang)->get();
+        $kategori = KategoriProdukSmartCanteen::where('ms_jenjang_id', $this->selectedJenjang)->get();
 
         return view('livewire.smart-canteen.transaksi-produk.index', [
             'allProduk' => $allProduk,

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class ProdukKantin extends Model
+class ProdukSmartCanteen extends Model
 {
     use HasFactory;
     use SoftDeletes;
@@ -38,6 +38,6 @@ class ProdukKantin extends Model
 
     public function ms_kategori_produk_kantin()
     {
-        return $this->belongsTo(KategoriProdukKantin::class, 'ms_kategori_produk_kantin_id');
+        return $this->belongsTo(KategoriProdukSmartCanteen::class, 'ms_kategori_produk_kantin_id');
     }
 }

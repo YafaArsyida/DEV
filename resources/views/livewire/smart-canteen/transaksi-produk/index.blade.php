@@ -4,7 +4,7 @@
             <!-- Kiri: Nama & SmartCard -->
             <div>
                 <h4 class="mb-1 fw-bold text-dark">
-                    {{ $nama_siswa ?: 'Belum ada siswa' }}
+                    {{ $nama ?: 'Belum ada pengguna' }}
                 </h4>
                 <div class="text-muted">
                     SmartCard : 
@@ -28,10 +28,11 @@
                     <a href="#ModalScanRFID" data-bs-toggle="modal" 
                     class="btn btn-light btn-icon shadow-sm"
                     wire:click.prevent="$emit('openScanModal')">
-                        <i class="ri-qr-scan-2-line align-bottom fs-20"></i>
+                        <i class="ri-qr-scan-2-line align-bottom text-primary fs-20"></i>
                     </a>
                 </div>
             </div>
+
 
         </div>
     </div>
