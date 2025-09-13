@@ -5,19 +5,19 @@
 
                 <!-- Ikon Produk -->
                 <div class="position-relative d-inline-block mx-auto">
-                    <i class="{{ $item->icon ?? 'mdi mdi-cube-outline' }} {{ $item->icon_color ?? 'text-primary' }} mb-2"
+                    <i wire:click="$emit('tambahKeranjang', {{ $item->ms_produk_kantin_id }})" class="{{ $item->icon ?? 'mdi mdi-cube-outline' }} {{ $item->icon_color ?? 'text-primary' }} mb-2"
                        style="font-size: 35px;"></i>
                 </div>
 
                 <!-- Nama Produk -->
-                <h5 class="mb-0 fs-12 fw-semibold text-uppercase text-truncate" 
+                <h5 wire:click="$emit('tambahKeranjang', {{ $item->ms_produk_kantin_id }})" class="mb-0 fs-12 fw-semibold text-uppercase text-truncate" 
                     title="{{ $item->nama_produk_kantin }}">
                     {{ $item->nama_produk_kantin }}
                 </h5>
 
                 <!-- Harga -->
                 <h4 class="mb-2 fs-20 fw-bold ff-secondary text-success">
-                    Rp {{ number_format($item->harga, 0, ',', '.') }}
+                    RP{{ number_format($item->harga, 0, ',', '.') }}
                 </h4>
 
                 <!-- Tombol Tambah Keranjang -->

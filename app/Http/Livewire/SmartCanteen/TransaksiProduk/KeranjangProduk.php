@@ -61,6 +61,60 @@ class KeranjangProduk extends Component
         $this->emitSelf('$refresh'); // Memicu render ulang komponen sendiri
     }
 
+    public function incrementQty($ms_keranjang_smartcanteen_id)
+    {
+        $ms_pengguna_id = auth()->id();
+
+        $item = KeranjangSmartCanteen::where('ms_keranjang_smartcanteen_id', $ms_keranjang_smartcanteen_id)
+            ->where('user_id', $this->user_id)
+            ->where('ms_pengguna_id', $ms_pengguna_id)
+            ->first();
+
+        if ($item) {
+            $item->increment('jumlah_produk');
+            $this->emitSelf('$refresh');
+            $this->dispatchBrowserEvent('alertify-success', ['message' => 'Berhasil menambah produk']);
+        }
+    }
+
+    public function decrementQty($ms_keranjang_smartcanteen_id)
+    {
+        $ms_pengguna_id = auth()->id();
+
+        $item = KeranjangSmartCanteen::where('ms_keranjang_smartcanteen_id', $ms_keranjang_smartcanteen_id)
+            ->where('user_id', $this->user_id)
+            ->where('ms_pengguna_id', $ms_pengguna_id)
+            ->first();
+
+        if ($item) {
+            if ($item->jumlah_produk > 1) {
+                $item->decrement('jumlah_produk');
+                $this->dispatchBrowserEvent('alertify-success', ['message' => 'Berhasil mengurangi produk']);
+            } else {
+                $this->dispatchBrowserEvent('alertify-error', ['message' => 'Produk dihapus dari keranjang']);
+                $item->delete();
+            }
+            $this->emitSelf('$refresh');
+        }
+    }
+
+    public function hapusKeranjang($ms_keranjang_smartcanteen_id)
+    {
+        $ms_pengguna_id = auth()->id();
+
+        $item = KeranjangSmartCanteen::where('ms_keranjang_smartcanteen_id', $ms_keranjang_smartcanteen_id)
+            ->where('user_id', $this->user_id)
+            ->where('ms_pengguna_id', $ms_pengguna_id)
+            ->first();
+
+        if ($item) {
+            $item->delete();
+            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Produk dihapus dari keranjang']);
+            $this->emitSelf('$refresh');
+        } else {
+            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Produk tidak ditemukan']);
+        }
+    }
 
     public function render()
     {
@@ -79,16 +133,6 @@ class KeranjangProduk extends Component
                 return ($item->ms_produk_kantin->harga ?? 0) * $item->jumlah_produk;
             });
         }
-        // dd([
-        //     'user_type'    => $this->user_type,
-        //     'user_id'      => $this->user_id,
-        //     'nama'         => $this->nama,
-        //     'educard'      => $this->educard,
-        //     'saldo_edupay' => $this->saldo_edupay,
-        //     'keranjang'    => $keranjang,
-        //     'totalKeranjang' => $this->totalKeranjang,
-        // ]);
-
 
         return view('livewire.smart-canteen.transaksi-produk.keranjang-produk', [
             'keranjang' => $keranjang,

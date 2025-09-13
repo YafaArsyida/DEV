@@ -11,9 +11,9 @@
             <table class="table table-borderless align-middle mb-0">
                 <thead class="table-light">
                     <tr class="table-active text-uppercase text-center">
-                        <th style="width: 50px;">Batal</th>
+                        {{-- <th style="width: 50px;">Batal</th> --}}
                         <th class="text-start">Produk</th>
-                        <th class="text-start">Jumlah</th>
+                        <th class="text-center">Jumlah</th>
                         <th class="text-end">Harga</th>
                     </tr>
                 </thead>
@@ -21,21 +21,28 @@
                     @if ($user_id)
                         @forelse($keranjang as $item)
                             <tr>
-                                <td class="text-center">
+                                {{-- <td class="text-center">
                                     <button type="button" class="btn btn-sm btn-soft-danger"
                                             wire:click="hapusKeranjang({{ $item->ms_keranjang_smartcanteen_id }})">
                                         <i class="ri-delete-bin-5-line"></i>
                                     </button>
-                                </td>
+                                </td> --}}
                                 <td class="text-start">
                                     <span class="fs-12 fw-semibold text-uppercase">{{ $item->ms_produk_kantin->nama_produk_kantin ?? '-' }}</span>
                                     <p class="text-muted mb-0">RP{{ number_format($item->ms_produk_kantin->harga, 0, ',', '.') }}</p>
                                 </td>
-                                <td class="text-start text-uppercase">
-                                    <span class="fs-12 fw-semibold text-uppercase">{{ $item->jumlah_produk }} {{ $item->ms_produk_kantin->satuan }}</span>
+                               <td class="text-center align-middle">
+                                    <div class="d-flex justify-content-center align-items-center gap-1" style="border: 0;">
+                                        <button type="button" class="minus shadow btn btn-sm btn-light" wire:click="decrementQty({{ $item->ms_keranjang_smartcanteen_id }})">–</button>
+
+                                        <input type="text" class="product-quantity form-control form-control-sm text-center" style="width: 50px;" value="{{ $item->jumlah_produk }}" readonly>
+
+                                        <button type="button" class="plus shadow btn btn-sm btn-light" wire:click="incrementQty({{ $item->ms_keranjang_smartcanteen_id }})">+</button>
+                                    </div>
                                 </td>
+
                                 <td class="text-end fw-medium text-success fs-14">
-                                    Rp {{ number_format(($item->ms_produk_kantin->harga ?? 0) * $item->jumlah_produk, 0, ',', '.') }}
+                                    RP{{ number_format(($item->ms_produk_kantin->harga ?? 0) * $item->jumlah_produk, 0, ',', '.') }}
                                 </td>
                             </tr>
                         @empty
