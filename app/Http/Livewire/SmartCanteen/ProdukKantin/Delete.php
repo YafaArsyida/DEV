@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\SmartCanteen\ProdukKantin;
 
 use App\Models\ProdukKantin;
+use App\Models\ProdukSmartCanteen;
 use Livewire\Component;
 
 class Delete extends Component
@@ -19,7 +20,7 @@ class Delete extends Component
     public function deleteProduk()
     {
         try {
-            ProdukKantin::findOrFail($this->ms_produk_kantin_id)->delete();
+            ProdukSmartCanteen::findOrFail($this->ms_produk_kantin_id)->delete();
 
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'Produk berhasil dihapus!']);
             $this->dispatchBrowserEvent('hide-modal', ['modalId' => 'ModalDeleteProduk']);

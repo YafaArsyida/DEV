@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\SmartCanteen\ProdukKantin;
 
 use App\Models\ProdukKantin;
+use App\Models\ProdukSmartCanteen;
 use Livewire\Component;
 
 class Detail extends Component
@@ -13,7 +14,7 @@ class Detail extends Component
 
     public function showDetailProduk($produkId)
     {
-        $this->produk = ProdukKantin::findOrFail($produkId);
+        $this->produk = ProdukSmartCanteen::findOrFail($produkId);
     }
 
     public function render()

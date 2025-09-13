@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\SmartCanteen\KategoriProdukKantin;
 
 use App\Models\KategoriProdukKantin;
+use App\Models\KategoriProdukSmartCanteen;
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
 
@@ -16,7 +17,7 @@ class Edit extends Component
 
     public function loadDataKategori($id)
     {
-        $kategori = KategoriProdukKantin::findOrFail($id);
+        $kategori = KategoriProdukSmartCanteen::findOrFail($id);
         $this->ms_kategori_produk_kantin_id = $kategori->ms_kategori_produk_kantin_id;
         $this->ms_jenjang_id = $kategori->ms_jenjang_id;
         $this->nama_kategori_produk_kantin = $kategori->nama_kategori_produk_kantin;
@@ -46,7 +47,7 @@ class Edit extends Component
 
         try {
 
-            $kategori = KategoriProdukKantin::findOrFail($this->ms_kategori_produk_kantin_id);
+            $kategori = KategoriProdukSmartCanteen::findOrFail($this->ms_kategori_produk_kantin_id);
             $kategori->update([
                 'ms_jenjang_id' => $this->ms_jenjang_id,
                 'nama_kategori_produk_kantin' => $this->nama_kategori_produk_kantin,

@@ -34,7 +34,7 @@ class KeranjangSmartCanteen extends Model
     }
 
     // Relasi ke produk kantin
-    public function ms_produk()
+    public function ms_produk_kantin()
     {
         return $this->belongsTo(ProdukSmartCanteen::class, 'ms_produk_kantin_id', 'ms_produk_kantin_id');
     }

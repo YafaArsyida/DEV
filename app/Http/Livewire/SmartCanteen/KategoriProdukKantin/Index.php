@@ -4,6 +4,7 @@ namespace App\Http\Livewire\SmartCanteen\KategoriProdukKantin;
 
 use App\Models\Jenjang;
 use App\Models\KategoriProdukKantin;
+use App\Models\KategoriProdukSmartCanteen;
 use Livewire\Component;
 
 class Index extends Component
@@ -27,7 +28,7 @@ class Index extends Component
 
     public function render()
     {
-        $kategori = KategoriProdukKantin::query();
+        $kategori = KategoriProdukSmartCanteen::query();
 
         // filter jenjang
         if ($this->selectedJenjang) {

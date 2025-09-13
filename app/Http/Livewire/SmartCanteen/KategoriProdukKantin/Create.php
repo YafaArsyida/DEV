@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\SmartCanteen\KategoriProdukKantin;
 
 use App\Models\KategoriProdukKantin;
+use App\Models\KategoriProdukSmartCanteen;
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
 
@@ -45,7 +46,7 @@ class Create extends Component
 
         try {
 
-            KategoriProdukKantin::create([
+            KategoriProdukSmartCanteen::create([
                 'ms_jenjang_id' => $this->ms_jenjang_id,
                 'nama_kategori_produk_kantin' => $this->nama_kategori_produk_kantin,
                 'deskripsi'  => $this->deskripsi,

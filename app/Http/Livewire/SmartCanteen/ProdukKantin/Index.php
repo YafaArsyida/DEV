@@ -4,7 +4,9 @@ namespace App\Http\Livewire\SmartCanteen\ProdukKantin;
 
 use App\Models\Jenjang;
 use App\Models\KategoriProdukKantin;
+use App\Models\KategoriProdukSmartCanteen;
 use App\Models\ProdukKantin;
+use App\Models\ProdukSmartCanteen;
 use Livewire\Component;
 
 class Index extends Component
@@ -42,7 +44,7 @@ class Index extends Component
 
     public function render()
     {
-        $query = ProdukKantin::query();
+        $query = ProdukSmartCanteen::query();
 
         if ($this->selectedJenjang) {
             $query->where('ms_jenjang_id', $this->selectedJenjang);
@@ -57,7 +59,7 @@ class Index extends Component
         // dd($allProduk->toArray());
 
         // ambil kategori
-        $kategori = KategoriProdukKantin::where('ms_jenjang_id', $this->selectedJenjang)->get();
+        $kategori = KategoriProdukSmartCanteen::where('ms_jenjang_id', $this->selectedJenjang)->get();
 
         return view('livewire.smart-canteen.produk-kantin.index', [
             'allProduk' => $allProduk,

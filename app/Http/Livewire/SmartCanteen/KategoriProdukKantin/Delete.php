@@ -3,7 +3,9 @@
 namespace App\Http\Livewire\SmartCanteen\KategoriProdukKantin;
 
 use App\Models\KategoriProdukKantin;
+use App\Models\KategoriProdukSmartCanteen;
 use App\Models\ProdukKantin;
+use App\Models\ProdukSmartCanteen;
 use Livewire\Component;
 
 class Delete extends Component
@@ -20,11 +22,11 @@ class Delete extends Component
     public function deleteKategori()
     {
         if ($this->ms_kategori_produk_kantin_id) {
-            $kategori = KategoriProdukKantin::find($this->ms_kategori_produk_kantin_id);
+            $kategori = KategoriProdukSmartCanteen::find($this->ms_kategori_produk_kantin_id);
 
             if ($kategori) {
                 // cek apakah kategori dipakai di produk kantin
-                $isUsed = ProdukKantin::where('ms_kategori_produk_kantin_id', $this->ms_kategori_produk_kantin_id)->exists();
+                $isUsed = ProdukSmartCanteen::where('ms_kategori_produk_kantin_id', $this->ms_kategori_produk_kantin_id)->exists();
 
                 if ($isUsed) {
                     $this->dispatchBrowserEvent('alertify-error', [

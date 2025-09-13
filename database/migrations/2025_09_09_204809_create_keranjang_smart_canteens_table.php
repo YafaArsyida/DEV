@@ -11,8 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('keranjang_smart_canteens', function (Blueprint $table) {
-            $table->id();
+        Schema::create('ms_keranjang_smartcanteen', function (Blueprint $table) {
+            $table->bigIncrements('ms_keranjang_smartcanteen_id'); // PK
+            $table->enum('user_type', ['siswa', 'pegawai']);       // tipe pemilik keranjang
+            $table->unsignedBigInteger('user_id');                 // id siswa/pegawai
+            $table->unsignedBigInteger('ms_produk_kantin_id');     // produk kantin
+            $table->unsignedBigInteger('ms_pengguna_id');          // pengguna sistem (kasir/pegawai yang input)
+            $table->integer('jumlah_produk')->default(1);          // jumlah produk
+
             $table->timestamps();
         });
     }
@@ -22,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('keranjang_smart_canteens');
+        Schema::dropIfExists('ms_keranjang_smartcanteen');
     }
 };

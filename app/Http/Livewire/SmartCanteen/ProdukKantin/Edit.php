@@ -3,7 +3,9 @@
 namespace App\Http\Livewire\SmartCanteen\ProdukKantin;
 
 use App\Models\KategoriProdukKantin;
+use App\Models\KategoriProdukSmartCanteen;
 use App\Models\ProdukKantin;
+use App\Models\ProdukSmartCanteen;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -29,7 +31,7 @@ class Edit extends Component
 
     public function showEditProduk($ms_produk_kantin_id)
     {
-        $produk = ProdukKantin::findOrFail($ms_produk_kantin_id);
+        $produk = ProdukSmartCanteen::findOrFail($ms_produk_kantin_id);
         $this->ms_produk_kantin_id = $produk->ms_produk_kantin_id;
 
         $this->ms_jenjang_id = $produk->ms_jenjang_id;
@@ -100,7 +102,7 @@ class Edit extends Component
 
         try {
 
-            $produk = ProdukKantin::findOrFail($this->ms_produk_kantin_id);
+            $produk = ProdukSmartCanteen::findOrFail($this->ms_produk_kantin_id);
             $produk->update([
                 'ms_jenjang_id' => $this->ms_jenjang_id,
                 'ms_kategori_produk_kantin_id' => $this->ms_kategori_produk_kantin_id,
@@ -129,7 +131,7 @@ class Edit extends Component
     public function render()
     {
         return view('livewire.smart-canteen.produk-kantin.edit', [
-            'kategoriList' => KategoriProdukKantin::all(),
+            'kategoriList' => KategoriProdukSmartCanteen::all(),
         ]);
     }
 }
