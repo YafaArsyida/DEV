@@ -9,8 +9,8 @@ class KeranjangSmartCanteen extends Model
 {
     use HasFactory;
 
-    protected $table = 'ms_keranjang_smartcanteen'; // Nama tabel
-    protected $primaryKey = 'ms_keranjang_smartcanteen_id'; // Nama kolom primary key
+    protected $table = 'ms_keranjang_kantin'; // Nama tabel
+    protected $primaryKey = 'ms_keranjang_kantin_id'; // Nama kolom primary key
 
     protected $fillable = [
         'user_type',

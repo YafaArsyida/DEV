@@ -77,7 +77,7 @@
             class="form-control" 
             wire:model.defer="deskripsi" 
             placeholder="deskripsi transaksi (bila perlu)" 
-            aria-label="Infaq">
+            aria-label="Deskripsi">
             <select class="form-select w-auto" 
                     wire:model.defer="metode_pembayaran" 
                     aria-label="Pilih metode pembayaran">

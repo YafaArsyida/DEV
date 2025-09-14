@@ -89,46 +89,43 @@ class Siswa extends Model
         return $this->total_kredit_tabungan() - $this->total_debit_tabungan();
     }
 
-    // ===============EDUPAY
-    public function ms_edupay_siswa()
+    // =============== EDUPAY ===============
+    public function ms_transaksi_edupay()
     {
-        return $this->hasMany(EduPaySiswa::class, 'ms_siswa_id', 'ms_siswa_id');
+        return $this->hasMany(TransaksiEduPay::class, 'user_id', 'ms_siswa_id')
+            ->where('user_type', 'siswa');
     }
-
-    public function total_pemasukan_edupay_siswa()
+    public function total_pemasukan_edupay()
     {
-        // Menghitung total nominal dari transaksi topup dan topup online
-        return $this->ms_edupay_siswa()
+        return $this->ms_transaksi_edupay()
             ->whereIn('jenis_transaksi', ['topup tunai', 'topup online', 'pengembalian dana'])
             ->sum('nominal');
     }
 
-    public function total_penarikan_edupay_siswa()
+    public function total_penarikan_edupay()
     {
-        // Menghitung total nominal penarikan
-        return $this->ms_edupay_siswa()
+        return $this->ms_transaksi_edupay()
             ->where('jenis_transaksi', 'penarikan')
             ->sum('nominal');
     }
 
-    public function total_pembayaran_edupay_siswa()
+    public function total_pembayaran_edupay()
     {
-        // Menghitung total nominal pembayaran
-        return $this->ms_edupay_siswa()
+        return $this->ms_transaksi_edupay()
             ->where('jenis_transaksi', 'pembayaran')
             ->sum('nominal');
     }
 
-    public function total_pengeluaran_edupay_siswa()
+    public function total_pengeluaran_edupay()
     {
-        // Menghitung total pengeluaran (penarikan + pembayaran)
-        return $this->total_penarikan_edupay_siswa() + $this->total_pembayaran_edupay_siswa();
+        return $this->total_penarikan_edupay() + $this->total_pembayaran_edupay();
     }
+
     public function saldo_edupay_siswa()
     {
-        // Menghitung saldo berdasarkan total topup dikurangi total penarikan dan pembayaran
-        return $this->total_pemasukan_edupay_siswa() - $this->total_pengeluaran_edupay_siswa();
+        return $this->total_pemasukan_edupay() - $this->total_pengeluaran_edupay();
     }
+
     // ===============END EDUPAY
 
     // ===============EDUCARD

@@ -23,7 +23,7 @@
                             <tr>
                                 {{-- <td class="text-center">
                                     <button type="button" class="btn btn-sm btn-soft-danger"
-                                            wire:click="hapusKeranjang({{ $item->ms_keranjang_smartcanteen_id }})">
+                                            wire:click="hapusKeranjang({{ $item->ms_keranjang_kantin_id }})">
                                         <i class="ri-delete-bin-5-line"></i>
                                     </button>
                                 </td> --}}
@@ -33,11 +33,11 @@
                                 </td>
                                <td class="text-center align-middle">
                                     <div class="d-flex justify-content-center align-items-center gap-1" style="border: 0;">
-                                        <button type="button" class="minus shadow btn btn-sm btn-light" wire:click="decrementQty({{ $item->ms_keranjang_smartcanteen_id }})">–</button>
+                                        <button type="button" class="minus shadow btn btn-sm btn-light" wire:click="decrementQty({{ $item->ms_keranjang_kantin_id }})">–</button>
 
                                         <input type="text" class="product-quantity form-control form-control-sm text-center" style="width: 50px;" value="{{ $item->jumlah_produk }}" readonly>
 
-                                        <button type="button" class="plus shadow btn btn-sm btn-light" wire:click="incrementQty({{ $item->ms_keranjang_smartcanteen_id }})">+</button>
+                                        <button type="button" class="plus shadow btn btn-sm btn-light" wire:click="incrementQty({{ $item->ms_keranjang_kantin_id }})">+</button>
                                     </div>
                                 </td>
 
@@ -73,7 +73,19 @@
 
         {{-- Aksi --}}
         <div class="hstack gap-2 justify-content-end mt-4">
-            <a href="#" class="btn btn-success">
+            <select class="form-select w-auto" 
+                    wire:model.defer="metode_pembayaran" 
+                    aria-label="Pilih metode pembayaran">
+                {{-- <option value="Tunai">Tunai</option> --}}
+                <option value="EduPay">EduPay</option>
+            </select>
+            {{-- <a href="#ModalScanRFID" data-bs-toggle="modal" 
+                wire:click.prevent="simpanTransaksiKantin"
+                x-on:click="$wire.emit('openScanModal')"
+                    class="btn btn-success">
+                <i class="ri-shopping-cart-2-line align-bottom"></i> Bayar
+            </a> --}}
+            <a href="" wire:click.prevent="simpanTransaksiKantin" class="btn btn-success">
                 <i class="ri-shopping-cart-2-line align-bottom"></i> Bayar
             </a>
         </div>

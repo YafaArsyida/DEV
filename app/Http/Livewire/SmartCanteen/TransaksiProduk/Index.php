@@ -33,7 +33,8 @@ class Index extends Component
         'refreshProduk' => '$refresh',
         'parameterUpdated' => 'updateParameters',
         'filterKategori' => 'setKategori',
-        'scanSuccess'
+        'scanSuccess',
+        'openScanModal'
     ];
 
     public function setKategori($kategoriId)
@@ -47,6 +48,17 @@ class Index extends Component
 
         $j = Jenjang::find($jenjang);
         $this->namaJenjang = $j ? $j->nama_jenjang : 'Tidak Diketahui';
+    }
+
+    public function openScanModal()
+    {
+        $this->reset([
+            'user_type',
+            'user_id',
+            'nama',
+            'educard',
+            'saldo_edupay',
+        ]);
     }
 
     public function scanSuccess($data)

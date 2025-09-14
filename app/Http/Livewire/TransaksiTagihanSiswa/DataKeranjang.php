@@ -8,6 +8,7 @@ use App\Models\EduPaySiswa;
 use App\Models\KeranjangTagihanSiswa;
 use App\Models\PenempatanSiswa;
 use App\Models\TagihanSiswa;
+use App\Models\TransaksiEduPay;
 use App\Models\TransaksiTagihanSiswa;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -183,7 +184,7 @@ class DataKeranjang extends Component
                     return $item->nama_jenis_tagihan_siswa();
                 })->join(', ');
 
-                $this->simpanTransaksiEduPay($penempatanSiswa->ms_siswa_id, $this->ms_penempatan_siswa_id, $totalBayar, $deskripsiEduPay, $jurnalDetailDebit->akuntansi_jurnal_detail_id, $jurnalDetailKredit->akuntansi_jurnal_detail_id);
+                $this->simpanTransaksiEduPay($penempatanSiswa->ms_siswa_id, $totalBayar, $deskripsiEduPay, $jurnalDetailDebit->akuntansi_jurnal_detail_id, $jurnalDetailKredit->akuntansi_jurnal_detail_id);
             }
 
             $transaksi = TransaksiTagihanSiswa::create([
@@ -238,12 +239,12 @@ class DataKeranjang extends Component
         }
     }
 
-    public function simpanTransaksiEduPay($ms_siswa_id, $ms_penempatan_siswa_id, $totalBayar, $deskripsiEduPay, $akuntansi_jurnal_detail_debit_id, $akuntansi_jurnal_detail_kredit_id)
+    public function simpanTransaksiEduPay($ms_siswa_id, $totalBayar, $deskripsiEduPay, $akuntansi_jurnal_detail_debit_id, $akuntansi_jurnal_detail_kredit_id)
     {
         // Simpan transaksi EduPay dengan jenis transaksi 'pembayaran'
-        EduPaySiswa::create([
-            'ms_siswa_id' => $ms_siswa_id,
-            'ms_penempatan_siswa_id' => $ms_penempatan_siswa_id,
+        TransaksiEduPay::create([
+            'user_type' => 'siswa',
+            'user_id' => $ms_siswa_id,
             'ms_pengguna_id' => Auth::id(),
             'jenis_transaksi' => 'pembayaran',
             'nominal' => $totalBayar,

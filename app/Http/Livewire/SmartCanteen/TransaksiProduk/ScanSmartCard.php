@@ -13,9 +13,20 @@ class ScanSmartCard extends Component
     public $educard;
     public $saldo_edupay;
 
+    public $selectedJenjang = null;
+    public $selectedTahunAjar = null;
+
     protected $listeners = [
-        'openScanModal'
+        'openScanModal',
+        'parameterUpdated',
     ];
+
+    public function parameterUpdated($jenjang, $tahunAjar)
+    {
+        // Update nilai selectedJenjang dan selectedTahunAjar
+        $this->selectedJenjang = $jenjang;
+        $this->selectedTahunAjar = $tahunAjar;
+    }
 
     // Reset saat modal dibuka
     public function openScanModal()
@@ -61,6 +72,8 @@ class ScanSmartCard extends Component
                 'nama'          => $this->nama,
                 'educard'       => $this->educard,
                 'saldo_edupay'  => $this->saldo_edupay,
+                'ms_jenjang_id'  => $this->selectedJenjang,
+                'ms_tahun_ajar_id'  => $this->selectedTahunAjar,
             ]);
 
             $this->dispatchBrowserEvent('hide-delete-modal', ['modalId' => 'ModalScanRFID']);
