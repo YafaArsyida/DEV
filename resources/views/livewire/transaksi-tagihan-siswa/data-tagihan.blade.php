@@ -106,10 +106,7 @@
                             <i class="ri-money-dollar-circle-line text-success fs-24 float-end align-bottom" 
                             role="button"
                             wire:click.prevent="$emitTo('transaksi-edu-pay-siswa.index', 'showEduPay', {
-                                ms_siswa_id: {{ $ms_siswa_id }},
                                 ms_penempatan_siswa_id: {{ $ms_penempatan_siswa_id }},
-                                jenjang: {{ $ms_jenjang_id }},
-                                tahunAjar: {{ $ms_tahun_ajar_id }}
                             })"
 
                             {{-- wire:click.prevent="$emitTo('transaksi-edu-pay-siswa.index', 'showEduPay', {{ $ms_siswa_id }}, {{ $ms_penempatan_siswa_id }})" --}}

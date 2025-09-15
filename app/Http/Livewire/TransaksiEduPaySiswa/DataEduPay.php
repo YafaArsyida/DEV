@@ -6,6 +6,7 @@ use App\Http\Controllers\HelperController;
 use App\Models\EduPaySiswa;
 use App\Models\KuitansiEduPaySiswa;
 use App\Models\PenempatanSiswa;
+use App\Models\TransaksiEduPay;
 use App\Models\WhatsAppEduPaySiswa;
 use Livewire\Component;
 
@@ -36,7 +37,7 @@ class DataEduPay extends Component
         $this->ms_siswa_id = $penempatanSiswa->ms_siswa_id;
         $this->selectedJenjang = $penempatanSiswa->ms_jenjang_id;
 
-        // Emit refresh agar data di render diperbarui
+        // Emit refresh agar data di render diperbaruip
         $this->emitSelf('$refresh');
     }
 
@@ -45,9 +46,10 @@ class DataEduPay extends Component
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Pesan sedang diproses.']);
 
         // Ambil data transaksi EduPay berdasarkan ID siswa
-        $edupayTransaksi = EduPaySiswa::where('ms_siswa_id', $this->ms_siswa_id)
+        $edupayTransaksi = TransaksiEduPay::where('user_type', 'siswa')
+            ->where('user_id', $this->ms_siswa_id)
             ->orderBy('tanggal', 'ASC')
-            ->orderBy('ms_edupay_siswa_id', 'ASC')
+            ->orderBy('ms_transaksi_edupay_id', 'ASC')
             ->get();
 
         // Pastikan data transaksi ditemukan
@@ -76,6 +78,7 @@ class DataEduPay extends Component
                     break;
                 case 'penarikan':
                 case 'pembayaran':
+                case 'kantin':
                     $saldo -= $transaksi->nominal;
                     break;
             }
@@ -86,7 +89,6 @@ class DataEduPay extends Component
             }
         }
 
-        // dd($edupayId);
         // Ambil nomor telepon siswa
         $telepon = $targetTransaksi->ms_siswa->telepon;
 
@@ -168,9 +170,9 @@ class DataEduPay extends Component
         $saldo = 0; // Inisialisasi di luar closure
         /// Query data tabungan siswa jika siswa dipilih
         $transaksiEduPay = $this->ms_siswa_id
-            ? EduPaySiswa::where('ms_siswa_id', $this->ms_siswa_id)
-            // ->orderBy('tanggal', 'ASC')
-            ->orderBy('ms_edupay_siswa_id', 'ASC')
+            ? TransaksiEduPay::where('user_type', 'siswa')
+            ->where('user_id', $this->ms_siswa_id)
+            ->orderBy('tanggal', 'ASC')
             ->get()
             ->map(function ($item) use (&$saldo) {
                 switch ($item->jenis_transaksi) {
@@ -179,8 +181,10 @@ class DataEduPay extends Component
                     case 'topup online':
                         $saldo += $item->nominal;
                         break;
+
                     case 'penarikan':
                     case 'pembayaran':
+                    case 'kantin': // 👈 transaksi kantin kurangi saldo
                         $saldo -= $item->nominal;
                         break;
                 }

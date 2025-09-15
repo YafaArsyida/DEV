@@ -3,7 +3,7 @@
 namespace App\Http\Livewire\TransaksiEduPaySiswa;
 
 use App\Models\AkuntansiJurnalDetail;
-use App\Models\EduPaySiswa;
+use App\Models\TransaksiEduPay;
 use Carbon\Carbon;
 use Livewire\Component;
 
@@ -20,10 +20,10 @@ class Edit extends Component
         'loadTransaksiEduPay',
     ];
 
-    public function loadTransaksiEduPay($ms_edupay_siswa_id)
+    public function loadTransaksiEduPay($ms_transkasi_edupay_id)
     {
         // Ambil data transaksi
-        $transaksi = EduPaySiswa::find($ms_edupay_siswa_id);
+        $transaksi = TransaksiEduPay::find($ms_transkasi_edupay_id);
 
         if (!$transaksi) {
             $this->dispatchBrowserEvent('alertify-error', ['message' => 'Transaksi tidak ditemukan.']);
@@ -31,15 +31,12 @@ class Edit extends Component
         }
 
         // Ambil data penempatan siswa melalui relasi
-        $penempatanSiswa = $transaksi->ms_penempatan_siswa;
+        $siswa = $transaksi->user_id;
 
-        if (!$penempatanSiswa) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Penempatan siswa tidak ditemukan.']);
+        if (!$siswa) {
+            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Siswa tidak ditemukan.']);
             return;
         }
-        // Set properti dari penempatan siswa
-        $this->ms_jenjang_id = $penempatanSiswa->ms_jenjang_id;
-        $this->ms_tahun_ajar_id = $penempatanSiswa->ms_tahun_ajar_id;
 
         $this->transaksi = $transaksi;
         $this->tanggal = $transaksi->tanggal;

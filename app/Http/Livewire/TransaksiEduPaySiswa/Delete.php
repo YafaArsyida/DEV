@@ -3,14 +3,13 @@
 namespace App\Http\Livewire\TransaksiEduPaySiswa;
 
 use App\Models\AkuntansiJurnalDetail;
-use App\Models\EduPaySiswa;
+use App\Models\TransaksiEduPay;
 use Livewire\Component;
+use Illuminate\Support\Facades\DB;
 
 class Delete extends Component
 {
-    public $ms_edupay_siswa_id;
-    public $ms_jenjang_id;
-    public $ms_tahun_ajar_id;
+    public $ms_transaksi_edupay_id;
 
     public $nama_petugas;
 
@@ -23,83 +22,75 @@ class Delete extends Component
         'confirmDeleteEduPay'
     ];
 
-    public function confirmDeleteEduPay($ms_edupay_siswa_id)
+    public function confirmDeleteEduPay($ms_transaksi_edupay_id)
     {
-        $transaksi = EduPaySiswa::findOrFail($ms_edupay_siswa_id);
-
-        $penempatanSiswa = $transaksi->ms_penempatan_siswa;
-        $this->ms_jenjang_id = $penempatanSiswa->ms_jenjang_id ?? null;
-        $this->ms_tahun_ajar_id = $penempatanSiswa->ms_tahun_ajar_id ?? null;
-
-        $this->ms_edupay_siswa_id = $ms_edupay_siswa_id;
+        $this->ms_transaksi_edupay_id = $ms_transaksi_edupay_id;
     }
 
     public function deleteEduPay()
     {
+        DB::beginTransaction();
+
         try {
-            // Validasi apakah ID EduPay ada
-            if (!$this->ms_edupay_siswa_id) {
+            if (!$this->ms_transaksi_edupay_id) {
                 $this->dispatchBrowserEvent('alertify-error', ['message' => 'Transaksi EduPay tidak ditemukan.']);
                 return;
             }
 
-            // Ambil data transaksi berdasarkan ID
-            $transaksi = EduPaySiswa::find($this->ms_edupay_siswa_id);
+            $transaksi = TransaksiEduPay::find($this->ms_transaksi_edupay_id);
 
             if (!$transaksi) {
                 $this->dispatchBrowserEvent('alertify-error', ['message' => 'Transaksi EduPay tidak ditemukan.']);
                 return;
             }
 
-            // Hitung saldo EduPay siswa saat ini
             $saldoSaatIni = $transaksi->ms_siswa->saldo_edupay_siswa();
 
-            // Hitung saldo setelah penghapusan transaksi
+            // Hitung saldo setelah penghapusan
             if (in_array($transaksi->jenis_transaksi, ['topup', 'topup online', 'pengembalian dana'])) {
-                // Untuk jenis transaksi yang mengurangi saldo
                 $saldoSetelahHapus = $saldoSaatIni - $transaksi->nominal;
-            } elseif (in_array($transaksi->jenis_transaksi, ['penarikan', 'pembayaran'])) {
-                // Untuk jenis transaksi yang menambah saldo
+            } elseif (in_array($transaksi->jenis_transaksi, ['penarikan', 'pembayaran', 'kantin'])) {
                 $saldoSetelahHapus = $saldoSaatIni + $transaksi->nominal;
             } else {
-                // Jika jenis transaksi tidak dikenali, tetap menggunakan saldo saat ini
                 $saldoSetelahHapus = $saldoSaatIni;
             }
-            // Validasi apakah saldo menjadi negatif setelah penghapusan
+
             if ($saldoSetelahHapus < 0) {
-                $this->dispatchBrowserEvent('alertify-error', ['message' => 'Gagal! saldo telah digunakan.' . $saldoSaatIni . ' batas ' . $saldoSetelahHapus]);
+                $this->dispatchBrowserEvent('alertify-error', [
+                    'message' => "Gagal! saldo telah digunakan. Saldo saat ini {$saldoSaatIni}, batas {$saldoSetelahHapus}"
+                ]);
                 return;
             }
 
-            // Tambahkan log di deskripsi transaksi sebelum penghapusan
-            $transaksi->deskripsi = $transaksi->deskripsi . " (Dihapus oleh petugas {$this->nama_petugas})";
+            // Update deskripsi transaksi
+            $transaksi->deskripsi .= " (Dihapus oleh petugas {$this->nama_petugas})";
             $transaksi->save();
 
-            // Dapatkan ID jurnal terkait
+            // Hapus jurnal terkait
             $jurnalIds = [
                 $transaksi->akuntansi_jurnal_detail_debit_id,
                 $transaksi->akuntansi_jurnal_detail_kredit_id,
             ];
 
-            // Validasi dan soft delete jurnal
-            AkuntansiJurnalDetail::whereIn('akuntansi_jurnal_detail_id', $jurnalIds)->get()->each(function ($jurnal) {
-                $jurnal->delete();
-            });
+            AkuntansiJurnalDetail::whereIn('akuntansi_jurnal_detail_id', $jurnalIds)->get()->each->delete();
 
             // Hapus transaksi
             $transaksi->delete();
 
-            // Emit event untuk memperbarui data di tabel
+            // Commit transaksi
+            DB::commit();
+
+            // Refresh UI
             $this->emit('refreshEduPays');
             $this->emit('tagihanUpdated');
             $this->emit('refreshSaldo');
             $this->dispatchBrowserEvent('hide-delete-modal', ['modalId' => 'ModalDeleteEduPay']);
-
-            // Berikan notifikasi sukses
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'Transaksi EduPay berhasil dihapus.']);
         } catch (\Exception $e) {
-            // Notifikasi error jika terjadi kesalahan
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+            DB::rollBack();
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ]);
         }
     }
 

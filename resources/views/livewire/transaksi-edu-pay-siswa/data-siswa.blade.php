@@ -45,7 +45,7 @@
                     </div>
                     <div class="flex-grow-1">
                         <p class="text-muted mb-1">Masuk :</p>
-                        <h5 class="mb-0">RP{{ number_format($total_pemasukan_edupay_siswa, 0, ',', '.') }}</h5>
+                        <h5 class="mb-0">RP{{ number_format($total_pemasukan_edupay, 0, ',', '.') }}</h5>
                     </div>
                 </div>
             </div>
@@ -61,7 +61,7 @@
                     </div>
                     <div class="flex-grow-1">
                         <p class="text-muted mb-1">Keluar :</p>
-                        <h5 class="mb-0">RP{{ number_format($total_pengeluaran_edupay_siswa, 0, ',', '.') }}</h5>
+                        <h5 class="mb-0">RP{{ number_format($total_pengeluaran_edupay, 0, ',', '.') }}</h5>
                     </div>
                 </div>
             </div>

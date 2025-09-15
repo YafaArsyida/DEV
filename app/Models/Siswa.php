@@ -51,7 +51,7 @@ class Siswa extends Model
             });
     }
 
-    
+
     // Relasi ke Tagihan
     public function ms_tagihan_siswa()
     {
@@ -115,10 +115,16 @@ class Siswa extends Model
             ->where('jenis_transaksi', 'pembayaran')
             ->sum('nominal');
     }
+    public function total_pembayaran_kantin()
+    {
+        return $this->ms_transaksi_edupay()
+            ->where('jenis_transaksi', 'kantin')
+            ->sum('nominal');
+    }
 
     public function total_pengeluaran_edupay()
     {
-        return $this->total_penarikan_edupay() + $this->total_pembayaran_edupay();
+        return $this->total_penarikan_edupay() + $this->total_pembayaran_edupay() + $this->total_pembayaran_kantin();
     }
 
     public function saldo_edupay_siswa()

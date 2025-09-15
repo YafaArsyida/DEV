@@ -3,9 +3,7 @@
 namespace App\Http\Livewire\SmartCanteen\TransaksiProduk;
 
 use App\Models\Jenjang;
-use App\Models\KategoriProdukKantin;
 use App\Models\KategoriProdukSmartCanteen;
-use App\Models\ProdukKantin;
 use App\Models\ProdukSmartCanteen;
 use Livewire\Component;
 

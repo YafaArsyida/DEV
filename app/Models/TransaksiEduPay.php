@@ -10,7 +10,7 @@ class TransaksiEduPay extends Model
 {
     use HasFactory, SoftDeletes;
     protected $table = 'ms_transaksi_edupay'; // Nama tabel
-    protected $primaryKey = 'ms_transkasi_edupay_id'; // Nama kolom primary key
+    protected $primaryKey = 'ms_transaksi_edupay_id'; // Nama kolom primary key
 
     protected $fillable = [
         'user_type', // siswa, pegawai, guru, wali, dll
@@ -34,14 +34,14 @@ class TransaksiEduPay extends Model
     // Relasi ke Siswa
     public function ms_siswa()
     {
-        return $this->belongsTo(Siswa::class, 'user_id', 'ms_siswa_id')
-            ->where('user_type', 'siswa');
+        return $this->belongsTo(Siswa::class, 'user_id', 'ms_siswa_id');
+                    // ->where('user_type', 'siswa');
     }
 
     // Relasi ke Pegawai
     public function ms_pegawai()
     {
-        return $this->belongsTo(Pegawai::class, 'user_id', 'ms_pegawai_id')
-            ->where('user_type', 'pegawai');
+        return $this->belongsTo(Pegawai::class, 'user_id', 'ms_pegawai_id');
+            // ->where('user_type', 'pegawai');
     }
 }

@@ -42,6 +42,17 @@ class KeranjangProduk extends Component
         $this->ms_tahun_ajar_id = $data['ms_tahun_ajar_id'];
     }
 
+    public function openScanModal()
+    {
+        $this->reset([
+            'user_type',
+            'user_id',
+            'nama',
+            'educard',
+            'saldo_edupay',
+        ]);
+    }
+
     public function tambahKeranjang($produkId)
     {
         if (!$this->user_id || !$this->user_type) {
@@ -253,19 +264,20 @@ class KeranjangProduk extends Component
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'Transaksi kantin berhasil disimpan.']);
             $this->emitSelf('$refresh');
             $this->emit('openScanModal');
+            $this->openScanModal();
         } catch (\Exception $e) {
             DB::rollBack();
             $this->dispatchBrowserEvent('alertify-error', ['message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
     }
-     public function simpanTransaksiEduPay($ms_siswa_id, $totalBayar, $deskripsiEduPay, $akuntansi_jurnal_detail_debit_id, $akuntansi_jurnal_detail_kredit_id)
+    public function simpanTransaksiEduPay($ms_siswa_id, $totalBayar, $deskripsiEduPay, $akuntansi_jurnal_detail_debit_id, $akuntansi_jurnal_detail_kredit_id)
     {
         // Simpan transaksi EduPay dengan jenis transaksi 'pembayaran'
         TransaksiEduPay::create([
             'user_type' => 'siswa',
             'user_id' => $ms_siswa_id,
             'ms_pengguna_id' => Auth::id(),
-            'jenis_transaksi' => 'pembayaran',
+            'jenis_transaksi' => 'kantin',
             'nominal' => $totalBayar,
             'tanggal' => now(),
             'akuntansi_jurnal_detail_debit_id' => $akuntansi_jurnal_detail_debit_id,
