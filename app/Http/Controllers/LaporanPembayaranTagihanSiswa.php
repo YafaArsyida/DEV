@@ -88,7 +88,7 @@ class LaporanPembayaranTagihanSiswa extends Controller
         // PDF
         $pdf = new TCPDF('L', 'mm', 'A4', true, 'UTF-8', false);
         $pdf::SetTitle('Laporan Pembayaran Siswa');
-        $pdf::AddPage();
+        $pdf::AddPage('L');
         $pdf::SetFont('times', 'B', 12);
         $pdf::Cell(0, 1, 'Laporan Pembayaran Tagihan Siswa', 0, 1, 'C');
         $pdf::Ln(2);

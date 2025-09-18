@@ -84,7 +84,20 @@
             <div class="col-6 col-sm-4">
                 <div class="p-3 border border-dashed border-end-0">
                     <h5 class="mb-1">
-                        <span class="fw-semibold text-info">
+                        <span class="fw-semibold text-danger">
+                            RP{{ number_format($total_kantin, 0, ',', '.') }}
+                        </span>
+                    </h5>
+                    <p class="text-muted mb-0">
+                        <i class="ri-pulse-line display-8 text-danger"></i>
+                        Kantin
+                    </p>
+                </div>
+            </div>
+            <div class="col-6 col-sm-12">
+                <div class="p-3 border border-dashed border-end-0">
+                    <h5 class="mb-1">
+                        <span class="fw-bold text-info">
                             RP{{ number_format($saldo, 0, ',', '.') }}
                         </span>
                     </h5>

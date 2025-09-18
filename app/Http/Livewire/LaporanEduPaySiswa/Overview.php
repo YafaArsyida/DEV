@@ -4,6 +4,7 @@ namespace App\Http\Livewire\LaporanEduPaySiswa;
 
 use App\Models\EduPaySiswa;
 use App\Models\Kelas;
+use App\Models\TransaksiEduPay;
 use Livewire\Component;
 
 class Overview extends Component
@@ -37,11 +38,11 @@ class Overview extends Component
                 ->get();
         }
 
-        $query = EduPaySiswa::query()
+        $query = TransaksiEduPay::query()
             ->with(['ms_siswa', 'ms_pengguna', 'ms_penempatan_siswa'])
-            ->join('ms_siswa', 'ms_siswa.ms_siswa_id', '=', 'ms_edupay_siswa.ms_siswa_id')
-            ->join('ms_penempatan_siswa', 'ms_penempatan_siswa.ms_penempatan_siswa_id', '=', 'ms_edupay_siswa.ms_penempatan_siswa_id')
-            ->select('ms_edupay_siswa.*', 'ms_siswa.nama_siswa', 'ms_penempatan_siswa.ms_jenjang_id', 'ms_penempatan_siswa.ms_tahun_ajar_id')
+            ->join('ms_siswa', 'ms_siswa.ms_siswa_id', '=', 'ms_transaksi_edupay.user_id')
+            ->join('ms_penempatan_siswa', 'ms_penempatan_siswa.ms_penempatan_siswa_id', '=', 'ms_transaksi_edupay.ms_penempatan_siswa_id')
+            ->select('ms_transaksi_edupay.*', 'ms_siswa.nama_siswa', 'ms_penempatan_siswa.ms_jenjang_id', 'ms_penempatan_siswa.ms_tahun_ajar_id')
             ->where('ms_penempatan_siswa.ms_jenjang_id', $this->selectedJenjang)
             ->where('ms_penempatan_siswa.ms_tahun_ajar_id', $this->selectedTahunAjar)
             ->orderBy('tanggal', 'ASC');
@@ -72,7 +73,11 @@ class Overview extends Component
             ->where('jenis_transaksi', 'pembayaran')
             ->sum('nominal');
 
-        $saldo = $total_topup_tunai + $total_topup_online + $total_pengembalian_dana - $total_penarikan - $total_pembayaran;
+        $total_kantin = (clone $query)
+            ->where('jenis_transaksi', 'kantin')
+            ->sum('nominal');
+
+        $saldo = $total_topup_tunai + $total_topup_online + $total_pengembalian_dana - $total_penarikan - $total_pembayaran + $total_kantin;
 
         // Return masing-masing variabel
         return view('livewire.laporan-edu-pay-siswa.overview', [
@@ -82,6 +87,7 @@ class Overview extends Component
             'total_pengembalian_dana' => $total_pengembalian_dana,
             'total_penarikan' => $total_penarikan,
             'total_pembayaran' => $total_pembayaran,
+            'total_kantin' => $total_kantin,
             'saldo' => $saldo,
         ]);
     }

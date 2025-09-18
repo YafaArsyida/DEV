@@ -58,16 +58,15 @@ class Siswa extends Model
         return $this->hasManyThrough(TagihanSiswa::class, PenempatanSiswa::class, 'ms_siswa_id', 'ms_penempatan_siswa_id', 'ms_siswa_id', 'ms_penempatan_siswa_id');
     }
 
-    public function ms_tabungan_siswa()
+    public function ms_transaksi_tabungan()
     {
-        // Relasi tabungan untuk siswa ini
-        return $this->hasMany(TabunganSiswa::class, 'ms_siswa_id');
+        return $this->hasMany(TransaksiTabungan::class, 'user_id', 'ms_siswa_id');
+        // ->where('user_type', 'siswa');
     }
-
     public function total_kredit_tabungan()
     {
         // Menghitung total nominal kredit (Setoran)
-        return $this->ms_tabungan_siswa()
+        return $this->ms_transaksi_tabungan()
             ->where('jenis_transaksi', 'setoran')
             ->sum('nominal');
     }
@@ -75,7 +74,7 @@ class Siswa extends Model
     public function total_debit_tabungan()
     {
         // Menghitung total nominal debit (Penarikan)
-        return $this->ms_tabungan_siswa()
+        return $this->ms_transaksi_tabungan()
             ->where('jenis_transaksi', 'penarikan')
             ->sum('nominal');
     }

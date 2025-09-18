@@ -35,7 +35,7 @@
                                             </div>
                                         </div>
                                         <div class="flex-grow-1">
-                                            <p class="text-muted mb-1">Saldo :</p>
+                                            <p class="text-muted mb-1">Saldo Tabungan:</p>
                                             <h5 class="mb-0">RP{{ number_format($saldo_tabungan_siswa, 0, ',', '.') }}</h5>
                                         </div>
                                     </div>
@@ -195,7 +195,7 @@
                                             <td style="width: 50px">{{ $loop->iteration }}.</td>
                                             <td>
                                                 <a href="#ModalDeleteTabungan" data-bs-toggle="modal" class="btn btn-sm btn-soft-danger d-inline-flex align-items-center gap-1" 
-                                                wire:click.prevent="$emit('confirmDelete', {{ $item->ms_tabungan_siswa_id }})" data-bs-trigger="hover" data-bs-placement="top" title="Hapus Transaksi Tabungan">
+                                                wire:click.prevent="$emit('confirmDeleteTabungan', {{ $item->ms_transaksi_tabungan_id }})" data-bs-trigger="hover" data-bs-placement="top" title="Hapus Transaksi Tabungan">
                                                     <i class="ri-delete-bin-5-line align-bottom"></i>
                                                 </a>
                                             </td>
@@ -203,7 +203,7 @@
                                                 {{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($item->tanggal) }}
                                             </td>
                                             <td class="text-start">
-                                                <span class="fw-medium">
+                                                <span class="fs-14">
                                                     {!! 'RP' . number_format($item->nominal, 0, ',', '.') . ' - <i>' . ucfirst($item->jenis_transaksi) . '</i>' !!}
                                                 </span>
                                                 <p class="text-muted mb-0">{{ $item->deskripsi ?? '' }}</p>
@@ -211,33 +211,42 @@
 
                                             <td>{{ $item->ms_pengguna->nama }}</td>
                                             <td>
-                                                <span class="fw-medium text-success">
+                                                <span class="fs-14 text-success">
                                                     {{ $item->jenis_transaksi === 'setoran' ? 'RP' . number_format($item->nominal, 0, ',', '.') : '-' }}
                                                 </span>
                                             </td>
                                             <td>
-                                                <span class="fw-medium text-danger">
+                                                <span class="fs-14 text-danger">
                                                     {{ $item->jenis_transaksi === 'penarikan' ? 'RP' . number_format($item->nominal, 0, ',', '.') : '-' }}
                                                 </span>
                                             </td>
 
                                             <td>
-                                                <span class="fw-medium text-info">
+                                                <span class="fs-14 text-info">
                                                     RP{{ number_format($item->saldo, 0, ',', '.') }}
                                                 </span>
                                             </td>
                                             <td class="text-start">
                                                 <ul class="list-inline hstack gap-2 mb-0">
-                                                    <li class="list-inline-item detail" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Kirim Pesan Transaksi">
-                                                        <a href="" wire:click.prevent="kirimWhatsapp({{ $item->ms_tabungan_siswa_id }})" class="btn btn-sm btn-soft-success d-inline-flex align-items-center gap-1">
-                                                            <i class="ri-whatsapp-line align-bottom"></i> Kirim Whatsapp
+                                                    <li class="list-inline-item detail" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Edit Transaksi">
+                                                        <a href="#editTransaksiEduPay" data-bs-toggle="modal" wire:click.prevent="$emit('loadTransaksiTabungan', {{ $item->ms_transaksi_tabungan_id }})" 
+                                                            class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1">
+                                                            <i class="ri-quill-pen-line align-bottom"></i>
+                                                            <span>Edit Transaksi</span>
                                                         </a>
                                                     </li>
-                                                    {{-- <li class="list-inline-item detail" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Kirim Bukti Transaksi">
-                                                        <a href="" class="btn btn-danger d-inline-flex align-items-center gap-1">
-                                                            <i class="ri-printer-line align-bottom"></i> Cetak
+                                                    <li class="list-inline-item detail" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Kirim Pesan Transaksi">
+                                                        <a  wire:click.prevent="kirimWhatsapp({{ $item->ms_transaksi_tabungan_id }})" class="btn btn-sm btn-soft-success d-inline-flex align-items-center gap-1">
+                                                            <i class="ri-whatsapp-line align-bottom"></i>
+                                                            <span>Kirim WhatsApp</span>
                                                         </a>
-                                                    </li> --}}
+                                                    </li>
+                                                    <li class="list-inline-item detail" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Cetak Bukti Transaksi">
+                                                        <a wire:click="cetakTransaksi({{ $item->ms_transaksi_tabungan_id }})" class="btn btn-sm btn-danger d-inline-flex align-items-center gap-1">
+                                                            <i class="ri-printer-line align-bottom"></i>
+                                                            <span>Cetak</span>
+                                                        </a>
+                                                    </li>
                                                 </ul>
                                             </td>
                                         </tr>
@@ -250,15 +259,6 @@
                                     @endforelse
                                 </tbody>
                             </table><!--end table-->
-                        </div>
-
-                        <div class="hstack gap-2 justify-content-end d-print-none mt-4">   
-                            <a href="" 
-                            wire:click.prevent="" 
-                            class="btn btn-success">
-                                <i class="ri-printer-line align-bottom me-1"></i> Bayarkan
-                            </a>
-                            {{-- <a href="javascript:void(0);" class="btn btn-primary"><i class="ri-download-2-line align-bottom me-1"></i> Download</a> --}}
                         </div>
                     </div>
                 </div>

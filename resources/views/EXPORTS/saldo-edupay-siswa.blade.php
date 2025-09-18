@@ -13,7 +13,7 @@
                 <td>{{ $loop->iteration }}</td>
                 <td>{{ $item['ms_siswa']['nama_siswa'] }}</td>
                 <td>{{ $item['ms_kelas']['nama_kelas'] }}</td>
-                <td>{{ $item['saldo_edupay'] }}</td>
+                <td>{{ $item['saldo_edupay_siswa'] }}</td>
             </tr>
         @endforeach
     </tbody>

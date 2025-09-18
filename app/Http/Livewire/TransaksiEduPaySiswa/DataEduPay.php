@@ -45,35 +45,29 @@ class DataEduPay extends Component
     {
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Pesan sedang diproses.']);
 
-        // Ambil data transaksi EduPay berdasarkan ID siswa
-        $edupayTransaksi = TransaksiEduPay::where('user_type', 'siswa')
-            ->where('user_id', $this->ms_siswa_id)
-            ->orderBy('tanggal', 'ASC')
-            ->orderBy('ms_transaksi_edupay_id', 'ASC')
-            ->get();
-
-        // Pastikan data transaksi ditemukan
-        if ($edupayTransaksi->isEmpty()) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Transaksi EduPay tidak ditemukan']);
-            return;
-        }
-
-        // Cari transaksi spesifik berdasarkan ID
-        $targetTransaksi = $edupayTransaksi->where('ms_edupay_siswa_id', $edupayId)->first();
+        // Ambil transaksi berdasarkan ID
+        $targetTransaksi = TransaksiEduPay::with(['ms_siswa', 'ms_pengguna'])
+            ->where('user_type', 'siswa')
+            ->where('ms_transaksi_edupay_id', $edupayId)
+            ->first();
 
         if (!$targetTransaksi) {
             $this->dispatchBrowserEvent('alertify-error', ['message' => 'Transaksi EduPay tidak ditemukan']);
             return;
         }
 
-        // Hitung saldo berdasarkan urutan transaksi
+        // Ambil semua transaksi siswa untuk hitung saldo
+        $edupayTransaksi = TransaksiEduPay::where('user_id', $this->ms_siswa_id)
+            // ->orderBy('ms_transaksi_edupay_id', 'ASC')
+            ->get();
+
+        // Hitung saldo sampai transaksi yang diminta
         $saldo = 0;
         foreach ($edupayTransaksi as $transaksi) {
-            // Periksa jenis transaksi dan update saldo sesuai dengan jenisnya
             switch ($transaksi->jenis_transaksi) {
-                case 'topup':
+                case 'topup tunai':
+                case 'topup online':
                 case 'pengembalian dana':
-                case 'topup online': // Topup online juga dianggap menambah saldo
                     $saldo += $transaksi->nominal;
                     break;
                 case 'penarikan':
@@ -83,32 +77,28 @@ class DataEduPay extends Component
                     break;
             }
 
-            // Simpan saldo saat mencapai transaksi yang diminta
-            if ($transaksi->ms_edupay_siswa_id === $edupayId) {
+            if ($transaksi->ms_transaksi_edupay_id === $edupayId) {
                 break;
             }
         }
 
         // Ambil nomor telepon siswa
         $telepon = $targetTransaksi->ms_siswa->telepon;
-
-        // Pastikan nomor telepon ada
         if (!$telepon) {
             $this->dispatchBrowserEvent('alertify-error', ['message' => 'Nomor telepon siswa tidak ditemukan']);
             return;
         }
 
-        // Replace nomor telepon yang diawali dengan '0' menjadi '+62'
+        // Ubah format nomor jadi +62
         if (substr($telepon, 0, 1) === '0') {
-            $telepon = '+62' . substr($telepon, 1); // Ganti '0' pertama dengan '+62'
+            $telepon = '+62' . substr($telepon, 1);
         }
 
-        // Pastikan template ditemukan
-        $templatePesan = WhatsAppEduPaySiswa::where('ms_jenjang_id', $this->selectedJenjang)
+        // Ambil template WA
+        $templatePesan = WhatsAppEduPaySiswa::where('ms_jenjang_id', $this->selectedJenjang ?? null)
             ->latest()
             ->first();
 
-        // Pastikan template ditemukan
         if (!$templatePesan) {
             $this->dispatchBrowserEvent('alertify-error', ['message' => 'Template pesan tidak ditemukan']);
             return;
@@ -117,30 +107,31 @@ class DataEduPay extends Component
         // Tentukan label jenis transaksi
         $jenisTransaksi = ucfirst($targetTransaksi->jenis_transaksi);
 
-        // Siapkan rincian pembayaran (jika deskripsi tidak null/kosong)
-        $rincianPembayaran = !empty($transaksi->deskripsi)
-            ? "\n\n*{$transaksi->deskripsi}*"
+        // Rincian deskripsi (jika ada)
+        $rincianPembayaran = !empty($targetTransaksi->deskripsi)
+            ? "\n\n*{$targetTransaksi->deskripsi}*"
             : "";
 
-        // Siapkan pesan yang ingin dikirim
-        $pesan = "*" . $templatePesan->judul . "*\n\n"; // Judul (dengan format *)
-        $pesan .= $templatePesan->salam_pembuka . "\n\n"; // Salam pembuka
-        $pesan .= $templatePesan->kalimat_pembuka . "\n\n"; // Kalimat pembuka
-        $pesan .= "Kami informasikan bahwa *Transaksi EduPay* atas nama siswa *" . $transaksi->ms_siswa->nama_siswa . "* telah berhasil. Berikut adalah rincian transaksinya:\n\n";
-        $pesan .= "*" . $jenisTransaksi . " : Rp" . number_format($transaksi->nominal, 0, ',', '.') . "*\n";
+        // Siapkan isi pesan
+        $pesan = "*" . $templatePesan->judul . "*\n\n";
+        $pesan .= $templatePesan->salam_pembuka . "\n\n";
+        $pesan .= $templatePesan->kalimat_pembuka . "\n\n";
+        $pesan .= "Kami informasikan bahwa *Transaksi EduPay* atas nama siswa *" . $targetTransaksi->ms_siswa->nama_siswa . "* telah berhasil. Berikut adalah rincian transaksinya:\n\n";
+        $pesan .= "*" . $jenisTransaksi . " : Rp" . number_format($targetTransaksi->nominal, 0, ',', '.') . "*\n";
         $pesan .= "*Saldo EduPay : Rp" . number_format($saldo, 0, ',', '.') . "*";
-        $pesan .= $rincianPembayaran . "\n\n"; // Rincian penggunaan jika ada
-        $pesan .= $templatePesan->kalimat_penutup . "\n"; // Kalimat penutup
-        $pesan .= "\n" . $templatePesan->salam_penutup . "\n\n"; // Salam penutup
-        $pesan .= "Tata Usaha - " . $transaksi->ms_pengguna->nama . "\n"; // Informasi petugas
-        $pesan .= HelperController::formatTanggalIndonesia($transaksi->tanggal, 'd F Y'); // Tanggal transaksi
+        $pesan .= $rincianPembayaran . "\n\n";
+        $pesan .= $templatePesan->kalimat_penutup . "\n";
+        $pesan .= "\n" . $templatePesan->salam_penutup . "\n\n";
+        $pesan .= "Tata Usaha - " . $targetTransaksi->ms_pengguna->nama . "\n";
+        $pesan .= HelperController::formatTanggalIndonesia($targetTransaksi->tanggal, 'd F Y');
 
-        // Format URL WhatsApp
+        // Buat URL WA
         $url = "https://wa.me/{$telepon}?text=" . urlencode($pesan);
 
-        // Emit event ke frontend untuk membuka URL di tab baru
+        // Emit ke frontend
         $this->emit('openNewTab', $url);
     }
+
 
     public function cetakTransaksi($eduPayId)
     {
@@ -172,13 +163,13 @@ class DataEduPay extends Component
         $transaksiEduPay = $this->ms_siswa_id
             ? TransaksiEduPay::where('user_type', 'siswa')
             ->where('user_id', $this->ms_siswa_id)
-            ->orderBy('tanggal', 'ASC')
+            // ->orderBy('tanggal', 'ASC')
             ->get()
             ->map(function ($item) use (&$saldo) {
                 switch ($item->jenis_transaksi) {
-                    case 'pengembalian dana':
                     case 'topup tunai':
                     case 'topup online':
+                    case 'pengembalian dana':
                         $saldo += $item->nominal;
                         break;
 

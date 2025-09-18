@@ -5,6 +5,7 @@ namespace App\Http\Livewire\LaporanEduPaySiswa;
 use App\Models\EduPay;
 use App\Models\EduPaySiswa;
 use App\Models\Kelas;
+use App\Models\TransaksiEduPay;
 use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -71,11 +72,11 @@ class Index extends Component
 
     public function showExportEduPay()
     {
-        $query = EduPaySiswa::query()
-            ->with(['ms_siswa', 'ms_pengguna', 'ms_penempatan_siswa.ms_kelas'])
-            ->join('ms_siswa', 'ms_siswa.ms_siswa_id', '=', 'ms_edupay_siswa.ms_siswa_id')
-            ->join('ms_penempatan_siswa', 'ms_penempatan_siswa.ms_penempatan_siswa_id', '=', 'ms_edupay_siswa.ms_penempatan_siswa_id')
-            ->select('ms_edupay_siswa.*', 'ms_siswa.nama_siswa', 'ms_penempatan_siswa.ms_jenjang_id', 'ms_penempatan_siswa.ms_tahun_ajar_id')
+        $query = TransaksiEduPay::query()
+            ->with(['ms_siswa', 'ms_pengguna', 'ms_penempatan_siswa'])
+            ->join('ms_siswa', 'ms_siswa.ms_siswa_id', '=', 'ms_transaksi_edupay.user_id')
+            ->join('ms_penempatan_siswa', 'ms_penempatan_siswa.ms_penempatan_siswa_id', '=', 'ms_transaksi_edupay.ms_penempatan_siswa_id')
+            ->select('ms_transaksi_edupay.*', 'ms_siswa.nama_siswa', 'ms_penempatan_siswa.ms_jenjang_id', 'ms_penempatan_siswa.ms_tahun_ajar_id')
             ->where('ms_penempatan_siswa.ms_jenjang_id', $this->selectedJenjang)
             ->where('ms_penempatan_siswa.ms_tahun_ajar_id', $this->selectedTahunAjar)
             ->orderBy('tanggal', 'ASC');
@@ -86,7 +87,7 @@ class Index extends Component
         }
 
         if ($this->selectedPetugas) {
-            $query->where('ms_edupay_siswa.ms_pengguna_id', $this->selectedPetugas);
+            $query->where('ms_transaksi_edupay.ms_pengguna_id', $this->selectedPetugas);
         }
 
         // Filter berdasarkan rentang tanggal
@@ -96,22 +97,23 @@ class Index extends Component
             $query->whereBetween('tanggal', [$startDate, $endDate]);
         }
 
-        // Filter berdasarkan jenis transaksi (jika relevan)
+        // Mapping kategori
+        $pemasukanJenis = ['topup tunai', 'topup online', 'pengembalian dana'];
+        $pengeluaranJenis = ['penarikan', 'pembayaran', 'kantin'];
+
+        // Filter berdasarkan pilihan
         if ($this->selectedJenisTransaksi) {
-            if (in_array('pemasukan', $this->selectedJenisTransaksi)) {
-                $query->whereIn('jenis_transaksi', ['topup tunai', 'topup online', 'pengembalian dana']);
-            } elseif (in_array('pengeluaran', $this->selectedJenisTransaksi)) {
-                $query->whereIn('jenis_transaksi', ['penarikan', 'pembayaran']);
-            }
+            $query->whereIn('jenis_transaksi', $this->selectedJenisTransaksi);
         }
 
-        // Total nominal transaksi
+        // Hitung total pemasukan
         $totalPemasukan = $query->clone()
-            ->whereIn('jenis_transaksi', ['topup online', 'topup tunai', 'pengembalian dana'])
+            ->whereIn('jenis_transaksi', $pemasukanJenis)
             ->sum('nominal');
 
+        // Hitung total pengeluaran
         $totalPengeluaran = $query->clone()
-            ->whereIn('jenis_transaksi', ['pembayaran', 'penarikan'])
+            ->whereIn('jenis_transaksi', $pengeluaranJenis)
             ->sum('nominal');
 
         $totalSaldo = $totalPemasukan - $totalPengeluaran;
@@ -131,11 +133,11 @@ class Index extends Component
                 ->get();
         }
 
-        $query = EduPaySiswa::query()
+        $query = TransaksiEduPay::query()
             ->with(['ms_siswa', 'ms_pengguna', 'ms_penempatan_siswa'])
-            ->join('ms_siswa', 'ms_siswa.ms_siswa_id', '=', 'ms_edupay_siswa.ms_siswa_id')
-            ->join('ms_penempatan_siswa', 'ms_penempatan_siswa.ms_penempatan_siswa_id', '=', 'ms_edupay_siswa.ms_penempatan_siswa_id')
-            ->select('ms_edupay_siswa.*', 'ms_siswa.nama_siswa', 'ms_penempatan_siswa.ms_jenjang_id', 'ms_penempatan_siswa.ms_tahun_ajar_id')
+            ->join('ms_siswa', 'ms_siswa.ms_siswa_id', '=', 'ms_transaksi_edupay.user_id')
+            ->join('ms_penempatan_siswa', 'ms_penempatan_siswa.ms_penempatan_siswa_id', '=', 'ms_transaksi_edupay.ms_penempatan_siswa_id')
+            ->select('ms_transaksi_edupay.*', 'ms_siswa.nama_siswa', 'ms_penempatan_siswa.ms_jenjang_id', 'ms_penempatan_siswa.ms_tahun_ajar_id')
             ->where('ms_penempatan_siswa.ms_jenjang_id', $this->selectedJenjang)
             ->where('ms_penempatan_siswa.ms_tahun_ajar_id', $this->selectedTahunAjar)
             ->orderBy('tanggal', 'ASC');
@@ -146,7 +148,7 @@ class Index extends Component
         }
 
         if ($this->selectedPetugas) {
-            $query->where('ms_edupay_siswa.ms_pengguna_id', $this->selectedPetugas);
+            $query->where('ms_transaksi_edupay.ms_pengguna_id', $this->selectedPetugas);
         }
 
         // Filter berdasarkan nama siswa jika ada
@@ -164,27 +166,29 @@ class Index extends Component
         }
 
         // Filter berdasarkan jenis transaksi (jika relevan)
+        // Mapping kategori
+        $pemasukanJenis = ['topup tunai', 'topup online', 'pengembalian dana'];
+        $pengeluaranJenis = ['penarikan', 'pembayaran', 'kantin'];
+
+        // Filter berdasarkan pilihan
         if ($this->selectedJenisTransaksi) {
-            if (in_array('pemasukan', $this->selectedJenisTransaksi)) {
-                $query->whereIn('jenis_transaksi', ['topup tunai', 'topup online', 'pengembalian dana']);
-            } elseif (in_array('pengeluaran', $this->selectedJenisTransaksi)) {
-                $query->whereIn('jenis_transaksi', ['penarikan', 'pembayaran']);
-            }
+            $query->whereIn('jenis_transaksi', $this->selectedJenisTransaksi);
         }
 
-        // Total nominal transaksi
+        // Hitung total pemasukan
         $totalPemasukan = $query->clone()
-            ->whereIn('jenis_transaksi', ['topup online', 'topup tunai', 'pengembalian dana'])
+            ->whereIn('jenis_transaksi', $pemasukanJenis)
             ->sum('nominal');
 
+        // Hitung total pengeluaran
         $totalPengeluaran = $query->clone()
-            ->whereIn('jenis_transaksi', ['pembayaran', 'penarikan'])
+            ->whereIn('jenis_transaksi', $pengeluaranJenis)
             ->sum('nominal');
 
         $totalSaldo = $totalPemasukan - $totalPengeluaran;
 
         // Ambil data transaksi yang telah difilter
-        $laporan = $query->paginate(50);
+        $laporan = $query->paginate(100);
 
         return view('livewire.laporan-edu-pay-siswa.index', [
             'select_kelas' => $select_kelas,

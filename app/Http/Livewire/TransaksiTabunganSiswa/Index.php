@@ -6,9 +6,11 @@ use App\Http\Controllers\HelperController;
 use App\Models\AkuntansiJurnalDetail;
 use App\Models\PenempatanSiswa;
 use App\Models\Siswa;
-use App\Models\TabunganSiswa;
+use App\Models\TransaksiTabungan;
 use App\Models\WhatsAppHistoriTabunganSiswa;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
 use Livewire\Component;
 
 class Index extends Component
@@ -93,6 +95,8 @@ class Index extends Component
     // kredit
     public function simpanKredit()
     {
+        DB::beginTransaction();
+
         try {
             // Pastikan siswa dipilih
             if (!$this->ms_siswa_id) {
@@ -148,17 +152,20 @@ class Index extends Component
             $jurnalKreditId = AkuntansiJurnalDetail::create($jurnalKredit)->akuntansi_jurnal_detail_id;
 
             // Simpan transaksi kredit
-            TabunganSiswa::create([
+            TransaksiTabungan::create([
+                'user_id' => $this->ms_siswa_id,
+                'user_type' => 'siswa',
                 'ms_penempatan_siswa_id' => $this->ms_penempatan_siswa_id,
-                'ms_siswa_id' => $this->ms_siswa_id,
                 'ms_pengguna_id' => $ms_pengguna_id,
                 'jenis_transaksi' => 'setoran', // Jenis transaksi untuk kredit
                 'nominal' => $this->nominal_kredit,
+                'tanggal' => now(),
                 'deskripsi' => $this->deskripsi_kredit,
                 'akuntansi_jurnal_detail_debit_id' => $jurnalDebitId,
                 'akuntansi_jurnal_detail_kredit_id' => $jurnalKreditId,
-                'tanggal' => now(),
             ]);
+
+            DB::commit();
 
             // Reset input
             $this->reset(['nominal_kredit', 'deskripsi_kredit']);
@@ -174,6 +181,7 @@ class Index extends Component
             $this->emit('refreshSaldo');
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'Transaksi kredit berhasil disimpan.']);
         } catch (\Exception $e) {
+            DB::rollBack();
             // Notifikasi error
             $this->dispatchBrowserEvent('alertify-error', ['message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
@@ -181,6 +189,8 @@ class Index extends Component
 
     public function simpanDebit()
     {
+        DB::beginTransaction();
+
         try {
             // Pastikan siswa dipilih
             if (!$this->ms_siswa_id) {
@@ -244,17 +254,20 @@ class Index extends Component
             ];
             $jurnalKreditId = AkuntansiJurnalDetail::create($jurnalKredit)->akuntansi_jurnal_detail_id;
 
-            TabunganSiswa::create([
+            TransaksiTabungan::create([
+                'user_id' => $this->ms_siswa_id,
+                'user_type' => 'siswa',
                 'ms_penempatan_siswa_id' => $this->ms_penempatan_siswa_id,
-                'ms_siswa_id' => $this->ms_siswa_id,
                 'ms_pengguna_id' => $ms_pengguna_id,
                 'jenis_transaksi' => 'penarikan', // Jenis transaksi untuk debit
                 'nominal' => $this->nominal_debit,
+                'tanggal' => now(),
                 'deskripsi' => $this->deskripsi_debit,
                 'akuntansi_jurnal_detail_debit_id' => $jurnalDebitId,
                 'akuntansi_jurnal_detail_kredit_id' => $jurnalKreditId,
-                'tanggal' => now(),
             ]);
+
+            DB::commit();
 
             // Reset input
             $this->reset(['nominal_debit', 'deskripsi_debit']);
@@ -268,6 +281,7 @@ class Index extends Component
             $this->emit('tagihanUpdated');
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'Transaksi debit berhasil disimpan.']);
         } catch (\Exception $e) {
+            DB::rollBack();
             // Notifikasi error
             $this->dispatchBrowserEvent('alertify-error', ['message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
@@ -276,7 +290,7 @@ class Index extends Component
     public function kirimWhatsapp($tabunganId)
     {
         // Ambil data tabungan berdasarkan ID
-        $tabungan = TabunganSiswa::where('ms_siswa_id', $this->ms_siswa_id)
+        $tabungan = TransaksiTabungan::where('ms_siswa_id', $this->ms_siswa_id)
             ->orderBy('tanggal', 'asc')
             ->orderBy('ms_tabungan_siswa_id', 'asc')
             ->get();
@@ -355,12 +369,21 @@ class Index extends Component
         $saldo = 0; // Letakkan di luar closure
 
         $transaksiTabunganSiswa = $this->ms_siswa_id
-            ? TabunganSiswa::where('ms_siswa_id', $this->ms_siswa_id)
-            // ->orderBy('tanggal', 'asc')
-            ->orderBy('ms_tabungan_siswa_id', 'asc')
+            ? TransaksiTabungan::query()
+            ->where('user_id', $this->ms_siswa_id)
+            // ->where('user_type', 'siswa')
+            // ->when($this->ms_penempatan_siswa_id, function ($query) {
+            //     $query->where('ms_penempatan_siswa_id', $this->ms_penempatan_siswa_id);
+            // })
+            ->orderBy('tanggal', 'ASC')
+            ->orderBy('ms_transaksi_tabungan_id', 'ASC')
             ->get()
             ->map(function ($item) use (&$saldo) {
-                $saldo += $item->jenis_transaksi === 'setoran' ? $item->nominal : -$item->nominal;
+                if (in_array($item->jenis_transaksi, ['setoran'])) {
+                    $saldo += $item->nominal;
+                } else {
+                    $saldo -= $item->nominal; // penarikan, transfer keluar
+                }
                 $item->saldo = $saldo;
                 return $item;
             })

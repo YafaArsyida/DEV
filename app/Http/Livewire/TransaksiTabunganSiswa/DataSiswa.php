@@ -6,7 +6,10 @@ use App\Models\AkuntansiJurnalDetail;
 use App\Models\PenempatanSiswa;
 use App\Models\Siswa;
 use App\Models\TabunganSiswa;
+use App\Models\TransaksiTabungan;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
 use Livewire\Component;
 
 class DataSiswa extends Component
@@ -71,6 +74,8 @@ class DataSiswa extends Component
     // kredit
     public function simpanKredit()
     {
+        DB::beginTransaction();
+
         try {
             // Pastikan siswa dipilih
             if (!$this->ms_siswa_id) {
@@ -131,18 +136,20 @@ class DataSiswa extends Component
             $jurnalKreditId = AkuntansiJurnalDetail::create($jurnalKredit)->akuntansi_jurnal_detail_id;
 
             // Simpan transaksi kredit
-            TabunganSiswa::create([
+            TransaksiTabungan::create([
+                'user_type' => 'siswa',
+                'user_id' => $this->ms_siswa_id,
                 'ms_penempatan_siswa_id' => $this->ms_penempatan_siswa_id,
-                'ms_siswa_id' => $this->ms_siswa_id,
                 'ms_pengguna_id' => $ms_pengguna_id,
                 'jenis_transaksi' => 'setoran', // Jenis transaksi untuk kredit
                 'nominal' => $this->nominal_kredit,
+                'tanggal' => now(),
                 'deskripsi' => $this->deskripsi_kredit,
                 'akuntansi_jurnal_detail_debit_id' => $jurnalDebitId,
                 'akuntansi_jurnal_detail_kredit_id' => $jurnalKreditId,
-                'tanggal' => now(),
             ]);
 
+            DB::commit();
             // Reset input
             $this->reset(['nominal_kredit', 'deskripsi_kredit']);
 
@@ -157,6 +164,7 @@ class DataSiswa extends Component
             $this->emit('refreshSaldo');
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'Transaksi kredit berhasil disimpan.']);
         } catch (\Exception $e) {
+            DB::rollBack();
             // Notifikasi error
             $this->dispatchBrowserEvent('alertify-error', ['message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
@@ -164,6 +172,8 @@ class DataSiswa extends Component
 
     public function simpanDebit()
     {
+        DB::beginTransaction();
+
         try {
             // Pastikan siswa dipilih
             if (!$this->ms_siswa_id) {
@@ -232,17 +242,20 @@ class DataSiswa extends Component
             $jurnalKreditId = AkuntansiJurnalDetail::create($jurnalKredit)->akuntansi_jurnal_detail_id;
 
             // Simpan transaksi debit
-            TabunganSiswa::create([
+            TransaksiTabungan::create([
+                'user_type' => 'siswa',
+                'user_id' => $this->ms_siswa_id,
                 'ms_penempatan_siswa_id' => $this->ms_penempatan_siswa_id,
-                'ms_siswa_id' => $this->ms_siswa_id,
                 'ms_pengguna_id' => $ms_pengguna_id,
                 'jenis_transaksi' => 'penarikan', // Jenis transaksi untuk debit
                 'nominal' => $this->nominal_debit,
+                'tanggal' => now(),
                 'deskripsi' => $this->deskripsi_debit,
                 'akuntansi_jurnal_detail_debit_id' => $jurnalDebitId,
                 'akuntansi_jurnal_detail_kredit_id' => $jurnalKreditId,
-                'tanggal' => now(),
             ]);
+
+            DB::commit();
 
             // Reset input
             $this->reset(['nominal_debit', 'deskripsi_debit']);
@@ -257,6 +270,7 @@ class DataSiswa extends Component
             $this->emit('refreshSaldo');
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'Transaksi debit berhasil disimpan.']);
         } catch (\Exception $e) {
+            DB::rollBack();
             // Notifikasi error
             $this->dispatchBrowserEvent('alertify-error', ['message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }

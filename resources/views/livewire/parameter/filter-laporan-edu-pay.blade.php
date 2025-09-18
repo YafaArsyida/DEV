@@ -30,9 +30,13 @@
                     </div>
                     <div class="mb-4">
                         <p class="text-muted text-uppercase fs-12 fw-medium mb-2">Jenis Transaksi</p>
-                        <select id="PilihJenisTransaksi" style="cursor: pointer" wire:model="selectedJenisTransaksi" class="form-select" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Metode Pembayaran" multiple="multiple" >
-                            <option value="pemasukan">Pemasukan</option>
-                            <option value="pengeluaran">Pengeluaran</option>
+                        <select id="PilihJenisTransaksi" style="cursor: pointer" wire:model="selectedJenisTransaksi" class="form-select" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Jenis Transaksi" multiple="multiple" >
+                            <option value="topup tunai">Topup Tunai</option>
+                            <option value="topup online">Topup Online</option>
+                            <option value="penarikan">Penarikan Tunai</option>
+                            <option value="pembayaran">Pembayaran Tagihan</option>
+                            <option value="pengembalian dana">Pengembalian Dana</option>
+                            <option value="kantin">Kantin</option>
                         </select>
                     </div>
                 </div>

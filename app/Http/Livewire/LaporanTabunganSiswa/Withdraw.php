@@ -5,10 +5,10 @@ namespace App\Http\Livewire\LaporanTabunganSiswa;
 use App\Models\AkuntansiJurnalDetail;
 use Livewire\Component;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 
 use App\Models\PenempatanSiswa;
-use App\Models\Tabungan;
-use App\Models\TabunganSiswa;
+use App\Models\TransaksiTabungan;
 
 class Withdraw extends Component
 {
@@ -38,7 +38,7 @@ class Withdraw extends Component
 
         // Ambil siswa berdasarkan kelas
         $this->siswa = PenempatanSiswa::where('ms_kelas_id', $this->selectedKelas)
-            ->whereHas('ms_siswa.ms_tabungan_siswa', function (Builder $query) {
+            ->whereHas('ms_siswa.ms_transaksi_tabungan', function (Builder $query) {
                 $query->where('jenis_transaksi', '!=', 'penarikan') // Pastikan transaksi bukan penarikan
                     ->where('nominal', '>', 0); // Pastikan saldo positif
             })
@@ -95,6 +95,7 @@ class Withdraw extends Component
             $this->dispatchBrowserEvent('alertify-error', ['message' => 'Tidak ada siswa untuk diproses.']);
             return;
         }
+        DB::beginTransaction();
         try {
             foreach ($this->siswa as $student) {
                 $saldoSekarang = $student->ms_siswa->saldo_tabungan_siswa();
@@ -115,7 +116,7 @@ class Withdraw extends Component
                         'ms_tahun_ajaran_id' => $student->ms_tahun_ajar_id,
                         'ms_jenjang_id' => $student->ms_jenjang_id,
                         'is_canceled' => 'active',
-                        'deskripsi' => "Penarikan Tunai tabungan Rp {$saldoSekarang} siswa {$student->ms_siswa->nama_siswa}",
+                        'deskripsi' => "Penarikan Tunai tabungan Rp {$saldoSekarang} siswa {$student->ms_siswa->nama_siswa} akhir tahun ajaran",
                     ];
                     $jurnalDebitId = AkuntansiJurnalDetail::create($jurnalDebit)->akuntansi_jurnal_detail_id;
 
@@ -129,28 +130,32 @@ class Withdraw extends Component
                         'ms_tahun_ajaran_id' => $student->ms_tahun_ajar_id,
                         'ms_jenjang_id' => $student->ms_jenjang_id,
                         'is_canceled' => 'active',
-                        'deskripsi' => "Penarikan Tunai tabungan Rp {$saldoSekarang} siswa {$student->ms_siswa->nama_siswa}",
+                        'deskripsi' => "Penarikan Tunai tabungan Rp {$saldoSekarang} siswa {$student->ms_siswa->nama_siswa} akhir tahun ajaran",
                     ];
                     $jurnalKreditId = AkuntansiJurnalDetail::create($jurnalKredit)->akuntansi_jurnal_detail_id;
 
                     // Simpan transaksi penarikan ke tabel ms_tabungan_siswa
-                    TabunganSiswa::create([
+                    TransaksiTabungan::create([
+                        'user_type' => 'siswa',
+                        'user_id' => $student->ms_siswa->ms_siswa_id,
                         'ms_penempatan_siswa_id' => $student->ms_penempatan_siswa_id,
-                        'ms_siswa_id' => $student->ms_siswa->ms_siswa_id,
                         'ms_pengguna_id' => auth()->id(), // ID pengguna saat ini
                         'jenis_transaksi' => 'penarikan',
                         'nominal' => $saldoSekarang,
-                        'deskripsi' => 'Penarikan saldo tabungan',
+                        'tanggal' => now(),
+                        'deskripsi' => "Penarikan Tunai tabungan Rp {$saldoSekarang} siswa {$student->ms_siswa->nama_siswa} akhir tahun ajaran",
                         'akuntansi_jurnal_detail_debit_id' => $jurnalDebitId,
                         'akuntansi_jurnal_detail_kredit_id' => $jurnalKreditId,
-                        'tanggal' => now(),
                     ]);
                 }
             }
+            DB::commit();
+
             $this->emit('refreshSaldo');
             $this->emit('refreshSaldoTabunganSiswa'); // Emit event ke komponen Livewire terkait
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'Saldo berhasil dikosongkan untuk semua siswa.']);
         } catch (\Exception $e) {
+            DB::rollBack();
             // Notifikasi error
             $this->dispatchBrowserEvent('alertify-error', ['message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }

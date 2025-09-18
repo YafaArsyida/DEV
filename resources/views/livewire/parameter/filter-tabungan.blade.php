@@ -29,6 +29,13 @@
                             @endforeach
                         </select>
                     </div>
+                    <div class="mb-4">
+                        <p class="text-muted text-uppercase fs-12 fw-medium mb-2">Jenis Transaksi</p>
+                        <select id="PilihJenisTransaksi" style="cursor: pointer" wire:model="selectedJenisTransaksi" class="form-select" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Jenis Transaksi" multiple="multiple" >
+                            <option value="setoran">Setoran</option>
+                            <option value="penarikan">Penarikan</option>
+                        </select>
+                    </div>
                    
                 </div>
                 <div class="offcanvas-footer border-top p-3 text-center hstack gap-2">
@@ -43,6 +50,7 @@
         // Select2 handler
         function initSelect2() {
             $('#PilihPetugas').select2(); // Terapkan Select2 pada elemen ini
+            $('#PilihJenisTransaksi').select2(); // Terapkan Select2 pada elemen ini
         }
 
         // Clear filter hanya didaftarkan sekali
@@ -66,6 +74,7 @@
                 startDate: startDate,
                 endDate: endDate,
                 selectedJenjang: $("#PilihPetugas").val(),
+                selectedJenisTransaksi: $("#PilihJenisTransaksi").val(),
             };
 
             // Emit filters ke Livewire

@@ -3,10 +3,10 @@
 namespace App\Http\Livewire\LaporanEduPaySiswa;
 
 use App\Models\AkuntansiJurnalDetail;
-use App\Models\EduPay;
-use App\Models\EduPaySiswa;
 use App\Models\PenempatanSiswa;
+use App\Models\TransaksiEduPay;
 use Livewire\Component;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Builder;
 
 class Withdraw extends Component
@@ -37,7 +37,7 @@ class Withdraw extends Component
 
         // Ambil siswa berdasarkan kelas
         $this->siswa = PenempatanSiswa::where('ms_kelas_id', $this->selectedKelas)
-            ->whereHas('ms_siswa.ms_edupay_siswa', function (Builder $query) {
+            ->whereHas('ms_siswa.ms_transaksi_edupay', function (Builder $query) {
                 $query->where('jenis_transaksi', '!=', 'penarikan') // Pastikan transaksi bukan penarikan
                     ->where('nominal', '>', 0); // Pastikan saldo positif
             })
@@ -92,6 +92,7 @@ class Withdraw extends Component
             $this->dispatchBrowserEvent('alertify-error', ['message' => 'Tidak ada siswa untuk diproses.']);
             return;
         }
+        DB::beginTransaction();
         try {
             foreach ($this->siswa as $student) {
                 $saldoSekarang = $student->ms_siswa->saldo_edupay_siswa();
@@ -131,24 +132,28 @@ class Withdraw extends Component
                     $jurnalKreditId = AkuntansiJurnalDetail::create($jurnalKredit)->akuntansi_jurnal_detail_id;
 
                     // Simpan transaksi penarikan ke tabel ms_edupay_siswa
-                    EduPaySiswa::create([
+                    TransaksiEduPay::create([
+                        'user_type' => 'siswa',
+                        'user_id' => $student->ms_siswa->ms_siswa_id,
                         'ms_penempatan_siswa_id' => $student->ms_penempatan_siswa_id,
-                        'ms_siswa_id' => $student->ms_siswa->ms_siswa_id,
                         'ms_pengguna_id' => auth()->id(), // ID pengguna saat ini
                         'jenis_transaksi' => 'penarikan',
                         'nominal' => $saldoSekarang,
-                        'deskripsi' => 'Penarikan saldo EduPay akhir tahun ajaran',
+                        'tanggal' => now(),
+                        'deskripsi' => "Penarikan Tunai EduPay Rp {$saldoSekarang} siswa {$student->ms_siswa->nama_siswa} akhir tahun ajaran",
                         'akuntansi_jurnal_detail_debit_id' => $jurnalDebitId,
                         'akuntansi_jurnal_detail_kredit_id' => $jurnalKreditId,
-                        'tanggal' => now(),
                     ]);
                 }
             }
+
+            DB::commit();
 
             $this->emit('refreshSaldoEduPay'); // Emit event ke komponen Livewire terkait
             $this->emit('refreshSaldo');
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'Saldo berhasil dikosongkan untuk semua siswa.']);
         } catch (\Exception $e) {
+            DB::rollBack();
             // Notifikasi error
             $this->dispatchBrowserEvent('alertify-error', ['message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }

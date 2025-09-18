@@ -7,8 +7,7 @@ use App\Models\Kelas;
 use Livewire\WithPagination;
 use Livewire\Component;
 
-use App\Models\Tabungan;
-use App\Models\TabunganSiswa;
+use App\Models\TransaksiTabungan;
 
 class Overview extends Component
 {
@@ -36,13 +35,20 @@ class Overview extends Component
                 ->get();
         }
 
-        $query = TabunganSiswa::query()
-            ->with(['ms_siswa', 'ms_pengguna', 'ms_penempatan_siswa'])
-            ->join('ms_siswa', 'ms_siswa.ms_siswa_id', '=', 'ms_tabungan_siswa.ms_siswa_id')
-            ->join('ms_penempatan_siswa', 'ms_penempatan_siswa.ms_penempatan_siswa_id', '=', 'ms_tabungan_siswa.ms_penempatan_siswa_id')
-            ->select('ms_tabungan_siswa.*', 'ms_siswa.nama_siswa', 'ms_penempatan_siswa.ms_jenjang_id', 'ms_penempatan_siswa.ms_tahun_ajar_id')
+        $query = TransaksiTabungan::query()
+            ->with(['ms_siswa', 'ms_pengguna', 'ms_penempatan_siswa.ms_kelas']) // ambil relasi kelas juga
+            ->join('ms_siswa', 'ms_siswa.ms_siswa_id', '=', 'ms_transaksi_tabungan.user_id')
+            ->join('ms_penempatan_siswa', 'ms_penempatan_siswa.ms_penempatan_siswa_id', '=', 'ms_transaksi_tabungan.ms_penempatan_siswa_id')
+            ->select(
+                'ms_transaksi_tabungan.*',
+                'ms_siswa.nama_siswa',
+                'ms_penempatan_siswa.ms_jenjang_id',
+                'ms_penempatan_siswa.ms_tahun_ajar_id',
+                'ms_penempatan_siswa.ms_kelas_id'
+            )
             ->where('ms_penempatan_siswa.ms_jenjang_id', $this->selectedJenjang)
             ->where('ms_penempatan_siswa.ms_tahun_ajar_id', $this->selectedTahunAjar)
+            ->where('ms_transaksi_tabungan.user_type', 'siswa')
             ->orderBy('tanggal', 'ASC');
 
         // Filter berdasarkan tahun ajar

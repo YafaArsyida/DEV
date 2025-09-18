@@ -2,39 +2,39 @@
     <div class="col-xxl-12 col-sm-12">
         <div class="card">
             <div class="card-body">
-                <div class="row g-3">
+                <div class="row g-3 align-items-end mb-3">
+                    <!-- Input Pencarian -->
                     <div class="col-xxl-8 col-sm-6">
-                        <div class="search-box">
-                            <input type="text" class="form-control search" wire:model.debounce.500ms="search" placeholder="cari nama, deskripsi atau lainnya...">
-                            <i class="ri-search-line search-icon"></i>
+                        <label for="searchInput" class="form-label">Pencarian</label>
+                        <div class="position-relative">
+                            <input type="text" id="searchInput" 
+                                class="form-control ps-4" 
+                                wire:model.debounce.300ms="search" 
+                                placeholder="Cari nama, deskripsi, atau lainnya...">
+                            <i class="ri-search-line position-absolute top-50 start-0 translate-middle-y ms-2 text-muted"></i>
                         </div>
                     </div>
+
+                    <!-- Filter Periode -->
                     <div class="col-xxl-4 col-sm-6">
-                        {{-- <select wire:model="selectedBulan" wire:change="$emit('bulanUpdated', $event.target.value)" class="form-select">
-                            <option value="">Semua Periode</option>
-                            @foreach ($select_bulan as $bulan)
-                                <option value="{{ $bulan['value'] }}">{{ $bulan['name'] }}</option>
-                            @endforeach
-                        </select> --}}
-                        <div class="row g-2 align-items-center">
-                            <!-- Label di sisi kiri -->
-                            <div class="col-auto">
-                                <label for="startDate" class="form-label text-muted text-uppercase fs-12 fw-medium mb-0">Periode </label>
-                            </div>
-                            <!-- Input tanggal di sisi kanan -->
+                        <label class="form-label">Periode</label>
+                        <div class="row g-2">
                             <div class="col">
-                                <div class="row g-2 align-items-center">
-                                    <div class="col-lg">
-                                        <input type="date" id="startDate" class="form-control" wire:model="startDate" placeholder="0">
-                                    </div>
-                                    <div class="col-lg">
-                                        <input type="date" id="endDate" class="form-control" wire:model="endDate" placeholder="0">
-                                    </div>
-                                </div>
+                                <input type="date" id="startDate" 
+                                    class="form-control" 
+                                    wire:model="startDate" 
+                                    placeholder="Mulai">
+                            </div>
+                            <div class="col">
+                                <input type="date" id="endDate" 
+                                    class="form-control" 
+                                    wire:model="endDate" 
+                                    placeholder="Sampai">
                             </div>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>

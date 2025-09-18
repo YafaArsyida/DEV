@@ -138,6 +138,7 @@ class DataSiswa extends Component
             TransaksiEduPay::create([
                 'user_type' => 'siswa',
                 'user_id' => $this->ms_siswa_id,
+                'ms_penempatan_siswa_id' => $this->ms_penempatan_siswa_id,
                 'ms_pengguna_id' => $ms_pengguna_id,
                 'jenis_transaksi' => 'topup tunai',
                 'nominal' => $this->nominal_topup,
@@ -249,6 +250,7 @@ class DataSiswa extends Component
             TransaksiEduPay::create([
                 'user_type' => 'siswa',
                 'user_id' => $this->ms_siswa_id,
+                'ms_penempatan_siswa_id' => $this->ms_penempatan_siswa_id,
                 'ms_pengguna_id' => $ms_pengguna_id,
                 'jenis_transaksi' => 'penarikan', // Jenis transaksi untuk tarik tunai
                 'nominal' => $this->nominal_penarikan,

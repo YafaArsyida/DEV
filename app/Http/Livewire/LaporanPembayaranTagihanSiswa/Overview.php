@@ -39,19 +39,22 @@ class Overview extends Component
             ->join('ms_tagihan_siswa', 'dt_transaksi_tagihan_siswa.ms_tagihan_siswa_id', '=', 'ms_tagihan_siswa.ms_tagihan_siswa_id')
             ->join('ms_penempatan_siswa', 'ms_tagihan_siswa.ms_penempatan_siswa_id', '=', 'ms_penempatan_siswa.ms_penempatan_siswa_id')
             ->selectRaw("
-            CASE
-                WHEN metode_pembayaran = 'Teller Tunai' THEN 'Teller Tunai'
-                WHEN metode_pembayaran = 'EduPay' THEN 'EduPay'
-                WHEN metode_pembayaran = 'Transfer ke Rekening Sekolah' THEN 'Transfer ke Rekening Sekolah'
-                ELSE 'Lainnya'
-            END as metode,
-            SUM(dt_transaksi_tagihan_siswa.jumlah_bayar) as total
-        ")
+                CASE
+                    WHEN metode_pembayaran = 'Teller Tunai' THEN 'Teller Tunai'
+                    WHEN metode_pembayaran = 'EduPay' THEN 'EduPay'
+                    WHEN metode_pembayaran = 'Transfer ke Rekening Sekolah' THEN 'Transfer ke Rekening Sekolah'
+                    ELSE 'Lainnya'
+                END as metode,
+                SUM(dt_transaksi_tagihan_siswa.jumlah_bayar) as total
+            ")
             ->where('ms_penempatan_siswa.ms_tahun_ajar_id', $this->selectedTahunAjar)
             ->where('ms_penempatan_siswa.ms_jenjang_id', $this->selectedJenjang)
-            ->when($this->selectedBulan, function ($query) {
-                $query->whereMonth('ms_transaksi_tagihan_siswa.tanggal_transaksi', $this->selectedBulan);
+            ->when($this->startDate && $this->endDate, function ($query) {
+                $query->whereBetween('ms_transaksi_tagihan_siswa.tanggal_transaksi', [$this->startDate, $this->endDate]);
             })
+            // ->when($this->selectedBulan, function ($query) {
+            //     $query->whereMonth('ms_transaksi_tagihan_siswa.tanggal_transaksi', $this->selectedBulan);
+            // })
             ->groupBy('metode')
             ->orderBy('total', 'DESC')
             ->get()
@@ -70,8 +73,11 @@ class Overview extends Component
         ")
             ->where('ms_penempatan_siswa.ms_tahun_ajar_id', $this->selectedTahunAjar)
             ->where('ms_penempatan_siswa.ms_jenjang_id', $this->selectedJenjang)
-            ->when($this->selectedBulan, function ($query) {
-                $query->whereMonth('ms_transaksi_tagihan_siswa.tanggal_transaksi', $this->selectedBulan);
+            // ->when($this->selectedBulan, function ($query) {
+            //     $query->whereMonth('ms_transaksi_tagihan_siswa.tanggal_transaksi', $this->selectedBulan);
+            // })
+            ->when($this->startDate && $this->endDate, function ($query) {
+                $query->whereBetween('ms_transaksi_tagihan_siswa.tanggal_transaksi', [$this->startDate, $this->endDate]);
             })
             ->groupBy('ms_kelas.nama_kelas')
             ->orderBy('total', 'DESC')
@@ -90,14 +96,17 @@ class Overview extends Component
         ")
             ->where('ms_penempatan_siswa.ms_tahun_ajar_id', $this->selectedTahunAjar)
             ->where('ms_penempatan_siswa.ms_jenjang_id', $this->selectedJenjang)
-            ->when($this->selectedBulan, function ($query) {
-                $query->whereMonth('ms_transaksi_tagihan_siswa.tanggal_transaksi', $this->selectedBulan);
+            // ->when($this->selectedBulan, function ($query) {
+            //     $query->whereMonth('ms_transaksi_tagihan_siswa.tanggal_transaksi', $this->selectedBulan);
+            // })
+            ->when($this->startDate && $this->endDate, function ($query) {
+                $query->whereBetween('ms_transaksi_tagihan_siswa.tanggal_transaksi', [$this->startDate, $this->endDate]);
             })
             ->groupBy('bulan')
             ->orderBy('bulan', 'ASC')
             ->get()
             ->toArray();
-
+            
         $totalMonths = array_sum(array_column($months, 'total'));
 
         $this->emit('prepareExportOverview', $methods, $classes, $months, $totalClasses);

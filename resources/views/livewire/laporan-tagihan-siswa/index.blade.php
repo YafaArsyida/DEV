@@ -12,7 +12,7 @@
                     @else
                         <button type="button" class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#suratTagihan" aria-controls="suratTagihan" wire:click="$emit('refreshSurat', {{ $selectedJenjang }})"><i class="ri-file-paper-2-line me-1"></i> Format Surat</button>
                     @endif
-                    <button data-bs-toggle="modal" data-bs-target="#ExportTagihanSiswa" wire:click.prevent="showExportTagihanSiswa" class="btn btn-soft-success"><i class="ri-file-excel-2-line me-1"></i> Export</button>
+                    {{-- <button data-bs-toggle="modal" data-bs-target="#ExportTagihanSiswa" wire:click.prevent="showExportTagihanSiswa" class="btn btn-soft-success"><i class="ri-file-excel-2-line me-1"></i> Export</button> --}}
                     <button type="button" class="btn btn-info" data-bs-toggle="offcanvas" data-bs-target="#filterTagihan" aria-controls="filterTagihan"><i class="ri-filter-3-line me-1"></i> Fliters</button>
                 </div>
             </div>
@@ -20,22 +20,35 @@
         </div>
     </div>
     <div class="card-body">
-        <div class="row g-3 mb-3">
+        <div class="row g-3 align-items-end mb-3">
+            <!-- Dropdown Kelas -->
             <div class="col-xxl-2 col-sm-6"> 
-                <select wire:model="selectedKelas" style="cursor: pointer" class="form-select" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Kelas">
+                <label for="selectKelas" class="form-label">Kelas</label>
+                <select id="selectKelas" 
+                        wire:model="selectedKelas" 
+                        class="form-select" style="cursor: pointer"
+                        data-bs-toggle="tooltip" data-bs-trigger="hover" 
+                        data-bs-placement="top" title="Pilih Kelas">
                     <option value="">Semua Kelas</option>
                     @foreach ($select_kelas as $item)    
-                    <option value="{{ $item->ms_kelas_id }}">{{ $item->nama_kelas }}</option>
+                        <option value="{{ $item->ms_kelas_id }}">{{ $item->nama_kelas }}</option>
                     @endforeach
                 </select>
             </div>
+
+            <!-- Input Pencarian -->
             <div class="col-xxl-10 col-sm-6">
-                <div class="search-box">
-                    <input type="text" class="form-control search" wire:model.debounce.300ms="search" placeholder="cari nama, deskripsi atau lainnya...">
-                    <i class="ri-search-line search-icon"></i>
+                <label for="searchInput" class="form-label">Pencarian</label>
+                <div class="position-relative">
+                    <input type="text" id="searchInput" 
+                        class="form-control ps-4" 
+                        wire:model.debounce.300ms="search" 
+                        placeholder="Cari nama, deskripsi, atau lainnya...">
+                    <i class="ri-search-line position-absolute top-50 start-0 translate-middle-y ms-2 text-muted"></i>
                 </div>
             </div>
         </div>
+
         <!--end row-->
         {{-- DATA --}}
         <div class="live-preview">

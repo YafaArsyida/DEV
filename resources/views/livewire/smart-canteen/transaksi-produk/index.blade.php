@@ -19,7 +19,7 @@
                 <div class="text-end me-2">
                     <h6 class="mb-1 text-primary">Saldo EduPay</h6>
                     <h4 class="fw-bold text-success mb-0">
-                        Rp {{ number_format($saldo_edupay ?? 0, 0, ',', '.') }}
+                        RP{{ number_format($saldo_edupay ?? 0, 0, ',', '.') }}
                     </h4>
                 </div>
 

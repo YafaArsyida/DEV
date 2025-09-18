@@ -47,7 +47,7 @@ class Delete extends Component
             $saldoSaatIni = $transaksi->ms_siswa->saldo_edupay_siswa();
 
             // Hitung saldo setelah penghapusan
-            if (in_array($transaksi->jenis_transaksi, ['topup', 'topup online', 'pengembalian dana'])) {
+            if (in_array($transaksi->jenis_transaksi, ['topup tunai', 'topup online', 'pengembalian dana'])) {
                 $saldoSetelahHapus = $saldoSaatIni - $transaksi->nominal;
             } elseif (in_array($transaksi->jenis_transaksi, ['penarikan', 'pembayaran', 'kantin'])) {
                 $saldoSetelahHapus = $saldoSaatIni + $transaksi->nominal;

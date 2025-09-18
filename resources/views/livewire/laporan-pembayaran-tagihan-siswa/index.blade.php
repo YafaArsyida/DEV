@@ -9,8 +9,9 @@
                         <i class="ri-printer-line align-bottom"></i>
                         <span>Cetak Laporan</span>
                     </button>
+                    <button data-bs-toggle="modal" data-bs-target="#ExportLaporanExcel" class="btn btn-soft-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button>
+                    {{-- <button data-bs-toggle="modal" data-bs-target="#ExportPembayaranSiswa" wire:click.prevent="showExportPembayaranSiswa"  class="btn btn-soft-success"><i class="ri-file-excel-2-line me-1 align-bottom"></i> Export</button> --}}
                     <button type="button" class="btn btn-info" data-bs-toggle="offcanvas" data-bs-target="#filterPembayaran" aria-controls="filterTabungan"><i class="ri-filter-3-line align-bottom me-1"></i> Fliters</button>
-                    <button data-bs-toggle="modal" data-bs-target="#ExportPembayaranSiswa" wire:click.prevent="showExportPembayaranSiswa"  class="btn btn-soft-success"><i class="ri-file-excel-2-line me-1 align-bottom"></i> Export</button>
                 </div>
             </div>
             @endif
@@ -40,7 +41,7 @@
                 </div>
             @else
             <div class="table-responsive">
-                <table class="table table-hover nowrap align-middle" style="width:100%">
+                <table id="tabelPembayaran" class="table table-hover nowrap align-middle" style="width:100%">
                     <thead class="table-light">
                         <tr>
                             <th class="text-uppercase">No</th>
@@ -110,4 +111,45 @@
         </div>
         {{-- end data --}}
     </div>
+    {{-- MODAL --}}
+    <div class="modal fade zoomIn" id="ExportLaporanExcel" tabindex="-1" aria-labelledby="exportRecordLabel" aria-hidden="true" wire:ignore.self>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-5 text-center">
+                    <lord-icon src="https://cdn.lordicon.com/fjvfsqea.json" trigger="loop" colors="primary:#405189,secondary:#f06548" style="width:90px;height:90px"></lord-icon>
+                    <div class="mt-4 text-center">
+                        <h4 class="fs-semibold">Konfirmasi Export</h4>
+                        <p class="text-muted fs-14 mb-4 pt-1">
+                            Apakah Anda yakin ingin mengekspor laporan Pembayaran Tagihan Siswa? Data yang diekspor akan sesuai dengan tabel yang ditampilkan.
+                        </p>
+                        <div class="hstack gap-2 justify-content-center remove">
+                            <button class="btn btn-link link-success fw-medium text-decoration-none shadow-none" data-bs-dismiss="modal">
+                                <i class="ri-close-line me-1 align-middle"></i> Batal
+                            </button>
+                            <button class="btn btn-primary" id="konfirmasiExportLaporan" data-bs-dismiss="modal">Ya, Export!</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('konfirmasiExportLaporan').addEventListener('click', function () {
+            alertify.success("Menyiapkan Dokumen");
+            // Tambahkan delay 1 detik
+            setTimeout(function () {
+                // Ambil elemen tabel berdasarkan ID
+                var table = document.getElementById("tabelPembayaran"); // ganti sesuai kebutuhan
+        
+                // Konversi tabel ke format Excel
+                var workbook = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+                
+                // Simpan file Excel
+                XLSX.writeFile(workbook, "Laporan-Pembayaran-Siswa.xlsx");
+            }, 1000); // 1000 ms = 1 detik
+        });
+    </script>
 </div>

@@ -15,6 +15,7 @@ class FilterTabungan extends Component
     public $endDate = null;
     public $selectedPetugas = [];
     public $selectedJenjang = [];
+    public $selectedJenisTransaksi = [];
 
     // Listener untuk Livewire
     protected $listeners = [
@@ -28,6 +29,7 @@ class FilterTabungan extends Component
         $this->endDate = $filters['endDate'] ?? null;
 
         $this->selectedPetugas = $filters['selectedPetugas'] ?? [];
+        $this->selectedJenisTransaksi = $filters['selectedJenisTransaksi'] ?? [];
     }
 
     public function clearFilters()
@@ -35,6 +37,7 @@ class FilterTabungan extends Component
         $this->startDate = null;
         $this->endDate = null;
 
+        $this->selectedJenisTransaksi = [];
         $this->selectedPetugas = [];
     }
 

@@ -18,10 +18,12 @@
             </div>
             <div class="card-body">
                 <div class="row g-3 align-items-end mb-3">
-                    <!-- Dropdown Transaksi -->
+                    <!-- Dropdown Kas/Bank -->
                     <div class="col-xxl-2 col-md-6">
                         <label for="selectRekening" class="form-label">Kas/Bank</label>
-                        <select id="selectRekening" wire:model="selectedRekening" class="form-select" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Jenis Transaksi">
+                        <select id="selectRekening" wire:model="selectedRekening" class="form-select"
+                                data-bs-toggle="tooltip" data-bs-trigger="hover" 
+                                data-bs-placement="top" title="Pilih Jenis Transaksi">
                             <option value="">Semua</option>
                             <option value="11001">Kas Besar</option>
                             <option value="11002">Bank Sekolah</option>
@@ -32,31 +34,35 @@
                     <div class="col-xxl-5 col-md-5">
                         <label for="searchInput" class="form-label">Pencarian</label>
                         <div class="position-relative">
-                            <input type="text" id="searchInput" class="form-control ps-4" wire:model.debounce.300ms="search" placeholder="Cari nama, deskripsi, atau lainnya...">
+                            <input type="text" id="searchInput" 
+                                class="form-control ps-4" 
+                                wire:model.debounce.300ms="search" 
+                                placeholder="Cari nama, deskripsi, atau lainnya...">
                             <i class="ri-search-line position-absolute top-50 start-0 translate-middle-y ms-2 text-muted"></i>
                         </div>
                     </div>
 
                     <!-- Filter Periode -->
                     <div class="col-xxl-5">
-                        <div class="row">
-                            <div class="col-12">
-                                <label class="form-label">Periode</label>
-                            </div>
+                        <label class="form-label">Periode</label>
+                        <div class="row g-2 align-items-center">
                             <div class="col-md-5">
                                 <input type="date" id="startDate" class="form-control" wire:model="startDate" placeholder="Mulai">
                             </div>
                             <div class="col-md-5">
                                 <input type="date" id="endDate" class="form-control" wire:model="endDate" placeholder="Sampai">
                             </div>
-                            <div class="col-md-2">
-                                <button type="button" class="btn btn-soft-secondary btn-icon rounded-circle" wire:click="resetTanggal" title="Reset Tanggal">
+                            <div class="col-md-2 text-center">
+                                <button type="button" class="btn btn-soft-secondary btn-icon rounded-circle" 
+                                        wire:click="resetTanggal" data-bs-toggle="tooltip" 
+                                        data-bs-placement="top" title="Reset Tanggal">
                                     <i class="ri-refresh-line fs-16"></i>
-                                </button>    
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
+
                 {{-- DATA --}}
                 <div class="live-preview">
                     <div class="table-responsive">

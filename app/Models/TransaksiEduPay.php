@@ -15,6 +15,7 @@ class TransaksiEduPay extends Model
     protected $fillable = [
         'user_type', // siswa, pegawai, guru, wali, dll
         'user_id',   // id dari user_type terkait
+        'ms_penempatan_siswa_id',
         'ms_pengguna_id',
         'jenis_transaksi',
         'nominal',
@@ -37,6 +38,11 @@ class TransaksiEduPay extends Model
         return $this->belongsTo(Siswa::class, 'user_id', 'ms_siswa_id');
                     // ->where('user_type', 'siswa');
     }
+    public function ms_penempatan_siswa()
+    {
+        return $this->belongsTo(PenempatanSiswa::class, 'ms_penempatan_siswa_id', 'ms_penempatan_siswa_id');
+    }
+
 
     // Relasi ke Pegawai
     public function ms_pegawai()

@@ -8,34 +8,44 @@
             </div>
             <div class="flex-shrink-0">
                 <div class="d-flex gap-2 flex-wrap">
+                    <button data-bs-toggle="modal" data-bs-target="#ExportLaporanExcel" class="btn btn-soft-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button>
+                    {{-- <button data-bs-toggle="modal" data-bs-target="#ExportTabunganSiswa" wire:click.prevent="showExportTabunganSiswa" class="btn btn-soft-success"><i class="ri-file-excel-2-line"></i> Export</button> --}}
                     <button type="button" class="btn btn-info" data-bs-toggle="offcanvas" data-bs-target="#filterTabungan" aria-controls="filterTabungan"><i class="ri-filter-3-line align-bottom me-1"></i> Fliters</button>
-                    <button data-bs-toggle="modal" data-bs-target="#ExportTabunganSiswa" wire:click.prevent="showExportTabunganSiswa" class="btn btn-soft-success"><i class="ri-file-excel-2-line"></i> Export</button>
                 </div>
             </div>
         </div>
     </div>
     <div class="card-body">
-        <div class="row g-3 mb-3">
-            <div class="col-xxl-8 col-sm-6">
-                <div class="search-box">
-                    <input type="text" class="form-control search" wire:model.debounce.300ms="search" placeholder="cari nama, deskripsi atau lainnya...">
-                    <i class="ri-search-line search-icon"></i>
-                </div>
-            </div>
-            <div class="col-xxl-4 col-sm-6">
-                <select wire:model="selectedKelas" style="cursor: pointer" class="form-select" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Kelas">
+        <div class="row g-3 align-items-end mb-3">
+            <!-- Dropdown Kelas -->
+            <div class="col-xxl-3 col-sm-6">
+                <label for="selectKelas" class="form-label">Kelas</label>
+                <select id="selectKelas" wire:model="selectedKelas" 
+                        class="form-select" style="cursor: pointer"
+                        data-bs-toggle="tooltip" data-bs-trigger="hover" 
+                        data-bs-placement="top" title="Pilih Kelas">
                     <option value="">Semua Kelas</option>
                     @foreach ($select_kelas as $item)    
-                    <option value="{{ $item->ms_kelas_id }}">{{ $item->nama_kelas }}</option>
+                        <option value="{{ $item->ms_kelas_id }}">{{ $item->nama_kelas }}</option>
                     @endforeach
                 </select>
+            </div>
+            <!-- Input Pencarian -->
+            <div class="col-xxl-9 col-sm-6">
+                <label for="searchInput" class="form-label">Pencarian</label>
+                <div class="position-relative">
+                    <input type="text" id="searchInput" class="form-control ps-4" 
+                        wire:model.debounce.300ms="search" 
+                        placeholder="Cari nama, deskripsi, atau lainnya...">
+                    <i class="ri-search-line position-absolute top-50 start-0 translate-middle-y ms-2 text-muted"></i>
+                </div>
             </div>
         </div>
         <!--end row-->
         {{-- DATA --}}
         <div class="live-preview">
             <div class="table-responsive">
-                <table class="table table-hover nowrap align-middle" style="width:100%">
+                <table id="tabelTabungan" class="table table-hover nowrap align-middle" style="width:100%">
                     <thead class="table-light">
                         <tr>
                             <th class="text-uppercase">No</th>
@@ -124,4 +134,45 @@
             </div>
         </div>
     </div>
+    {{-- MODAL --}}
+    <div class="modal fade zoomIn" id="ExportLaporanExcel" tabindex="-1" aria-labelledby="exportRecordLabel" aria-hidden="true" wire:ignore.self>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-5 text-center">
+                    <lord-icon src="https://cdn.lordicon.com/fjvfsqea.json" trigger="loop" colors="primary:#405189,secondary:#f06548" style="width:90px;height:90px"></lord-icon>
+                    <div class="mt-4 text-center">
+                        <h4 class="fs-semibold">Konfirmasi Export</h4>
+                        <p class="text-muted fs-14 mb-4 pt-1">
+                            Apakah Anda yakin ingin mengekspor laporan Tabungan Siswa? Data yang diekspor akan sesuai dengan tabel yang ditampilkan.
+                        </p>
+                        <div class="hstack gap-2 justify-content-center remove">
+                            <button class="btn btn-link link-success fw-medium text-decoration-none shadow-none" data-bs-dismiss="modal">
+                                <i class="ri-close-line me-1 align-middle"></i> Batal
+                            </button>
+                            <button class="btn btn-primary" id="konfirmasiExportLaporan" data-bs-dismiss="modal">Ya, Export!</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('konfirmasiExportLaporan').addEventListener('click', function () {
+            alertify.success("Menyiapkan Dokumen");
+            // Tambahkan delay 1 detik
+            setTimeout(function () {
+                // Ambil elemen tabel berdasarkan ID
+                var table = document.getElementById("tabelTabungan"); // ganti sesuai kebutuhan
+        
+                // Konversi tabel ke format Excel
+                var workbook = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+                
+                // Simpan file Excel
+                XLSX.writeFile(workbook, "Laporan-Tabungan-Siswa.xlsx");
+            }, 1000); // 1000 ms = 1 detik
+        });
+    </script>
 </div>

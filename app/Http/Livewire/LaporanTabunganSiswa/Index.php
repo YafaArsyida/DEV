@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 
 use App\Models\Tabungan;
 use App\Models\TabunganSiswa;
+use App\Models\TransaksiTabungan;
 
 class Index extends Component
 {
@@ -20,6 +21,7 @@ class Index extends Component
     public $selectedTahunAjar = null;
     public $selectedKelas = null;
 
+    public $selectedJenisTransaksi = [];
     public $selectedPetugas = [];
 
     public $startDate = null;
@@ -46,6 +48,7 @@ class Index extends Component
         // Simpan filter yang diterima
         $this->startDate = $filters['startDate'] ?? null;
         $this->endDate = $filters['endDate'] ?? null;
+        $this->selectedJenisTransaksi = $filters['selectedJenisTransaksi'] ?? [];
         $this->selectedPetugas = $filters['selectedPetugas'] ?? [];
     }
 
@@ -53,6 +56,7 @@ class Index extends Component
     {
         $this->startDate = null;
         $this->endDate = null;
+        $this->selectedJenisTransaksi = [];
         $this->selectedPetugas = [];
     }
 
@@ -63,11 +67,11 @@ class Index extends Component
 
     public function showExportTabunganSiswa()
     {
-        $query = TabunganSiswa::query()
+        $query = TransaksiTabungan::query()
             ->with(['ms_siswa', 'ms_pengguna', 'ms_penempatan_siswa.ms_kelas'])
-            ->join('ms_siswa', 'ms_siswa.ms_siswa_id', '=', 'ms_tabungan_siswa.ms_siswa_id')
-            ->join('ms_penempatan_siswa', 'ms_penempatan_siswa.ms_penempatan_siswa_id', '=', 'ms_tabungan_siswa.ms_penempatan_siswa_id')
-            ->select('ms_tabungan_siswa.*', 'ms_siswa.nama_siswa', 'ms_penempatan_siswa.ms_jenjang_id', 'ms_penempatan_siswa.ms_tahun_ajar_id')
+            ->join('ms_siswa', 'ms_siswa.ms_siswa_id', '=', 'ms_transaksi_tabungan.user_id')
+            ->join('ms_penempatan_siswa', 'ms_penempatan_siswa.ms_penempatan_siswa_id', '=', 'ms_transaksi_tabungan.ms_penempatan_siswa_id')
+            ->select('ms_transaksi_tabungan.*', 'ms_siswa.nama_siswa', 'ms_penempatan_siswa.ms_jenjang_id', 'ms_penempatan_siswa.ms_tahun_ajar_id')
             ->where('ms_penempatan_siswa.ms_jenjang_id', $this->selectedJenjang)
             ->where('ms_penempatan_siswa.ms_tahun_ajar_id', $this->selectedTahunAjar)
             ->orderBy('tanggal', 'ASC');
@@ -78,7 +82,7 @@ class Index extends Component
         }
 
         if ($this->selectedPetugas) {
-            $query->where('ms_tabungan_siswa.ms_pengguna_id', $this->selectedPetugas);
+            $query->where('ms_transaksi_tabungan.ms_pengguna_id', $this->selectedPetugas);
         }
 
         // Filter berdasarkan nama siswa jika ada
@@ -116,13 +120,20 @@ class Index extends Component
                 ->get();
         }
 
-        $query = TabunganSiswa::query()
-            ->with(['ms_siswa', 'ms_pengguna', 'ms_penempatan_siswa'])
-            ->join('ms_siswa', 'ms_siswa.ms_siswa_id', '=', 'ms_tabungan_siswa.ms_siswa_id')
-            ->join('ms_penempatan_siswa', 'ms_penempatan_siswa.ms_penempatan_siswa_id', '=', 'ms_tabungan_siswa.ms_penempatan_siswa_id')
-            ->select('ms_tabungan_siswa.*', 'ms_siswa.nama_siswa', 'ms_penempatan_siswa.ms_jenjang_id', 'ms_penempatan_siswa.ms_tahun_ajar_id')
+        $query = TransaksiTabungan::query()
+            ->with(['ms_siswa', 'ms_pengguna', 'ms_penempatan_siswa.ms_kelas']) // ambil relasi kelas juga
+            ->join('ms_siswa', 'ms_siswa.ms_siswa_id', '=', 'ms_transaksi_tabungan.user_id')
+            ->join('ms_penempatan_siswa', 'ms_penempatan_siswa.ms_penempatan_siswa_id', '=', 'ms_transaksi_tabungan.ms_penempatan_siswa_id')
+            ->select(
+                'ms_transaksi_tabungan.*',
+                'ms_siswa.nama_siswa',
+                'ms_penempatan_siswa.ms_jenjang_id',
+                'ms_penempatan_siswa.ms_tahun_ajar_id',
+                'ms_penempatan_siswa.ms_kelas_id'
+            )
             ->where('ms_penempatan_siswa.ms_jenjang_id', $this->selectedJenjang)
             ->where('ms_penempatan_siswa.ms_tahun_ajar_id', $this->selectedTahunAjar)
+            ->where('ms_transaksi_tabungan.user_type', 'siswa')
             ->orderBy('tanggal', 'ASC');
 
         // Filter berdasarkan tahun ajar
@@ -131,7 +142,7 @@ class Index extends Component
         }
 
         if ($this->selectedPetugas) {
-            $query->where('ms_tabungan_siswa.ms_pengguna_id', $this->selectedPetugas);
+            $query->where('ms_transaksi_tabungan.ms_pengguna_id', $this->selectedPetugas);
         }
 
         // Filter berdasarkan nama siswa jika ada
@@ -146,6 +157,11 @@ class Index extends Component
             $startDate = Carbon::createFromFormat('Y-m-d', $this->startDate)->startOfDay();
             $endDate = Carbon::createFromFormat('Y-m-d', $this->endDate)->endOfDay();
             $query->whereBetween('tanggal', [$startDate, $endDate]);
+        }
+      
+        // Filter berdasarkan pilihan
+        if ($this->selectedJenisTransaksi) {
+            $query->whereIn('jenis_transaksi', $this->selectedJenisTransaksi);
         }
 
         // Hitung total kredit, debit, dan saldo

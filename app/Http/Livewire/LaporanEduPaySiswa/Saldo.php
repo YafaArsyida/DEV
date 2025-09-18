@@ -74,7 +74,7 @@ class Saldo extends Component
             });
         }
 
-        $query->whereHas('ms_siswa.ms_edupay_siswa', function (Builder $query) {
+        $query->whereHas('ms_siswa.ms_transaksi_edupay', function (Builder $query) {
             $query->whereNotNull('ms_penempatan_siswa_id');
         });
 
@@ -112,7 +112,7 @@ class Saldo extends Component
             ->where('ms_tahun_ajar_id', $this->selectedTahunAjar)
             ->when($this->selectedKelas, fn($q) => $q->where('ms_kelas_id', $this->selectedKelas))
             ->whereHas(
-                'ms_siswa.ms_edupay_siswa',
+                'ms_siswa.ms_transaksi_edupay',
                 fn($q) =>
                 $q->whereNotNull('ms_penempatan_siswa_id')
             )
