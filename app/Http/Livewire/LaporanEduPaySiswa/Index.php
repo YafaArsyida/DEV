@@ -124,6 +124,27 @@ class Index extends Component
         $this->emit('prepareExportEduPay', $laporans->toArray(), $totalPemasukan, $totalPengeluaran, $totalSaldo);
     }
 
+    public function cetakLaporan()
+    {
+        if (!$this->selectedJenjang || !$this->selectedTahunAjar) {
+            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Jenjang dan Tahun Ajar wajib dipilih']);
+            return;
+        }
+
+        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Laporan diproses.']);
+
+        $url = route('laporan.edupay-siswa.pdf', [
+            'jenjang' => $this->selectedJenjang,
+            'tahun' => $this->selectedTahunAjar,
+            'start_date' => $this->startDate,
+            'end_date' => $this->endDate,
+            'kelas' => $this->selectedKelas,
+            'jenis_transaksi' => $this->selectedJenisTransaksi,
+        ]);
+
+        $this->emit('openNewTab', $url);
+    }
+
     public function render()
     {
         $select_kelas = [];

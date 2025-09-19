@@ -128,8 +128,16 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/laporan/tagihan-siswa/{msPenempatanSiswaId}', [LaporanTagihanSiswa::class, 'generatePDF'])->name('laporan.tagihan-siswa.generatePDF');
     Route::get('/laporan/tagihan-kelas/{ms_kelas_id}', [LaporanTagihanSiswa::class, 'generatePDFByClass'])->name('laporan.tagihan-kelas.generatePDFByClass');
 
+    // LAPORAN TABUNGAN SISWA 
     Route::get('/laporan/tabungan-siswa',  [LaporanTabunganSiswa::class, 'index'])->name('laporan.tabungan-siswa');
+    Route::get('/laporan/tabungan-siswa/pdf',  [LaporanTabunganSiswa::class, 'cetakPDF'])->name('laporan.tabungan-siswa.pdf');
+    // END LAPORAN TABUNGAN SISWA
+
+    // LAPORAN EDUPAY SISWA
     Route::get('/laporan/edupay-siswa',  [LaporanEduPaySiswa::class, 'index'])->name('laporan.edupay-siswa');
+    Route::get('/laporan/edupay-siswa/pdf',  [LaporanEduPaySiswa::class, 'cetakPDF'])->name('laporan.edupay-siswa.pdf');
+    // END LAPORAN EDUPAY SISWA
+
     Route::get('/laporan/rekapitulasi-keuangan',  [LaporanRekapitulasiKeuangan::class, 'index'])->name('laporan.rekapitulasi-keuangan');
 
     Route::get('/akuntansi/konfigurasi',  [AkuntansiKonfigurasi::class, 'index'])->name('akuntansi.konfigurasi');

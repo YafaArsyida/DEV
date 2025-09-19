@@ -8,6 +8,12 @@
             </div>
             <div class="flex-shrink-0">
                 <div class="d-flex gap-2 flex-wrap">
+                    @if ($selectedKelas)
+                        <button wire:click="cetakLaporan" class="btn btn-danger d-inline-flex align-items-center gap-1">
+                            <i class="ri-printer-line align-bottom"></i>
+                            <span>Cetak Laporan</span>
+                        </button>
+                    @endif
                     <button data-bs-toggle="modal" data-bs-target="#ExportLaporanExcel" class="btn btn-soft-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button>
                     {{-- <button data-bs-toggle="modal" data-bs-target="#ExportTabunganSiswa" wire:click.prevent="showExportTabunganSiswa" class="btn btn-soft-success"><i class="ri-file-excel-2-line"></i> Export</button> --}}
                     <button type="button" class="btn btn-info" data-bs-toggle="offcanvas" data-bs-target="#filterTabungan" aria-controls="filterTabungan"><i class="ri-filter-3-line align-bottom me-1"></i> Fliters</button>

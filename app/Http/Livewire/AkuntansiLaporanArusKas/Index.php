@@ -41,7 +41,6 @@ class Index extends Component
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
     }
 
-
     public function cetakLaporan()
     {
         if (!$this->selectedJenjang || !$this->selectedTahunAjar) {
