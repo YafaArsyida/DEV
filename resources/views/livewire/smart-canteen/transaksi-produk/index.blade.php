@@ -5,6 +5,14 @@
             <div>
                 <h4 class="mb-1 fw-bold text-dark">
                     {{ $nama ?: 'Belum ada pengguna' }}
+                    - 
+                    @if($user_type === 'siswa')
+                        {{ $nama_kelas ?: 'Belum ada kelas' }}
+                    @elseif($user_type === 'pegawai')
+                        {{ $nama_jabatan ?: 'Belum ada jabatan' }}
+                    @else
+                        {{ 'Belum ada informasi' }}
+                    @endif
                 </h4>
                 <div class="text-muted">
                     SmartCard : 
