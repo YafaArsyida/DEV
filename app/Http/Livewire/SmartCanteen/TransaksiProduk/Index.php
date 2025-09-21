@@ -62,6 +62,7 @@ class Index extends Component
             'nama_kelas',
             'educard',
             'saldo_edupay',
+            
             'nama_jabatan',
         ]);
     }

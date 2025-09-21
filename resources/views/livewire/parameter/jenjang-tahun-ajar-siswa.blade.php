@@ -104,7 +104,6 @@
                                                             <i class="ri-checkbox-circle-line align-bottom"></i> Pilih
                                                         </button>
                                                     </li>
-                                                    
                                                 </ul>
                                             </td>
                                         </tr>

@@ -190,24 +190,41 @@
                             </ul>
                         </div>
                     </li>
-                
-                     <!-- Transaksi Pegawai -->
-                     <li class="nav-item">
-                        <a class="nav-link menu-link" href="#sidebarTransaksiPegawai" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarTransaksiPegawai">
-                            <i class="mdi mdi-account-cash-outline"></i>
+
+                    @php
+                        $isTransaksiPegawaiActive = request()->routeIs('transaksi.edupay-pegawai') || request()->routeIs('transaksi.edupay-pegawai');
+                    @endphp
+                    
+                    <li class="nav-item">
+                        <a class="nav-link menu-link {{ $isTransaksiPegawaiActive ? 'active' : '' }}" 
+                        href="#sidebarTransaksiPegawai" 
+                        data-bs-toggle="collapse" 
+                        role="button" 
+                        aria-expanded="{{ $isTransaksiPegawaiActive ? 'true' : 'false' }}" 
+                        aria-controls="sidebarTransaksiPegawai">
+                            <i class="mdi mdi-school"></i>
                             <span data-key="t-transaksi-pegawai">Transaksi Pegawai</span>
                         </a>
-                        <div class="collapse menu-dropdown" id="sidebarTransaksiPegawai">
+                        <div class="collapse menu-dropdown {{ $isTransaksiPegawaiActive ? 'show' : '' }}" id="sidebarTransaksiPegawai">
                             <ul class="nav nav-sm flex-column">
                                 <li class="nav-item">
-                                    <a href="#" class="nav-link" data-key="t-tabungan-pegawai">Tabungan Pegawai</a>
+                                    <a href="{{ route('transaksi.edupay-pegawai') }}" 
+                                    class="nav-link {{ request()->routeIs('transaksi.edupay-pegawai') ? 'active' : '' }}" 
+                                    data-key="t-tabungan-pegawai">
+                                    Tabungan Pegawai
+                                    </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="#" class="nav-link" data-key="t-edupay-pegawai">EduPay Pegawai</a>
+                                    <a href="{{ route('transaksi.edupay-pegawai') }}" 
+                                    class="nav-link {{ request()->routeIs('transaksi.edupay-pegawai') ? 'active' : '' }}" 
+                                    data-key="t-edupay-pegawai">
+                                    EduPay Pegawai
+                                    </a>
                                 </li>
                             </ul>
                         </div>
-                    </li>  
+                    </li>
+                
                     <!-- Penggajian Pegawai -->
                     <li class="nav-item">
                         <a class="nav-link menu-link" href="#">

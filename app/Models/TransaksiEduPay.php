@@ -13,7 +13,7 @@ class TransaksiEduPay extends Model
     protected $primaryKey = 'ms_transaksi_edupay_id'; // Nama kolom primary key
 
     protected $fillable = [
-        'user_type', // siswa, pegawai, guru, wali, dll
+        'user_type', // siswa, pegawai dll
         'user_id',   // id dari user_type terkait
         'ms_penempatan_siswa_id',
         'ms_pengguna_id',

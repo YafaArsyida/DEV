@@ -141,4 +141,17 @@ class Siswa extends Model
             ->where('jenis_pemilik', 'siswa');
     }
     // ===============END EDUCARD
+
+    // =============== SMARTCANTEEN ===============
+    public function ms_transaksi_smartcanteen()
+    {
+        return $this->hasMany(TransaksiSmartCanteen::class, 'user_id', 'ms_siswa_id')
+            ->where('user_type', 'siswa');
+    }
+
+    public function total_transaksi_smartcanteen()
+    {
+        return $this->ms_transaksi_smartcanteen()->sum('total_transaksi');
+    }
+    // =============== END SMARTCANTEEN ===============
 }

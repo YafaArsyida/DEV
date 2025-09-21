@@ -59,10 +59,10 @@
                 </li>
                 <li class="menu-title"><span data-key="t-administrasi">Laporan</span></li>
                 <li class="nav-item">
-                    <a href="{{ route('akuntansi.konfigurasi') }}"
-                    class="nav-link menu-link {{ request()->routeIs('akuntansi.konfigurasi') ? 'active' : '' }}">
+                    <a href="{{ route('smartCanteen.laporan.transaksi') }}"
+                    class="nav-link menu-link {{ request()->routeIs('smartCanteen.laporan.transaksi') ? 'active' : '' }}">
                         <i class="mdi mdi-school-outline"></i>
-                        <span data-key="t-kelas-siswa">Laporan Keuangan</span>
+                        <span data-key="t-kelas-siswa">Laporan Transaksi</span>
                     </a>
                 </li>
             </ul>

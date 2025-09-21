@@ -18,9 +18,14 @@ class KeranjangProduk extends Component
 
     public $user_type;
     public $user_id;
+    public $ms_penempatan_siswa_id;
     public $nama;
+    public $nama_kelas;
     public $educard;
     public $saldo_edupay;
+
+    public $nama_jabatan;
+
     public $metode_pembayaran = 'EduPay';
 
     public $ms_jenjang_id;
@@ -33,13 +38,18 @@ class KeranjangProduk extends Component
 
     public function scanSuccess($data)
     {
-        $this->user_type    = $data['user_type'];   // 'siswa' atau 'pegawai'
-        $this->user_id      = $data['user_id'];     // ms_siswa_id atau ms_pegawai_id
-        $this->nama         = $data['nama'];        // nama siswa/pegawai
-        $this->educard      = $data['educard'];
-        $this->saldo_edupay = $data['saldo_edupay'];
-        $this->ms_jenjang_id = $data['ms_jenjang_id'];
-        $this->ms_tahun_ajar_id = $data['ms_tahun_ajar_id'];
+        $this->user_type                = $data['user_type'];   // 'siswa' atau 'pegawai'
+        $this->user_id                  = $data['user_id'];     // ms_siswa_id atau ms_pegawai_id
+        $this->ms_penempatan_siswa_id   = $data['ms_penempatan_siswa_id'];     // ms_siswa_id atau ms_pegawai_id
+        $this->nama                     = $data['nama'];        // nama siswa/pegawai
+        $this->nama_kelas               = $data['nama_kelas'];        // nama siswa/pegawai
+        $this->educard                  = $data['educard'];
+        $this->saldo_edupay             = $data['saldo_edupay'];
+
+        $this->ms_jenjang_id            = $data['ms_jenjang_id'];
+        $this->ms_tahun_ajar_id         = $data['ms_tahun_ajar_id'];
+
+        $this->nama_jabatan               = $data['nama_jabatan'];        // nama siswa/pegawai
     }
 
     public function openScanModal()
@@ -47,9 +57,16 @@ class KeranjangProduk extends Component
         $this->reset([
             'user_type',
             'user_id',
+            'ms_penempatan_siswa_id',
             'nama',
+            'nama_kelas',
             'educard',
             'saldo_edupay',
+
+            'ms_jenjang_id',
+            'ms_tahun_ajar_id',
+
+            'nama_jabatan',
         ]);
     }
 
@@ -226,13 +243,14 @@ class KeranjangProduk extends Component
                     return $item->ms_produk_kantin->nama_produk_kantin . ' x' . $item->jumlah_produk;
                 })->join(', ');
 
-                $this->simpanTransaksiEduPay($this->user_id, $totalBayar, $deskripsiEduPay, $jurnalDetailDebit->akuntansi_jurnal_detail_id, $jurnalDetailKredit->akuntansi_jurnal_detail_id);
+                $this->simpanTransaksiEduPay($totalBayar, $deskripsiEduPay, $jurnalDetailDebit->akuntansi_jurnal_detail_id, $jurnalDetailKredit->akuntansi_jurnal_detail_id);
             }
 
             // Insert transaksi utama
             $transaksi = TransaksiSmartCanteen::create([
                 'user_type' => $this->user_type,
                 'user_id' => $this->user_id,
+                'ms_penempatan_siswa_id' => $this->ms_penempatan_siswa_id,
                 'ms_pengguna_id' => $ms_pengguna_id,
                 'tanggal_transaksi' => now(),
                 'total_transaksi' => $totalBayar,
@@ -270,12 +288,13 @@ class KeranjangProduk extends Component
             $this->dispatchBrowserEvent('alertify-error', ['message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
     }
-    public function simpanTransaksiEduPay($ms_siswa_id, $totalBayar, $deskripsiEduPay, $akuntansi_jurnal_detail_debit_id, $akuntansi_jurnal_detail_kredit_id)
+    public function simpanTransaksiEduPay($totalBayar, $deskripsiEduPay, $akuntansi_jurnal_detail_debit_id, $akuntansi_jurnal_detail_kredit_id)
     {
         // Simpan transaksi EduPay dengan jenis transaksi 'pembayaran'
         TransaksiEduPay::create([
-            'user_type' => 'siswa',
-            'user_id' => $ms_siswa_id,
+            'user_type' => $this->user_type,
+            'user_id' => $this->user_id,
+            'ms_penempatan_siswa_id' => $this->ms_penempatan_siswa_id,
             'ms_pengguna_id' => Auth::id(),
             'jenis_transaksi' => 'kantin',
             'nominal' => $totalBayar,

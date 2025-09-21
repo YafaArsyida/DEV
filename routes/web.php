@@ -33,9 +33,11 @@ use App\Http\Controllers\ManajemenKepegawaian;
 use App\Http\Controllers\PenggunaJenjang;
 use App\Http\Controllers\SmartCanteenAdministrasiProduk;
 use App\Http\Controllers\SmartCanteenDashboard;
+use App\Http\Controllers\SmartCanteenLaporanTransaksi;
 use App\Http\Controllers\SmartCanteenTransaksiProduk;
 use App\Http\Controllers\TagihanJenis;
 use App\Http\Controllers\TagihanSiswa;
+use App\Http\Controllers\TransaksiEduPayPegawai;
 use App\Http\Controllers\TransaksiEduPaySiswa;
 use App\Http\Controllers\TransaksiPendapatanLainnya;
 use App\Http\Controllers\TransaksiPengeluaran;
@@ -72,8 +74,12 @@ Route::middleware(['auth'])->get('/dashboard', [DashboardController::class, 'ind
 Route::middleware(['auth'])->group(function () {
     // SMARTCANTEEN 
     Route::get('/smartCanteen/dashboard', [SmartCanteenDashboard::class, 'index'])->name('smartCanteen.dashboard');
+
     Route::get('/smartCanteen/administrasi/produk', [SmartCanteenAdministrasiProduk::class, 'index'])->name('smartCanteen.administrasi.produk');
+
     Route::get('/smartCanteen/transaksi/produk', [SmartCanteenTransaksiProduk::class, 'index'])->name('smartCanteen.transaksi.produk');
+
+    Route::get('/smartCanteen/laporan/transaksi',  [SmartCanteenLaporanTransaksi::class, 'index'])->name('smartCanteen.laporan.transaksi');
     // END SMARTCANTEEN 
 
     Route::get('/sistem/jenjang-tahun-ajar',  [JenjangTahunAjar::class, 'index'])->name('sistem.jenjang-tahun-ajar');
@@ -103,10 +109,16 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/transaksi/tagihan-siswa',  [TransaksiTagihanSiswa::class, 'index'])->name('transaksi.tagihan-siswa');
     Route::get('/transaksi/tagihan-siswa/{transaksiId}', [TransaksiTagihanSiswa::class, 'kuitansiPDF'])->name('transaksi.tagihan-siswa.kuitansiPDF');
 
+    // TRANSAKSI SISWA
     Route::get('/transaksi/tabungan-siswa',  [TransaksiTabunganSiswa::class, 'index'])->name('transaksi.tabungan-siswa');
-
+    
     Route::get('/transaksi/edupay-siswa',  [TransaksiEduPaySiswa::class, 'index'])->name('transaksi.edupay-siswa');
     Route::get('/transaksi/edupay-siswa/{eduPayId}', [TransaksiEduPaySiswa::class, 'kuitansiPDF'])->name('transaksi.edupay-siswa.kuitansiPDF');
+    // END TRANSAKSI SISWA
+
+    // TRANSAKSI PEGAWAI
+    Route::get('/transaksi/edupay-pegawai',  [TransaksiEduPayPegawai::class, 'index'])->name('transaksi.edupay-pegawai');
+    // END TRANSAKSI PEGAWAI
 
     // transaksi pendapatan
     Route::get('/transaksi/pendapatan-lainnya',  [TransaksiPendapatanLainnya::class, 'index'])->name('transaksi.pendapatan-lainnya');

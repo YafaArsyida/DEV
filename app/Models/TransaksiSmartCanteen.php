@@ -17,6 +17,7 @@ class TransaksiSmartCanteen extends Model
     protected $fillable = [
         'user_type',
         'user_id',
+        'ms_penempatan_siswa_id',
         'ms_pengguna_id',
         'tanggal_transaksi',
         'total_transaksi',
