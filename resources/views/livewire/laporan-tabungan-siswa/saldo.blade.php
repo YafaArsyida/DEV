@@ -91,7 +91,7 @@
                                 <td class="text-uppercase text-start">TOTAL</td>
                                 <td class="text-center">
                                     <span class="fs-14 text-info">
-                                        Rp{{ number_format($totalSaldo, 0, ',', '.') }}</span>
+                                        RP{{ number_format($totalSaldo, 0, ',', '.') }}</span>
                                 </td>
                             </tr>
                         </tfoot>

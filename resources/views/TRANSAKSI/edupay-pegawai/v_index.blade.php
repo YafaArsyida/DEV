@@ -10,7 +10,7 @@
                             <h4 class="fs-16 mb-1">Transaksi EduPay Pegawai</h4>
                             <p class="text-muted mb-0">Transaksi Pegawai > EduPay Pegawai</p>
                         </div>
-                        @livewire('parameter.jenjang-pegawai')   
+                        @livewire('parameter.jenjang-tahun-pegawai')   
                     </div><!-- end card header -->
                 </div>
             </div>
@@ -23,14 +23,14 @@
                                 <div class="col-xxl-4 pe-1">
                                     <div class="card">
                                         @livewire('transaksi-edu-pay-pegawai.data-pegawai')   
-                                        {{-- @livewire('transaksi-edu-pay-siswa.edit')   
-                                        @livewire('transaksi-edu-pay-siswa.delete')    --}}
+                                        @livewire('transaksi-edu-pay-pegawai.edit')   
+                                        @livewire('transaksi-edu-pay-pegawai.delete')   
                                     </div><!-- end card -->
                                 </div>
                                 <!--end col-->
                                 <div class="col-xxl-8 ps-0">
                                     <div class="sticky-side-div">
-                                        {{-- @livewire('transaksi-edu-pay-siswa.data-edu-pay')  --}}
+                                        @livewire('transaksi-edu-pay-pegawai.data-edu-pay') 
                                     </div>
                                 </div>
                             </div>

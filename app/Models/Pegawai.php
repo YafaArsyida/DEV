@@ -64,4 +64,51 @@ class Pegawai extends Model
         return $this->hasOne(EduCard::class, 'ms_pegawai_id', 'ms_pegawai_id')
             ->where('jenis_pemilik', 'pegawai');
     }
+
+    // =============== EDUPAY ===============
+    public function ms_transaksi_edupay()
+    {
+        return $this->hasMany(TransaksiEduPay::class, 'user_id', 'ms_pegawai_id')
+            ->where('user_type', 'pegawai');
+    }
+
+    public function total_pemasukan_edupay()
+    {
+        return $this->ms_transaksi_edupay()
+            ->whereIn('jenis_transaksi', ['topup tunai', 'topup online', 'pengembalian dana'])
+            ->sum('nominal');
+    }
+
+    public function total_penarikan_edupay()
+    {
+        return $this->ms_transaksi_edupay()
+            ->where('jenis_transaksi', 'penarikan')
+            ->sum('nominal');
+    }
+
+    public function total_pembayaran_edupay()
+    {
+        return $this->ms_transaksi_edupay()
+            ->where('jenis_transaksi', 'pembayaran')
+            ->sum('nominal');
+    }
+
+    public function total_pembayaran_kantin()
+    {
+        return $this->ms_transaksi_edupay()
+            ->where('jenis_transaksi', 'kantin')
+            ->sum('nominal');
+    }
+
+    public function total_pengeluaran_edupay()
+    {
+        return $this->total_penarikan_edupay()
+            + $this->total_pembayaran_edupay()
+            + $this->total_pembayaran_kantin();
+    }
+
+    public function saldo_edupay_pegawai()
+    {
+        return $this->total_pemasukan_edupay() - $this->total_pengeluaran_edupay();
+    }
 }

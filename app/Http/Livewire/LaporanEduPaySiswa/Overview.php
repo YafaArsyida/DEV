@@ -77,7 +77,7 @@ class Overview extends Component
             ->where('jenis_transaksi', 'kantin')
             ->sum('nominal');
 
-        $saldo = $total_topup_tunai + $total_topup_online + $total_pengembalian_dana - $total_penarikan - $total_pembayaran + $total_kantin;
+        $saldo = $total_topup_tunai + $total_topup_online + $total_pengembalian_dana - $total_penarikan - $total_pembayaran - $total_kantin;
 
         // Return masing-masing variabel
         return view('livewire.laporan-edu-pay-siswa.overview', [

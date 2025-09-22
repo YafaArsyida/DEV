@@ -94,7 +94,7 @@
                     </p>
                 </div>
             </div>
-            <div class="col-6 col-sm-12">
+            {{-- <div class="col-6 col-sm-12">
                 <div class="p-3 border border-dashed border-end-0">
                     <h5 class="mb-1">
                         <span class="fw-bold text-info">
@@ -106,7 +106,7 @@
                         Saldo
                     </p>
                 </div>
-            </div>
+            </div> --}}
             <!--end col-->
         </div>
     </div>

@@ -14,7 +14,7 @@
     </div><!-- end card header -->
     <div class="card-body pt-0">
         <div class="row g-0 text-center">
-            <div class="col-6 col-sm-4">
+            <div class="col-6 col-sm-6">
                 <div class="p-3 border border-dashed border-start-0">
                     <h5 class="mb-1">
                         <span class="fw-semibold text-success">
@@ -28,7 +28,7 @@
                 </div>
             </div>
             <!--end col-->
-            <div class="col-6 col-sm-4">
+            <div class="col-6 col-sm-6">
                 <div class="p-3 border border-dashed border-start-0">
                     <h5 class="mb-1">
                         <span class="fw-semibold text-danger">
@@ -42,7 +42,7 @@
                 </div>
             </div>
             <!--end col-->
-            <div class="col-6 col-sm-4">
+            {{-- <div class="col-6 col-sm-4">
                 <div class="p-3 border border-dashed border-end-0">
                     <h5 class="mb-1">
                         <span class="fw-semibold text-info">
@@ -54,7 +54,7 @@
                         Saldo
                     </p>
                 </div>
-            </div>
+            </div> --}}
             <!--end col-->
         </div>
     </div>
