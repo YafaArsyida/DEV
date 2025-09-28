@@ -23,8 +23,8 @@
                                 <div class="col-xxl-4 pe-1">
                                     <div class="card">
                                         @livewire('transaksi-edu-pay-pegawai.data-pegawai')   
-                                        @livewire('transaksi-edu-pay-pegawai.edit')   
-                                        @livewire('transaksi-edu-pay-pegawai.delete')   
+                                        @livewire('transaksi-edu-pay-siswa.edit')   
+                                        @livewire('transaksi-edu-pay-siswa.delete')   
                                     </div><!-- end card -->
                                 </div>
                                 <!--end col-->

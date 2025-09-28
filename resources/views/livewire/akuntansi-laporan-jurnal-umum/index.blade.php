@@ -30,32 +30,29 @@
                 <div class="row g-3 align-items-end mb-3">
                     <!-- Input Pencarian -->
                     <div class="col-xxl-8 col-sm-6">
-                        <label for="searchInput" class="form-label">Pencarian</label>
-                        <div class="position-relative">
+                        <label for="searchInput" class="form-label fw-semibold">Pencarian</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-0">
+                                <i class="ri-search-line text-muted"></i>
+                            </span>
                             <input type="text" id="searchInput" 
-                                class="form-control ps-4" 
+                                class="form-control border-start-0 ps-1" 
                                 wire:model.debounce.300ms="search" 
                                 placeholder="Cari nama, deskripsi, atau lainnya...">
-                            <i class="ri-search-line position-absolute top-50 start-0 translate-middle-y ms-2 text-muted"></i>
                         </div>
                     </div>
 
                     <!-- Filter Periode -->
                     <div class="col-xxl-4 col-sm-6">
-                        <label class="form-label">Periode</label>
-                        <div class="row g-2">
-                            <div class="col">
-                                <input type="date" id="startDate" 
-                                    class="form-control" 
-                                    wire:model="startDate" 
-                                    placeholder="Mulai">
-                            </div>
-                            <div class="col">
-                                <input type="date" id="endDate" 
-                                    class="form-control" 
-                                    wire:model="endDate" 
-                                    placeholder="Sampai">
-                            </div>
+                        <label class="form-label fw-semibold">Periode</label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="date" id="startDate" class="form-control" wire:model="startDate" value="{{ $startDate }}">
+                            <span class="text-muted">–</span>
+                            <input type="date" id="endDate" class="form-control" wire:model="endDate" value="{{ $endDate }}">
+                            <button type="button" class="btn text-info btn-icon" 
+                                wire:click="resetTanggal" title="Reset Tanggal">
+                                <i class="ri-refresh-line fs-16"></i>
+                            </button>
                         </div>
                     </div>
                 </div>

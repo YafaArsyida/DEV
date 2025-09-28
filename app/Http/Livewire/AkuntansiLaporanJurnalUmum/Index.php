@@ -25,6 +25,13 @@ class Index extends Component
         $this->emitSelf('$refresh'); //ringan
     }
 
+    public function resetTanggal()
+    {
+        $this->startDate = null;
+        $this->endDate = null;
+        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
+    }
+
     public function updateParameters($jenjang, $tahunAjar)
     {
         // Update nilai selectedJenjang dan selectedTahunAjar
@@ -65,6 +72,11 @@ class Index extends Component
             // ->when($this->selectedBulan, function ($query) {
             //     $query->whereMonth('tanggal_transaksi', $this->selectedBulan);
             // })
+            ->when(!$this->startDate && !$this->endDate, function () {
+                // default ke hari ini
+                $this->startDate = now()->toDateString();
+                $this->endDate   = now()->toDateString();
+            })
             ->when($this->startDate && $this->endDate, function ($query) {
                 $query->whereBetween('tanggal_transaksi', [$this->startDate, $this->endDate]);
             })

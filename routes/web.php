@@ -80,6 +80,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/smartCanteen/transaksi/produk', [SmartCanteenTransaksiProduk::class, 'index'])->name('smartCanteen.transaksi.produk');
 
     Route::get('/smartCanteen/laporan/transaksi',  [SmartCanteenLaporanTransaksi::class, 'index'])->name('smartCanteen.laporan.transaksi');
+    Route::get('/smartCanteen/laporan/transaksi/pdf',  [SmartCanteenLaporanTransaksi::class, 'cetakPDF'])->name('smartCanteen.laporan.transaksi.pdf');
     // END SMARTCANTEEN 
 
     Route::get('/sistem/jenjang-tahun-ajar',  [JenjangTahunAjar::class, 'index'])->name('sistem.jenjang-tahun-ajar');
@@ -111,7 +112,7 @@ Route::middleware(['auth'])->group(function () {
 
     // TRANSAKSI SISWA
     Route::get('/transaksi/tabungan-siswa',  [TransaksiTabunganSiswa::class, 'index'])->name('transaksi.tabungan-siswa');
-    
+
     Route::get('/transaksi/edupay-siswa',  [TransaksiEduPaySiswa::class, 'index'])->name('transaksi.edupay-siswa');
     Route::get('/transaksi/edupay-siswa/{eduPayId}', [TransaksiEduPaySiswa::class, 'kuitansiPDF'])->name('transaksi.edupay-siswa.kuitansiPDF');
     // END TRANSAKSI SISWA

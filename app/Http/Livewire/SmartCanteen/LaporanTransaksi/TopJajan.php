@@ -1,0 +1,65 @@
+<?php
+
+namespace App\Http\Livewire\SmartCanteen\LaporanTransaksi;
+
+use App\Models\TransaksiSmartCanteen;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Livewire\Component;
+
+class TopJajan extends Component
+{
+    public $selectedJenis = '';   // siswa / pegawai / semua
+    public $search = '';
+    public $selectedPeriode = 'bulan_ini'; // default bulan ini
+
+    public function render()
+    {
+        $query = TransaksiSmartCanteen::query();
+
+        // Filter periode
+        $startDate = null;
+        $endDate = Carbon::now()->endOfDay();
+
+        if ($this->selectedPeriode === 'bulan_ini') {
+            $startDate = Carbon::now()->startOfMonth();
+        } elseif ($this->selectedPeriode === '3_bulan') {
+            $startDate = Carbon::now()->subMonths(3)->startOfDay();
+        } elseif ($this->selectedPeriode === '6_bulan') {
+            $startDate = Carbon::now()->subMonths(6)->startOfDay();
+        }
+
+        if ($startDate) {
+            $query->whereBetween('tanggal_transaksi', [$startDate, $endDate]);
+        }
+
+        // Filter jenis pembeli
+        if ($this->selectedJenis === 'siswa') {
+            $query->where('user_type', 'siswa');
+        } elseif ($this->selectedJenis === 'pegawai') {
+            $query->where('user_type', 'pegawai');
+        }
+
+        // Search nama
+        if (!empty($this->search)) {
+            $query->where(function ($q) {
+                $q->whereHas('ms_siswa', function ($qs) {
+                    $qs->where('nama_siswa', 'like', '%' . $this->search . '%');
+                })->orWhereHas('ms_pegawai', function ($qp) {
+                    $qp->where('nama_pegawai', 'like', '%' . $this->search . '%');
+                });
+            });
+        }
+
+        // Hitung top jajan (group by user_id + user_type)
+        $siswas = $query->selectRaw('user_id, user_type, SUM(total_transaksi) as total_jajan')
+            ->groupBy('user_id', 'user_type')
+            ->orderByDesc('total_jajan')
+            ->take(10)
+            ->get();
+
+        return view('livewire.smart-canteen.laporan-transaksi.top-jajan', [
+            'siswas' => $siswas,
+        ]);
+    }
+}

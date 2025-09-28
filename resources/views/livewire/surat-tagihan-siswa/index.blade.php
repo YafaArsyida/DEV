@@ -35,10 +35,10 @@
                                 <h3 class="text-black">Foto kop belum diunggah</h3>
                             @endif
                         </div>
-                        <!-- Garis pertama -->
+                        {{-- <!-- Garis pertama -->
                         <div class="line" style="height: 3px; background-color: black; margin: 0 auto; width: 95%;"></div>
                         <!-- Garis kedua -->
-                        <div class="line" style="height: 1px; background-color: black; margin: 2px auto; width: 95%;"></div>
+                        <div class="line" style="height: 1px; background-color: black; margin: 2px auto; width: 95%;"></div> --}}
 
                         <div class="p-4 text-black" style="font-family: 'Times New Roman', Times, serif; font-size: 12pt;">
                             <p class="text-end mb-0">{{ $surat->tempat_tanggal }}</p>
@@ -115,9 +115,9 @@
                             <img src="{{ Storage::url($surat->foto_kop) }}" alt="Kop Surat" class="img-fluid" style="max-width: 100%; height: auto;">
                         </div>
                         <!-- Garis pertama -->
-                        <div class="line" style="height: 3px; background-color: black; margin: 0 auto; width: 95%;"></div>
+                        {{-- <div class="line" style="height: 3px; background-color: black; margin: 0 auto; width: 95%;"></div> --}}
                         <!-- Garis kedua -->
-                        <div class="line" style="height: 1px; background-color: black; margin: 2px auto; width: 95%;"></div>
+                        {{-- <div class="line" style="height: 1px; background-color: black; margin: 2px auto; width: 95%;"></div> --}}
 
                         <div class="p-4 text-black" style="font-family: 'Times New Roman', Times, serif; font-size: 12pt;">
                             <p class="text-black"><b>Rincian Tagihan Administrasi Sekolah</b></p>
