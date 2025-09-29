@@ -34,17 +34,20 @@ class LoginController extends Controller
             // Hapus sesi lama jika ada
             $sessionId = session()->getId();
             if ($user->current_session && $user->current_session !== $sessionId) {
-                // Hapus sesi lama
                 $user->current_session = null;
             }
 
-            // Tetapkan sesi baru
             $user->current_session = $sessionId;
             $user->save();
 
             $request->session()->regenerate();
 
-            return redirect()->intended('/dashboard');
+            // Redirect sesuai peran
+            if ($user->peran === 'kantin') {
+                return redirect()->route('smartCanteen.dashboard');
+            }
+
+            return redirect()->route('dashboard.index');
         }
 
         return back()->with('loginError', 'Login gagal !');
@@ -63,7 +66,8 @@ class LoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/login');
+        return redirect('/');
+        // return redirect('/login');
     }
 
     /**

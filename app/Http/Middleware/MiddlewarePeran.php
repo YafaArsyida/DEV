@@ -17,10 +17,9 @@ class MiddlewarePeran
      * @param  string  $role
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
-    public function handle(Request $request, Closure $next, $role)
+    public function handle(Request $request, Closure $next, ...$roles)
     {
-        // Periksa apakah pengguna memiliki peran yang sesuai
-        if (auth()->check() && auth()->user()->peran == $role) {
+        if (auth()->check() && in_array(auth()->user()->peran, $roles)) {
             return $next($request);
         }
 

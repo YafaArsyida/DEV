@@ -23,7 +23,6 @@
                     <i class="ri-search-line position-absolute top-50 start-0 translate-middle-y ms-2 text-muted"></i>
                 </div>
             </div>
-
             <div class="col-xxl-4 col-sm-6">
                 <label for="selectJenis" class="form-label">Pembeli</label>
                 <select id="selectJenis" wire:model="selectedJenis" class="form-select" style="cursor: pointer">

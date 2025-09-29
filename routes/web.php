@@ -55,23 +55,32 @@ use App\Http\Controllers\TransaksiTagihanSiswa;
 |
 */
 
-Route::get('/', function () {
-    return view('v_home');
+// Route::get('/', function () {
+//     return view('v_home');
+// });
+
+Route::get('/home', function () {
+    $user = auth()->user();
+    if (!$user) {
+        return redirect()->route('login.index');
+    }
+
+    if ($user->peran === 'kantin') {
+        return redirect()->route('smartCanteen.dashboard');
+    }
+
+    return redirect()->route('dashboard.index');
 });
 
-// Route::get('/', [LandingEkstrakurikuler::class, 'index'])->name('landing.ekstrakurikuler');
+Route::get('/landing/ekstrakurikuler', [LandingEkstrakurikuler::class, 'index'])->name('landing.ekstrakurikuler');
 
 // login
-Route::get('/login', [LoginController::class, 'index'])->name('login.index')->middleware('guest');
-// Route::get('/', [LoginController::class, 'index'])->name('login.index')->middleware('guest');
+// Route::get('/login', [LoginController::class, 'index'])->name('login.index')->middleware('guest');
+Route::get('/', [LoginController::class, 'index'])->name('login.index')->middleware('guest');
 Route::post('/login', [LoginController::class, 'authenticate'])->name('login.authenticate');
 Route::post('/logout', [LoginController::class, 'logOut'])->name('logout');
 
-Route::middleware(['auth'])->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
-
-// SISTEM
-// JENJANG TAHUN AJAR
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'peran:superadmin,admin,kantin'])->group(function () {
     // SMARTCANTEEN 
     Route::get('/smartCanteen/dashboard', [SmartCanteenDashboard::class, 'index'])->name('smartCanteen.dashboard');
 
@@ -82,6 +91,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/smartCanteen/laporan/transaksi',  [SmartCanteenLaporanTransaksi::class, 'index'])->name('smartCanteen.laporan.transaksi');
     Route::get('/smartCanteen/laporan/transaksi/pdf',  [SmartCanteenLaporanTransaksi::class, 'cetakPDF'])->name('smartCanteen.laporan.transaksi.pdf');
     // END SMARTCANTEEN 
+});
+
+
+// SISTEM
+// JENJANG TAHUN AJAR
+Route::middleware(['auth', 'peran:superadmin,admin'])->group(function () {
+    Route::middleware(['auth'])->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
     Route::get('/sistem/jenjang-tahun-ajar',  [JenjangTahunAjar::class, 'index'])->name('sistem.jenjang-tahun-ajar');
     Route::get('/sistem/dokumen-administrasi',  [DokumenAdministrasi::class, 'index'])->name('sistem.dokumen-administrasi');
