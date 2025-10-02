@@ -7,8 +7,8 @@
             <div class="flex-shrink-0">
                 <div class="d-flex gap-2 flex-wrap">
                     @if ($selectedKelas)
-                        <button type="button" class="btn btn-success" wire:click="$emit('cetakSuratKelas')"><i class="ri-vip-crown-fill text-warning me-1"></i> Kirim Semua Pesan</button>
-                        <button type="button" class="btn btn-danger" wire:click="cetakSuratKelas({{ $selectedKelas }})"><i class="ri-vip-crown-fill text-warning me-1"></i> Cetak Semua Surat</button>
+                        {{-- <button type="button" class="btn btn-success" wire:click="$emit('cetakSuratKelas')"><i class="ri-vip-crown-fill text-warning me-1"></i> Kirim Semua Pesan</button> --}}
+                        <button type="button" class="btn btn-primary" wire:click="cetakSuratKelas({{ $selectedKelas }})"><i class="ri-vip-crown-fill text-warning me-1"></i> Cetak Semua Surat</button>
                     @else
                         <button type="button" class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#suratTagihan" aria-controls="suratTagihan" wire:click="$emit('refreshSurat', {{ $selectedJenjang }})"><i class="ri-file-paper-2-line me-1"></i> Format Surat</button>
                     @endif

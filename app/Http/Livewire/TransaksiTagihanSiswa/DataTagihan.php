@@ -7,7 +7,8 @@ use App\Models\KeranjangTagihanSiswa;
 use App\Models\PenempatanSiswa;
 use App\Models\SuratTagihanSiswa;
 use App\Models\TagihanSiswa;
-use App\Models\WhatsAppPembayaranTagihanSiswa;
+use App\Models\User;
+use App\Models\WhatsAppTagihanSiswa;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Livewire\WithPagination;
@@ -170,13 +171,17 @@ class DataTagihan extends Component
         $telepon = substr($telepon, 0, 1) === '0' ? '+62' . substr($telepon, 1) : $telepon;
 
         // Ambil template pesan dari model WhatsAppTagihanSiswa
-        $templatePesan = WhatsAppPembayaranTagihanSiswa::where('ms_jenjang_id', $this->ms_jenjang_id)->first();
+        $templatePesan = WhatsAppTagihanSiswa::where('ms_jenjang_id', $this->ms_jenjang_id)->first();
 
         // Validasi keberadaan template
         if (!$templatePesan) {
             $this->dispatchBrowserEvent('alertify-error', ['message' => 'Template pesan tidak ditemukan']);
             return;
         }
+
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Pesan berhasil diproses.'
+        ]);
 
         // Persiapkan pesan berdasarkan template
         $pesan = "*" . $templatePesan->judul . "*\n\n"; // Judul
@@ -193,7 +198,7 @@ class DataTagihan extends Component
                 continue;
             }
 
-            $namaTagihan = strtoupper($tagihan->ms_jenis_tagihan_siswa->nama_jenis_tagihan ?? 'Tidak Ditemukan');
+            $namaTagihan = strtoupper($tagihan->ms_jenis_tagihan_siswa->nama_jenis_tagihan_siswa ?? 'Tidak Ditemukan');
             $jatuhTempo = $tagihan->tanggal_jatuh_tempo
                 ? HelperController::formatTanggalIndonesia($tagihan->tanggal_jatuh_tempo, 'd F Y')
                 : 'Tidak Ditentukan';
@@ -233,9 +238,12 @@ class DataTagihan extends Component
             }
         }
 
+        $ms_pengguna_id = Auth::id();
+        $nama_petugas = User::where('ms_pengguna_id', $ms_pengguna_id)->value('nama');
+
         $pesan .= "\n" . $templatePesan->kalimat_penutup . "\n"; // Kalimat penutup
         $pesan .= "\n" . $templatePesan->salam_penutup . "\n\n"; // Salam penutup
-        $pesan .= "Tata Usaha" . ($penempatanSiswa->ms_siswa->petugas ?? '') . "\n"; // Informasi petugas
+        $pesan .= "Tata Usaha - " . ($nama_petugas ?? '') . "\n"; // Informasi petugas
         $pesan .= HelperController::formatTanggalIndonesia(now(), 'd F Y'); // Tanggal transaksi
 
         // Format URL WhatsApp

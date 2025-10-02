@@ -11,6 +11,8 @@ use App\Models\WhatsAppTagihanSiswa;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class Index extends Component
 {
@@ -170,9 +172,12 @@ class Index extends Component
             }
         }
 
-        $pesan .= "\n\n" . $templatePesan->kalimat_penutup . "\n"; // Kalimat penutup
+        $ms_pengguna_id = Auth::id();
+        $nama_petugas = User::where('ms_pengguna_id', $ms_pengguna_id)->value('nama');
+
+        $pesan .= "\n" . $templatePesan->kalimat_penutup . "\n"; // Kalimat penutup
         $pesan .= "\n" . $templatePesan->salam_penutup . "\n\n"; // Salam penutup
-        $pesan .= "Tata Usaha" . ($penempatanSiswa->ms_siswa->petugas ?? '') . "\n"; // Informasi petugas
+        $pesan .= "Tata Usaha - " . ($nama_petugas ?? '') . "\n"; // Informasi petugas
         $pesan .= HelperController::formatTanggalIndonesia(now(), 'd F Y'); // Tanggal transaksi
 
         // Format URL WhatsApp

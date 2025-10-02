@@ -59,6 +59,7 @@
                             <th class="text-uppercase">Dibayarkan</th>
                             <th class="text-uppercase">Kekurangan</th>
                             <th class="text-uppercase">Lunas</th>
+                            <th class="text-uppercase">Dokumen</th>
                             <th class="text-uppercase">Aksi</th>
                         </tr>
                     </thead>
@@ -100,6 +101,20 @@
                                 @else
                                     -
                                 @endif</span>
+                            </td>                            
+                            <td>
+                                <div class="hstack gap-2">
+                                    <button class="btn btn-sm btn-success d-inline-flex align-items-center"
+                                            title="Surat Tagihan"
+                                            wire:click.prevent="kirimWhatsappTagihan({{ $item->ms_penempatan_siswa_id }})">
+                                        <i class="ri-whatsapp-line align-bottom me-1"></i> Pesan
+                                    </button>
+                                    <button class="btn btn-sm btn-danger d-inline-flex align-items-center"
+                                            title="Surat Tagihan"
+                                            wire:click.prevent="cetakSurat({{ $item->ms_penempatan_siswa_id }})">
+                                        <i class="ri-printer-line align-bottom me-1"></i> Surat
+                                    </button>
+                                </div>
                             </td>                            
                             <td>
                                 <div class="hstack gap-2">

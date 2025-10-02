@@ -280,8 +280,8 @@
         </table><!--end table-->
     </div>
     <div class="hstack gap-2 justify-content-end d-print-none mt-4">
-        <a href="" wire:click.prevent="kirimWhatsappTagihan({{ $ms_penempatan_siswa_id }})" class="btn btn-soft-success d-inline-flex align-items-center gap-1"><i class="ri-whatsapp-line align-bottom"></i> Kirim Tagihan</a>
-        <a wire:click="cetakSurat({{ $ms_penempatan_siswa_id }})" class="btn btn-danger d-inline-flex align-items-center gap-1"><i class="ri-printer-line align-bottom"></i> Cetak Tagihan</a>
+        <a href="" wire:click.prevent="kirimWhatsappTagihan({{ $ms_penempatan_siswa_id }})" class="btn btn-success d-inline-flex align-items-center gap-1"><i class="ri-whatsapp-line align-bottom"></i> Kirim Tagihan</a>
+        <a wire:click="cetakSurat({{ $ms_penempatan_siswa_id }})" class="btn btn-danger d-inline-flex align-items-center gap-1"><i class="ri-printer-line align-bottom"></i> Cetak Surat</a>
     </div>
     @endif
 </div>
