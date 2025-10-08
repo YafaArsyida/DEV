@@ -6,8 +6,8 @@
             <div class="col-12">
                 <div class="d-flex align-items-lg-center flex-lg-row flex-column">
                     <div class="flex-grow-1">
-                        <h4 class="fs-16 mb-1">Konfigurasi Keuangan</h4>
-                        <p class="text-muted mb-0">Keuangan > Konfigurasi</p>
+                        <h4 class="fs-16 mb-1">Konfigurasi Keuangan Siswa</h4>
+                        <p class="text-muted mb-0">Administrasi > Konfigurasi Keuangan Siswa</p>
                     </div>
                     @livewire('parameter.jenjang-tahun-ajar')   
                 </div><!-- end card header -->

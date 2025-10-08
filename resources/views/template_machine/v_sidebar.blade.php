@@ -87,7 +87,7 @@
                         <a href="{{ route('keuangan.konfigurasi-tagihan-siswa') }}"
                         class="nav-link menu-link {{ request()->routeIs('keuangan.konfigurasi-tagihan-siswa') ? 'active' : '' }}">
                             <i class="mdi mdi-cog-outline"></i>
-                            <span data-key="t-konfigurasi-tagihan">Konfigurasi Tagihan Siswa</span>
+                            <span data-key="t-konfigurasi-tagihan">Konfigurasi Keuangan Siswa</span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -263,7 +263,7 @@
                         <a class="nav-link menu-link {{ request()->routeIs('laporan.tagihan-siswa') ? 'active' : '' }}"
                             href="{{ route('laporan.tagihan-siswa') }}">
                             <i class="mdi mdi-alert-circle-outline"></i> 
-                            <span data-key="t-tunggakan-tagihan">Tunggakan Tagihan Siswa</span>
+                            <span data-key="t-tunggakan-tagihan">Piutang Tagihan Siswa</span>
                         </a>
                     </li>
 

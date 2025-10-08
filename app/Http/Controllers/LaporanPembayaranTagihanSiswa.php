@@ -8,6 +8,8 @@ use Carbon\Carbon;
 use Elibyy\TCPDF\Facades\TCPDF;
 
 use App\Models\DetailTransaksiTagihanSiswa;
+use App\Models\Jenjang;
+use App\Models\TahunAjar;
 
 class LaporanPembayaranTagihanSiswa extends Controller
 {
@@ -25,8 +27,19 @@ class LaporanPembayaranTagihanSiswa extends Controller
         $selectedMetode = $request->metode ?? [];
         $selectedPetugas = $request->petugas ?? [];
         $search = $request->search;
-        $startDate = $request->start ? Carbon::parse($request->start)->startOfDay() : null;
-        $endDate = $request->end ? Carbon::parse($request->end)->endOfDay() : null;
+
+        $startDate = $request->start;
+        $endDate = $request->end;
+
+        $startDate = Carbon::createFromFormat('Y-m-d', $startDate)->startOfDay();
+        $endDate   = Carbon::createFromFormat('Y-m-d', $endDate)->endOfDay();
+
+        $jenjang = Jenjang::find($selectedJenjang);
+        $tahunAjar = TahunAjar::find($selectedTahunAjar);
+
+        if (!$selectedJenjang || !$selectedTahunAjar) {
+            return response()->json(['error' => 'Jenjang dan Tahun Ajar wajib dipilih'], 400);
+        }
 
         $query = DetailTransaksiTagihanSiswa::with([
             'ms_transaksi_tagihan_siswa.ms_penempatan_siswa.ms_siswa',
@@ -86,12 +99,31 @@ class LaporanPembayaranTagihanSiswa extends Controller
         $total = $laporans->sum('jumlah_bayar');
 
         // PDF
+        $judul = 'Laporan Pembayaran Siswa';
+        $yayasan = 'Yayasan Drul Khukama Unit ' . ($jenjang->nama_jenjang ?? '-');
+
+        if ($request->start && $request->end) {
+            $periode = 'Periode ' . \App\Http\Controllers\HelperController::formatTanggalIndonesia($request->start, 'd F Y') .
+                ' sampai ' . \App\Http\Controllers\HelperController::formatTanggalIndonesia($request->end, 'd F Y');
+        } else {
+            $periode = 'Semua Periode';
+        }
+
         $pdf = new TCPDF('L', 'mm', 'A4', true, 'UTF-8', false);
-        $pdf::SetTitle('Laporan Pembayaran Siswa');
+        $pdf::SetTitle($judul);
         $pdf::AddPage('L');
-        $pdf::SetFont('times', 'B', 12);
-        $pdf::Cell(0, 1, 'Laporan Pembayaran Tagihan Siswa', 0, 1, 'C');
-        $pdf::Ln(2);
+
+        $pdf::SetFont('times', 'B', 13);
+        $pdf::Cell(0, 5, $judul, 0, 1, 'C');
+        $pdf::SetFont('times', '', 11);
+        $pdf::Cell(0, 5, $yayasan, 0, 1, 'C');
+        $pdf::SetFont('times', '', 10);
+        $pdf::MultiCell(0, 6, ($jenjang->deskripsi ?? '-'), 0, 'C');
+        $pdf::Cell(0, 5, $periode, 0, 1, 'C');
+        $pdf::Ln(3);
+
+        $pdf::SetFont('times', '', 9);
+        $pdf::setCellHeightRatio(1.2);
 
         $html = '
         <table border="0.5" cellpadding="1" cellspacing="0" style="width:100%;">

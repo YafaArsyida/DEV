@@ -4,6 +4,7 @@ namespace App\Http\Livewire\AkuntansiLaporanJurnalUmum;
 
 use App\Models\AkuntansiJurnalDetail;
 use App\Models\TahunAjar;
+use Carbon\Carbon;
 use Livewire\Component;
 
 class Index extends Component
@@ -27,8 +28,8 @@ class Index extends Component
 
     public function resetTanggal()
     {
-        $this->startDate = null;
-        $this->endDate = null;
+        $this->startDate = now()->format('Y-m-d');
+        $this->endDate   = now()->format('Y-m-d');
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
     }
 
@@ -64,21 +65,24 @@ class Index extends Component
         $this->emit('openNewTab', $url);
     }
 
+    public function mount()
+    {
+        // Default ke hari ini
+        $this->startDate = now()->format('Y-m-d');
+        $this->endDate   = now()->format('Y-m-d');
+    }
+
+
     public function render()
     {
         $transaksiJurnal = AkuntansiJurnalDetail::with('akuntansi_rekening', 'ms_pengguna')
             ->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
             ->where('ms_jenjang_id', $this->selectedJenjang)
-            // ->when($this->selectedBulan, function ($query) {
-            //     $query->whereMonth('tanggal_transaksi', $this->selectedBulan);
-            // })
-            ->when(!$this->startDate && !$this->endDate, function () {
-                // default ke hari ini
-                $this->startDate = now()->toDateString();
-                $this->endDate   = now()->toDateString();
-            })
             ->when($this->startDate && $this->endDate, function ($query) {
-                $query->whereBetween('tanggal_transaksi', [$this->startDate, $this->endDate]);
+                $startDate = Carbon::parse($this->startDate)->startOfDay();
+                $endDate   = Carbon::parse($this->endDate)->endOfDay();
+
+                $query->whereBetween('tanggal_transaksi', [$startDate, $endDate]);
             })
             ->when($this->search, function ($query) {
                 $query->where('deskripsi', 'like', '%' . $this->search . '%');
@@ -86,8 +90,6 @@ class Index extends Component
             ->orderBy('tanggal_transaksi')
             ->get()
             ->groupBy(['deskripsi', 'nominal']);
-
-        // $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
 
         return view('livewire.akuntansi-laporan-jurnal-umum.index', [
             // 'select_bulan' => $select_bulan,

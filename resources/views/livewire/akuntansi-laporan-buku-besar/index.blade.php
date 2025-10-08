@@ -17,19 +17,15 @@
 
                     <!-- Filter Periode -->
                     <div class="col-xxl-4 col-sm-6">
-                        <label class="form-label">Periode</label>
-                        <div class="row g-2">
-                            <div class="col">
-                                <input type="date" id="startDate" 
-                                    class="form-control" 
-                                    wire:model="startDate" 
-                                    placeholder="Mulai">
-                            </div>
-                            <div class="col">
-                                <input type="date" id="endDate" 
-                                    class="form-control" 
-                                    wire:model="endDate" 
-                                    placeholder="Sampai">
+                        <label class="form-label fw-semibold">Periode</label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="date" id="startDate" class="form-control" wire:model="startDate" value="{{ $startDate }}">
+                            <span class="text-muted">–</span>
+                            <input type="date" id="endDate" class="form-control" wire:model="endDate" value="{{ $endDate }}">
+                            <div class="col-auto">
+                                <button type="button" class="btn btn-soft-secondary btn-icon rounded-circle" wire:click="resetTanggal" title="Reset Tanggal">
+                                    <i class="ri-refresh-line fs-16"></i>
+                                </button>    
                             </div>
                         </div>
                     </div>
@@ -63,11 +59,11 @@
             <div class="card-body">
                 {{-- DATA --}}
                 <div class="live-preview">
-                    <div id="table-{{ $rekening->kode_rekening }}" class="table-responsive" style="max-height: 500px;" data-simplebar>
+                    <div class="table-responsive" style="max-height: 500px;" data-simplebar>
                         @php
                             $saldo = 0;
                         @endphp
-                        <table class="table table-hover align-middle">
+                        <table id="table-{{ $rekening->kode_rekening }}" class="table table-hover align-middle">
                             <thead class="table-light">
                                 <tr>
                                     <th class="text-uppercase">No</th>
@@ -153,7 +149,9 @@
                                 <button class="btn btn-link link-success fw-medium text-decoration-none shadow-none" data-bs-dismiss="modal">
                                     <i class="ri-close-line me-1 align-middle"></i> Batal
                                 </button>
-                                <button class="btn btn-primary export-btn" data-table-id="Tabel-{{ $rekening->kode_rekening }}" data-bs-dismiss="modal">Ya, Export!</button>
+                                <button class="btn btn-primary export-btn" data-table-id="table-{{ $rekening->kode_rekening }}" data-nama-rekening="{{ $rekening->nama_rekening }}"  data-bs-dismiss="modal">
+                                    Ya, Export!
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -168,6 +166,7 @@
             document.body.addEventListener('click', function (event) {
                 if (event.target.classList.contains('export-btn')) {
                     const tableId = event.target.getAttribute('data-table-id');
+                     const namaRekening = event.target.getAttribute('data-nama-rekening') || 'Laporan';
                     const table = document.getElementById(tableId);
 
                     if (!table) {
@@ -180,9 +179,15 @@
                         try {
                             // Konversi tabel ke format Excel
                             const workbook = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+
+                            // Ganti karakter tidak valid pada nama file
+                            const safeName = namaRekening.replace(/[\\/:*?"<>|]/g, '');
+                            const fileName = `Laporan-${safeName}.xlsx`;
+
                             // Simpan file Excel
-                            XLSX.writeFile(workbook, `Laporan-${tableId}.xlsx`);
-                            alertify.success("Dokumen berhasil diunduh.");
+                            XLSX.writeFile(workbook, fileName);
+
+                            alertify.success(`Dokumen '${fileName}' berhasil diunduh.`);
                         } catch (error) {
                             alertify.error("Terjadi kesalahan: " + error.message);
                         }

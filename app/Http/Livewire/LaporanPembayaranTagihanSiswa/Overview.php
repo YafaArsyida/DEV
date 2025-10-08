@@ -4,6 +4,7 @@ namespace App\Http\Livewire\LaporanPembayaranTagihanSiswa;
 
 use App\Models\DetailTransaksi;
 use App\Models\DetailTransaksiTagihanSiswa;
+use Carbon\Carbon;
 use Livewire\Component;
 
 class Overview extends Component
@@ -106,7 +107,7 @@ class Overview extends Component
             ->orderBy('bulan', 'ASC')
             ->get()
             ->toArray();
-            
+
         $totalMonths = array_sum(array_column($months, 'total'));
 
         $this->emit('prepareExportOverview', $methods, $classes, $months, $totalClasses);
@@ -130,11 +131,11 @@ class Overview extends Component
             ->where('ms_penempatan_siswa.ms_tahun_ajar_id', $this->selectedTahunAjar)
             ->where('ms_penempatan_siswa.ms_jenjang_id', $this->selectedJenjang)
             ->when($this->startDate && $this->endDate, function ($query) {
-                $query->whereBetween('ms_transaksi_tagihan_siswa.tanggal_transaksi', [$this->startDate, $this->endDate]);
+                $startDate = Carbon::createFromFormat('Y-m-d', $this->startDate)->startOfDay();
+                $endDate = Carbon::createFromFormat('Y-m-d', $this->endDate)->endOfDay();
+
+                $query->whereBetween('ms_transaksi_tagihan_siswa.tanggal_transaksi', [$startDate, $endDate]);
             })
-            // ->when($this->selectedBulan, function ($query) {
-            //     $query->whereMonth('ms_transaksi_tagihan_siswa.tanggal_transaksi', $this->selectedBulan);
-            // })
             ->groupBy('metode')
             ->orderBy('total', 'DESC')
             ->get()
@@ -157,7 +158,10 @@ class Overview extends Component
             //     $query->whereMonth('ms_transaksi_tagihan_siswa.tanggal_transaksi', $this->selectedBulan);
             // })
             ->when($this->startDate && $this->endDate, function ($query) {
-                $query->whereBetween('ms_transaksi_tagihan_siswa.tanggal_transaksi', [$this->startDate, $this->endDate]);
+                $startDate = Carbon::createFromFormat('Y-m-d', $this->startDate)->startOfDay();
+                $endDate = Carbon::createFromFormat('Y-m-d', $this->endDate)->endOfDay();
+
+                $query->whereBetween('ms_transaksi_tagihan_siswa.tanggal_transaksi', [$startDate, $endDate]);
             })
             ->groupBy('ms_kelas.nama_kelas')
             ->orderBy('total', 'DESC')
@@ -180,7 +184,10 @@ class Overview extends Component
             //     $query->whereMonth('ms_transaksi_tagihan_siswa.tanggal_transaksi', $this->selectedBulan);
             // })
             ->when($this->startDate && $this->endDate, function ($query) {
-                $query->whereBetween('ms_transaksi_tagihan_siswa.tanggal_transaksi', [$this->startDate, $this->endDate]);
+                $startDate = Carbon::createFromFormat('Y-m-d', $this->startDate)->startOfDay();
+                $endDate = Carbon::createFromFormat('Y-m-d', $this->endDate)->endOfDay();
+
+                $query->whereBetween('ms_transaksi_tagihan_siswa.tanggal_transaksi', [$startDate, $endDate]);
             })
             ->groupBy('bulan')
             ->orderBy('bulan', 'ASC')

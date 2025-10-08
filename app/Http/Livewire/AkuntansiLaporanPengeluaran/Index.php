@@ -5,6 +5,7 @@ namespace App\Http\Livewire\AkuntansiLaporanPengeluaran;
 use App\Http\Controllers\HelperController;
 use App\Models\AkuntansiJurnalDetail;
 use App\Models\Jenjang;
+use Carbon\Carbon;
 use Livewire\Component;
 
 class Index extends Component
@@ -75,8 +76,12 @@ class Index extends Component
             ->where('ms_jenjang_id', $this->selectedJenjang)
             ->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
             ->where('posisi', 'debit') // beban = debit
+
             ->when($this->startDate && $this->endDate, function ($query) {
-                $query->whereBetween('tanggal_transaksi', [$this->startDate, $this->endDate]);
+                $startDate = Carbon::createFromFormat('Y-m-d', $this->startDate)->startOfDay();
+                $endDate   = Carbon::createFromFormat('Y-m-d', $this->endDate)->endOfDay();
+
+                $query->whereBetween('tanggal_transaksi', [$startDate, $endDate]);
             })
             ->whereHas('akuntansi_rekening', function ($query) {
                 $query->where('kode_rekening', 'like', '5%'); // kode beban
@@ -84,7 +89,7 @@ class Index extends Component
             ->get()
             ->groupBy([
                 fn($item) => $item->akuntansi_rekening->nama_rekening,
-                fn($item) => \Carbon\Carbon::parse($item->tanggal_transaksi)->format('Y-m') // per bulan
+                fn($item) => Carbon::parse($item->tanggal_transaksi)->format('Y-m') // per bulan
             ]);
 
         // Ambil semua header bulan unik

@@ -9,7 +9,15 @@
                 </div>
                 <div class="offcanvas-body">
                     <div class="mb-4">
-                        <p class="text-muted text-uppercase fs-12 fw-medium mb-2">Tanggal Jatuh Tempo</p>
+                        <div class="d-flex align-items-center mb-2">
+                            <p class="text-muted text-uppercase fs-12 fw-medium mb-0 me-1">Tanggal Jatuh Tempo</p>
+                            <i class="mdi mdi-information-outline fs-14 text-primary" 
+                            style="cursor: pointer;" 
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="top" 
+                            title="Pilih rentang tanggal jatuh tempo untuk menampilkan piutang dalam periode tersebut.">
+                            </i>
+                        </div>
                         <div class="row g-2 align-items-center">
                             <div class="col-lg">
                                 <input type="date" class="form-control" id="startDate" placeholder="0">
@@ -32,7 +40,15 @@
                     </div> --}}
 
                     <div class="mb-4">
-                        <p class="text-muted text-uppercase fs-12 fw-medium mb-2">Kategori Tagihan</p>
+                         <div class="d-flex align-items-center mb-2">
+                            <p class="text-muted text-uppercase fs-12 fw-medium mb-0 me-1">Kategori Tagihan</p>
+                            <i class="mdi mdi-information-outline fs-14 text-primary" 
+                            style="cursor: pointer;" 
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="top" 
+                            title="Pilih Kategori tagihan terlebih dahulu. Jenis tagihan akan tampil otomatis menyesuaikan dengan kategori yang Anda pilih.">
+                            </i>
+                        </div>
                         <select id="PilihKategoriTagihan" style="cursor: pointer" wire:model="selectedKategoriTagihan" class="form-select" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Kategori"  multiple="multiple">
                             {{-- <option value="">Semua Kategori</option> --}}
                             @foreach ($select_kategori_tagihan as $item)    

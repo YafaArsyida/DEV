@@ -105,13 +105,13 @@
                                 @endforeach
                             </td> --}}
                             <td>
-                                <span class="fw-medium text-success">    
+                                <span class="fs-14 text-success">    
                                     {{ $item->ms_siswa->telepon }}
                                 </span>
                             </td>
                             <td>
                                 @if($item->ms_siswa->ms_educard)
-                                <span class="fw-medium text-warning">    
+                                <span class="fs-14 text-warning">    
                                     {{ $item->ms_siswa->ms_educard->kode_kartu }}
                                 </span>
                                 @else
@@ -119,7 +119,7 @@
                                 @endif
                             </td>
                             <td> <!-- Menampilkan saldo tabungan -->
-                                <span class="fw-medium text-info">
+                                <span class="fs-14 text-info">
                                     RP{{ number_format($item->ms_siswa->saldo_edupay_siswa(), 0, ',', '.') }}
                                 </span>
                             </td>

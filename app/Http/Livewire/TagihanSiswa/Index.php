@@ -237,6 +237,7 @@ class Index extends Component
 
         if ($this->selectedJenjang && $this->selectedTahunAjar) {
             $query = PenempatanSiswa::with(['ms_siswa', 'ms_kelas'])
+                ->join('ms_siswa', 'ms_penempatan_siswa.ms_siswa_id', '=', 'ms_siswa.ms_siswa_id')
                 ->where('ms_penempatan_siswa.ms_jenjang_id', $this->selectedJenjang)
                 ->where('ms_penempatan_siswa.ms_tahun_ajar_id', $this->selectedTahunAjar);
 
@@ -250,7 +251,8 @@ class Index extends Component
                 });
             }
 
-            $tagihans = $query->get();
+            $tagihans = $query->orderBy('ms_penempatan_siswa.ms_kelas_id')
+                ->orderBy('ms_siswa.nama_siswa')->get();
 
             foreach ($tagihans as $item) {
                 $tagihan = $item->total_tagihan_siswa();

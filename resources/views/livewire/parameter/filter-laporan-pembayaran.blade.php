@@ -9,18 +9,6 @@
                 </div>
                 <div class="offcanvas-body">
                     <div class="mb-4">
-                        <p class="text-muted text-uppercase fs-12 fw-medium mb-2">Tanggal Transaksi</p>
-                        <div class="row g-2 align-items-center">
-                            <div class="col-lg">
-                                <input type="date" class="form-control" id="startDate" placeholder="0">
-                            </div>
-                            <div class="col-lg-auto">-</div>
-                            <div class="col-lg">
-                                <input type="date" class="form-control" id="endDate" placeholder="0">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mb-4">
                         <p class="text-muted text-uppercase fs-12 fw-medium mb-2">Kelas</p>
                         <select id="PilihKelas" style="cursor: pointer" wire:model="selectedKelas" class="form-select" multiple="multiple">
                             @foreach ($select_kelas as $item)
@@ -65,12 +53,9 @@
                     <div class="mb-4">
                         <p class="text-muted text-uppercase fs-12 fw-medium mb-2">Metode Pembayaran</p>
                         <select id="PilihMetodePembayaran" style="cursor: pointer" wire:model="selectedMetode" class="form-select" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Metode Pembayaran" multiple="multiple" >
-                            <option value="Teller Tunai">Tunai</option>
-                            <option value="BNI">BNI</option>
-                            <option value="BRI">BRI</option>
-                            <option value="BCA">BCA</option>
+                            <option value="Teller Tunai">Teller Tunai</option>
+                            <option value="Transfer ke Rekening Sekolah">Transfer ke Rekening Sekolah</option>
                             <option value="EduPay">EduPay</option>
-                            <option value="lainnya">Lainnya</option>
                         </select>
                     </div>
                 </div>
@@ -134,12 +119,7 @@
 
         // Fungsi untuk mengirim data filter hanya didaftarkan sekali
         document.getElementById("ApplyFilter").addEventListener("click", function () {
-            const startDate = document.getElementById("startDate").value;
-            const endDate = document.getElementById("endDate").value;
-
             const filters = {
-                startDate: startDate,
-                endDate: endDate,
                 selectedKelas: $("#PilihKelas").val(),
                 selectedPetugas: $("#PilihPetugas").val(),
                 selectedKategoriTagihanSiswa: $("#PilihKategoriTagihan").val(),

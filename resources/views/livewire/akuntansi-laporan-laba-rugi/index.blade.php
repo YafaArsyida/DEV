@@ -7,7 +7,7 @@
                         <h5 class="card-title mb-0">
                             Laporan Laba Rugi
                         </h5>
-                        <p class="mb-0">kjsbhdjjsjjs</p>       
+                        {{-- <p class="mb-0">kjsbhdjjsjjs</p>        --}}
                     </div>
                     <div class="flex-shrink-0">
                         <div class="d-flex gap-2 flex-wrap">
@@ -28,23 +28,12 @@
             </div><!-- end card header -->
             <div class="card-body">
                 <div class="row g-3 mb-3">
-                    <div class="col-xxl-12 col-sm-12"> 
-                        <div class="row g-2 align-items-center">
-                            <!-- Label di sisi kiri -->
-                            <div class="col-auto">
-                                <label for="startDate" class="form-label text-muted text-uppercase fs-12 fw-medium mb-0">Periode </label>
-                            </div>
-                            <!-- Input tanggal di sisi kanan -->
-                            <div class="col">
-                                <div class="row g-2 align-items-center">
-                                    <div class="col-lg">
-                                        <input type="date" id="startDate" class="form-control" wire:model="startDate" placeholder="0">
-                                    </div>
-                                    <div class="col-lg">
-                                        <input type="date" id="endDate" class="form-control" wire:model="endDate" placeholder="0">
-                                    </div>
-                                </div>
-                            </div>
+                   <div class="col-xxl-12 col-sm-12">
+                        <label class="form-label fw-semibold">Periode</label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="date" id="startDate" class="form-control" wire:model="startDate" value="{{ $startDate }}">
+                            <span class="text-muted">–</span>
+                            <input type="date" id="endDate" class="form-control" wire:model="endDate" value="{{ $endDate }}">
                             <div class="col-auto">
                                 <button type="button" class="btn btn-soft-secondary btn-icon rounded-circle" wire:click="resetTanggal" title="Reset Tanggal">
                                     <i class="ri-refresh-line fs-16"></i>

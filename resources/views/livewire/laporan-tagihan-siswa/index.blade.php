@@ -6,14 +6,22 @@
             @if ($selectedJenjang && $selectedTahunAjar)
             <div class="flex-shrink-0">
                 <div class="d-flex gap-2 flex-wrap">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tipsCetakSuratModal">
+                        <i class="ri-lightbulb-flash-fill text-warning me-1"></i> Tips fitur Unggulan
+                    </button>
                     @if ($selectedKelas)
-                        {{-- <button type="button" class="btn btn-success" wire:click="$emit('cetakSuratKelas')"><i class="ri-vip-crown-fill text-warning me-1"></i> Kirim Semua Pesan</button> --}}
                         <button type="button" class="btn btn-primary" wire:click="cetakSuratKelas({{ $selectedKelas }})"><i class="ri-vip-crown-fill text-warning me-1"></i> Cetak Semua Surat</button>
-                    @else
-                        <button type="button" class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#suratTagihan" aria-controls="suratTagihan" wire:click="$emit('refreshSurat', {{ $selectedJenjang }})"><i class="ri-file-paper-2-line me-1"></i> Format Surat</button>
                     @endif
+
+                    @if (!$pesans)
+                        <button data-bs-target="#createPesanTagihanSiswa" data-bs-toggle="modal" wire:click="$emit('createPesanTagihanSiswa', {{ $selectedJenjang }})" class="btn btn-success shadow-none"><i class="ri-whatsapp-line align-bottom me-1"></i> Setting WhatsApp</button>
+                    @else
+                    <button data-bs-target="#ModalEditTagihanSiswa" data-bs-toggle="modal" wire:click="$emit('loadPesanTagihanSiswa', {{ $ms_pesan_id }})" class="btn btn-success shadow-none"><i class="ri-whatsapp-line align-bottom me-1"></i> Edit WhatsApp</button>
+                    @endif
+
+                    <button type="button" class="btn btn-danger" data-bs-toggle="offcanvas" data-bs-target="#suratTagihan" aria-controls="suratTagihan" wire:click="$emit('refreshSurat', {{ $selectedJenjang }})"><i class="ri-file-paper-2-line me-1"></i> Format Surat</button>
                     {{-- <button data-bs-toggle="modal" data-bs-target="#ExportTagihanSiswa" wire:click.prevent="showExportTagihanSiswa" class="btn btn-soft-success"><i class="ri-file-excel-2-line me-1"></i> Export</button> --}}
-                    <button type="button" class="btn btn-info" data-bs-toggle="offcanvas" data-bs-target="#filterTagihan" aria-controls="filterTagihan"><i class="ri-filter-3-line me-1"></i> Fliters</button>
+                    <button type="button" class="btn btn-info" data-bs-toggle="offcanvas" data-bs-target="#filterTagihan" aria-controls="filterTagihan"><i class="ri-filter-3-line me-1"></i> Filters</button>
                 </div>
             </div>
             @endif
@@ -108,12 +116,12 @@
                                 <ul class="list-inline hstack gap-2 mb-0">
                                     <li class="list-inline-item detail" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Kirim Tagihan">
                                         <a href="" wire:click.prevent="kirimWhatsappTagihan({{ $laporan['ms_penempatan_siswa_id'] }})" class="btn btn-success btn-sm d-inline-flex align-items-center gap-1" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Kirim Pesan WA">
-                                            <i class="ri-whatsapp-line fs-16 align-middle"></i> Kirim Pesan
+                                            <i class="ri-whatsapp-line fs-14 align-middle"></i> Kirim Pesan
                                         </a>
                                         <!-- Tombol Cetak -->
                                         <a wire:click="cetakSurat({{ $laporan['ms_penempatan_siswa_id'] }})" 
-                                            class="btn btn-info btn-sm d-inline-flex align-items-center gap-1" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Cetak Surat">
-                                            <i class="ri-printer-line fs-16 align-middle"></i>
+                                            class="btn btn-danger btn-sm d-inline-flex align-items-center gap-1" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Cetak Surat">
+                                            <i class="ri-printer-line fs-14 align-middle"></i>
                                             <span> Cetak Surat</span>
                                         </a>
                                     </li>
@@ -150,5 +158,36 @@
             @endif
         </div>
         {{-- end data --}}
+    </div>
+    <div class="modal fade zoomIn" id="tipsCetakSuratModal" tabindex="-1" aria-labelledby="tipsCetakSuratLabel" aria-hidden="true" wire:ignore.self>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-0">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-5 text-center">
+                    <lord-icon
+                        src="https://cdn.lordicon.com/lupuorrc.json"
+                        trigger="loop"
+                        colors="primary:#405189,secondary:#f06548"
+                        style="width:90px;height:90px">
+                    </lord-icon>
+
+                    <div class="mt-4 text-center">
+                        <h4 class="fs-semibold">Tips Fitur Unggulan</h4>
+                        <p class="text-muted fs-14 mb-4 pt-1">
+                            Fitur <strong>Cetak Surat Massal</strong> memungkinkan Anda mencetak semua surat piutang tagihan untuk satu kelas sekaligus.  
+                            <br><br>
+                            <span class="text-danger fw-semibold">Pilih kelas terlebih dahulu</span> untuk mengaktifkan tombol <strong>Cetak Semua Surat</strong>.
+                        </p>
+                        <div class="hstack gap-2 justify-content-center">
+                            <button class="btn btn-link link-secondary fw-medium text-decoration-none shadow-none" data-bs-dismiss="modal">
+                                <i class="ri-close-line me-1 align-middle"></i> Mengerti
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

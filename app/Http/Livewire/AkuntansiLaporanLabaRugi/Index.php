@@ -6,6 +6,7 @@ use App\Http\Controllers\HelperController;
 use App\Models\AkuntansiJurnalDetail;
 use App\Models\Jenjang;
 use App\Models\TahunAjar;
+use Carbon\Carbon;
 use Livewire\Component;
 
 class Index extends Component
@@ -37,7 +38,9 @@ class Index extends Component
     public function resetTanggal()
     {
         $this->startDate = null;
-        $this->endDate = null;
+        $this->endDate   = null;
+        // $this->startDate = now()->format('Y-m-d');
+        // $this->endDate   = now()->format('Y-m-d');
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
     }
 
@@ -60,6 +63,13 @@ class Index extends Component
         $this->emit('openNewTab', $url);
     }
 
+    public function mount()
+    {
+        // Default ke hari ini
+        $this->startDate = null;
+        $this->endDate   = null;
+    }
+
     public function render()
     {
         // PENDAPATAN: akun kode 4%
@@ -68,15 +78,19 @@ class Index extends Component
             ->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
             ->where('posisi', 'kredit')
             ->when($this->startDate && $this->endDate, function ($query) {
-                $query->whereBetween('tanggal_transaksi', [$this->startDate, $this->endDate]);
+                $startDate = Carbon::createFromFormat('Y-m-d', $this->startDate)->startOfDay();
+                $endDate   = Carbon::createFromFormat('Y-m-d', $this->endDate)->endOfDay();
+
+                $query->whereBetween('tanggal_transaksi', [$startDate, $endDate]);
             })
+
             ->whereHas('akuntansi_rekening', function ($query) {
                 $query->where('kode_rekening', 'like', '4%');
             })
             ->get()
             ->groupBy([
                 fn($item) => $item->akuntansi_rekening->nama_rekening,
-                fn($item) => \Carbon\Carbon::parse($item->tanggal_transaksi)->format('Y-m')
+                fn($item) => Carbon::parse($item->tanggal_transaksi)->format('Y-m')
             ]);
 
         // BEBAN: akun kode 5%
@@ -85,7 +99,10 @@ class Index extends Component
             ->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
             ->where('posisi', 'debit')
             ->when($this->startDate && $this->endDate, function ($query) {
-                $query->whereBetween('tanggal_transaksi', [$this->startDate, $this->endDate]);
+                $startDate = Carbon::createFromFormat('Y-m-d', $this->startDate)->startOfDay();
+                $endDate   = Carbon::createFromFormat('Y-m-d', $this->endDate)->endOfDay();
+
+                $query->whereBetween('tanggal_transaksi', [$startDate, $endDate]);
             })
             ->whereHas('akuntansi_rekening', function ($query) {
                 $query->where('kode_rekening', 'like', '5%');
@@ -93,7 +110,7 @@ class Index extends Component
             ->get()
             ->groupBy([
                 fn($item) => $item->akuntansi_rekening->nama_rekening,
-                fn($item) => \Carbon\Carbon::parse($item->tanggal_transaksi)->format('Y-m')
+                fn($item) => Carbon::parse($item->tanggal_transaksi)->format('Y-m')
             ]);
 
         // Gabungkan bulan dari pendapatan + beban

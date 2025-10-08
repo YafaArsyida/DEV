@@ -103,13 +103,18 @@
                                                     class="form-control" 
                                                     wire:model.defer="deskripsi_topup" 
                                                     placeholder="deskripsi transaksi (bila perlu)" 
-                                                    aria-label="deskripsi">
+                                                    aria-label="Deskripsi">
                                                 @error('deskripsi_topup') <span class="text-danger">{{ $message }}</span> @enderror
-
+                                                <select class="form-select w-auto" 
+                                                        wire:model.defer="jenis_transaksi_topup" 
+                                                        aria-label="Pilih jenis pembayaran">
+                                                    <option value="topup tunai">Teller Tunai</option>
+                                                    <option value="topup online">Transfer ke Rekening Sekolah</option>
+                                                </select>
                                                 <!-- Tombol simpan -->
-                                                <button wire:click="simpanTopUp" class="btn btn-sm btn-success">
-                                                    <i class="ri-printer-line align-bottom me-1"></i> Top-Up
-                                                </button>
+                                                <a wire:click="simpanTopUp" class="btn btn-success">
+                                                    <i class="ri-printer-line align-bottom me-1"></i> Bayar
+                                                </a>
                                             </div>
                                         </div>
                                     </div>
@@ -146,7 +151,7 @@
 
                                                 <!-- Tombol simpan -->
                                                 <button wire:click="simpanPengeluaran" class="btn btn-sm btn-danger">
-                                                    <i class="ri-printer-line align-bottom me-1"></i> Tarik Tunai
+                                                    <i class="ri-printer-line align-bottom me-1"></i> Bayar
                                                 </button>
                                             </div>
                                         </div>

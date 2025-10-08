@@ -6,10 +6,10 @@
             @if ($selectedJenjang && $selectedTahunAjar)
             <div class="flex-shrink-0">
                 <div class="d-flex gap-2 flex-wrap">
-                    <button wire:click="cetakOverviewPembayaran" class="btn btn-danger d-inline-flex align-items-center gap-1">
+                    {{-- <button wire:click="cetakOverviewPembayaran" class="btn btn-danger d-inline-flex align-items-center gap-1">
                         <i class="ri-printer-line align-bottom"></i>
                         <span>Cetak</span>
-                    </button>
+                    </button> --}}
                     <button data-bs-toggle="modal" data-bs-target="#ExportOverviewExcel" class="btn btn-soft-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button>
                     {{-- <button data-bs-toggle="modal" data-bs-target="#ExportOverviewPembayaran" wire:click.prevent="showExportOverviewPembayaran"  class="btn btn-soft-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button> --}}
                 </div>
@@ -89,7 +89,7 @@
                         <tr class="fw-bold">
                             <td></td>
                             <td>TOTAL</td>
-                            <td class="text-end fs-14 text-info">RP{{ number_format($totalMonths, 0, ',', '.') }}</td>
+                            <td class="text-end fs-14 text-success">RP{{ number_format($totalMonths, 0, ',', '.') }}</td>
                         </tr>
                     </tbody>
 
@@ -119,7 +119,7 @@
                         <tr class="fw-bold">
                             <td></td>
                             <td>TOTAL</td>
-                            <td class="text-end fs-14 text-info">RP{{ number_format($totalMethods, 0, ',', '.') }}</td>
+                            <td class="text-end fs-14 text-success">RP{{ number_format($totalMethods, 0, ',', '.') }}</td>
                         </tr>
                     </tbody>
 
@@ -149,7 +149,7 @@
                         <tr class="fw-bold">
                             <td></td>
                             <td>TOTAL</td>
-                            <td class="text-end text-info fs-14">RP{{ number_format($totalClasses, 0, ',', '.') }}</td>
+                            <td class="text-end text-success fs-14">RP{{ number_format($totalClasses, 0, ',', '.') }}</td>
                         </tr>
                     </tbody>
 

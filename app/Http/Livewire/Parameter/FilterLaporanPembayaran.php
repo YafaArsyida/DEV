@@ -13,9 +13,6 @@ class FilterLaporanPembayaran extends Component
     public $selectedJenjang = null;
     public $selectedTahunAjar = null;
 
-    public $startDate = null;
-    public $endDate = null;
-
     public $selectedKelas = [];
     public $selectedPetugas = [];
     public $selectedKategoriTagihanSiswa = [];
@@ -38,9 +35,6 @@ class FilterLaporanPembayaran extends Component
 
     public function applyFilters($filters)
     {
-        $this->startDate = $filters['startDate'] ?? null;
-        $this->endDate = $filters['endDate'] ?? null;
-
         $this->selectedKelas = $filters['selectedKelas'] ?? [];
         $this->selectedPetugas = $filters['selectedPetugas'] ?? [];
         $this->selectedKategoriTagihanSiswa = $filters['selectedKategoriTagihanSiswa'] ?? [];
@@ -54,9 +48,6 @@ class FilterLaporanPembayaran extends Component
 
     public function clearFilters()
     {
-        $this->startDate = null;
-        $this->endDate = null;
-
         $this->selectedKelas = [];
         $this->selectedPetugas = [];
         $this->selectedKategoriTagihanSiswa = [];

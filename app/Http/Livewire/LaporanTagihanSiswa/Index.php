@@ -443,10 +443,19 @@ class Index extends Component
 
         $totalTagihan = $laporans->sum('total_tagihan');
 
+        $pesans = null;
+
+        if ($this->selectedJenjang) {
+            $pesans = WhatsAppTagihanSiswa::where('ms_jenjang_id', $this->selectedJenjang)->first();
+        }
+
         return view('livewire.laporan-tagihan-siswa.index', [
             'select_kelas' => $select_kelas,
             'laporans' => $paginatedLaporans,
             'totalTagihan' => $totalTagihan,
+
+            'ms_pesan_id' => $pesans ? $pesans->ms_whatsapp_tagihan_siswa_id : null,
+            'pesans' => $pesans,
         ]);
     }
 }

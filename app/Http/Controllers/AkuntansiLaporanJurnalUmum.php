@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AkuntansiJurnalDetail;
 use App\Models\Jenjang;
 use App\Models\TahunAjar;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Elibyy\TCPDF\Facades\TCPDF;
 
@@ -33,18 +34,23 @@ class AkuntansiLaporanJurnalUmum extends Controller
         $data = AkuntansiJurnalDetail::with('akuntansi_rekening', 'ms_pengguna')
             ->where('ms_jenjang_id', $selectedJenjang)
             ->where('ms_tahun_ajaran_id', $selectedTahunAjar)
-            ->when($startDate &&  $endDate, fn($q) => $q->whereBetween('tanggal_transaksi', [$startDate,  $endDate]))
+            ->when($startDate && $endDate, function ($q) use ($startDate, $endDate) {
+                $start = Carbon::createFromFormat('Y-m-d', $startDate)->startOfDay();
+                $end   = Carbon::createFromFormat('Y-m-d', $endDate)->endOfDay();
+
+                $q->whereBetween('tanggal_transaksi', [$start, $end]);
+            })
             ->when($search, fn($q) => $q->where('deskripsi', 'like', "%{$search}%"))
             ->orderBy('tanggal_transaksi')
             ->get()
             ->groupBy(['deskripsi', 'nominal']);
 
         $judul = 'Laporan Jurnal Keuangan';
-        $yayasan = 'Yayasan Drul Khukama Unit ' . ($jenjang->nama_jenjang ?? '-');
+        $yayasan = 'Yayasan Drul Khukama Unit ' . ($jenjang->nama_jenjang ?? '-') . ' Tahun Ajaran ' . ($tahunAjar->nama_tahun_ajar ?? '-');
 
         if ($request->start_date && $request->end_date) {
-            $periode = 'Periode ' . \App\Http\Controllers\HelperController::formatTanggalIndonesia($request->start_date, 'F Y') .
-                ' sampai ' . \App\Http\Controllers\HelperController::formatTanggalIndonesia($request->end_date, 'F Y');
+            $periode = 'Periode ' . \App\Http\Controllers\HelperController::formatTanggalIndonesia($request->start_date, 'd F Y') .
+                ' sampai ' . \App\Http\Controllers\HelperController::formatTanggalIndonesia($request->end_date, 'd F Y');
         } else {
             $periode = 'Semua Periode';
         }
@@ -57,6 +63,8 @@ class AkuntansiLaporanJurnalUmum extends Controller
         $pdf::Cell(0, 5, $judul, 0, 1, 'C');
         $pdf::SetFont('times', '', 11);
         $pdf::Cell(0, 5, $yayasan, 0, 1, 'C');
+        $pdf::SetFont('times', '', 10);
+        $pdf::MultiCell(0, 6, ($jenjang->deskripsi ?? '-'), 0, 'C');
         $pdf::Cell(0, 5, $periode, 0, 1, 'C');
         $pdf::Ln(3);
 

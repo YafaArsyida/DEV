@@ -5,6 +5,7 @@ namespace App\Http\Livewire\TransaksiPendapatanLainnya;
 use App\Models\AkuntansiJurnalDetail;
 use App\Models\AkuntansiRekening;
 use App\Models\PendapatanLainnya;
+use Carbon\Carbon;
 use Livewire\Component;
 
 class Index extends Component
@@ -122,6 +123,13 @@ class Index extends Component
         }
     }
 
+    public function resetTanggal()
+    {
+        $this->startDate = null;
+        $this->endDate   = null;
+        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
+    }
+
     public function cetakLaporan()
     {
         if (!$this->selectedJenjang || !$this->selectedTahunAjar) {
@@ -155,7 +163,10 @@ class Index extends Component
             ->where('ms_tahun_ajar_id', $this->selectedTahunAjar)
             ->where('ms_jenjang_id', $this->selectedJenjang)
             ->when($this->startDate && $this->endDate, function ($query) {
-                $query->whereBetween('tanggal', [$this->startDate, $this->endDate]);
+                $startDate = Carbon::parse($this->startDate)->startOfDay();
+                $endDate   = Carbon::parse($this->endDate)->endOfDay();
+
+                $query->whereBetween('tanggal', [$startDate, $endDate]);
             });
 
         if (!empty($this->selectedRekening)) {
@@ -176,8 +187,6 @@ class Index extends Component
         $data = $query->get();
 
         $this->totalPendapatanLainnya = (clone $query)->sum('nominal');
-
-        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui..']);
 
         return view('livewire.transaksi-pendapatan-lainnya.index', [
             'data' => $data,

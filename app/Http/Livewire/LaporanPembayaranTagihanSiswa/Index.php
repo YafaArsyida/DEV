@@ -49,8 +49,6 @@ class Index extends Component
     public function applyFilters($filters)
     {
         // Simpan filter yang diterima
-        $this->startDate = $filters['startDate'] ?? null;
-        $this->endDate = $filters['endDate'] ?? null;
         $this->selectedKelas = $filters['selectedKelas'] ?? [];
         $this->selectedPetugas = $filters['selectedPetugas'] ?? [];
         $this->selectedKategoriTagihanSiswa = $filters['selectedKategoriTagihanSiswa'] ?? [];
@@ -60,8 +58,8 @@ class Index extends Component
 
     public function clearFilters()
     {
-        $this->startDate = null;
-        $this->endDate = null;
+        $this->startDate = now()->format('Y-m-d');
+        $this->endDate   = now()->format('Y-m-d');
 
         $this->selectedKelas = [];
         $this->selectedPetugas = [];
@@ -178,6 +176,20 @@ class Index extends Component
         ]);
 
         $this->emit('openNewTab', $url);
+    }
+
+    public function mount()
+    {
+        // Default ke hari ini
+        $this->startDate = now()->format('Y-m-d');
+        $this->endDate   = now()->format('Y-m-d');
+    }
+    
+    public function resetTanggal()
+    {
+        $this->startDate = now()->format('Y-m-d');
+        $this->endDate   = now()->format('Y-m-d');
+        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
     }
 
     public function render()

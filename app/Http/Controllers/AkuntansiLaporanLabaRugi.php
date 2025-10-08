@@ -34,7 +34,12 @@ class AkuntansiLaporanLabaRugi extends Controller
             ->where('ms_jenjang_id', $selectedJenjang)
             ->where('ms_tahun_ajaran_id', $selectedTahunAjar)
             ->where('posisi', 'kredit')
-            ->when($startDate && $endDate, fn($q) => $q->whereBetween('tanggal_transaksi', [$startDate, $endDate]))
+            ->when($startDate && $endDate, function ($q) use ($startDate, $endDate) {
+                $start = Carbon::createFromFormat('Y-m-d', $startDate)->startOfDay();
+                $end   = Carbon::createFromFormat('Y-m-d', $endDate)->endOfDay();
+
+                $q->whereBetween('tanggal_transaksi', [$start, $end]);
+            })
             ->whereHas('akuntansi_rekening', fn($q) => $q->where('kode_rekening', 'like', '4%'))
             ->get()
             ->groupBy([
@@ -46,7 +51,12 @@ class AkuntansiLaporanLabaRugi extends Controller
             ->where('ms_jenjang_id', $selectedJenjang)
             ->where('ms_tahun_ajaran_id', $selectedTahunAjar)
             ->where('posisi', 'debit')
-            ->when($startDate && $endDate, fn($q) => $q->whereBetween('tanggal_transaksi', [$startDate, $endDate]))
+            ->when($startDate && $endDate, function ($q) use ($startDate, $endDate) {
+                $start = Carbon::createFromFormat('Y-m-d', $startDate)->startOfDay();
+                $end   = Carbon::createFromFormat('Y-m-d', $endDate)->endOfDay();
+
+                $q->whereBetween('tanggal_transaksi', [$start, $end]);
+            })
             ->whereHas('akuntansi_rekening', fn($q) => $q->where('kode_rekening', 'like', '5%'))
             ->get()
             ->groupBy([
@@ -61,8 +71,8 @@ class AkuntansiLaporanLabaRugi extends Controller
         $yayasan = 'Yayasan Drul Khukama Unit ' . ($jenjang->nama_jenjang ?? '-') . ' Tahun Ajaran ' . ($tahunAjar->nama_tahun_ajar ?? '-');
 
         if ($request->start_date && $request->end_date) {
-            $periode = 'Periode ' . \App\Http\Controllers\HelperController::formatTanggalIndonesia($request->start_date, 'F Y') .
-                ' sampai ' . \App\Http\Controllers\HelperController::formatTanggalIndonesia($request->end_date, 'F Y');
+            $periode = 'Periode ' . \App\Http\Controllers\HelperController::formatTanggalIndonesia($request->start_date, 'd F Y') .
+                ' sampai ' . \App\Http\Controllers\HelperController::formatTanggalIndonesia($request->end_date, 'd F Y');
         } else {
             $periode = 'Semua Periode';
         }

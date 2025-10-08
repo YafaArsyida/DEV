@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\AkuntansiLaporanArusKas;
 
 use App\Models\AkuntansiJurnalDetail;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
@@ -36,8 +37,8 @@ class Index extends Component
 
     public function resetTanggal()
     {
-        $this->endDate = null;
-        $this->startDate = null;
+        $this->startDate = now()->format('Y-m-d');
+        $this->endDate   = now()->format('Y-m-d');
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
     }
 
@@ -61,6 +62,13 @@ class Index extends Component
         $this->emit('openNewTab', $url);
     }
 
+    public function mount()
+    {
+        // Default ke hari ini
+        $this->startDate = now()->format('Y-m-d');
+        $this->endDate   = now()->format('Y-m-d');
+    }
+
     public function render()
     {
         $akunKasBank = [11001, 11002]; // 11001 = Kas, 11002 = Bank
@@ -77,7 +85,10 @@ class Index extends Component
                 $query->whereIn('kode_rekening', $akunKasBank);
             })
             ->when($this->startDate && $this->endDate, function ($query) {
-                $query->whereBetween('tanggal_transaksi', [$this->startDate, $this->endDate]);
+                $startDate = Carbon::parse($this->startDate)->startOfDay();
+                $endDate   = Carbon::parse($this->endDate)->endOfDay();
+
+                $query->whereBetween('tanggal_transaksi', [$startDate, $endDate]);
             })
             ->when($this->search, function ($query) {
                 $query->where('deskripsi', 'like', '%' . $this->search . '%');
@@ -103,7 +114,8 @@ class Index extends Component
                     $query->whereIn('kode_rekening', $akunKasBank);
                 })
                 ->when($this->startDate, function ($query) {
-                    $query->where('tanggal_transaksi', '<', $this->startDate);
+                    $startDate = Carbon::createFromFormat('Y-m-d', $this->startDate)->startOfDay();
+                    $query->where('tanggal_transaksi', '<', $startDate);
                 })
                 ->selectRaw("
                 SUM(CASE WHEN posisi = 'debit' THEN nominal ELSE 0 END) -

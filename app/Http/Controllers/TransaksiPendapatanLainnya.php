@@ -26,6 +26,9 @@ class TransaksiPendapatanLainnya extends Controller
         $endDate = $request->end_date;
         $search = $request->search;
 
+        $jenjang = Jenjang::find($selectedJenjang);
+        $tahunAjar = TahunAjar::find($selectedTahunAjar);
+
         if (!$selectedJenjang || !$selectedTahunAjar) {
             return response()->json(['error' => 'Jenjang dan Tahun Ajar wajib dipilih'], 400);
         }
@@ -34,7 +37,9 @@ class TransaksiPendapatanLainnya extends Controller
             ->where('ms_jenjang_id', $selectedJenjang)
             ->where('ms_tahun_ajar_id', $selectedTahunAjar)
             ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
-                $query->whereBetween('tanggal', [$startDate, $endDate]);
+                $start = Carbon::createFromFormat('Y-m-d', $startDate)->startOfDay();
+                $end   = Carbon::createFromFormat('Y-m-d', $endDate)->endOfDay();
+                $query->whereBetween('tanggal', [$start, $end]);
             });
 
         if (!empty($selectedRekening)) {
@@ -53,31 +58,35 @@ class TransaksiPendapatanLainnya extends Controller
         $data = $query->orderBy('tanggal', 'ASC')->get();
         $total = $data->sum('nominal');
 
-        $jenjang = Jenjang::find($selectedJenjang);
-        $tahunAjar = TahunAjar::find($selectedTahunAjar);
         $rekening = $selectedRekening ? AkuntansiRekening::where('kode_rekening', $selectedRekening)->first() : null;
 
-        $judul = 'Transaksi Pendapatan Lainnya';
-        $subjudul = 'Jenjang: ' . ($jenjang->nama_jenjang ?? '-') .
-            ' | Tahun Ajar: ' . ($tahunAjar->nama_tahun_ajar ?? '-');
+        $judul = 'Laporan Transaksi Pendapatan Lainnya';
+        $yayasan = 'Yayasan Drul Khukama Unit ' . ($jenjang->nama_jenjang ?? '-') . ' Tahun Ajaran ' . ($tahunAjar->nama_tahun_ajar ?? '-');
 
-        if ($rekening) {
-            $subjudul .= ' | Rekening: ' . $rekening->nama_rekening;
+        if ($request->start_date && $request->end_date) {
+            $periode = 'Periode ' . \App\Http\Controllers\HelperController::formatTanggalIndonesia($request->start_date, 'd F Y') .
+                ' sampai ' . \App\Http\Controllers\HelperController::formatTanggalIndonesia($request->end_date, 'd F Y');
+        } else {
+            $periode = 'Semua Periode';
         }
 
         // Init PDF
         $pdf = new TCPDF('L', 'mm', 'A4', true, 'UTF-8', false);
         $pdf::SetTitle($judul);
-        $pdf::AddPage();
-        $pdf::SetFont('times', '', 9);
+        $pdf::AddPage('L');
 
         $pdf::SetFont('times', 'B', 13);
         $pdf::Cell(0, 5, $judul, 0, 1, 'C');
         $pdf::SetFont('times', '', 11);
-        $pdf::Cell(0, 5, $subjudul, 0, 1, 'C');
+        $pdf::Cell(0, 5, $yayasan, 0, 1, 'C');
+        $pdf::SetFont('times', '', 10);
+        $pdf::MultiCell(0, 6, ($jenjang->deskripsi ?? '-'), 0, 'C');
+        $pdf::Cell(0, 5, $periode, 0, 1, 'C');
         $pdf::Ln(3);
 
         $pdf::SetFont('times', '', 9);
+        $pdf::setCellHeightRatio(1.2);
+
         $html = '
             <table border="0.5" cellpadding="1" cellspacing="0" style="width:100%;">
                 <thead>

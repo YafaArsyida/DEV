@@ -44,20 +44,15 @@
 
                     <!-- Filter Periode -->
                     <div class="col-xxl-5">
-                        <label class="form-label">Periode</label>
-                        <div class="row g-2 align-items-center">
-                            <div class="col-md-5">
-                                <input type="date" id="startDate" class="form-control" wire:model="startDate" placeholder="Mulai">
-                            </div>
-                            <div class="col-md-5">
-                                <input type="date" id="endDate" class="form-control" wire:model="endDate" placeholder="Sampai">
-                            </div>
-                            <div class="col-md-2 text-center">
-                                <button type="button" class="btn btn-soft-secondary btn-icon rounded-circle" 
-                                        wire:click="resetTanggal" data-bs-toggle="tooltip" 
-                                        data-bs-placement="top" title="Reset Tanggal">
+                        <label class="form-label fw-semibold">Periode</label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="date" id="startDate" class="form-control" wire:model="startDate" value="{{ $startDate }}">
+                            <span class="text-muted">–</span>
+                            <input type="date" id="endDate" class="form-control" wire:model="endDate" value="{{ $endDate }}">
+                            <div class="col-auto">
+                                <button type="button" class="btn btn-soft-secondary btn-icon rounded-circle" wire:click="resetTanggal" title="Reset Tanggal">
                                     <i class="ri-refresh-line fs-16"></i>
-                                </button>
+                                </button>    
                             </div>
                         </div>
                     </div>

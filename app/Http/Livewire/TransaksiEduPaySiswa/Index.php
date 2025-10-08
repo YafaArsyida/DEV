@@ -10,7 +10,7 @@ use App\Models\PenempatanSiswa;
 use App\Models\Siswa;
 use App\Models\TransaksiEduPay;
 use App\Models\WhatsAppEduPaySiswa;
-
+use Exception;
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -31,6 +31,7 @@ class Index extends Component
     public $total_pengeluaran_edupay_siswa;
 
     // save topup
+    public $jenis_transaksi_topup = 'topup tunai';
     public $nominal_topup;
     public $deskripsi_topup;
 
@@ -119,12 +120,22 @@ class Index extends Component
 
             // simpan jurnal
             $kode_rekening_kas = 11001;
+            $kode_rekening_bank = 11002;
             $kode_rekening_edupay = 22002;
-            $deskripsiJurnal = "Top Up Tunai EduPay Rp {$this->nominal_topup} siswa {$this->nama_siswa}";
+
+            if ($this->jenis_transaksi_topup == 'topup tunai') {
+                $debitAkunId = $kode_rekening_kas; // ID Akun Kas
+            } elseif ($this->jenis_transaksi_topup == 'topup online') {
+                $debitAkunId = $kode_rekening_bank; // ID Akun Bank
+            } else {
+                throw new Exception('Metode pembayaran tidak valid.');
+            }
+
+            $deskripsiJurnal = "{$this->jenis_transaksi_topup} EduPay Rp {$this->nominal_topup} siswa {$this->nama_siswa}";
 
             // Data untuk jurnal debit
             $jurnalDebit = [
-                'kode_rekening' => $kode_rekening_kas,
+                'kode_rekening' => $debitAkunId,
                 'posisi' => 'debit',
                 'nominal' => $this->nominal_topup,
                 'tanggal_transaksi' => now(),
@@ -156,7 +167,8 @@ class Index extends Component
                 'user_id' => $this->ms_siswa_id,
                 'ms_penempatan_siswa_id' => $this->ms_penempatan_siswa_id,
                 'ms_pengguna_id' => $ms_pengguna_id,
-                'jenis_transaksi' => 'topup tunai',
+                'jenis_transaksi' => $this->jenis_transaksi_topup,
+                // 'jenis_transaksi' => 'topup tunai',
                 'nominal' => $this->nominal_topup,
                 'tanggal' => now(),
                 'akuntansi_jurnal_detail_debit_id' => $jurnalDebitId,
@@ -169,6 +181,7 @@ class Index extends Component
 
             // Reset input
             $this->reset(['nominal_topup', 'deskripsi_topup']);
+            $this->jenis_transaksi_topup = 'topup tunai';
 
             // Refresh saldo siswa EduPay
             $siswa = Siswa::find($this->ms_siswa_id);
@@ -229,6 +242,7 @@ class Index extends Component
             $ms_pengguna_id = Auth::id();
 
             $kode_rekening_kas = 11001;
+            $kode_rekening_bank = 11002;
             $kode_rekening_edupay = 22002;
 
             $deskripsiJurnal = "Penarikan Tunai EduPay Rp {$this->nominal_penarikan} siswa {$this->nama_siswa}";

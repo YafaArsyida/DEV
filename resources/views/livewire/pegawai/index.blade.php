@@ -74,12 +74,18 @@
                                     <span class="fw-medium text-success">
                                         Telepon : {{ $item->telepon }}
                                     </span>
-                                    <p class="text-muted mb-0">E-mail : {{ $item->email }}</p>
+                                    <p class="text-primary mb-0">e-mail : <i>{{ $item->email }}</i></p>
                                 </td>
-                                <td>{{ $item->nip }}</td>
+                                <td>
+                                    <span class="fw-medium fs-14 text-info">
+                                    {{ $item->nip }}
+                                    </span>
+                                </td>
                                 <td>
                                     @if ($item->ms_educard)
+                                    <span class="fw-medium fs-14 text-warning">
                                         {{ $item->ms_educard->kode_kartu }}
+                                    </span>
                                     @else
                                         <em>Belum memiliki kartu</em>
                                     @endif

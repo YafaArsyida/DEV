@@ -7,6 +7,7 @@ use App\Models\AkuntansiKelompokRekening;
 use App\Models\AkuntansiRekening;
 use App\Models\Jenjang;
 use App\Models\TahunAjar;
+use Carbon\Carbon;
 use Livewire\Component;
 
 class Index extends Component
@@ -68,7 +69,7 @@ class Index extends Component
     {
         if ($this->selectedTahunAjar) {
             $tahunAjar = TahunAjar::findOrFail($this->selectedTahunAjar);
-            $this->labaRugi = $tahunAjar->hitungLabaRugi($this->selectedJenjang);
+            $this->labaRugi = $tahunAjar->hitungLabaRugi($this->selectedJenjang, $this->endDate);
             $this->tutupBuku = $tahunAjar->tutup_buku;
         }
 
@@ -76,8 +77,10 @@ class Index extends Component
             ->where('ms_jenjang_id', $this->selectedJenjang)
             ->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
             ->when($this->endDate, function ($query) {
-                $query->whereDate('tanggal_transaksi', '<=', $this->endDate);
+                $endDate = Carbon::createFromFormat('Y-m-d', $this->endDate)->endOfDay();
+                $query->where('tanggal_transaksi', '<=', $endDate);
             })
+
             ->get();
 
         // Kelompokkan transaksi berdasarkan kategori rekening (1xx, 2xx, 3xx)

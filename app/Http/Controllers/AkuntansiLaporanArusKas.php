@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\AkuntansiJurnalDetail;
 use App\Models\Jenjang;
+use Carbon\Carbon;
 use App\Models\TahunAjar;
 use Illuminate\Http\Request;
 use Elibyy\TCPDF\Facades\TCPDF;
@@ -42,8 +43,11 @@ class AkuntansiLaporanArusKas extends Controller
             }, function ($query) use ($akunKasBank) {
                 $query->whereIn('kode_rekening', $akunKasBank);
             })
-            ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
-                $query->whereBetween('tanggal_transaksi', [$startDate, $endDate]);
+            ->when($startDate && $endDate, function ($q) use ($startDate, $endDate) {
+                $start = Carbon::createFromFormat('Y-m-d', $startDate)->startOfDay();
+                $end   = Carbon::createFromFormat('Y-m-d', $endDate)->endOfDay();
+
+                $q->whereBetween('tanggal_transaksi', [$start, $end]);
             })
             ->orderBy('tanggal_transaksi')
             ->get();
@@ -54,6 +58,7 @@ class AkuntansiLaporanArusKas extends Controller
         // Hitung saldo awal
         $saldoAwal = 0;
         if ($startDate && $endDate) {
+            $startDate = Carbon::createFromFormat('Y-m-d', $startDate)->startOfDay();
             $saldoAwal = AkuntansiJurnalDetail::where('ms_tahun_ajaran_id', $selectedTahunAjar)
                 ->where('ms_jenjang_id', $selectedJenjang)
                 ->when($rekening, function ($query) use ($rekening) {
@@ -76,8 +81,8 @@ class AkuntansiLaporanArusKas extends Controller
         $yayasan = 'Yayasan Drul Khukama Unit ' . ($jenjang->nama_jenjang ?? '-');
 
         if ($request->start_date && $request->end_date) {
-            $periode = 'Periode ' . \App\Http\Controllers\HelperController::formatTanggalIndonesia($request->start_date, 'F Y') .
-                ' sampai ' . \App\Http\Controllers\HelperController::formatTanggalIndonesia($request->end_date, 'F Y');
+            $periode = 'Periode ' . \App\Http\Controllers\HelperController::formatTanggalIndonesia($request->start_date, 'd F Y') .
+                ' sampai ' . \App\Http\Controllers\HelperController::formatTanggalIndonesia($request->end_date, 'd F Y');
         } else {
             $periode = 'Semua Periode';
         }
@@ -90,6 +95,8 @@ class AkuntansiLaporanArusKas extends Controller
         $pdf::Cell(0, 5, $judul, 0, 1, 'C');
         $pdf::SetFont('times', '', 11);
         $pdf::Cell(0, 5, $yayasan, 0, 1, 'C');
+        $pdf::SetFont('times', '', 10);
+        $pdf::MultiCell(0, 6, ($jenjang->deskripsi ?? '-'), 0, 'C');
         $pdf::Cell(0, 5, $periode, 0, 1, 'C');
         $pdf::Ln(3);
 

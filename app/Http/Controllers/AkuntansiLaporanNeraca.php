@@ -62,6 +62,12 @@ class AkuntansiLaporanNeraca extends Controller
         $judul = 'Laporan Neraca';
         $yayasan = 'Yayasan Drul Khukama Unit ' . ($jenjang->nama_jenjang ?? '-') . ' Tahun Ajaran ' . ($tahunAjar->nama_tahun_ajar ?? '-');
 
+        if ($request->end_date) {
+            $periode = 'Sampai Periode ' . \App\Http\Controllers\HelperController::formatTanggalIndonesia($request->end_date, 'd F Y');
+        } else {
+            $periode = 'Semua Periode';
+        }
+
         $pdf = new TCPDF('L', 'mm', 'A4', true, 'UTF-8', false);
         $pdf::SetTitle($judul);
         $pdf::AddPage();
@@ -72,6 +78,7 @@ class AkuntansiLaporanNeraca extends Controller
         $pdf::Cell(0, 5, $yayasan, 0, 1, 'C');
         $pdf::SetFont('times', '', 10);
         $pdf::MultiCell(0, 6, ($jenjang->deskripsi ?? '-'), 0, 'C');
+        $pdf::Cell(0, 5, $periode, 0, 1, 'C');
         $pdf::Ln(3);
 
         // ========== TABEL ==========
