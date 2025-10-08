@@ -120,7 +120,7 @@ class Index extends Component
         // Persiapkan pesan berdasarkan template
         $pesan = "*" . $templatePesan->judul . "*\n\n"; // Judul
         $pesan .= $templatePesan->salam_pembuka . "\n\n"; // Salam pembuka
-        $pesan .= $templatePesan->kalimat_pembuka . "\n"; // Kalimat pembuka
+        $pesan .= $templatePesan->kalimat_pembuka; // Kalimat pembuka
         $pesan .= "Kami informasikan bahwa Tagihan sekolah atas nama siswa *" . $penempatanSiswa->ms_siswa->nama_siswa . "* kelas *" . ($penempatanSiswa->ms_kelas->nama_kelas ?? '-') . "* masih perlu diselesaikan. Berikut adalah rincian tagihannya : \n\n";
 
         $totalTagihan = 0;
