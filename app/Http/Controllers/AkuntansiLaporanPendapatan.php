@@ -58,8 +58,8 @@ class AkuntansiLaporanPendapatan extends Controller
         $yayasan = 'Yayasan Drul Khukama Unit ' . ($jenjang->nama_jenjang ?? '-');
 
         if ($request->start_date && $request->end_date) {
-            $periode = 'Periode ' . \App\Http\Controllers\HelperController::formatTanggalIndonesia($request->start_date, 'F Y') .
-                ' sampai ' . \App\Http\Controllers\HelperController::formatTanggalIndonesia($request->end_date, 'F Y');
+            $periode = 'Periode ' . \App\Http\Controllers\HelperController::formatTanggalIndonesia($request->start_date, 'd F Y') .
+                ' sampai ' . \App\Http\Controllers\HelperController::formatTanggalIndonesia($request->end_date, 'd F Y');
         } else {
             $periode = 'Semua Periode';
         }
@@ -67,16 +67,15 @@ class AkuntansiLaporanPendapatan extends Controller
         // Mulai PDF
         $pdf = new TCPDF('L', 'mm', 'A4', true, 'UTF-8', false);
         $pdf::SetTitle($judul);
-        $pdf::AddPage('L'); // L = Landscape
+        $pdf::AddPage('L');
 
         $pdf::SetFont('times', 'B', 13);
         $pdf::Cell(0, 5, $judul, 0, 1, 'C');
         $pdf::SetFont('times', '', 11);
         $pdf::Cell(0, 5, $yayasan, 0, 1, 'C');
-        $pdf::Cell(0, 5, $periode, 0, 1, 'C');
-        $pdf::Cell(0, 6, 'Tahun Ajaran: ' . ($tahunAjar->nama_tahun_ajar ?? '-'), 0, 1, 'C');
         $pdf::SetFont('times', '', 10);
         $pdf::MultiCell(0, 6, ($jenjang->deskripsi ?? '-'), 0, 'C');
+        $pdf::Cell(0, 5, $periode, 0, 1, 'C');
         $pdf::Ln(3);
 
         $pdf::SetFont('times', '', 9);

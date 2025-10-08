@@ -45,7 +45,7 @@
                 <li class="nav-item">
                     <a href="{{ route('smartCanteen.administrasi.produk') }}"
                     class="nav-link menu-link {{ request()->routeIs('smartCanteen.administrasi.produk') ? 'active' : '' }}">
-                        <i class="mdi mdi-school-outline"></i>
+                        <i class="mdi mdi-food-outline"></i>
                         <span data-key="t-kelas-siswa">Master Produk</span>
                     </a>
                 </li>
@@ -53,7 +53,7 @@
                 <li class="nav-item">
                     <a href="{{ route('smartCanteen.transaksi.produk') }}"
                     class="nav-link menu-link {{ request()->routeIs('smartCanteen.transaksi.produk') ? 'active' : '' }}">
-                        <i class="mdi mdi-school-outline"></i>
+                        <i class="mdi mdi-cart-outline"></i>
                         <span data-key="t-kelas-siswa">Pembelian Produk</span>
                     </a>
                 </li>
@@ -61,7 +61,7 @@
                 <li class="nav-item">
                     <a href="{{ route('smartCanteen.laporan.transaksi') }}"
                     class="nav-link menu-link {{ request()->routeIs('smartCanteen.laporan.transaksi') ? 'active' : '' }}">
-                        <i class="mdi mdi-school-outline"></i>
+                        <i class="mdi mdi-file-chart-outline"></i>
                         <span data-key="t-kelas-siswa">Laporan Transaksi</span>
                     </a>
                 </li>

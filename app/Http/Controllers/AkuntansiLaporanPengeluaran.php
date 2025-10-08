@@ -68,13 +68,14 @@ class AkuntansiLaporanPengeluaran extends Controller
         // Mulai PDF
         $pdf = new TCPDF('L', 'mm', 'A4', true, 'UTF-8', false);
         $pdf::SetTitle($judul);
-        $pdf::AddPage('L'); // L = Landscape
-        $pdf::SetFont('times', '', 9);
+        $pdf::AddPage('L');
 
         $pdf::SetFont('times', 'B', 13);
         $pdf::Cell(0, 5, $judul, 0, 1, 'C');
         $pdf::SetFont('times', '', 11);
         $pdf::Cell(0, 5, $yayasan, 0, 1, 'C');
+        $pdf::SetFont('times', '', 10);
+        $pdf::MultiCell(0, 6, ($jenjang->deskripsi ?? '-'), 0, 'C');
         $pdf::Cell(0, 5, $periode, 0, 1, 'C');
         $pdf::Ln(3);
 

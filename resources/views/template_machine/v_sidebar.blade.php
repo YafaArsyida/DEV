@@ -64,7 +64,7 @@
                     <li class="nav-item">
                         <a href="{{ route('akuntansi.konfigurasi') }}"
                         class="nav-link menu-link {{ request()->routeIs('akuntansi.konfigurasi') ? 'active' : '' }}">
-                            <i class="mdi mdi-school-outline"></i>
+                            <i class="mdi mdi-calculator-variant-outline"></i>
                             <span data-key="t-kelas-siswa">Konfigurasi Akuntansi</span>
                         </a>
                     </li>
@@ -79,14 +79,14 @@
                     <li class="nav-item">
                         <a href="{{ route('administrasi.ekstrakurikuler-siswa') }}"
                         class="nav-link menu-link {{ request()->routeIs('administrasi.ekstrakurikuler-siswa') ? 'active' : '' }}">
-                            <i class="mdi mdi-school-outline"></i>
+                            <i class="mdi mdi-trophy-outline"></i>
                             <span data-key="t-kelas-siswa">Ekstrakurikuler Siswa</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a href="{{ route('keuangan.konfigurasi-tagihan-siswa') }}"
                         class="nav-link menu-link {{ request()->routeIs('keuangan.konfigurasi-tagihan-siswa') ? 'active' : '' }}">
-                            <i class="mdi mdi-cog-outline"></i>
+                            <i class="mdi mdi-credit-card-settings-outline"></i>
                             <span data-key="t-konfigurasi-tagihan">Konfigurasi Keuangan Siswa</span>
                         </a>
                     </li>
@@ -152,7 +152,7 @@
                     <li class="nav-item">
                         <a class="nav-link menu-link {{ request()->routeIs('transaksi.tagihan-siswa') ? 'active' : '' }}"
                              href="{{ route('transaksi.tagihan-siswa') }}">
-                            <i class="mdi mdi-cash-register"></i>
+                            <i class="mdi mdi-receipt-text-outline"></i>
                             <span data-key="t-tagihan-siswa">Tagihan Siswa</span>
                         </a>
                     </li>
@@ -168,7 +168,7 @@
                         role="button" 
                         aria-expanded="{{ $isTransaksiSiswaActive ? 'true' : 'false' }}" 
                         aria-controls="sidebarTransaksiSiswa">
-                            <i class="mdi mdi-school"></i>
+                            <i class="mdi mdi-bank-transfer"></i>
                             <span data-key="t-transaksi-siswa">Transaksi Siswa</span>
                         </a>
                         <div class="collapse menu-dropdown {{ $isTransaksiSiswaActive ? 'show' : '' }}" id="sidebarTransaksiSiswa">
@@ -202,7 +202,7 @@
                         role="button" 
                         aria-expanded="{{ $isTransaksiPegawaiActive ? 'true' : 'false' }}" 
                         aria-controls="sidebarTransaksiPegawai">
-                            <i class="mdi mdi-school"></i>
+                            <i class="mdi mdi-briefcase-outline"></i>
                             <span data-key="t-transaksi-pegawai">Transaksi Pegawai</span>
                         </a>
                         <div class="collapse menu-dropdown {{ $isTransaksiPegawaiActive ? 'show' : '' }}" id="sidebarTransaksiPegawai">
@@ -228,21 +228,21 @@
                     <!-- Penggajian Pegawai -->
                     <li class="nav-item">
                         <a class="nav-link menu-link" href="#">
-                            <i class="mdi mdi-cash-multiple"></i>
+                            <i class="mdi mdi-cash-check"></i>
                             <span data-key="t-gaji-pegawai">Pennggajian Pegawai</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link menu-link {{ request()->routeIs('transaksi.pendapatan-lainnya') ? 'active' : '' }}"
                            href="{{ route('transaksi.pendapatan-lainnya') }}">
-                            <i class="mdi mdi-cash-multiple"></i>
+                            <i class="mdi mdi-trending-up"></i>
                             <span data-key="t-gaji-pegawai">Transaksi Pendapatan</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link menu-link {{ request()->routeIs('transaksi.pengeluaran') ? 'active' : '' }}" 
                             href="{{ route('transaksi.pengeluaran') }}">
-                            <i class="mdi mdi-cash-multiple"></i>
+                            <i class="mdi mdi-trending-down"></i>
                             <span data-key="t-gaji-pegawai">Transaksi Pengeluaran</span>
                         </a>
                     </li>
@@ -253,7 +253,7 @@
                     <li class="nav-item">
                         <a class="nav-link menu-link {{ request()->routeIs('laporan.pembayaran-tagihan-siswa') ? 'active' : '' }}"
                             href="{{ route('laporan.pembayaran-tagihan-siswa') }}">
-                            <i class="mdi mdi-receipt-text"></i> 
+                            <i class="mdi mdi-file-check-outline"></i>
                             <span data-key="t-pembayaran-tagihan">Pembayaran Tagihan Siswa</span>
                         </a>
                     </li>
@@ -262,7 +262,7 @@
                     <li class="nav-item">
                         <a class="nav-link menu-link {{ request()->routeIs('laporan.tagihan-siswa') ? 'active' : '' }}"
                             href="{{ route('laporan.tagihan-siswa') }}">
-                            <i class="mdi mdi-alert-circle-outline"></i> 
+                            <i class="mdi mdi-file-alert-outline"></i>
                             <span data-key="t-tunggakan-tagihan">Piutang Tagihan Siswa</span>
                         </a>
                     </li>
@@ -278,7 +278,7 @@
                         role="button" 
                         aria-expanded="{{ $laporanSiswa ? 'true' : 'false' }}" 
                         aria-controls="sidebarLaporanSiswa">
-                            <i class="mdi mdi-school-outline"></i>
+                            <i class="mdi mdi-chart-box-outline"></i>
                             <span data-key="t-laporan-siswa">Laporan Siswa</span>
                         </a>
                         <div class="collapse menu-dropdown {{ $laporanSiswa ? 'show' : '' }}" id="sidebarLaporanSiswa">
@@ -305,7 +305,7 @@
                     <li class="nav-item">
                         <a class="nav-link menu-link {{ request()->routeIs('laporan.rekapitulasi-keuangan') ? 'active' : '' }}"
                             href="{{ route('laporan.rekapitulasi-keuangan') }}">
-                            <i class="mdi mdi-chart-bar-stacked"></i> 
+                            <i class="mdi mdi-chart-bar-stacked"></i>
                             <span data-key="t-rekapitulasi-keuangan">Rekapitulasi Keuangan Siswa</span>
                         </a>
                     </li>
@@ -313,7 +313,7 @@
                     <!-- Laporan Pegawai: Tabungan & EduPay -->
                     <li class="nav-item">
                         <a class="nav-link menu-link" href="#sidebarLaporanPegawai" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarLaporanPegawai">
-                            <i class="mdi mdi-account-tie-outline"></i>
+                            <i class="mdi mdi-finance"></i>
                             <span data-key="t-laporan-pegawai">Laporan Pegawai</span>
                         </a>
                         <div class="collapse menu-dropdown" id="sidebarLaporanPegawai">
@@ -334,7 +334,7 @@
                     <li class="nav-item">
                         <a class="nav-link menu-link {{ request()->routeIs('akuntansi.laporan-pendapatan') ? 'active' : '' }}"
                            href="{{ route('akuntansi.laporan-pendapatan') }}">
-                            <i class="mdi mdi-cash-multiple"></i> 
+                            <i class="mdi mdi-trending-up"></i>
                             <span data-key="t-pendapatan-unit">Laporan Pendapatan</span>
                         </a>
                     </li>
@@ -342,7 +342,7 @@
                     <li class="nav-item">
                         <a class="nav-link menu-link {{ request()->routeIs('akuntansi.laporan-pengeluaran') ? 'active' : '' }}"
                            href="{{ route('akuntansi.laporan-pengeluaran') }}">
-                            <i class="mdi mdi-cash-multiple"></i> 
+                            <i class="mdi mdi-trending-down"></i>
                             <span data-key="t-pengeluaran-unit">Laporan Pengeluaran</span>
                         </a>
                     </li>
@@ -361,7 +361,7 @@
                     <li class="nav-item">
                         <a class="nav-link menu-link {{ request()->routeIs('akuntansi.laporan-buku-besar') ? 'active' : '' }}"
                            href="{{ route('akuntansi.laporan-buku-besar') }}">
-                            <i class="mdi mdi-book"></i> 
+                            <i class="mdi mdi-book-outline"></i> 
                             <span data-key="t-buku-besar">Laporan Buku Besar</span>
                         </a>
                     </li>
@@ -428,13 +428,13 @@
                     <li class="menu-title"><span data-key="t-menu">modul</span></li>
                     <!-- Jenjang & Tahun Ajaran -->
                     <li class="nav-item">
-                        <a class="nav-link menu-link" href="{{ route('smartCanteen.dashboard') }}">
-                            <i class="mdi mdi-calendar-outline"></i> <span data-key="t-tahun-ajaran">SmartCanteen - eKantin</span>
+                        <a class="nav-link menu-link" target="_blank" href="{{ route('smartCanteen.dashboard') }}">
+                            <i class="mdi mdi-food-fork-drink"></i> <span data-key="t-tahun-ajaran">SmartCanteen - eKantin</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link menu-link" href="{{ route('smartCanteen.dashboard') }}">
-                            <i class="mdi mdi-calendar-outline"></i> <span data-key="t-tahun-ajaran">SmartPass - eAbsensi</span>
+                        <a class="nav-link menu-link" target="_blank" href="{{ route('smartCanteen.dashboard') }}">
+                            <i class="mdi mdi-card-account-details-outline"></i> <span data-key="t-tahun-ajaran">SmartPass - eAbsensi</span>
                         </a>
                     </li>
                 {{-- @endif --}}
