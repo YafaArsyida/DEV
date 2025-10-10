@@ -245,6 +245,7 @@ class DataKeranjang extends Component
         TransaksiEduPay::create([
             'user_type' => 'siswa',
             'user_id' => $ms_siswa_id,
+            'ms_penempatan_siswa_id' => $this->ms_penempatan_siswa_id,
             'ms_pengguna_id' => Auth::id(),
             'jenis_transaksi' => 'pembayaran',
             'nominal' => $totalBayar,

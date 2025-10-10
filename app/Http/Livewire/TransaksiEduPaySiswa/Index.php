@@ -6,10 +6,11 @@ use App\Http\Controllers\HelperController;
 
 use App\Models\AkuntansiJurnalDetail;
 use App\Models\KuitansiEduPaySiswa;
+use App\Models\KuitansiTransaksiEduPay;
 use App\Models\PenempatanSiswa;
 use App\Models\Siswa;
 use App\Models\TransaksiEduPay;
-use App\Models\WhatsAppEduPaySiswa;
+use App\Models\WhatsAppTransaksiEduPay;
 use Exception;
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
@@ -168,7 +169,6 @@ class Index extends Component
                 'ms_penempatan_siswa_id' => $this->ms_penempatan_siswa_id,
                 'ms_pengguna_id' => $ms_pengguna_id,
                 'jenis_transaksi' => $this->jenis_transaksi_topup,
-                // 'jenis_transaksi' => 'topup tunai',
                 'nominal' => $this->nominal_topup,
                 'tanggal' => now(),
                 'akuntansi_jurnal_detail_debit_id' => $jurnalDebitId,
@@ -367,7 +367,7 @@ class Index extends Component
         }
 
         // Ambil template WA
-        $templatePesan = WhatsAppEduPaySiswa::where('ms_jenjang_id', $this->ms_jenjang_id ?? null)
+        $templatePesan = WhatsAppTransaksiEduPay::where('ms_jenjang_id', $this->ms_jenjang_id ?? null)
             ->latest()
             ->first();
 
@@ -407,7 +407,7 @@ class Index extends Component
     // Fungsi untuk menangani tombol cetak
     public function cetakTransaksi($eduPayId)
     {
-        $surat = KuitansiEduPaySiswa::where('ms_jenjang_id', $this->ms_jenjang_id)->first();
+        $surat = KuitansiTransaksiEduPay::where('ms_jenjang_id', $this->ms_jenjang_id)->first();
 
         if (!$surat) {
             $this->dispatchBrowserEvent('alertify-error', [
@@ -420,9 +420,9 @@ class Index extends Component
 
         // Menggunakan route untuk mengarahkan ke controller cetak
         $url = route('transaksi.edupay-siswa.kuitansiPDF', [
-            'selectedJenjang' => $this->ms_jenjang_id,
             'eduPayId' => $eduPayId,
-            'selectedSiswa' => $this->ms_siswa_id
+            'selectedJenjang' => $this->ms_jenjang_id,
+            'userId' => $this->ms_siswa_id
         ]);
 
         // Emit URL untuk membuka tab baru

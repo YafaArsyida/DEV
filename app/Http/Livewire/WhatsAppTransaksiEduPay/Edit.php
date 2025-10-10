@@ -1,43 +1,38 @@
 <?php
 
-namespace App\Http\Livewire\WhatsAppEduPaySiswa;
+namespace App\Http\Livewire\WhatsAppTransaksiEduPay;
 
 use Illuminate\Support\Facades\DB;
+use App\Models\WhatsAppTransaksiEduPay;
 use Livewire\Component;
 
-use App\Models\WhatsAppEduPay;
-use App\Models\WhatsAppEduPaySiswa;
-
-class Create extends Component
+class Edit extends Component
 {
-    public $ms_jenjang_id;
+    public $ms_whatsapp_transaksi_edupay_id;
     public $judul;
     public $salam_pembuka;
     public $kalimat_pembuka;
+    public $detail_transaksi;
     public $kalimat_penutup;
     public $salam_penutup;
 
-    protected $listeners = ['createPesanEduPay'];
+    protected $listeners = ['loadPesanEduPay'];
 
-    public function createPesanEduPay($ms_jenjang_id)
+    public function loadPesanEduPay($ms_whatsapp_transaksi_edupay_id)
     {
-        $this->resetInputFields(); // Reset input field setiap kali modal dibuka
-        $this->ms_jenjang_id = $ms_jenjang_id;
-    }
+        $pesan = WhatsAppTransaksiEduPay::findOrFail($ms_whatsapp_transaksi_edupay_id);
 
-    public function resetInputFields()
-    {
-        $this->judul = '';
-        $this->salam_pembuka = '';
-        $this->kalimat_pembuka = '';
-        $this->kalimat_penutup = '';
-        $this->salam_penutup = '';
+        $this->ms_whatsapp_transaksi_edupay_id = $pesan->ms_whatsapp_transaksi_edupay_id;
+        $this->judul = $pesan->judul;
+        $this->salam_pembuka = $pesan->salam_pembuka;
+        $this->kalimat_pembuka = $pesan->kalimat_pembuka;
+        $this->kalimat_penutup = $pesan->kalimat_penutup;
+        $this->salam_penutup = $pesan->salam_penutup;
     }
 
     public function rules()
     {
         return [
-            'ms_jenjang_id' => 'required|exists:ms_jenjang,ms_jenjang_id',
             'judul' => 'required|string|max:255',
             'salam_pembuka' => 'required|string|max:255',
             'kalimat_pembuka' => 'required|string|max:500',
@@ -69,16 +64,18 @@ class Create extends Component
         $this->validateOnly($fields);
     }
 
-    public function createPesan()
+    public function updatePesan()
     {
         $validatedData = $this->validate();
 
         DB::beginTransaction();
 
         try {
-            // Buat pesan baru
-            WhatsAppEduPaySiswa::create([
-                'ms_jenjang_id' => $this->ms_jenjang_id,
+            // Cari data pesan yang akan diperbarui
+            $pesan = WhatsAppTransaksiEduPay::withTrashed()->findOrFail($this->ms_whatsapp_transaksi_edupay_id);
+
+            // Perbarui data pesan
+            $pesan->update([
                 'judul' => $this->judul,
                 'salam_pembuka' => $this->salam_pembuka,
                 'kalimat_pembuka' => $this->kalimat_pembuka,
@@ -89,19 +86,19 @@ class Create extends Component
             DB::commit();
 
             // Kirim notifikasi sukses
-            $this->dispatchBrowserEvent('alertify-success', ['message' => 'Pesan berhasil dibuat.']);
-            $this->dispatchBrowserEvent('hide-create-modal', ['modalId' => 'createPesanEduPay']);
+            $this->dispatchBrowserEvent('alertify-success', ['message' => 'Pesan berhasil diperbarui.']);
+            $this->dispatchBrowserEvent('hide-create-modal', ['modalId' => 'loadPesanEduPay']);
             $this->emit('UpdatePesanTransaksiEduPay');
         } catch (\Exception $e) {
             DB::rollBack();
 
             // Kirim notifikasi error
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Terjadi kesalahan saat membuat pesan: ' . $e->getMessage()]);
+            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Terjadi kesalahan saat memperbarui pesan: ' . $e->getMessage()]);
         }
     }
 
     public function render()
     {
-        return view('livewire.whats-app-edu-pay-siswa.create');
+        return view('livewire.whats-app-transaksi-edu-pay.edit');
     }
 }

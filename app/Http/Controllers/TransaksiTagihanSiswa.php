@@ -139,6 +139,6 @@ class TransaksiTagihanSiswa extends Controller
         // $pdf::SetFont('times', 'I', 8);
         // $pdf::Cell(0, 5, 'Wassalamu’alaikum Wr. Wb.', 0, 1, 'L');
         // Menampilkan PDF langsung ke browser
-        $pdf::Output('histori_transaksi.pdf', 'I');
+        $pdf::Output('kuitansi_transaksi_piutang.pdf', 'I');
     }
 }

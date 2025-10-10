@@ -3,11 +3,10 @@
 namespace App\Http\Livewire\TransaksiEduPaySiswa;
 
 use App\Http\Controllers\HelperController;
-use App\Models\EduPaySiswa;
-use App\Models\KuitansiEduPaySiswa;
+use App\Models\KuitansiTransaksiEduPay;
 use App\Models\PenempatanSiswa;
 use App\Models\TransaksiEduPay;
-use App\Models\WhatsAppEduPaySiswa;
+use App\Models\WhatsAppTransaksiEduPay;
 use Livewire\Component;
 
 class DataEduPay extends Component
@@ -58,7 +57,6 @@ class DataEduPay extends Component
 
         // Ambil semua transaksi siswa untuk hitung saldo
         $edupayTransaksi = TransaksiEduPay::where('user_id', $this->ms_siswa_id)
-            // ->orderBy('ms_transaksi_edupay_id', 'ASC')
             ->get();
 
         // Hitung saldo sampai transaksi yang diminta
@@ -95,7 +93,7 @@ class DataEduPay extends Component
         }
 
         // Ambil template WA
-        $templatePesan = WhatsAppEduPaySiswa::where('ms_jenjang_id', $this->selectedJenjang ?? null)
+        $templatePesan = WhatsAppTransaksiEduPay::where('ms_jenjang_id', $this->selectedJenjang ?? null)
             ->latest()
             ->first();
 
@@ -132,10 +130,9 @@ class DataEduPay extends Component
         $this->emit('openNewTab', $url);
     }
 
-
     public function cetakTransaksi($eduPayId)
     {
-        $surat = KuitansiEduPaySiswa::where('ms_jenjang_id', $this->selectedJenjang)->first();
+        $surat = KuitansiTransaksiEduPay::where('ms_jenjang_id', $this->selectedJenjang)->first();
 
         if (!$surat) {
             $this->dispatchBrowserEvent('alertify-error', [
@@ -150,7 +147,7 @@ class DataEduPay extends Component
         $url = route('transaksi.edupay-siswa.kuitansiPDF', [
             'eduPayId' => $eduPayId,
             'selectedJenjang' => $this->selectedJenjang,
-            'selectedSiswa' => $this->ms_siswa_id
+            'userId' => $this->ms_siswa_id
         ]);
 
         // Emit URL untuk membuka tab baru

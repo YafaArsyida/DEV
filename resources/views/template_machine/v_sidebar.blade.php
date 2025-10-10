@@ -393,21 +393,24 @@
                     <li class="menu-title"><span data-key="t-menu">sistem</span></li>
                     <!-- Jenjang & Tahun Ajaran -->
                     <li class="nav-item">
-                        <a class="nav-link menu-link" href="{{ route('sistem.jenjang-tahun-ajar') }}">
+                        <a class="nav-link menu-link {{ request()->routeIs('sistem.jenjang-tahun-ajar') ? 'active' : '' }}" 
+                            href="{{ route('sistem.jenjang-tahun-ajar') }}">
                             <i class="mdi mdi-calendar-outline"></i> <span data-key="t-tahun-ajaran">Jenjang & Tahun Ajaran</span>
                         </a>
                     </li>
     
                     <!-- Akses Petugas -->
                     <li class="nav-item">
-                        <a class="nav-link menu-link" href="{{ route('sistem.pengguna-jenjang') }}">
+                        <a class="nav-link menu-link {{ request()->routeIs('sistem.pengguna-jenjang') ? 'active' : '' }}"
+                            href="{{ route('sistem.pengguna-jenjang') }}">
                             <i class="mdi mdi-account-key-outline"></i> <span data-key="t-pengguna">Akses Petugas</span>
                         </a>
                     </li>
     
                     <!-- Dokumen Administrasi -->
                     <li class="nav-item">
-                        <a class="nav-link menu-link" href="{{ route('sistem.dokumen-administrasi') }}">
+                        <a class="nav-link menu-link {{ request()->routeIs('sistem.dokumen-administrasi') ? 'active' : '' }}"
+                            href="{{ route('sistem.dokumen-administrasi') }}">
                             <i class="mdi mdi-file-document-outline"></i> <span data-key="t-dokumen-administrasi">Dokumen Administrasi</span>
                         </a>
                     </li>
@@ -420,11 +423,11 @@
                     </li> --}}
     
                     <!-- Menu & Sub-Menu -->
-                    <li class="nav-item">
+                    {{-- <li class="nav-item">
                         <a class="nav-link menu-link" href="menu-submenu.html">
                             <i class="mdi mdi-view-list-outline"></i> <span data-key="t-menu-submenu">Menu & Sub-Menu</span>
                         </a>
-                    </li>       
+                    </li>        --}}
                     <li class="menu-title"><span data-key="t-menu">modul</span></li>
                     <!-- Jenjang & Tahun Ajaran -->
                     <li class="nav-item">

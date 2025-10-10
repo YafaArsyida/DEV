@@ -4,8 +4,8 @@ namespace App\Http\Livewire\TransaksiTagihanSiswa;
 
 use App\Models\AkuntansiJurnalDetail;
 use App\Models\DetailTransaksiTagihanSiswa;
-use App\Models\EduPaySiswa;
 use App\Models\PenempatanSiswa;
+use App\Models\TransaksiEduPay;
 use App\Models\TransaksiTagihanSiswa;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
@@ -157,23 +157,24 @@ class DeleteTransaksi extends Component
                     ];
                     $jurnalKreditId = AkuntansiJurnalDetail::create($jurnalKredit)->akuntansi_jurnal_detail_id;
 
-                    EduPaySiswa::create([
+                    TransaksiEduPay::create([
+                        'user_type'             => 'siswa',
+                        'user_id'               => $this->ms_siswa_id,
                         'ms_penempatan_siswa_id' => $this->ms_penempatan_siswa_id,
-                        'ms_siswa_id'            => $this->ms_siswa_id,
                         'ms_pengguna_id'         => $ms_pengguna_id,
                         'jenis_transaksi'        => 'pengembalian dana',
                         'nominal'                => $totalPengembalian,
-                        'deskripsi'              => $deskripsiJurnal,
+                        'tanggal'                => now(),
                         'akuntansi_jurnal_detail_debit_id' => $jurnalDebitId,
                         'akuntansi_jurnal_detail_kredit_id' => $jurnalKreditId,
-                        'tanggal'                => now(),
+                        'deskripsi'              => $deskripsiJurnal,
                     ]);
                 }
             }
 
             // hapus riwayat ms edupay
             if ($transaksi->metode_pembayaran === 'EduPay') {
-                EduPaySiswa::where('akuntansi_jurnal_detail_debit_id', $transaksi->akuntansi_jurnal_detail_debit_id)
+                TransaksiEduPay::where('akuntansi_jurnal_detail_debit_id', $transaksi->akuntansi_jurnal_detail_debit_id)
                     ->where('akuntansi_jurnal_detail_kredit_id', $transaksi->akuntansi_jurnal_detail_kredit_id)
                     ->delete();
             }

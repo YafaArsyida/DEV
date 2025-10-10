@@ -40,9 +40,9 @@
                 @livewire('whats-app-histori-tabungan-siswa.edit')
             </div>
             <div class="col-xxl-6 ps-0">
-                @livewire('whats-app-edu-pay-siswa.index')
-                @livewire('whats-app-edu-pay-siswa.create')
-                @livewire('whats-app-edu-pay-siswa.edit')
+                @livewire('whats-app-transaksi-edu-pay.index')
+                @livewire('whats-app-transaksi-edu-pay.create')
+                @livewire('whats-app-transaksi-edu-pay.edit')
             </div>
            
             <!--end col-->

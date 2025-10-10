@@ -6,13 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
-class WhatsAppHistoriTabunganSiswa extends Model
+class WhatsAppTransaksiTabungan extends Model
 {
     use HasFactory;
     use SoftDeletes;
 
-    protected $table = 'ms_whatsapp_histori_tabungan_siswa'; // Nama tabel
-    protected $primaryKey = 'ms_whatsapp_histori_tabungan_siswa_id'; // Nama kolom primary key
+    protected $table = 'ms_whatsapp_transaksi_tabungan'; // Nama tabel
+    protected $primaryKey = 'ms_whatsapp_transaksi_tabungan_id'; // Nama kolom primary key
 
     // Kolom yang dapat diisi melalui mass assignment
     protected $fillable = [

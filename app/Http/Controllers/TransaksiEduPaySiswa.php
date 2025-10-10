@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\EduPaySiswa;
-use App\Models\KuitansiEduPaySiswa;
+use App\Models\KuitansiTransaksiEduPay;
+use App\Models\TransaksiEduPay;
 use Elibyy\TCPDF\Facades\TCPDF;
 
 class TransaksiEduPaySiswa extends Controller
@@ -16,15 +16,13 @@ class TransaksiEduPaySiswa extends Controller
     public function kuitansiPDF($eduPayId)
     {
         $ms_jenjang_id = request()->query('selectedJenjang');
-        $ms_siswa_id = request()->query('selectedSiswa');
+        $user_id = request()->query('userId');
 
         // Ambil data transaksi EduPay berdasarkan ID siswa
-        $edupayTransaksi = EduPaySiswa::where('ms_siswa_id', $ms_siswa_id)
-            ->orderBy('tanggal', 'asc')
-            ->orderBy('ms_edupay_siswa_id', 'asc')
+        $edupayTransaksi = TransaksiEduPay::with(['ms_siswa', 'ms_penempatan_siswa.ms_kelas', 'ms_pengguna'])->where('user_id', $user_id)
             ->get();
 
-        $actualTransaction = EduPaySiswa::where('ms_edupay_siswa_id', $eduPayId)->first();
+        $actualTransaction = TransaksiEduPay::where('ms_transaksi_edupay_id', $eduPayId)->first();
 
         // Pastikan data transaksi ditemukan
         if ($edupayTransaksi->isEmpty()) {
@@ -32,7 +30,7 @@ class TransaksiEduPaySiswa extends Controller
         }
 
         // Cari transaksi spesifik berdasarkan ID
-        $targetTransaksi = $edupayTransaksi->where('ms_edupay_siswa_id', $eduPayId)->first();
+        $targetTransaksi = $edupayTransaksi->where('ms_transaksi_edupay_id', $eduPayId)->first();
 
         if (!$targetTransaksi) {
             return response()->json(['error' => 'Transaksi tidak ditemukan'], 404);
@@ -43,25 +41,25 @@ class TransaksiEduPaySiswa extends Controller
         foreach ($edupayTransaksi as $transaksi) {
             // Periksa jenis transaksi dan update saldo sesuai dengan jenisnya
             switch ($transaksi->jenis_transaksi) {
-                case 'topup':
+                case 'topup tunai':
+                case 'topup online':
                 case 'pengembalian dana':
-                case 'topup online': // Topup online juga dianggap menambah saldo
                     $saldo += $transaksi->nominal;
                     break;
                 case 'penarikan':
                 case 'pembayaran':
+                case 'kantin':
                     $saldo -= $transaksi->nominal;
                     break;
             }
 
-            // Simpan saldo saat mencapai transaksi yang diminta
-            if ($transaksi->ms_edupay_siswa_id === $targetTransaksi->ms_edupay_siswa_id) {
+            if ($transaksi->ms_transaksi_edupay_id === $eduPayId) {
                 break;
             }
         }
 
         // dd($eduPayId);
-        $kuitansi = KuitansiEduPaySiswa::where('ms_jenjang_id', $ms_jenjang_id)->first();
+        $kuitansi = KuitansiTransaksiEduPay::where('ms_jenjang_id', $ms_jenjang_id)->first();
 
         // Pastikan transaksi ditemukan
         if (!$transaksi) {
@@ -74,7 +72,7 @@ class TransaksiEduPaySiswa extends Controller
         // Inisialisasi TCPDF
         $pdf = new TCPDF();
 
-        $pdf::SetTitle('Kuitansi Transaksi');
+        $pdf::SetTitle('Kuitansi Transaksi Edupay');
         $pdf::AddPage('P', [100, 300]); // 'P' untuk Portrait, ukuran dalam milimeter (100mm x 150mm)
         $pdf::SetFont('times', '', 12);
 
@@ -116,6 +114,11 @@ class TransaksiEduPaySiswa extends Controller
         $pdf::Ln(4);
         $pdf::SetFont('times', 'B', 14);
         $pdf::Cell(0, 5, 'Rp' . number_format($actualTransaction->nominal, 0, ',', '.'), 0, 1, 'C');
+        if ($actualTransaction->deskripsi) {
+            $pdf::Ln(1);
+            $pdf::SetFont('times', 'I', 8);
+            $pdf::MultiCell(0, 5, $actualTransaction->deskripsi, 0, 'C');
+        }
         $pdf::Ln(4);
         // Salam Pmbuka
         // $pdf::SetFont('times', 'I', 8);
@@ -123,15 +126,14 @@ class TransaksiEduPaySiswa extends Controller
 
         // Informasi Pembayaran
         $pdf::SetFont('times', '', 10);
-        $pdf::Cell(0, 5, 'Siswa : ' . $transaksi->ms_siswa->nama_siswa, 0, 1, 'L');
-        $pdf::Cell(0, 5, 'Kelas : ' . $transaksi->ms_penempatan_siswa->ms_kelas->nama_kelas, 0, 1, 'L');
-        if ($actualTransaction->deskripsi) {
-            $pdf::MultiCell(0, 5, 'Keterangan : ' .  $actualTransaction->deskripsi, 0, 'L');
+        $pdf::Cell(0, 5, 'Siswa : ' . $actualTransaction->ms_siswa->nama_siswa, 0, 1, 'L');
+        if ($actualTransaction->ms_penempatan_siswa_id) {
+            $pdf::Cell(0, 5, 'Kelas : ' . $actualTransaction->ms_penempatan_siswa->ms_kelas->nama_kelas, 0, 1, 'L');
         }
         $pdf::SetFont('times', 'B', 10);
         $pdf::Cell(0, 5, 'Saldo : Rp ' . number_format($saldo, 0, ',', '.'), 0, 1, 'L');
 
-        $pdf::Ln(4);
+        $pdf::Ln(2);
         // Footer
         $pdf::SetFont('times', '', 9);
         $pdf::MultiCell(0, 5, $kuitansi->pesan, 0, 'C');
@@ -145,6 +147,6 @@ class TransaksiEduPaySiswa extends Controller
         // $pdf::SetFont('times', 'I', 8);
         // $pdf::Cell(0, 5, 'Wassalamu’alaikum Wr. Wb.', 0, 1, 'L');
         // Menampilkan PDF langsung ke browser
-        $pdf::Output('histori_transaksi.pdf', 'I');
+        $pdf::Output('kuitansi_transaksi_edupay.pdf', 'I');
     }
 }

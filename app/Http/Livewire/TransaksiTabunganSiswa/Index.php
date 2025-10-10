@@ -8,6 +8,7 @@ use App\Models\PenempatanSiswa;
 use App\Models\Siswa;
 use App\Models\TransaksiTabungan;
 use App\Models\WhatsAppHistoriTabunganSiswa;
+use App\Models\WhatsAppTransaksiTabungan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -289,20 +290,22 @@ class Index extends Component
 
     public function kirimWhatsapp($tabunganId)
     {
+        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Pesan sedang diproses.']);
+
         // Ambil data tabungan berdasarkan ID
-        $tabungan = TransaksiTabungan::where('ms_siswa_id', $this->ms_siswa_id)
+        $tabungan = TransaksiTabungan::where('user_id', $this->ms_siswa_id)
             ->orderBy('tanggal', 'asc')
-            ->orderBy('ms_tabungan_siswa_id', 'asc')
+            ->orderBy('ms_transaksi_tabungan_id', 'asc')
             ->get();
 
         // Pastikan data tabungan ditemukan
-        if ($tabungan->isEmpty()) {
+        if (!$tabungan) {
             $this->dispatchBrowserEvent('alertify-error', ['message' => 'Transaksi tabungan tidak ditemukan']);
             return;
         }
 
         // Cari transaksi spesifik berdasarkan ID
-        $targetTransaksi = $tabungan->where('ms_tabungan_siswa_id', $tabunganId)->first();
+        $targetTransaksi = $tabungan->where('ms_transaksi_tabungan_id', $tabunganId)->first();
 
         if (!$targetTransaksi) {
             $this->dispatchBrowserEvent('alertify-error', ['message' => 'Transaksi tabungan tidak ditemukan']);
@@ -315,7 +318,7 @@ class Index extends Component
             $saldo += $transaksi->jenis_transaksi === 'setoran' ? $transaksi->nominal : -$transaksi->nominal;
 
             // Simpan saldo saat mencapai transaksi yang diminta
-            if ($transaksi->ms_tabungan_siswa_id === $tabunganId) {
+            if ($transaksi->ms_transaksi_tabungan_id === $tabunganId) {
                 break;
             }
         }
@@ -335,7 +338,7 @@ class Index extends Component
         }
 
         // Ambil template pesan dari PesanTransaksiTabungan
-        $templatePesan = WhatsAppHistoriTabunganSiswa::where('ms_jenjang_id', $this->ms_jenjang_id)->first();
+        $templatePesan = WhatsAppTransaksiTabungan::where('ms_jenjang_id', $this->ms_jenjang_id)->first();
 
         // Pastikan template ditemukan
         if (!$templatePesan) {
@@ -350,7 +353,7 @@ class Index extends Component
         $pesan = "*" . $templatePesan->judul . "*\n\n"; // Judul (dengan format *)
         $pesan .= $templatePesan->salam_pembuka . "\n\n"; // Salam pembuka
         $pesan .= $templatePesan->kalimat_pembuka . "\n\n"; // Kalimat pembuka
-        $pesan .= "Kami informasikan bahwa *Transaksi Tabungan* atas nama siswa *" . $targetTransaksi->ms_siswa->nama_siswa . "* telah berhasil. Berikut adalah rincian transaksinya:\n\n";
+        $pesan .= "Kami informasikan bahwa *Transaksi Tabungan* atas nama *" . $targetTransaksi->ms_siswa->nama_siswa . "* telah berhasil. Berikut adalah rincian transaksinya:\n\n";
         $pesan .= "*" . $jenisTransaksi . ": Rp" . number_format($targetTransaksi->nominal, 0, ',', '.') . "*\n";
         $pesan .= "*Saldo Akhir: Rp" . number_format($saldo, 0, ',', '.') . "*\n";
         $pesan .= "\n" . $templatePesan->kalimat_penutup . "\n"; // Kalimat penutup
@@ -364,6 +367,7 @@ class Index extends Component
         // Emit event ke frontend untuk membuka URL di tab baru
         $this->emit('openNewTab', $url);
     }
+
     public function render()
     {
         $saldo = 0; // Letakkan di luar closure

@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class KuitansiEduPaySiswa extends Model
+class KuitansiTransaksiEduPay extends Model
 {
     use HasFactory;
-    protected $table = 'ms_kuitansi_edupay_siswa'; // Nama tabel
-    protected $primaryKey = 'ms_kuitansi_edupay_siswa_id'; // Nama kolom primary key
+    protected $table = 'ms_kuitansi_transaksi_edupay'; // Nama tabel
+    protected $primaryKey = 'ms_kuitansi_transaksi_edupay_id'; // Nama kolom primary key
 
     protected $fillable = [
         'ms_jenjang_id',
