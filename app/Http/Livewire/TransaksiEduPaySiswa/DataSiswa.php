@@ -152,7 +152,6 @@ class DataSiswa extends Component
                 'ms_penempatan_siswa_id' => $this->ms_penempatan_siswa_id,
                 'ms_pengguna_id' => $ms_pengguna_id,
                 'jenis_transaksi' => $this->jenis_transaksi_topup,
-                // 'jenis_transaksi' => 'topup tunai',
                 'nominal' => $this->nominal_topup,
                 'tanggal' => now(),
                 'akuntansi_jurnal_detail_debit_id' => $jurnalDebitId,

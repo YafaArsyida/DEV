@@ -93,12 +93,26 @@
                             <td class="text-start">
                                 <ul class="list-inline hstack gap-2 mb-0">
                                     <li class="list-inline-item detail" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Edit Transaksi">
-                                        <a href="#editTransaksiEduPay" data-bs-toggle="modal" wire:click.prevent="$emit('loadTransaksiEduPay', {{ $item->ms_transaksi_edupay_id }})" 
-                                            class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1">
-                                            <i class="ri-quill-pen-line align-bottom"></i>
-                                            <span>Edit Transaksi</span>
-                                        </a>
+                                        @if ($item->jenis_transaksi === 'penarikan' || $item->jenis_transaksi === 'topup tunai')
+                                            <a href="#editTransaksiEduPay" 
+                                                data-bs-toggle="modal" 
+                                                wire:click.prevent="$emit('loadTransaksiEduPay', {{ $item->ms_transaksi_edupay_id }})" 
+                                                class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1">
+                                                <i class="ri-quill-pen-line align-bottom"></i>
+                                                <span>Edit Transaksi</span>
+                                            </a>
+                                        @else
+                                            <span class="text-muted" 
+                                                data-bs-toggle="tooltip" 
+                                                data-bs-trigger="hover" 
+                                                data-bs-placement="top" 
+                                                title="Transaksi {{ ucfirst($item->jenis_transaksi) }} tidak dapat diedit">
+                                                <i class="ri-quill-pen-line align-bottom"></i>
+                                                <span>Edit Transaksi</span>
+                                            </span>
+                                        @endif
                                     </li>
+
                                     <li class="list-inline-item detail" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Kirim Pesan Transaksi">
                                         <a  wire:click.prevent="kirimWhatsapp({{ $item->ms_transaksi_edupay_id }})" class="btn btn-sm btn-soft-success d-inline-flex align-items-center gap-1">
                                             <i class="ri-whatsapp-line align-bottom"></i>

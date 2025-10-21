@@ -5,6 +5,7 @@ namespace App\Http\Livewire\TransaksiEduPayPegawai;
 use App\Models\AkuntansiJurnalDetail;
 use App\Models\Pegawai;
 use App\Models\TransaksiEduPay;
+use Exception;
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -13,7 +14,7 @@ class DataPegawai extends Component
 {
     public $ms_jenjang_id = null;
     public $ms_tahun_ajar_id = null;
-    
+
     public $ms_pegawai_id = null;
     public $nama_pegawai = null;
     public $educard_pegawai = null;
@@ -27,6 +28,7 @@ class DataPegawai extends Component
     public $total_pengeluaran_pegawai;
 
     // save topup
+    public $jenis_transaksi_topup = 'topup tunai';
     public $nominal_topup;
     public $deskripsi_topup;
 
@@ -102,14 +104,22 @@ class DataPegawai extends Component
 
             // simpan jurnal
             $kode_rekening_kas = 11001;
-            $kode_rekening_edupay = 22002;
+            $kode_rekening_bank = 11002;
+            $kode_rekening_edupay = 22005;
 
-            $nominal = number_format($this->nominal_topup, 0, ',', '.');
-            $deskripsiJurnal = "Top Up Tunai EduPay Rp {$nominal} Pegawai {$this->nama_pegawai}";
+            if ($this->jenis_transaksi_topup == 'topup tunai') {
+                $debitAkunId = $kode_rekening_kas; // ID Akun Kas
+            } elseif ($this->jenis_transaksi_topup == 'topup online') {
+                $debitAkunId = $kode_rekening_bank; // ID Akun Bank
+            } else {
+                throw new Exception('Metode pembayaran tidak valid.');
+            }
+
+            $deskripsiJurnal = "{$this->jenis_transaksi_topup} EduPay Rp {$this->nominal_topup} Pegawai {$this->nama_pegawai}";
 
             // Data untuk jurnal debit
             $jurnalDebit = [
-                'kode_rekening' => $kode_rekening_kas,
+                'kode_rekening' => $debitAkunId,
                 'posisi' => 'debit',
                 'nominal' => $this->nominal_topup,
                 'tanggal_transaksi' => now(),
@@ -140,7 +150,7 @@ class DataPegawai extends Component
                 'user_type' => 'pegawai',
                 'user_id' => $this->ms_pegawai_id,
                 'ms_pengguna_id' => $ms_pengguna_id,
-                'jenis_transaksi' => 'topup tunai',
+                'jenis_transaksi' => $this->jenis_transaksi_topup,
                 'nominal' => $this->nominal_topup,
                 'tanggal' => now(),
                 'akuntansi_jurnal_detail_debit_id' => $jurnalDebitId,
@@ -153,6 +163,7 @@ class DataPegawai extends Component
 
             // Reset input
             $this->reset(['nominal_topup', 'deskripsi_topup']);
+            $this->jenis_transaksi_topup = 'topup tunai';
 
             // Refresh saldo EduPay
             $pegawai = Pegawai::with('ms_jabatan', 'ms_educard')
@@ -211,7 +222,7 @@ class DataPegawai extends Component
 
             // simpan jurnal
             $kode_rekening_kas = 11001;
-            $kode_rekening_edupay = 22002;
+            $kode_rekening_edupay = 22005;
 
             $nominal = number_format($this->nominal_penarikan, 0, ',', '.');
             $deskripsiJurnal = "Penarikan Tunai EduPay Rp {$nominal} Pegawai {$this->nama_pegawai}";

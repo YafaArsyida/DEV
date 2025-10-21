@@ -9,24 +9,21 @@ use App\Http\Controllers\AkuntansiLaporanLabaRugi;
 use App\Http\Controllers\AkuntansiLaporanNeraca;
 use App\Http\Controllers\AkuntansiLaporanPendapatan;
 use App\Http\Controllers\AkuntansiLaporanPengeluaran;
-use App\Http\Controllers\AkuntansiLaporanRekonsiliasi;
 use App\Http\Controllers\AkuntansiTransaksiPendapatan;
 use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DokumenAdministrasi;
-use App\Http\Controllers\DokumenSiswa;
 use App\Http\Controllers\EkstrakurikulerSiswa;
-use App\Http\Controllers\HierarkiKepegawaian;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\JenjangTahunAjar;
-
 use App\Http\Controllers\KelasSiswa;
 use App\Http\Controllers\KonfigurasiTagihanSiswa;
 use App\Http\Controllers\LandingEkstrakurikuler;
+use App\Http\Controllers\LaporanEduPayPegawai;
 use App\Http\Controllers\LaporanEduPaySiswa;
 use App\Http\Controllers\LaporanPembayaranTagihanSiswa;
 use App\Http\Controllers\LaporanRekapitulasiKeuangan;
+use App\Http\Controllers\LaporanTabunganPegawai;
 use App\Http\Controllers\LaporanTabunganSiswa;
 use App\Http\Controllers\LaporanTagihanSiswa;
 use App\Http\Controllers\ManajemenKepegawaian;
@@ -41,6 +38,7 @@ use App\Http\Controllers\TransaksiEduPayPegawai;
 use App\Http\Controllers\TransaksiEduPaySiswa;
 use App\Http\Controllers\TransaksiPendapatanLainnya;
 use App\Http\Controllers\TransaksiPengeluaran;
+use App\Http\Controllers\TransaksiTabunganPegawai;
 use App\Http\Controllers\TransaksiTabunganSiswa;
 use App\Http\Controllers\TransaksiTagihanSiswa;
 
@@ -109,9 +107,8 @@ Route::middleware(['auth', 'peran:superadmin,admin'])->group(function () {
     Route::get('/administrasi/ekstrakurikuler-siswa/pdf',  [EkstrakurikulerSiswa::class, 'cetakPDF'])->name('administrasi.ekstrakurikuler-siswa.pdf');
     Route::get('/administrasi/ekstrakurikuler-siswa/siswapdf',  [EkstrakurikulerSiswa::class, 'cetakSiswaPDF'])->name('administrasi.ekstrakurikuler-siswa.siswapdf');
     // ekstrakurikuler
-    Route::get('/administrasi/dokumen-siswa',  [DokumenSiswa::class, 'index'])->name('administrasi.dokumen-siswa');
+
     Route::get('/administrasi/manajemen-kepegawaian',  [ManajemenKepegawaian::class, 'index'])->name('administrasi.manajemen-kepegawaian');
-    Route::get('/administrasi/hierarki-kepegawaian',  [HierarkiKepegawaian::class, 'index'])->name('administrasi.hierarki-kepegawaian');
 
     Route::get('/keuangan/konfigurasi-tagihan-siswa',  [KonfigurasiTagihanSiswa::class, 'index'])->name('keuangan.konfigurasi-tagihan-siswa');
 
@@ -128,6 +125,7 @@ Route::middleware(['auth', 'peran:superadmin,admin'])->group(function () {
 
     // TRANSAKSI SISWA
     Route::get('/transaksi/tabungan-siswa',  [TransaksiTabunganSiswa::class, 'index'])->name('transaksi.tabungan-siswa');
+    Route::get('/transaksi/tabungan-siswa/{tabunganId}', [TransaksiTabunganSiswa::class, 'kuitansiPDF'])->name('transaksi.tabungan-siswa.kuitansiPDF');
 
     Route::get('/transaksi/edupay-siswa',  [TransaksiEduPaySiswa::class, 'index'])->name('transaksi.edupay-siswa');
     Route::get('/transaksi/edupay-siswa/{eduPayId}', [TransaksiEduPaySiswa::class, 'kuitansiPDF'])->name('transaksi.edupay-siswa.kuitansiPDF');
@@ -135,6 +133,10 @@ Route::middleware(['auth', 'peran:superadmin,admin'])->group(function () {
 
     // TRANSAKSI PEGAWAI
     Route::get('/transaksi/edupay-pegawai',  [TransaksiEduPayPegawai::class, 'index'])->name('transaksi.edupay-pegawai');
+    Route::get('/transaksi/edupay-pegawai/{eduPayId}', [TransaksiEduPayPegawai::class, 'kuitansiPDF'])->name('transaksi.edupay-pegawai.kuitansiPDF');
+
+    Route::get('/transaksi/tabungan-pegawai',  [TransaksiTabunganPegawai::class, 'index'])->name('transaksi.tabungan-pegawai');
+    Route::get('/transaksi/tabungan-pegawai/{tabunganId}', [TransaksiTabunganPegawai::class, 'kuitansiPDF'])->name('transaksi.tabungan-pegawai.kuitansiPDF');
     // END TRANSAKSI PEGAWAI
 
     // transaksi pendapatan
@@ -169,12 +171,20 @@ Route::middleware(['auth', 'peran:superadmin,admin'])->group(function () {
 
     Route::get('/laporan/rekapitulasi-keuangan',  [LaporanRekapitulasiKeuangan::class, 'index'])->name('laporan.rekapitulasi-keuangan');
 
+    // LAPORAN TABUNGAN PEGAWAI
+    Route::get('/laporan/tabungan-pegawai',  [LaporanTabunganPegawai::class, 'index'])->name('laporan.tabungan-pegawai');
+    Route::get('/laporan/tabungan-pegawai/pdf',  [LaporanTabunganPegawai::class, 'cetakPDF'])->name('laporan.tabungan-pegawai.pdf');
+    // END LAPORAN TABUNGAN PEGAWAI
+
+    // LAPORAN EDUPAY PEGAWAI
+    Route::get('/laporan/edupay-pegawai',  [LaporanEduPayPegawai::class, 'index'])->name('laporan.edupay-pegawai');
+    Route::get('/laporan/edupay-pegawai/pdf',  [LaporanEduPayPegawai::class, 'cetakPDF'])->name('laporan.edupay-pegawai.pdf');
+    // END LAPORAN EDUPAY PEGAWAI
+
     Route::get('/akuntansi/konfigurasi',  [AkuntansiKonfigurasi::class, 'index'])->name('akuntansi.konfigurasi');
     Route::get('/akuntansi/jurnal-detail',  [AkuntansiJurnalDetail::class, 'index'])->name('akuntansi.jurnal-detail');
 
-
     // laporan akuntansi
-    Route::get('/akuntansi/laporan-rekonsiliasi',  [AkuntansiLaporanRekonsiliasi::class, 'index'])->name('akuntansi.laporan-rekonsiliasi');
     Route::get('/akuntansi/laporan-buku-besar',  [AkuntansiLaporanBukuBesar::class, 'index'])->name('akuntansi.laporan-buku-besar');
 
     // jurnal keuangan

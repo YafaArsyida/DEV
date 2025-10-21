@@ -60,8 +60,8 @@ class Siswa extends Model
 
     public function ms_transaksi_tabungan()
     {
-        return $this->hasMany(TransaksiTabungan::class, 'user_id', 'ms_siswa_id');
-        // ->where('user_type', 'siswa');
+        return $this->hasMany(TransaksiTabungan::class, 'user_id', 'ms_siswa_id')
+            ->where('user_type', 'siswa');
     }
     public function total_kredit_tabungan()
     {

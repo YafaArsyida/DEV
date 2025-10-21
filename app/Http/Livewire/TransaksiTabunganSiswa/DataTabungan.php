@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\TransaksiTabunganSiswa;
 
 use App\Http\Controllers\HelperController;
+use App\Models\KuitansiTransaksiTabungan;
 use App\Models\PenempatanSiswa;
 use App\Models\TransaksiTabungan;
 use App\Models\WhatsAppTransaksiTabungan;
@@ -16,11 +17,11 @@ class DataTabungan extends Component
     public $selectedJenjang = null;
 
     protected $listeners = [
-        'refreshTabunganSiswa',
+        'refreshTabungans',
         'siswaSelected'
     ];
 
-    public function refreshTabunganSiswa()
+    public function refreshTabungans()
     {
         $this->emitSelf('$refresh');
     }
@@ -99,14 +100,20 @@ class DataTabungan extends Component
         // Tentukan label jenis transaksi
         $jenisTransaksi = ucfirst($targetTransaksi->jenis_transaksi) === 'Setoran' ? 'Setoran' : 'Penarikan';
 
+        // Rincian deskripsi (jika ada)
+        $deskripsi = !empty($targetTransaksi->deskripsi)
+            ? "\n\n*{$targetTransaksi->deskripsi}*"
+            : "";
+
         // Siapkan pesan yang ingin dikirim
         $pesan = "*" . $templatePesan->judul . "*\n\n"; // Judul (dengan format *)
         $pesan .= $templatePesan->salam_pembuka . "\n\n"; // Salam pembuka
         $pesan .= $templatePesan->kalimat_pembuka . "\n\n"; // Kalimat pembuka
         $pesan .= "Kami informasikan bahwa *Transaksi Tabungan* atas nama *" . $targetTransaksi->ms_siswa->nama_siswa . "* telah berhasil. Berikut adalah rincian transaksinya:\n\n";
         $pesan .= "*" . $jenisTransaksi . ": Rp" . number_format($targetTransaksi->nominal, 0, ',', '.') . "*\n";
-        $pesan .= "*Saldo Akhir: Rp" . number_format($saldo, 0, ',', '.') . "*\n";
-        $pesan .= "\n" . $templatePesan->kalimat_penutup . "\n"; // Kalimat penutup
+        $pesan .= "*Saldo Akhir: Rp" . number_format($saldo, 0, ',', '.') . "*";
+        $pesan .= $deskripsi . "\n\n";
+        $pesan .= $templatePesan->kalimat_penutup . "\n"; // Kalimat penutup
         $pesan .= "\n" . $templatePesan->salam_penutup . "\n\n"; // Salam penutup
         $pesan .= "Tata Usaha - " . $targetTransaksi->ms_pengguna->nama . "\n"; // Informasi petugas
         $pesan .= HelperController::formatTanggalIndonesia($targetTransaksi->tanggal, 'd F Y'); // Tanggal transaksi
@@ -115,6 +122,30 @@ class DataTabungan extends Component
         $url = "https://wa.me/{$telepon}?text=" . urlencode($pesan);
 
         // Emit event ke frontend untuk membuka URL di tab baru
+        $this->emit('openNewTab', $url);
+    }
+
+    public function cetakTransaksi($tabunganId)
+    {
+        $surat = KuitansiTransaksiTabungan::where('ms_jenjang_id', $this->selectedJenjang)->first();
+
+        if (!$surat) {
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Kuitansi tidak ada. Cek Dokumen Administrasi'
+            ]);
+            return;
+        }
+        // Dispatch event alertify sukses
+        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Kuitansi sedang diproses.']);
+
+        // Menggunakan route untuk mengarahkan ke controller cetak
+        $url = route('transaksi.tabungan-siswa.kuitansiPDF', [
+            'tabunganId' => $tabunganId,
+            'selectedJenjang' => $this->selectedJenjang,
+            'userId' => $this->ms_siswa_id
+        ]);
+
+        // Emit URL untuk membuka tab baru
         $this->emit('openNewTab', $url);
     }
 

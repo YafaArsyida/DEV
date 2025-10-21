@@ -184,13 +184,18 @@ class KeranjangProduk extends Component
             // Kode rekening
             $kode_rekening_kas = 11001;
             $kode_rekening_edupay_siswa = 22002;
+            $kode_rekening_edupay_pegawai = 22005;
             $kode_rekening_pendapatan_kantin = 41002;
 
             // Pilih debit akun berdasarkan metode pembayaran
             if ($this->metode_pembayaran == 'Tunai') {
                 $debitAkunId = $kode_rekening_kas;
             } elseif ($this->metode_pembayaran == 'EduPay') {
-                $debitAkunId = $kode_rekening_edupay_siswa;
+                if ($this->user_type === 'siswa') {
+                    $debitAkunId = $kode_rekening_edupay_siswa;
+                }elseif($this->user_type === 'pegawai'){
+                    $debitAkunId = $kode_rekening_edupay_pegawai;
+                }
             } else {
                 throw new Exception('Metode pembayaran tidak valid.');
             }

@@ -35,14 +35,23 @@
                 @livewire('surat-tagihan-siswa.edit')
             </div>
             <div class="col-xxl-6 pe-1">
-                @livewire('whats-app-histori-tabungan-siswa.index')
-                @livewire('whats-app-histori-tabungan-siswa.create')
-                @livewire('whats-app-histori-tabungan-siswa.edit')
+                @livewire('whats-app-transaksi-tabungan.index')
+                @livewire('whats-app-transaksi-tabungan.create')
+                @livewire('whats-app-transaksi-tabungan.edit')
+
+                @livewire('kuitansi-transaksi-tabungan.index')
+                @livewire('kuitansi-transaksi-tabungan.create')
+                @livewire('kuitansi-transaksi-tabungan.edit')
             </div>
             <div class="col-xxl-6 ps-0">
                 @livewire('whats-app-transaksi-edu-pay.index')
                 @livewire('whats-app-transaksi-edu-pay.create')
                 @livewire('whats-app-transaksi-edu-pay.edit')
+
+                
+                @livewire('kuitansi-transaksi-edu-pay.index')
+                @livewire('kuitansi-transaksi-edu-pay.create')
+                @livewire('kuitansi-transaksi-edu-pay.edit')
             </div>
            
             <!--end col-->

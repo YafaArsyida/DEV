@@ -8,7 +8,7 @@
         <div class="row">
             {{-- DATA SISWA --}}
             <div class="col-xxl-4 pe-1">
-                <div class="card sticky-side-div">
+                <div class="card">
                     <div class="card-body p-4">
                         <div class="d-flex">
                             <div class="flex-grow-1">
@@ -229,7 +229,7 @@
                                             <td class="text-start">
                                                 <ul class="list-inline hstack gap-2 mb-0">
                                                     <li class="list-inline-item detail" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Edit Transaksi">
-                                                        <a href="#editTransaksiEduPay" data-bs-toggle="modal" wire:click.prevent="$emit('loadTransaksiTabungan', {{ $item->ms_transaksi_tabungan_id }})" 
+                                                        <a href="#loadTransaksiTabungan" data-bs-toggle="modal" wire:click.prevent="$emit('loadTransaksiTabungan', {{ $item->ms_transaksi_tabungan_id }})" 
                                                             class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1">
                                                             <i class="ri-quill-pen-line align-bottom"></i>
                                                             <span>Edit Transaksi</span>
@@ -252,7 +252,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="7" class="text-center text-muted">
+                                            <td colspan="9" class="text-center text-muted">
                                                 Tidak ada transaksi tabungan.
                                             </td>
                                         </tr>

@@ -4,58 +4,59 @@ namespace App\Http\Livewire\TransaksiTabunganSiswa;
 
 use App\Models\AkuntansiJurnalDetail;
 use App\Models\TabunganSiswa;
+use App\Models\TransaksiTabungan;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class Delete extends Component
 {
-    public $ms_tabungan_siswa_id;
-    public $ms_jenjang_id;
-    public $ms_tahun_ajar_id;
+    public $ms_transaksi_tabungan_id;
 
     protected $listeners = [
-        'confirmDelete'
+        'confirmDeleteTabungan'
     ];
 
-    public function confirmDelete($ms_tabungan_siswa_id)
+    public function confirmDeleteTabungan($ms_transaksi_tabungan_id)
     {
-        // Ambil transaksi berdasarkan ID
-        $transaksi = TabunganSiswa::findOrFail($ms_tabungan_siswa_id);
-
-        // Atur properti jenjang dan tahun ajar berdasarkan penempatan siswa
-        $penempatanSiswa = $transaksi->ms_penempatan_siswa;
-        $this->ms_jenjang_id = $penempatanSiswa->ms_jenjang_id ?? null;
-        $this->ms_tahun_ajar_id = $penempatanSiswa->ms_tahun_ajar_id ?? null;
-
-        // Simpan ID tabungan untuk dihapus
-        $this->ms_tabungan_siswa_id = $ms_tabungan_siswa_id;
+        $this->ms_transaksi_tabungan_id = $ms_transaksi_tabungan_id;
     }
 
     public function deleteTabungan()
     {
+        DB::beginTransaction();
+
         try {
             // Validasi apakah ID tabungan ada
-            if (!$this->ms_tabungan_siswa_id) {
+            if (!$this->ms_transaksi_tabungan_id) {
                 $this->dispatchBrowserEvent('alertify-error', ['message' => 'Transaksi tidak ditemukan.']);
                 return;
             }
 
             // Ambil data transaksi berdasarkan ID
-            $transaksi = TabunganSiswa::find($this->ms_tabungan_siswa_id);
+            $transaksi = TransaksiTabungan::find($this->ms_transaksi_tabungan_id);
 
             if (!$transaksi) {
                 $this->dispatchBrowserEvent('alertify-error', ['message' => 'Transaksi tidak ditemukan.']);
                 return;
             }
 
-            // Hitung saldo siswa saat ini
-            $saldoSaatIni = $transaksi->ms_siswa->saldo_tabungan_siswa();
+            if ($transaksi->user_type == 'siswa') {
+                $saldoSaatIni = $transaksi->ms_siswa->saldo_tabungan_siswa();
+            } elseif ($transaksi->user_type == 'pegawai') {
+                $saldoSaatIni = $transaksi->ms_pegawai->saldo_tabungan_pegawai();
+            } else {
+                // default 0 atau error
+                $this->dispatchBrowserEvent('alertify-error', ['message' => 'User tidak ditemukan']);
+            }
 
             // Hitung saldo setelah penghapusan transaksi
             $saldoSetelahHapus = $saldoSaatIni - ($transaksi->jenis_transaksi === 'setoran' ? $transaksi->nominal : -$transaksi->nominal);
 
             // Validasi apakah saldo menjadi negatif setelah penghapusan
             if ($saldoSetelahHapus < 0) {
-                $this->dispatchBrowserEvent('alertify-error', ['message' => 'Gagal! Penghapusan tidak dapat dilakukan karena saldo telah digunakan.']);
+                $this->dispatchBrowserEvent('alertify-error', [
+                    'message' => "Gagal! saldo telah digunakan. Saldo saat ini {$saldoSaatIni}, batas {$saldoSetelahHapus}"
+                ]);
                 return;
             }
 
@@ -77,6 +78,8 @@ class Delete extends Component
             // Hapus transaksi
             $transaksi->delete();
 
+            DB::commit();
+
             // Emit event untuk memperbarui data di tabel
             $this->emit('refreshTabungans');
             $this->emit('refreshSaldo');
@@ -87,6 +90,7 @@ class Delete extends Component
             // Berikan notifikasi sukses
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'Transaksi berhasil dihapus.']);
         } catch (\Exception $e) {
+            DB::rollBack();
             // Notifikasi error jika terjadi kesalahan
             $this->dispatchBrowserEvent('alertify-error', ['message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }

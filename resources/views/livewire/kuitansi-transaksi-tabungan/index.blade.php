@@ -1,4 +1,4 @@
-<div wire:ignore.self class="offcanvas offcanvas-top" id="kuitansiTransaksiTabungan" aria-labelledby="kuitansiTransaksiLabel" style="min-height:100vh;">
+<div wire:ignore.self class="offcanvas offcanvas-top" id="kuitansiTabungan" aria-labelledby="kuitansiTransaksiLabel" style="min-height:100vh;">
     <div class="offcanvas-header border-bottom">
         <h5 class="offcanvas-title" id="kuitansiTransaksiLabel">Format Kuitansi Tabungan</h5>
         <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -13,12 +13,12 @@
                             <div class="dropdown">
                                 @if ($selectedJenjang)
                                     @if (!$kuitansi)
-                                        <a href="#createKuitansiTransaksiTabungan" data-bs-toggle="modal" class="btn btn-ghost-secondary btn-icon shadow-none" wire:click="$emit('createKuitansiTransaksiTabungan', {{ $selectedJenjang }})">
+                                        <a href="#createKuitansiTabungan" data-bs-toggle="modal" class="btn btn-ghost-secondary btn-icon shadow-none" wire:click="$emit('createKuitansiTabungan', {{ $selectedJenjang }})">
                                             <i class="ri-settings-5-line fs-20" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Setting Kuitansi"></i>
                                         </a>
                                     @else
-                                    <a href="#editKuitansiTransaksiTabungan" data-bs-toggle="modal" class="btn btn-ghost-secondary btn-icon shadow-none" 
-                                    wire:click="$emit('loadKuitansiTransaksiTabungan', {{ $kuitansi->ms_kuitansi_transaksi_tabungan_id }}, {{ $selectedJenjang }})">
+                                    <a href="#editKuitansiTabungan" data-bs-toggle="modal" class="btn btn-ghost-secondary btn-icon shadow-none" 
+                                    wire:click="$emit('loadKuitansiTabungan', {{ $kuitansi->ms_kuitansi_transaksi_tabungan_id }}, {{ $selectedJenjang }})">
                                         <i class="ri-quill-pen-line fs-20" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Edit Kuitansi"></i>
                                     </a>
                                     @endif
@@ -28,7 +28,7 @@
                     </div>
                     @if ($kuitansi)
                     <div class="card-body p-4 bg-white p-1">
-                        <!-- Header -->
+                        <!-- HEADER -->
                         <div class="text-center text-black mb-2" style="font-family: 'Times New Roman', Times, serif; font-size: 18pt;">
                             <img src="{{ Storage::url($kuitansi->logo) }}" alt="Logo" class="img-fluid" style="height: 80px;">
                             <p class="mt-2 mb-0">{{ $kuitansi->nama_institusi }}</p>
@@ -37,61 +37,32 @@
                                 {{ $kuitansi->kontak }}
                             </p>
                             <p class="mt-2 mb-0"><b>{{ $kuitansi->judul }}</b></p>
-                            <p class="my-0"><b>Tunai/Online</b></p>
+                            <p class="my-0"><b>TABUNGAN TUNAI</b></p>
+                            <p class="mt-4 mb-0"><b>RP9.XXX.XXX</b></p>
+                            <p class="fst-italic" style="font-family: 'Times New Roman', Times, serif; font-size: 14pt;">
+                                deskripsi transaksi
+                            </p>
                         </div>
-                        
+
                         <div style="font-family: 'Times New Roman', Times, serif; font-size: 14pt;" class="px-4 m-2 text-black">
                             <table cellpadding="0" class="m-2">
                                 <tr>
                                     <td width="12%">Siswa</td>
-                                    <td width="88%">: nama siswa sekolah jenjang</td>
+                                    <td width="88%">: nama siswa</td>
                                 </tr>
                                 <tr>
                                     <td>Kelas</td>
-                                    <td>: nama kelas sekolah jenjang</td>
+                                    <td>: nama kelas</td>
+                                </tr>
+                                <tr class="fw-semibold">
+                                    <td>Saldo</td>
+                                    <td>: RP9.XXX.XXX</td>
                                 </tr>
                             </table> 
-                            <table cellpadding="0" style="font-family: 'Times New Roman', Times, serif; font-size: 14pt; width: 95%;">
-                                <thead>
-                                    <tr style="background-color: #f0f0f0;">
-                                        <td width="10%" style="text-align: center; border-bottom: 2px solid #000;">No</td>
-                                        <td width="60%" style="text-align: left; border-bottom: 2px solid #000;">Transaksi</td>
-                                        <td width="30%" style="text-align: right; border-bottom: 2px solid #000;">Nominal</td>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="text-center"> 1</td>
-                                        <td>Uang Pondok Agustus</td>
-                                        <td class="text-end">Rp10.000</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-center"> 2</td>
-                                        <td>Uang Pondok Juli</td>
-                                        <td class="text-end">Rp10.000</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-center"> 3</td>
-                                        <td>Uang Pondok Oktober</td>
-                                        <td class="text-end">Rp10.000</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-center">4</td>
-                                        <td>Daftar Ulang</td>
-                                        <td class="text-end">Rp1.250.000</td>
-                                    </tr>
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td colspan="2" style="border-top: 2px solid #000; font-weight: bold; text-align: right;"><b>Total</b></td>
-                                        <td style="border-top: 2px solid #000; font-weight: bold; text-align: right;"><b>Rp1.280.000</b></td>
-                                    </tr>
-                                </tfoot>
-                            </table> 
                              <!-- Catatan -->
-                            <div class="my-4 px-2 pe-4" style="font-family: 'Times New Roman', Times, serif; font-size: 14pt;">
+                            <div class="px-2 pe-4" style="font-family: 'Times New Roman', Times, serif; font-size: 14pt;">
                                 <p align='center'>{{ $kuitansi->pesan }}</p>
-                                <p align='center'>{{ $kuitansi->tempat }}, 26-05-2025</p>
+                                <p align='center'>{{ $kuitansi->tempat }}, {{ now()->format('d-m-Y') }}</p>
                             </div>
 
                             <div class="pt-4 px-2 text-center" style="font-family: 'Times New Roman', Times, serif; font-size: 14pt;">

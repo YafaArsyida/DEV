@@ -331,6 +331,7 @@ class Index extends Component
         // Ambil semua transaksi siswa untuk hitung saldo
         $edupayTransaksi = TransaksiEduPay::where('user_id', $this->ms_siswa_id)
             // ->orderBy('ms_transaksi_edupay_id', 'ASC')
+            ->orderBy('tanggal', 'ASC')
             ->get();
 
         // Hitung saldo sampai transaksi yang diminta

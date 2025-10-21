@@ -9,9 +9,9 @@ class Index extends Component
 {
     public $selectedJenjang;
 
-    protected $listeners = ['refreshKuitansiTabungan'];
+    protected $listeners = ['kuitansiTabungan'];
 
-    public function refreshKuitansiTabungan($ms_jenjang_id)
+    public function kuitansiTabungan($ms_jenjang_id)
     {
         // Jika ada logika lain yang diperlukan untuk merefresh, tambahkan di sini.
         $this->emitSelf('render');
@@ -25,6 +25,6 @@ class Index extends Component
         if ($this->selectedJenjang) {
             $kuitansi = KuitansiTransaksiTabungan::where('ms_jenjang_id', $this->selectedJenjang)->first();
         }
-        return view('livewire.kuitansi-transaksi-tabungan.index');
+        return view('livewire.kuitansi-transaksi-tabungan.index', compact('kuitansi'));
     }
 }

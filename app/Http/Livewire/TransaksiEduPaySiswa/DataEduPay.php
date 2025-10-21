@@ -57,6 +57,7 @@ class DataEduPay extends Component
 
         // Ambil semua transaksi siswa untuk hitung saldo
         $edupayTransaksi = TransaksiEduPay::where('user_id', $this->ms_siswa_id)
+            // ->orderBy('ms_transaksi_edupay_id', 'ASC')
             ->get();
 
         // Hitung saldo sampai transaksi yang diminta
@@ -130,6 +131,7 @@ class DataEduPay extends Component
         $this->emit('openNewTab', $url);
     }
 
+    // Fungsi untuk menangani tombol cetak
     public function cetakTransaksi($eduPayId)
     {
         $surat = KuitansiTransaksiEduPay::where('ms_jenjang_id', $this->selectedJenjang)->first();
@@ -153,6 +155,7 @@ class DataEduPay extends Component
         // Emit URL untuk membuka tab baru
         $this->emit('openNewTab', $url);
     }
+
     public function render()
     {
         $saldo = 0; // Inisialisasi di luar closure
@@ -160,7 +163,7 @@ class DataEduPay extends Component
         $transaksiEduPay = $this->ms_siswa_id
             ? TransaksiEduPay::where('user_type', 'siswa')
             ->where('user_id', $this->ms_siswa_id)
-            // ->orderBy('tanggal', 'ASC')
+            ->orderBy('tanggal', 'ASC')
             ->get()
             ->map(function ($item) use (&$saldo) {
                 switch ($item->jenis_transaksi) {

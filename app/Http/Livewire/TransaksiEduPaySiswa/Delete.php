@@ -43,8 +43,14 @@ class Delete extends Component
                 $this->dispatchBrowserEvent('alertify-error', ['message' => 'Transaksi EduPay tidak ditemukan.']);
                 return;
             }
-
-            $saldoSaatIni = $transaksi->ms_siswa->saldo_edupay_siswa();
+            if ($transaksi->user_type == 'siswa') {
+                $saldoSaatIni = $transaksi->ms_siswa->saldo_edupay_siswa();
+            } elseif ($transaksi->user_type == 'pegawai') {
+                $saldoSaatIni = $transaksi->ms_pegawai->saldo_edupay_pegawai();
+            } else {
+                // default 0 atau error
+                $this->dispatchBrowserEvent('alertify-error', ['message' => 'User tidak ditemukan']);
+            }
 
             // Hitung saldo setelah penghapusan
             if (in_array($transaksi->jenis_transaksi, ['topup tunai', 'topup online', 'pengembalian dana'])) {
@@ -85,6 +91,7 @@ class Delete extends Component
             $this->emit('tagihanUpdated');
             $this->emit('refreshSaldo');
             $this->dispatchBrowserEvent('hide-delete-modal', ['modalId' => 'ModalDeleteEduPay']);
+           
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'Transaksi EduPay berhasil dihapus.']);
         } catch (\Exception $e) {
             DB::rollBack();

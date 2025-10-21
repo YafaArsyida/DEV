@@ -42,6 +42,18 @@
                     <button id="ClearFilter" class="btn btn-light w-100" data-bs-dismiss="offcanvas">Clear Filter</button>
                     <button id="ApplyFilter" class="btn btn-primary w-100" data-bs-dismiss="offcanvas">Filters</button>
                 </div>
+                 {{-- <div class="card mt-3">
+                    <div class="card-header">
+                        <h5>Debugging Filters</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Start Date:</strong> {{ $startDate ?? 'Tidak ada' }}</p>
+                        <p><strong>End Date:</strong> {{ $endDate ?? 'Tidak ada' }}</p>
+                        <p><strong>Selected Petugas:</strong> 
+                            {{ count($selectedPetugas) > 0 ? implode(', ', $selectedPetugas) : 'Tidak ada petugas yang dipilih' }}
+                        </p>
+                    </div>
+                </div> --}}
             </div>
         </div>
     </div>
@@ -73,7 +85,7 @@
             const filters = {
                 startDate: startDate,
                 endDate: endDate,
-                selectedJenjang: $("#PilihPetugas").val(),
+                selectedPetugas: $("#PilihPetugas").val(),
                 selectedJenisTransaksi: $("#PilihJenisTransaksi").val(),
             };
 

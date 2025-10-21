@@ -21,8 +21,9 @@
                         <div class="row">
                             <div class="col-xxl-4 pe-1">
                                 <div class="card">
-                                    @livewire('transaksi-tabungan-siswa.delete')   
                                     @livewire('transaksi-tabungan-siswa.data-siswa')   
+                                    @livewire('transaksi-tabungan-siswa.delete')  
+                                    @livewire('transaksi-tabungan-siswa.edit') 
                                 </div><!-- end card -->
                             </div>
                             <!--end col-->

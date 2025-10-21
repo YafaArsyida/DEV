@@ -119,7 +119,7 @@
 
 
                     <!-- Collapse Menu: Administrasi Pegawai -->
-                    <li class="nav-item">
+                    {{-- <li class="nav-item">
                         <a class="nav-link menu-link"
                         href="#sidebarAdministrasiPegawai"
                         data-bs-toggle="collapse"
@@ -143,7 +143,7 @@
                                 </li>
                             </ul>
                         </div>
-                    </li>
+                    </li> --}}
 
 
                     <li class="menu-title"><span data-key="t-transaksi">Transaksi</span></li>
@@ -192,7 +192,7 @@
                     </li>
 
                     @php
-                        $isTransaksiPegawaiActive = request()->routeIs('transaksi.edupay-pegawai') || request()->routeIs('transaksi.edupay-pegawai');
+                        $isTransaksiPegawaiActive = request()->routeIs('transaksi.edupay-pegawai') || request()->routeIs('transaksi.tabungan-pegawai');
                     @endphp
                     
                     <li class="nav-item">
@@ -208,8 +208,8 @@
                         <div class="collapse menu-dropdown {{ $isTransaksiPegawaiActive ? 'show' : '' }}" id="sidebarTransaksiPegawai">
                             <ul class="nav nav-sm flex-column">
                                 <li class="nav-item">
-                                    <a href="{{ route('transaksi.edupay-pegawai') }}" 
-                                    class="nav-link {{ request()->routeIs('transaksi.edupay-pegawai') ? 'active' : '' }}" 
+                                    <a href="{{ route('transaksi.tabungan-pegawai') }}" 
+                                    class="nav-link {{ request()->routeIs('transaksi.tabungan-pegawai') ? 'active' : '' }}" 
                                     data-key="t-tabungan-pegawai">
                                     Tabungan Pegawai
                                     </a>
@@ -226,12 +226,12 @@
                     </li>
                 
                     <!-- Penggajian Pegawai -->
-                    <li class="nav-item">
+                    {{-- <li class="nav-item">
                         <a class="nav-link menu-link" href="#">
                             <i class="mdi mdi-cash-check"></i>
                             <span data-key="t-gaji-pegawai">Pennggajian Pegawai</span>
                         </a>
-                    </li>
+                    </li> --}}
                     <li class="nav-item">
                         <a class="nav-link menu-link {{ request()->routeIs('transaksi.pendapatan-lainnya') ? 'active' : '' }}"
                            href="{{ route('transaksi.pendapatan-lainnya') }}">
@@ -310,23 +310,29 @@
                         </a>
                     </li>
                     
+                     @php
+                        $laporanPegawai = request()->routeIs('laporan.tabungan-pegawai') || request()->routeIs('laporan.edupay-pegawai');
+                    @endphp
                     <!-- Laporan Pegawai: Tabungan & EduPay -->
                     <li class="nav-item">
-                        <a class="nav-link menu-link" href="#sidebarLaporanPegawai" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarLaporanPegawai">
+                        <a class="nav-link menu-link {{ $laporanPegawai ? 'active' : '' }}" 
+                            href="#sidebarLaporanPegawai" data-bs-toggle="collapse" role="button" 
+                            aria-expanded="{{ $laporanPegawai ? 'true' : 'false' }}" 
+                            aria-controls="sidebarLaporanPegawai">
                             <i class="mdi mdi-finance"></i>
                             <span data-key="t-laporan-pegawai">Laporan Pegawai</span>
                         </a>
-                        <div class="collapse menu-dropdown" id="sidebarLaporanPegawai">
+                        <div class="collapse menu-dropdown {{ $laporanPegawai ? 'show' : '' }}" id="sidebarLaporanPegawai">
                             <ul class="nav nav-sm flex-column">
                                 <li class="nav-item">
-                                    <a href="{{ route('laporan.tabungan-siswa') }}" class="nav-link" data-key="t-tabungan-pegawai">Tabungan Pegawai</a>
+                                    <a href="{{ route('laporan.tabungan-pegawai') }}" class="nav-link" data-key="t-tabungan-pegawai">Tabungan Pegawai</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="{{ route('laporan.edupay-siswa') }}" class="nav-link" data-key="t-edupay-pegawai">EduPay Pegawai</a>
+                                    <a href="{{ route('laporan.edupay-pegawai') }}" class="nav-link" data-key="t-edupay-pegawai">EduPay Pegawai</a>
                                 </li>
-                                <li class="nav-item">
+                                {{-- <li class="nav-item">
                                     <a href="#" class="nav-link" data-key="t-honor-pegawai">Penggajian Pegawai</a>
-                                </li>
+                                </li> --}}
                             </ul>
                         </div>
                     </li>     

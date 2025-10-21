@@ -4,6 +4,7 @@
         <h4 class="card-title mb-0">Pesan Transaksi EduPay</h4>   
         <div class="ms-auto"> <!-- Menambahkan ms-auto untuk mendorong ke kanan -->
             <div class="dropdown">
+                <button class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#kuitansiEduPay" aria-controls="kuitansiEduPay" wire:click="$emit('kuitansiEduPay', {{ $selectedJenjang }})"><i class="ri-file-paper-2-line me-1 align-bottom"></i> Kuitansi EduPay</button>
                 @if ($selectedJenjang)
                     @if (!$pesans)
                         <button data-bs-target="#createPesanEduPay" data-bs-toggle="modal" wire:click="$emit('createPesanEduPay', {{ $selectedJenjang }})" class="btn btn-soft-success shadow-none"><i class="ri-whatsapp-line align-bottom me-1"></i> Setting WhatsApp</button>

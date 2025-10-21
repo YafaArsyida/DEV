@@ -34,10 +34,10 @@ class DataSiswa extends Component
 
     protected $listeners = [
         'siswaSelected',
-        'refreshTabunganSiswa',
+        'refreshTabungans',
     ];
 
-    public function refreshTabunganSiswa()
+    public function refreshTabungans()
     {
         // Jika siswa sedang dipilih, perbarui data siswa
         if ($this->ms_penempatan_siswa_id) {
@@ -160,7 +160,7 @@ class DataSiswa extends Component
             $this->total_debit_tabungan = $siswa->total_debit_tabungan();
 
             // Notifikasi sukses
-            $this->emit('refreshTabunganSiswa');
+            $this->emit('refreshTabungans');
             $this->emit('refreshSaldo');
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'Transaksi kredit berhasil disimpan.']);
         } catch (\Exception $e) {
@@ -266,7 +266,7 @@ class DataSiswa extends Component
             $this->total_debit_tabungan = $siswa->total_debit_tabungan();
 
             // Notifikasi sukses
-            $this->emit('refreshTabunganSiswa');
+            $this->emit('refreshTabungans');
             $this->emit('refreshSaldo');
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'Transaksi debit berhasil disimpan.']);
         } catch (\Exception $e) {

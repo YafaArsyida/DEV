@@ -91,7 +91,7 @@
                              <!-- Catatan -->
                             <div class="my-4 px-2 pe-4" style="font-family: 'Times New Roman', Times, serif; font-size: 14pt;">
                                 <p align='center'>{{ $kuitansi->pesan }}</p>
-                                <p align='center'>{{ $kuitansi->tempat }}, 26-05-2025</p>
+                                <p align='center'>{{ $kuitansi->tempat }}, {{ now()->format('d-m-Y') }}</p>
                             </div>
 
                             <div class="pt-4 px-2 text-center" style="font-family: 'Times New Roman', Times, serif; font-size: 14pt;">
