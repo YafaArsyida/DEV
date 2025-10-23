@@ -130,7 +130,8 @@ class Saldo extends Component
                 });
             })
             ->get()
-            ->sortByDesc(fn($item) => $item->ms_siswa->saldo_edupay_siswa() ?? 0)
+            ->filter(fn($item) => $item->ms_siswa->saldo_edupay_siswa() !== 0)
+            ->sortByDesc(fn($item) => $item->ms_siswa->saldo_edupay_siswa())
             ->values(); // reset urutan index
 
         $this->totalSaldo = $siswas->sum(fn($item) => $item->ms_siswa->saldo_edupay_siswa() ?? 0);

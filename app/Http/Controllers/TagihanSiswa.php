@@ -30,8 +30,9 @@ class TagihanSiswa extends Controller
 
         // Ambil data siswa dengan filter
         $query = PenempatanSiswa::with(['ms_siswa', 'ms_kelas'])
-            ->where('ms_jenjang_id', $selectedJenjang)
-            ->where('ms_tahun_ajar_id', $selectedTahunAjar);
+            ->join('ms_siswa', 'ms_penempatan_siswa.ms_siswa_id', '=', 'ms_siswa.ms_siswa_id')
+            ->where('ms_penempatan_siswa.ms_jenjang_id', $selectedJenjang)
+            ->where('ms_penempatan_siswa.ms_tahun_ajar_id', $selectedTahunAjar);
 
         if ($selectedKelas) {
             $query->where('ms_kelas_id', $selectedKelas);
@@ -43,7 +44,8 @@ class TagihanSiswa extends Controller
             });
         }
 
-        $tagihans = $query->get();
+        $tagihans = $query->orderBy('ms_penempatan_siswa.ms_kelas_id')
+            ->orderBy('ms_siswa.nama_siswa')->get();
 
         // Inisialisasi total
         $totalTagihan = 0;

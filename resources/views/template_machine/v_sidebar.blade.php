@@ -325,10 +325,18 @@
                         <div class="collapse menu-dropdown {{ $laporanPegawai ? 'show' : '' }}" id="sidebarLaporanPegawai">
                             <ul class="nav nav-sm flex-column">
                                 <li class="nav-item">
-                                    <a href="{{ route('laporan.tabungan-pegawai') }}" class="nav-link" data-key="t-tabungan-pegawai">Tabungan Pegawai</a>
+                                    <a href="{{ route('laporan.tabungan-pegawai') }}" 
+                                    class="nav-link {{ request()->routeIs('laporan.tabungan-pegawai') ? 'active' : '' }}" 
+                                    data-key="t-tabungan-pegawai">
+                                    Tabungan Pegawai
+                                    </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="{{ route('laporan.edupay-pegawai') }}" class="nav-link" data-key="t-edupay-pegawai">EduPay Pegawai</a>
+                                    <a href="{{ route('laporan.edupay-pegawai') }}" 
+                                    class="nav-link {{ request()->routeIs('laporan.edupay-pegawai') ? 'active' : '' }}" 
+                                    data-key="t-edupay-pegawai">
+                                    EduPay Pegawai
+                                    </a>
                                 </li>
                                 {{-- <li class="nav-item">
                                     <a href="#" class="nav-link" data-key="t-honor-pegawai">Penggajian Pegawai</a>

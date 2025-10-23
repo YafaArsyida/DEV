@@ -122,7 +122,7 @@
                         <div class="mt-4 text-center">
                             <h4 class="fs-semibold">Konfirmasi Export</h4>
                             <p class="text-muted fs-14 mb-4 pt-1">
-                                Apakah Anda yakin ingin mengekspor laporan Rekapitulasi? Data yang diekspor akan sesuai dengan tabel yang ditampilkan.
+                                Apakah Anda yakin ingin mengekspor laporan Jurnal Transaksi? Data yang diekspor akan sesuai dengan tabel yang ditampilkan.
                             </p>
                             <div class="hstack gap-2 justify-content-center remove">
                                 <button class="btn btn-link link-success fw-medium text-decoration-none shadow-none" data-bs-dismiss="modal">

@@ -71,7 +71,7 @@
                     <p class="text-muted mb-0">Untuk melihat data kelas, harap pilih Jenjang dan Tahun Ajar terlebih dahulu.</p>
                 </div>
             @else
-            <div class="table-responsive" style="max-height: 1000px;" data-simplebar>
+            <div class="table-responsive">
                 <table class="table table-hover nowrap align-middle">
                     <thead class="table-light">
                         <tr>

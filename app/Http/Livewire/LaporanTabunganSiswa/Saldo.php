@@ -115,6 +115,7 @@ class Saldo extends Component
                 });
             })
             ->get()
+            ->filter(fn($item) => $item->ms_siswa->saldo_tabungan_siswa() !== 0)
             ->sortByDesc(fn($item) => $item->ms_siswa->saldo_tabungan_siswa() ?? 0)
             ->values(); // reset keys
 

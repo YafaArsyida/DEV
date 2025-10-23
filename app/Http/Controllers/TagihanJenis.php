@@ -39,7 +39,8 @@ class TagihanJenis extends Controller
             $query->where('nama_jenis_tagihan_siswa', 'like', '%' . $search . '%');
         }
 
-        $tagihans = $query->get();
+        $tagihans = $query
+            ->orderBy('ms_kategori_tagihan_siswa_id')->get();
 
         // Inisialisasi total
         $totalSiswa = 0;
