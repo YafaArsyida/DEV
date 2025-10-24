@@ -23,6 +23,7 @@ class KartuJumlahJurnalPendapatan extends Component
 
     protected $listeners = [
         'parameterUpdated' => 'updateParameters',
+        'refreshJurnalHariIni' => 'hitungPendapatan',
     ];
 
     public function mount()

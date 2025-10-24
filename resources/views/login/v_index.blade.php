@@ -44,7 +44,7 @@
                         <div class="text-center mt-sm-5 mb-4 text-white">
                             <span class="fw-bold fs-3">TemanSekolah X SMP Pandanaran</span>
                             <p class="mt-3 fs-15 fw-medium text-white-50">
-                                Sistem administrasi terintegrasi akuntansi untuk SMP Pandanaran
+                                Sistem Administrasi Terintegrasi untuk SMP Pandanaran
                             </p>
                         </div>
                     </div>
