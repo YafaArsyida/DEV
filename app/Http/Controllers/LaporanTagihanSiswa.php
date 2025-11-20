@@ -105,7 +105,7 @@ class LaporanTagihanSiswa extends Controller
             <table border="0" cellpadding="1" cellspacing="0">
                 <tr>
                     <td style="text-align: center;">
-                        <img src="' . $kopBase64 . '" width="1200px"/>
+                        <img src="' . $kopBase64 . '" width="1400px"/>
                     </td>
                 </tr>
             </table>

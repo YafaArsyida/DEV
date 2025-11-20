@@ -18,6 +18,11 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\JenjangTahunAjar;
 use App\Http\Controllers\KelasSiswa;
 use App\Http\Controllers\KonfigurasiTagihanSiswa;
+use App\Http\Controllers\KoperasiPintarAdministrasiProduk;
+use App\Http\Controllers\KoperasiPintarDashboard;
+use App\Http\Controllers\KoperasiPintarPembelianProduk;
+use App\Http\Controllers\KoperasiPintarPengembalianProduk;
+use App\Http\Controllers\KoperasiPintarPenjualanProduk;
 use App\Http\Controllers\LandingEkstrakurikuler;
 use App\Http\Controllers\LaporanEduPayPegawai;
 use App\Http\Controllers\LaporanEduPaySiswa;
@@ -89,6 +94,17 @@ Route::middleware(['auth', 'peran:superadmin,admin,kantin'])->group(function () 
     Route::get('/smartCanteen/laporan/transaksi',  [SmartCanteenLaporanTransaksi::class, 'index'])->name('smartCanteen.laporan.transaksi');
     Route::get('/smartCanteen/laporan/transaksi/pdf',  [SmartCanteenLaporanTransaksi::class, 'cetakPDF'])->name('smartCanteen.laporan.transaksi.pdf');
     // END SMARTCANTEEN 
+
+    // KOPERASIPINTAR
+    // master
+    Route::get('/koperasiPintar/dashboard', [KoperasiPintarDashboard::class, 'index'])->name('koperasiPintar.dashboard');
+    Route::get('/koperasiPintar/administrasi/produk', [KoperasiPintarAdministrasiProduk::class, 'index'])->name('koperasiPintar.administrasi.produk');
+
+    // transaksi
+    Route::get('/koperasiPintar/pembelian/produk', [KoperasiPintarPembelianProduk::class, 'index'])->name('koperasiPintar.pembelian.produk');
+    Route::get('/koperasiPintar/pengembalian/produk', [KoperasiPintarPengembalianProduk::class, 'index'])->name('koperasiPintar.pengembalian.produk');
+    Route::get('/koperasiPintar/penjualan/produk', [KoperasiPintarPenjualanProduk::class, 'index'])->name('koperasiPintar.penjualan.produk');
+    // END KOPERASIPINTAR
 });
 
 

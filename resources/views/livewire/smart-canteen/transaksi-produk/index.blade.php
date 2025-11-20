@@ -1,51 +1,84 @@
  <div class="" id="produkList">
-    <div class="card-body p-4 pb-0">
-        <div class="d-flex align-items-center justify-content-between flex-wrap">
-            <!-- Kiri: Nama & SmartCard -->
-            <div>
-                <h4 class="mb-1 fw-bold text-dark">
-                    {{ $nama ?: 'Belum ada pengguna' }}
-                    - 
+    <div class="card mb-4 shadow-sm border-0">
+        <div class="card-body p-4">
+
+    <div class="row g-4 align-items-center">
+
+        <!-- ============================ -->
+        <!-- KIRI — DATA PENGGUNA -->
+        <!-- ============================ -->
+        <div class="col-md-7">
+
+            @if($nama)
+
+                <h4 class="fw-bold text-dark mb-1">
+                    {{ $nama }}
+                    <span class="text-muted">—</span>
+
                     @if($user_type === 'siswa')
-                        {{ $nama_kelas ?: 'Belum ada kelas' }}
+                        <span class="text-primary">{{ $nama_kelas ?: 'Belum ada kelas' }}</span>
                     @elseif($user_type === 'pegawai')
-                        {{ $nama_jabatan ?: 'Belum ada jabatan' }}
+                        <span class="text-primary">{{ $nama_jabatan ?: 'Belum ada jabatan' }}</span>
                     @else
-                        {{ 'Belum ada informasi' }}
+                        <span class="text-primary">Belum ada informasi</span>
                     @endif
                 </h4>
-                <div class="text-muted">
-                    SmartCard : 
-                    <span class="fw-medium text-primary">
-                        {{ $educard ?: '-' }}
-                    </span>
-                </div>
-            </div>
 
-            <!-- Kanan: Saldo + Tombol Scan -->
-            <div class="d-flex align-items-center gap-3 mt-3 mt-md-0">
-                <div class="text-end me-2">
-                    <h6 class="mb-1 text-primary">Saldo EduPay</h6>
-                    <h4 class="fw-bold text-success mb-0">
+                <div class="text-muted mb-2">
+                    SmartCard :
+                    <span class="fw-semibold text-primary">{{ $educard ?: '-' }}</span>
+                </div>
+
+                <div class="mt-1">
+                    {{-- <div class="text-muted small">Saldo EduPay</div> --}}
+                    <h3 class="fw-bold text-success mb-0">
                         RP{{ number_format($saldo_edupay ?? 0, 0, ',', '.') }}
-                    </h4>
+                    </h3>
                 </div>
 
-                <!-- Tombol Scan -->
-                <div data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Scan Kartu RFID">
-                    <a href="#ModalScanRFID" data-bs-toggle="modal" 
-                    class="btn btn-light btn-icon shadow-sm"
-                    wire:click.prevent="$emit('openScanModal')">
-                        <i class="ri-qr-scan-2-line align-bottom text-primary fs-20"></i>
-                    </a>
-                </div>
-            </div>
+            @else
 
+                <div class="text-muted">
+                    <h5 class="mb-0">Tempelkan SmartCard untuk menampilkan data pengguna.</h5>
+                </div>
+
+            @endif
 
         </div>
+
+        <!-- ============================ -->
+        <!-- KANAN — INPUT SCAN -->
+        <!-- ============================ -->
+        <div class="col-md-5">
+
+            <label class="fw-semibold mb-1">Scan / Input SmartCard</label>
+
+            <div class="input-group input-group-lg shadow-sm">
+
+                <span class="input-group-text bg-primary text-white border-primary">
+                    <i class="ri-sensor-fill fs-4"></i>
+                </span>
+
+                <input type="text"
+                       id="inputSmartcard"
+                       wire:model.defer="smartcardInput"
+                       wire:keydown.enter="prosesSmartcard"
+                       class="form-control border-primary"
+                       placeholder="Tempelkan SmartCard atau ketik kode..."
+                       autofocus>
+            </div>
+
+        </div>
+
     </div>
+
+</div>
+
+    </div>
+
+
     <!-- Search & Filter -->
-    <div class="card-body border-end-0 border-start-0">
+    {{-- <div class="card-body border-end-0 border-start-0">
         <form>
             <div class="row g-3">
                 <div class="col-xxl-12 col-sm-12">
@@ -56,7 +89,7 @@
                 </div>
             </div>
         </form>
-    </div>
+    </div> --}}
 
     <!-- Tabs kategori -->
     <div class="card-body pt-0">
@@ -107,4 +140,11 @@
             @endforeach
         </div>
     </div>
+    <script>
+        document.addEventListener('focus-smartcard-input', () => {
+            const el = document.getElementById('inputSmartcard');
+            if (el) el.focus();
+        });
+    </script>
+
 </div>

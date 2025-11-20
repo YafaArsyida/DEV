@@ -52,7 +52,7 @@ class KeranjangProduk extends Component
         $this->nama_jabatan               = $data['nama_jabatan'];        // nama siswa/pegawai
     }
 
-    public function openScanModal()
+    public function resetScan()
     {
         $this->reset([
             'user_type',
@@ -193,7 +193,7 @@ class KeranjangProduk extends Component
             } elseif ($this->metode_pembayaran == 'EduPay') {
                 if ($this->user_type === 'siswa') {
                     $debitAkunId = $kode_rekening_edupay_siswa;
-                }elseif($this->user_type === 'pegawai'){
+                } elseif ($this->user_type === 'pegawai') {
                     $debitAkunId = $kode_rekening_edupay_pegawai;
                 }
             } else {
@@ -286,8 +286,9 @@ class KeranjangProduk extends Component
 
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'Transaksi kantin berhasil disimpan.']);
             $this->emitSelf('$refresh');
-            $this->emit('openScanModal');
-            $this->openScanModal();
+
+            $this->emit('resetScan');
+            $this->resetScan();
         } catch (\Exception $e) {
             DB::rollBack();
             $this->dispatchBrowserEvent('alertify-error', ['message' => 'Terjadi kesalahan: ' . $e->getMessage()]);

@@ -445,13 +445,18 @@
                     <li class="menu-title"><span data-key="t-menu">modul</span></li>
                     <!-- Jenjang & Tahun Ajaran -->
                     <li class="nav-item">
-                        <a class="nav-link menu-link" target="_blank" href="{{ route('smartCanteen.dashboard') }}">
+                        <a class="nav-link menu-link" target="_blank" href="{{ route('smartCanteen.transaksi.produk') }}">
                             <i class="mdi mdi-food-fork-drink"></i> <span data-key="t-tahun-ajaran">SmartCanteen - eKantin</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link menu-link" target="_blank" href="{{ route('smartCanteen.dashboard') }}">
                             <i class="mdi mdi-card-account-details-outline"></i> <span data-key="t-tahun-ajaran">SmartPass - eAbsensi</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link menu-link" target="_blank" href="{{ route('koperasiPintar.dashboard') }}">
+                            <i class="mdi mdi-card-account-details-outline"></i> <span data-key="t-tahun-ajaran">KoperasiPintar - BUMS</span>
                         </a>
                     </li>
                 {{-- @endif --}}

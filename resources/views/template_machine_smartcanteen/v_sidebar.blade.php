@@ -32,14 +32,13 @@
                 @php
                     $peran = auth()->check() ? auth()->user()->peran : null;
                 @endphp
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <a href="{{ route('smartCanteen.dashboard') }}"
                     class="nav-link menu-link {{ request()->routeIs('smartCanteen.dashboard') ? 'active' : '' }}">
                         <i class="mdi mdi-speedometer"></i>
                         <span data-key="t-jenis-tagihan">Dashboard</span>
                     </a>
-                </li>
-
+                </li> --}}
                 <li class="menu-title"><span data-key="t-administrasi">Administrasi</span></li>
                 
                 <li class="nav-item">

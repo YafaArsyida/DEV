@@ -12,7 +12,6 @@
                             <div class="col-xxl-8 col-md-8 pe-1">
                                 <div class="card">
                                     @livewire('smart-canteen.transaksi-produk.index')   
-                                    @livewire('smart-canteen.transaksi-produk.scan-smart-card')   
                                 </div><!-- end card -->
                             </div>
                             <!--end col-->

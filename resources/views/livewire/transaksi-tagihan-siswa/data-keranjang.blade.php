@@ -27,21 +27,21 @@
                                     </a>
                                 </th>
                                 <td class="text-start">
-                                    <span class="fw-medium">
+                                    <span class="fw-medium fs-14">
                                         {{ $item->nama_jenis_tagihan_siswa() }}</span>
                                     <p class="text-muted mb-0">RP{{ number_format($item->jumlah_tagihan_siswa(), 0, ',', '.') }}</p>
                                 </td>
                                 <td>
-                                    <span class="fw-medium">
+                                    <span class="fw-medium fs-14">
                                         RP{{ number_format($item->jumlah_sudah_dibayar(), 0, ',', '.') }}
                                     </span>
                                 </td>
-                                <td><span class="fw-medium text-success">
+                                <td><span class="fw-medium fs-14 text-success">
                                         RP{{ number_format($item->jumlah_bayar, 0, ',', '.') }}
                                     </span>
                                 </td>
                                <td class="text-end">
-                                    <span class="fw-medium text-danger">
+                                    <span class="fw-medium fs-14 text-danger">
                                         RP{{ number_format($item->jumlah_tagihan_siswa() - ($item->jumlah_sudah_dibayar() + $item->jumlah_bayar), 0, ',', '.') }}
                                     </span>
                                 </td>
