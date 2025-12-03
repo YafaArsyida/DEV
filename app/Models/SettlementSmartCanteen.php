@@ -28,4 +28,9 @@ class SettlementSmartCanteen extends Model
     {
         return $this->hasMany(TransaksiSmartCanteen::class, 'ms_settlement_kantin_id');
     }
+
+    public function ms_pengguna()
+    {
+        return $this->belongsTo(User::class, 'ms_pengguna_id', 'ms_pengguna_id');
+    }
 }

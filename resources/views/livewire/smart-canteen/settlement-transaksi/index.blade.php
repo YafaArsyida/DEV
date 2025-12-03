@@ -1,12 +1,24 @@
 <div class="card">
     <div class="card-header border-0 pb-0">
-        <div class="d-flex align-items-center">
+        <div class="d-flex align-items-center justify-content-between">
+
             <div class="flex-grow-1">
                 <h5 class="card-title mb-0">Settlement Transaksi Kantin</h5>
                 <p class="text-muted mb-0 fs-12">
                     Pilih kantin, periode transaksi, lalu proses settlement untuk transaksi yang belum diselesaikan.
                 </p>
             </div>
+
+            <!-- Tombol Riwayat Settlement -->
+            <button type="button"
+                data-bs-toggle="offcanvas"
+                data-bs-target="#offcanvasSettlement"
+                aria-controls="offcanvasSettlement"
+                class="btn btn-info d-inline-flex align-items-center gap-1">
+                <i class="ri-history-line align-bottom"></i>
+                <span>Riwayat Settlement</span>
+            </button>
+
         </div>
     </div>
 

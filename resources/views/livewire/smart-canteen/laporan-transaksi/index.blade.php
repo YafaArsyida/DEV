@@ -14,14 +14,12 @@
                     </button>
 
                     <button data-bs-toggle="modal" data-bs-target="#ExportLaporanExcel" class="btn btn-soft-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button>
-                    @if($selectedPetugas)            
-                    <button data-bs-toggle="modal" data-bs-target="#RiwayatSettlement"
-                            wire:click="$emit('RiwayatSettlement', {{ $selectedPetugas ?? 'null' }})"
-                            class="btn btn-info d-inline-flex align-items-center gap-1">
+                    {{-- @if($selectedPetugas)             --}}
+                    <button type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSettlement" aria-controls="offcanvasSettlement" class="btn btn-info d-inline-flex align-items-center gap-1">
                         <i class="ri-history-line align-bottom"></i>
                         <span>Riwayat Settlement</span>
                     </button>
-                    @endif
+                    {{-- @endif --}}
                     {{-- <button data-bs-toggle="modal" data-bs-target="#ExportEduPay" wire:click.prevent="showExportEduPay"  class="btn btn-soft-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button> --}}
                 </div>
             </div>
