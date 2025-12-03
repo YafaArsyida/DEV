@@ -15,6 +15,7 @@ class TransaksiTagihanSiswa extends Controller
     }
     public function kuitansiPDF($transaksiId)
     {
+        // UNTUK TMU-220D
         $selectedJenjang = request()->query('selectedJenjang');
         // return response()->json(['transaksiId' => $transaksiId]);
 
@@ -32,9 +33,10 @@ class TransaksiTagihanSiswa extends Controller
 
         // Inisialisasi TCPDF
         $pdf = new TCPDF();
+        $pdf::SetMargins(5, 5, 5); // contoh margin kiri 5mm, atas 5mm, kanan 5mm
 
         $pdf::SetTitle('Kuitansi Transaksi');
-        $pdf::AddPage('P', [100, 300]); // 'P' untuk Portrait, ukuran dalam milimeter (100mm x 150mm)
+        $pdf::AddPage('P', [75, 200]); // 'P' untuk Portrait, ukuran dalam milimeter (100mm x 150mm)
         $pdf::SetFont('times', '', 12);
 
         $logoPath = storage_path('app/public/' . $kuitansi->logo);
@@ -74,7 +76,7 @@ class TransaksiTagihanSiswa extends Controller
         // $pdf::Cell(0, 5, 'Assalamu’alaikum Wr. Wb.', 0, 1, 'L');
 
         // Informasi Pembayaran
-        $pdf::SetFont('times', '', 10);
+        $pdf::SetFont('times', '', 9);
         $pdf::Cell(0, 5, 'Siswa : ' . $transaksi->ms_penempatan_siswa->ms_siswa->nama_siswa, 0, 1, 'L');
         $pdf::Cell(0, 5, 'Kelas : ' . $transaksi->ms_penempatan_siswa->ms_kelas->nama_kelas, 0, 1, 'L');
         $pdf::Ln(2);
@@ -131,9 +133,9 @@ class TransaksiTagihanSiswa extends Controller
         $pdf::MultiCell(0, 5, $kuitansi->pesan, 0, 'C');
         $pdf::Ln(1);
         $pdf::Cell(0, 5, $kuitansi->tempat . ', ' .  HelperController::formatTanggalIndonesia($transaksi->tanggal_transaksi, 'd F Y'), 0, 1, 'C');
-        $pdf::Ln(5);
-        $pdf::Cell(0, 5, $transaksi->ms_pengguna->nama, 0, 1, 'C');
         $pdf::Ln(10);
+        $pdf::Cell(0, 5, $transaksi->ms_pengguna->nama, 0, 1, 'C');
+        // $pdf::Ln(10);
 
         // Penutup
         // $pdf::SetFont('times', 'I', 8);

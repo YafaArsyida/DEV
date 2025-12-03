@@ -14,6 +14,14 @@
                     </button>
 
                     <button data-bs-toggle="modal" data-bs-target="#ExportLaporanExcel" class="btn btn-soft-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button>
+                    @if($selectedPetugas)            
+                    <button data-bs-toggle="modal" data-bs-target="#RiwayatSettlement"
+                            wire:click="$emit('RiwayatSettlement', {{ $selectedPetugas ?? 'null' }})"
+                            class="btn btn-info d-inline-flex align-items-center gap-1">
+                        <i class="ri-history-line align-bottom"></i>
+                        <span>Riwayat Settlement</span>
+                    </button>
+                    @endif
                     {{-- <button data-bs-toggle="modal" data-bs-target="#ExportEduPay" wire:click.prevent="showExportEduPay"  class="btn btn-soft-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button> --}}
                 </div>
             </div>
@@ -91,6 +99,7 @@
                             <th class="text-uppercase" scope="col">Transaksi</th>
                             <th class="text-uppercase text-center">Petugas</th>
                             <th class="text-uppercase text-center">Nominal</th>
+                            <th class="text-uppercase text-center">Settlement</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -128,6 +137,18 @@
                                 <span class="fs-14 text-success">
                                     RP{{ number_format($item->total_transaksi, 0, ',', '.') }}
                                 </span>
+                            </td>
+                            <!-- 🔥 STATUS SETTLEMENT -->
+                            <td class="text-center">
+                                @if($item->status_settlement === 'sudah')
+                                    <span class="text-success fw-semibold">
+                                        <i class="ri-check-line me-1"></i> Sudah
+                                    </span>
+                                @else
+                                    <span class="text-danger fw-semibold">
+                                        <i class="ri-close-line me-1"></i> Belum
+                                    </span>
+                                @endif
                             </td>
                         </tr>
                     @empty

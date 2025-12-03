@@ -445,7 +445,7 @@
                     <li class="menu-title"><span data-key="t-menu">modul</span></li>
                     <!-- Jenjang & Tahun Ajaran -->
                     <li class="nav-item">
-                        <a class="nav-link menu-link" target="_blank" href="{{ route('smartCanteen.transaksi.produk') }}">
+                        <a class="nav-link menu-link" target="_blank" href="{{ route('smartCanteen.dashboard') }}">
                             <i class="mdi mdi-food-fork-drink"></i> <span data-key="t-tahun-ajaran">SmartCanteen - eKantin</span>
                         </a>
                     </li>

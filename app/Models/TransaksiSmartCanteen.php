@@ -25,9 +25,11 @@ class TransaksiSmartCanteen extends Model
         'deskripsi',
         'akuntansi_jurnal_detail_debit_id',
         'akuntansi_jurnal_detail_kredit_id',
+        'status_settlement',
+        'ms_settlement_kantin_id'
     ];
 
-     /**
+    /**
      * Relasi ke model Pegawai
      */
     public function ms_pegawai()
@@ -50,7 +52,7 @@ class TransaksiSmartCanteen extends Model
     {
         return $this->belongsTo(PenempatanSiswa::class, 'ms_penempatan_siswa_id', 'ms_penempatan_siswa_id');
     }
-    
+
     /**
      * Relasi ke model Pengguna
      */
@@ -63,7 +65,7 @@ class TransaksiSmartCanteen extends Model
     {
         return $this->belongsTo(AkuntansiJurnalDetail::class, 'akuntansi_jurnal_detail_id', 'akuntansi_jurnal_detail_id');
     }
-    
+
     public function dt_transaksi_kantin()
     {
         return $this->hasMany(DetailTransaksiSmartCanteen::class, 'ms_transaksi_kantin_id');

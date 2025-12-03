@@ -7,10 +7,10 @@
             <div class="col-12">
                 <div class="d-flex align-items-lg-center flex-lg-row flex-column">
                     <div class="flex-grow-1">
-                        <h4 class="fs-16 mb-1">Dashboard SmartCanteen</h4>
-                        <p class="text-muted mb-0">Dashboard > SmartCanteen</p>
+                        <h4 class="fs-16 mb-1">Dashboard SmartPss</h4>
+                        <p class="text-muted mb-0">Dashboard > SmartPss</p>
                     </div>
-                    @livewire('parameter.smart-canteen')   
+                    @livewire('parameter.jenjang-tahun-ajar')   
                 </div><!-- end card header -->
             </div>
             <!--end col-->
@@ -20,7 +20,7 @@
                 <div class="d-flex flex-column h-100">
                     <div class="row h-100">
                         <div class="col-12">
-                            @livewire('smart-canteen.widget.c-t-a-menu-transaksi-smart-canteen')   
+                            @livewire('widget.c-t-a-menu-transaksi-tagihan-siswa')   
                         </div> <!-- end col-->
                     </div> <!-- end row-->
 
@@ -35,8 +35,8 @@
             </div> <!-- end col-->
             <div class="col-xxl-7">
                 <div class="row h-100">
-                    @livewire('smart-canteen.widget.produk-terlaris')   
-                    @livewire('smart-canteen.widget.produk-aktif')   
+                    @livewire('widget.overview-tagihan-siswa')   
+                    @livewire('widget.progres-tagihan-siswa')   
                 </div> <!-- end row-->
             </div><!-- end col -->
         </div>

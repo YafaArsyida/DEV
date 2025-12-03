@@ -32,13 +32,14 @@
                 @php
                     $peran = auth()->check() ? auth()->user()->peran : null;
                 @endphp
-                {{-- <li class="nav-item">
+                <li class="nav-item">
                     <a href="{{ route('smartCanteen.dashboard') }}"
                     class="nav-link menu-link {{ request()->routeIs('smartCanteen.dashboard') ? 'active' : '' }}">
                         <i class="mdi mdi-speedometer"></i>
                         <span data-key="t-jenis-tagihan">Dashboard</span>
                     </a>
-                </li> --}}
+                </li>
+                @if($peran == 'kantin')
                 <li class="menu-title"><span data-key="t-administrasi">Administrasi</span></li>
                 
                 <li class="nav-item">
@@ -53,7 +54,7 @@
                     <a href="{{ route('smartCanteen.transaksi.produk') }}"
                     class="nav-link menu-link {{ request()->routeIs('smartCanteen.transaksi.produk') ? 'active' : '' }}">
                         <i class="mdi mdi-cart-outline"></i>
-                        <span data-key="t-kelas-siswa">Pembelian Produk</span>
+                        <span data-key="t-kelas-siswa">Transaksi Penjualan</span>
                     </a>
                 </li>
                 <li class="menu-title"><span data-key="t-administrasi">Laporan</span></li>
@@ -64,6 +65,23 @@
                         <span data-key="t-kelas-siswa">Laporan Transaksi</span>
                     </a>
                 </li>
+                @else
+                <li class="menu-title"><span data-key="t-administrasi">Laporan</span></li>
+                <li class="nav-item">
+                    <a href="{{ route('smartCanteen.laporan.transaksi') }}"
+                    class="nav-link menu-link {{ request()->routeIs('smartCanteen.laporan.transaksi') ? 'active' : '' }}">
+                        <i class="mdi mdi-file-chart-outline"></i>
+                        <span data-key="t-kelas-siswa">Laporan Transaksi</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('smartCanteen.settlement.transaksi') }}"
+                    class="nav-link menu-link {{ request()->routeIs('smartCanteen.settlement.transaksi') ? 'active' : '' }}">
+                        <i class="mdi mdi-file-chart-outline"></i>
+                        <span data-key="t-kelas-siswa">Settlement Transaksi</span>
+                    </a>
+                </li>
+                @endif
             </ul>
         </div>
         <!-- Sidebar -->

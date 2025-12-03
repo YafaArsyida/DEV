@@ -80,6 +80,7 @@ class KeranjangProduk extends Component
         // cek apakah produk sudah ada di keranjang
         $item = KeranjangSmartCanteen::where('user_type', $this->user_type)
             ->where('user_id', $this->user_id)
+            ->where('ms_pengguna_id', auth()->id())
             ->where('ms_produk_kantin_id', $produkId)
             ->first();
 
@@ -185,7 +186,7 @@ class KeranjangProduk extends Component
             $kode_rekening_kas = 11001;
             $kode_rekening_edupay_siswa = 22002;
             $kode_rekening_edupay_pegawai = 22005;
-            $kode_rekening_pendapatan_kantin = 41002;
+            $kode_rekening_hutang_kantin = 21001.01;
 
             // Pilih debit akun berdasarkan metode pembayaran
             if ($this->metode_pembayaran == 'Tunai') {
@@ -218,7 +219,7 @@ class KeranjangProduk extends Component
 
             // Jurnal - Kredit
             $jurnalDetailKredit = AkuntansiJurnalDetail::create([
-                'kode_rekening' => $kode_rekening_pendapatan_kantin,
+                'kode_rekening' => $kode_rekening_hutang_kantin,
                 'posisi' => 'kredit',
                 'nominal' => $totalBayar,
                 'tanggal_transaksi' => now(),
@@ -263,6 +264,7 @@ class KeranjangProduk extends Component
                 'deskripsi' => $deskripsiJurnal,
                 'akuntansi_jurnal_detail_debit_id' => $jurnalDetailDebit->akuntansi_jurnal_detail_id,
                 'akuntansi_jurnal_detail_kredit_id' => $jurnalDetailKredit->akuntansi_jurnal_detail_id,
+                'is_settled' => 'belum',
             ]);
 
             // Insert detail transaksi

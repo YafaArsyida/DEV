@@ -4,6 +4,7 @@ namespace App\Http\Livewire\SmartCanteen\LaporanTransaksi;
 
 use App\Models\TransaksiSmartCanteen;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
@@ -15,7 +16,14 @@ class TopJajan extends Component
 
     public function render()
     {
+        $user = Auth::user();
+
         $query = TransaksiSmartCanteen::query();
+
+        // filter sesuai peran
+        if ($user->peran === 'kantin') {
+            $query->where('ms_pengguna_id', $user->ms_pengguna_id);
+        }
 
         // Filter periode
         $startDate = null;
