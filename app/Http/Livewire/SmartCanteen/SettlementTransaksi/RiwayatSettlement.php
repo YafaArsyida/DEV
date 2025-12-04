@@ -32,6 +32,15 @@ class RiwayatSettlement extends Component
             $this->listPetugas = User::where('peran', 'kantin')->get();
         }
     }
+
+    public function resetTanggal()
+    {
+        // $this->startDate = now()->format('Y-m-d');
+        $this->startDate = now()->startOfMonth()->format('Y-m-d');
+        $this->endDate   = now()->format('Y-m-d');
+        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
+    }
+
     public function updatedSelectedPetugas()
     {
         $this->dispatchBrowserEvent('alertify-success', [

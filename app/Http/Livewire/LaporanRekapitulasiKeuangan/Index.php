@@ -20,13 +20,18 @@ class Index extends Component
 
     public $selectedJenjang = null;
     public $selectedTahunAjar = null;
-    public $selectedKelas = null;
+
+    public $selectedKelas = [];
+    public $selectedKategoriTagihanSiswa = [];
+    public $selectedJenisTagihanSiswa = [];
 
     public $search = '';
 
     // Listener untuk Livewire
     protected $listeners = [
         'parameterUpdated' => 'updateParameters',
+        'applyFilters' => 'applyFilters',
+        'clearFilters' => 'clearFilters',
     ];
 
     public function updateParameters($jenjang, $tahunAjar)
@@ -36,6 +41,21 @@ class Index extends Component
         $this->selectedTahunAjar = $tahunAjar;
     }
 
+    public function applyFilters($filters)
+    {
+        // Simpan filter yang diterima
+        $this->selectedKelas = $filters['selectedKelas'] ?? [];
+        $this->selectedKategoriTagihanSiswa = $filters['selectedKategoriTagihanSiswa'] ?? [];
+        $this->selectedJenisTagihanSiswa = $filters['selectedJenisTagihanSiswa'] ?? [];
+    }
+
+    public function clearFilters()
+    {
+        $this->selectedKelas = [];
+        $this->selectedKategoriTagihanSiswa = [];
+        $this->selectedJenisTagihanSiswa = [];
+    }
+
     public function updatedJenisRekapitulasi()
     {
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
@@ -43,83 +63,92 @@ class Index extends Component
 
     public function render()
     {
-        // Data untuk dropdown Kelas (hanya jika Jenjang dan Tahun Ajar dipilih)
-        $select_kelas = [];
-        if ($this->selectedJenjang && $this->selectedTahunAjar) {
-            $select_kelas = Kelas::where('ms_jenjang_id', $this->selectedJenjang)
-                ->where('ms_tahun_ajar_id', $this->selectedTahunAjar)
-                ->get();
-        }
-
         $this->jenisTagihan = JenisTagihanSiswa::with('ms_kategori_tagihan_siswa')
             ->whereHas('ms_kategori_tagihan_siswa', function ($q) {
                 $q->where('ms_jenjang_id', $this->selectedJenjang)
                     ->where('ms_tahun_ajar_id', $this->selectedTahunAjar);
             })
-            ->get()
-            ->sortBy('ms_kategori_tagihan_siswa_id')
-            ->values(); // Kembalikan koleksi lengkap
+            ->when(!empty($this->selectedKategoriTagihanSiswa), function ($q) {
+                $q->whereIn('ms_kategori_tagihan_siswa_id', $this->selectedKategoriTagihanSiswa);
+            })
+            ->when(!empty($this->selectedJenisTagihanSiswa), function ($q) {
+                $q->whereIn('ms_jenis_tagihan_siswa_id', $this->selectedJenisTagihanSiswa);
+            })
+            ->orderBy('ms_kategori_tagihan_siswa_id')
+            ->get();
 
+
+        // QUERY SISWA
         $query = PenempatanSiswa::with([
             'ms_siswa.ms_educard',
             'ms_kelas',
-            'ms_tagihan_siswa.ms_jenis_tagihan_siswa' // Pastikan jenis tagihan di-load
+            'ms_tagihan_siswa.ms_jenis_tagihan_siswa'
         ])
-            ->join('ms_siswa', 'ms_penempatan_siswa.ms_siswa_id', '=', 'ms_siswa.ms_siswa_id')
             ->where('ms_jenjang_id', $this->selectedJenjang)
             ->where('ms_tahun_ajar_id', $this->selectedTahunAjar);
 
-        // Tambahkan filter kelas
-        if ($this->selectedKelas) {
-            $query->where('ms_kelas_id', $this->selectedKelas);
+        if (!empty($this->selectedKelas)) {
+            $query->whereIn('ms_kelas_id', $this->selectedKelas);
         }
 
-        // Filter pencarian
+        if (!empty($this->selectedKategoriTagihanSiswa)) {
+            $query->whereHas('ms_tagihan_siswa.ms_jenis_tagihan_siswa', function ($q) {
+                $q->whereIn('ms_kategori_tagihan_siswa_id', $this->selectedKategoriTagihanSiswa);
+            });
+        }
+
+        if (!empty($this->selectedJenisTagihanSiswa)) {
+            $query->whereHas('ms_tagihan_siswa.ms_jenis_tagihan_siswa', function ($q) {
+                $q->whereIn('ms_jenis_tagihan_siswa_id', $this->selectedJenisTagihanSiswa);
+            });
+        }
+
         if ($this->search) {
-            $query->where(function ($query) {
-                $query->where('ms_siswa.nama_siswa', 'like', '%' . $this->search . '%')
-                    ->orWhereHas('ms_siswa.ms_educard', function ($query) {
-                        $query->where('kode_kartu', 'like', '%' . $this->search . '%');
+            $query->whereHas('ms_siswa', function ($q) {
+                $q->where('nama_siswa', 'like', "%{$this->search}%")
+                    ->orWhereHas('ms_educard', function ($qr) {
+                        $qr->where('kode_kartu', 'like', "%{$this->search}%");
                     });
             });
         }
 
-        $siswas = $query->orderBy('ms_penempatan_siswa.ms_kelas_id')
-            ->orderBy('ms_siswa.nama_siswa')
-            ->get();
-        // ->paginate(50);
+        $siswas = $query->orderBy('ms_kelas_id')->orderBy(
+            fn($q) => $q->select('nama_siswa')
+                ->from('ms_siswa')
+                ->whereColumn('ms_siswa.ms_siswa_id', 'ms_penempatan_siswa.ms_siswa_id')
+        )->get();
 
-        // Ambil data siswa sesuai filter
-        $siswas = $query->orderBy('ms_penempatan_siswa.ms_kelas_id')
-            ->orderBy('ms_siswa.nama_siswa')
-            ->get();
+        // ===============================
+        //   REKAP PER JENIS TAGIHAN
+        // ===============================
+        $this->total = [];
+        $this->grandTotal = 0;
 
-        // Hitung total per jenis tagihan berdasarkan data yang telah difilter
-        $this->total = $this->jenisTagihan->mapWithKeys(function ($jenis) use ($siswas) {
-            $total = $siswas->sum(function ($siswa) use ($jenis) {
-                $tagihanItem = $siswa->ms_tagihan_siswa->where('ms_jenis_tagihan_siswa_id', $jenis->ms_jenis_tagihan_siswa_id)->first();
+        foreach ($this->jenisTagihan as $jenis) {
+            $jenisId = $jenis->ms_jenis_tagihan_siswa_id;
+            $sum = 0;
 
-                if (!$tagihanItem) return 0;
+            foreach ($siswas as $siswa) {
+                $tagihan = $siswa->ms_tagihan_siswa
+                    ->firstWhere('ms_jenis_tagihan_siswa_id', $jenisId);
+
+                if (!$tagihan) continue;
 
                 if ($this->jenisRekapitulasi === 'tagihan') {
-                    return $tagihanItem->jumlah_tagihan_siswa;
+                    $sum += $tagihan->jumlah_tagihan_siswa;
                 } elseif ($this->jenisRekapitulasi === 'pembayaran') {
-                    return $tagihanItem->jumlah_sudah_dibayar();
+                    $sum += $tagihan->jumlah_sudah_dibayar();
                 } elseif ($this->jenisRekapitulasi === 'kekurangan') {
-                    return $tagihanItem->jumlah_kekurangan();
+                    $sum += $tagihan->jumlah_kekurangan();
                 }
+            }
 
-                return 0;
-            });
-
-            return [$jenis->ms_jenis_tagihan_siswa_id => $total];
-        });
-
-        // Hitung grand total
-        $this->grandTotal = $this->total->sum();
+            $this->total[$jenisId] = $sum;
+            $this->grandTotal += $sum;
+        }
 
         return view('livewire.laporan-rekapitulasi-keuangan.index', [
-            'select_kelas' => $select_kelas,
+            // 'select_kelas' => $select_kelas,
             'siswas' => $siswas,
         ]);
     }

@@ -58,7 +58,8 @@ class Index extends Component
 
     public function clearFilters()
     {
-        $this->startDate = now()->format('Y-m-d');
+        // $this->startDate = now()->format('Y-m-d');
+        $this->startDate = now()->startOfMonth()->format('Y-m-d');
         $this->endDate   = now()->format('Y-m-d');
 
         $this->selectedKelas = [];
@@ -181,13 +182,15 @@ class Index extends Component
     public function mount()
     {
         // Default ke hari ini
-        $this->startDate = now()->format('Y-m-d');
+        // $this->startDate = now()->format('Y-m-d');
+        $this->startDate = now()->startOfMonth()->format('Y-m-d');
         $this->endDate   = now()->format('Y-m-d');
     }
-    
+
     public function resetTanggal()
     {
-        $this->startDate = now()->format('Y-m-d');
+        // $this->startDate = now()->format('Y-m-d');
+        $this->startDate = now()->startOfMonth()->format('Y-m-d');
         $this->endDate   = now()->format('Y-m-d');
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
     }

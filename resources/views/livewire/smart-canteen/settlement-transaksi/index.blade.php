@@ -3,7 +3,7 @@
         <div class="d-flex align-items-center justify-content-between">
 
             <div class="flex-grow-1">
-                <h5 class="card-title mb-0">Settlement Transaksi Kantin</h5>
+                <h5 class="card-title mb-0">Settlement Transaksi SmartCanteen</h5>
                 <p class="text-muted mb-0 fs-12">
                     Pilih kantin, periode transaksi, lalu proses settlement untuk transaksi yang belum diselesaikan.
                 </p>

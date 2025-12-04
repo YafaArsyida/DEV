@@ -18,6 +18,7 @@
             <div class="flex-shrink-0">
                 <div class="d-flex gap-2 flex-wrap">
                     <button data-bs-toggle="modal" data-bs-target="#ExportLaporan" class="btn btn-soft-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button>
+                    <button type="button" class="btn btn-info" data-bs-toggle="offcanvas" data-bs-target="#filterRekapitulasi" aria-controls="filterTabungan"><i class="ri-filter-3-line align-bottom me-1"></i> Fliters</button>
                 </div>
             </div>
         </div>
@@ -28,30 +29,19 @@
             <div class="col-xxl-2 col-md-3">
                 <label for="rekapSelect" class="form-label">Jenis Rekapitulasi</label>
                 <select id="rekapSelect" wire:model="jenisRekapitulasi" class="form-select" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Jenis Rekapitulasi">
-                    <option value="tagihan">Rekapitulasi Tagihan</option>
-                    <option value="pembayaran">Rekapitulasi Pembayaran</option>
-                    <option value="kekurangan">Rekapitulasi Kekurangan</option>
+                    <option value="tagihan">Estimasi</option>
+                    <option value="pembayaran">Dibayarkan</option>
+                    <option value="kekurangan">Kekurangan</option>
                 </select>
             </div>
 
             <!-- Pencarian (tengah) -->
-            <div class="col-xxl-8 col-md-6">
+            <div class="col-xxl-10 col-md-9">
                 <label for="searchRekap" class="form-label">Pencarian</label>
                 <div class="position-relative">
                     <input type="text" id="searchRekap" class="form-control ps-4" wire:model.debounce.300ms="search" placeholder="Cari nama, deskripsi, atau lainnya...">
                     <i class="ri-search-line position-absolute top-50 start-0 translate-middle-y ms-2 text-muted"></i>
                 </div>
-            </div>
-
-            <!-- Pilih Kelas (paling kanan) -->
-            <div class="col-xxl-2 col-md-3">
-                <label for="kelasSelect" class="form-label">Kelas</label>
-                <select id="kelasSelect" wire:model="selectedKelas" class="form-select" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Kelas">
-                    <option value="">Semua Kelas</option>
-                    @foreach ($select_kelas as $item)    
-                        <option value="{{ $item->ms_kelas_id }}">{{ $item->nama_kelas }}</option>
-                    @endforeach
-                </select>
             </div>
         </div>
         <!--end row-->

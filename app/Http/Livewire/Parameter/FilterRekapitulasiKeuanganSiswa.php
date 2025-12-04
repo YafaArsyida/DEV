@@ -2,23 +2,20 @@
 
 namespace App\Http\Livewire\Parameter;
 
-use Livewire\Component;
 use App\Models\JenisTagihanSiswa;
 use App\Models\KategoriTagihanSiswa;
 use App\Models\Kelas;
-use App\Models\User;
+use Livewire\Component;
 
-class FilterLaporanPembayaran extends Component
+class FilterRekapitulasiKeuanganSiswa extends Component
 {
     public $selectedJenjang = null;
     public $selectedTahunAjar = null;
 
     public $selectedKelas = [];
-    public $selectedPetugas = [];
     public $selectedKategoriTagihanSiswa = [];
     public $showJenisTagihan = false;
     public $selectedJenisTagihanSiswa = [];
-    public $selectedMetode = [];
 
     // Listener untuk Livewire
     protected $listeners = [
@@ -36,14 +33,12 @@ class FilterLaporanPembayaran extends Component
     public function applyFilters($filters)
     {
         $this->selectedKelas = $filters['selectedKelas'] ?? [];
-        $this->selectedPetugas = $filters['selectedPetugas'] ?? [];
         $this->selectedKategoriTagihanSiswa = $filters['selectedKategoriTagihanSiswa'] ?? [];
 
         // Tampilkan filter jenis tagihan jika kategori tidak kosong
         $this->showJenisTagihan = !empty($this->selectedKategoriTagihanSiswa);
 
         $this->selectedJenisTagihanSiswa = $filters['selectedJenisTagihanSiswa'] ?? [];
-        $this->selectedMetode = $filters['selectedMetode'] ?? [];
 
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
     }
@@ -51,10 +46,8 @@ class FilterLaporanPembayaran extends Component
     public function clearFilters()
     {
         $this->selectedKelas = [];
-        $this->selectedPetugas = [];
         $this->selectedKategoriTagihanSiswa = [];
         $this->selectedJenisTagihanSiswa = [];
-        $this->selectedMetode = [];
 
         $this->showJenisTagihan = false;
 
@@ -92,14 +85,7 @@ class FilterLaporanPembayaran extends Component
                 // ->orderBy('nama_jenis_tagihan_siswa')   // Urut berdasarkan nama jenis tagihan
                 ->get();
         }
-
-        $select_petugas = [];
-        if ($this->selectedJenjang && $this->selectedTahunAjar) {
-            $select_petugas = User::get();
-        }
-
-        return view('livewire.parameter.filter-laporan-pembayaran', [
-            'select_petugas' => $select_petugas,
+        return view('livewire.parameter.filter-rekapitulasi-keuangan-siswa', [
             'select_kelas' => $select_kelas,
             'select_kategori_tagihan' => $select_kategori_tagihan,
             'select_jenis_tagihan' => $select_jenis_tagihan,

@@ -16,6 +16,7 @@
         </div>
         <div class="row">
             <div class="col-xxl-12">
+                @livewire('parameter.filter-rekapitulasi-keuangan-siswa')   
                 @livewire('laporan-rekapitulasi-keuangan.index')   
             </div>  
         </div>

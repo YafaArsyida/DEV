@@ -3,7 +3,7 @@
 
 <div class="page-content">
     <div class="container-fluid" style="max-width: 100%">
-        <div class="row mb-3 pb-1">
+        {{-- <div class="row mb-3 pb-1">
             <div class="col-12">
                 <div class="d-flex align-items-lg-center flex-lg-row flex-column">
                     <div class="flex-grow-1">
@@ -14,7 +14,7 @@
                 </div><!-- end card header -->
             </div>
             <!--end col-->
-        </div>
+        </div> --}}
         <div class="row">
             <div class="col-xxl-5">
                 <div class="d-flex flex-column h-100">

@@ -2,7 +2,7 @@
 <div class="card-header border-0">
     <div class="row g-4 align-items-center">
         <div class="col-xxl-12 col-sm-12">
-            <div wire:ignore.self class="offcanvas offcanvas-end" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="filterPembayaran" aria-labelledby="filterTabunganLabel">
+            <div wire:ignore.self class="offcanvas offcanvas-end" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="filterRekapitulasi" aria-labelledby="filterTabunganLabel">
                 <div class="offcanvas-header border-bottom">
                     <h5 class="offcanvas-title" id="filterTabunganLabel">Filter</h5>
                     <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -15,14 +15,6 @@
                                 <option value="{{ $item->ms_kelas_id }}">
                                     {{ $item->nama_kelas }}
                                 </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="mb-4">
-                        <p class="text-muted text-uppercase fs-12 fw-medium mb-2">Petugas</p>
-                        <select id="PilihPetugas" style="cursor: pointer" wire:model="selectedPetugas" class="form-select" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Kelas" multiple="multiple">
-                            @foreach ($select_petugas as $item)    
-                            <option value="{{ $item->ms_pengguna_id }}">{{ $item->nama }} - <i>{{ $item->peran }}</i> </option>
                             @endforeach
                         </select>
                     </div>
@@ -57,15 +49,6 @@
                         </select>
                     </div>
                     @endif
-
-                    <div class="mb-4">
-                        <p class="text-muted text-uppercase fs-12 fw-medium mb-2">Metode Pembayaran</p>
-                        <select id="PilihMetodePembayaran" style="cursor: pointer" wire:model="selectedMetode" class="form-select" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Metode Pembayaran" multiple="multiple" >
-                            <option value="Teller Tunai">Teller Tunai</option>
-                            <option value="Transfer ke Rekening Sekolah">Transfer ke Rekening Sekolah</option>
-                            <option value="EduPay">EduPay</option>
-                        </select>
-                    </div>
                 </div>
                 <div class="offcanvas-footer border-top p-3 text-center hstack gap-2">
                     <button id="ClearFilter" class="btn btn-light w-100" data-bs-dismiss="offcanvas">Clear Filter</button>
@@ -77,19 +60,14 @@
                         <h5>Debugging Filters</h5>
                     </div>
                     <div class="card-body">
-                        <p><strong>Start Date:</strong> {{ $startDate ?? 'Tidak ada' }}</p>
-                        <p><strong>End Date:</strong> {{ $endDate ?? 'Tidak ada' }}</p>
                         <p><strong>Selected Kelas:</strong> 
                             {{ count($selectedKelas) > 0 ? implode(', ', $selectedKelas) : 'Tidak ada kelas yang dipilih' }}
                         </p>
-                        <p><strong>Selected Petugas:</strong> 
-                            {{ count($selectedPetugas) > 0 ? implode(', ', $selectedPetugas) : 'Tidak ada petugas yang dipilih' }}
+                        <p><strong>Selected Kategori:</strong> 
+                            {{ count($selectedKategoriTagihanSiswa) > 0 ? implode(', ', $selectedKategoriTagihanSiswa) : 'Tidak kategori tagihan yang dipilih' }}
                         </p>
                         <p><strong>Selected Jenis Tagihan:</strong> 
                             {{ count($selectedJenisTagihanSiswa) > 0 ? implode(', ', $selectedJenisTagihanSiswa) : 'Tidak ada jenis tagihan yang dipilih' }}
-                        </p>
-                        <p><strong>Selected Metode Pembayaran:</strong> 
-                            {{ count($selectedMetode) > 0 ? implode(', ', $selectedMetode) : 'Tidak ada metode pembayaran yang dipilih' }}
                         </p>
                     </div>
                 </div> --}}
@@ -102,23 +80,16 @@
         // Select2 handler
         function initSelect2() {
             $('#PilihKelas').select2(); // Terapkan Select2 pada elemen ini
-            $('#PilihPetugas').select2(); // Terapkan Select2 pada elemen ini
             $('#PilihKategoriTagihan').select2(); // Terapkan Select2 pada elemen ini
             $('#PilihJenisTagihan').select2(); // Terapkan Select2 pada elemen ini
-            $('#PilihMetodePembayaran').select2(); // Terapkan Select2 pada elemen ini
         }
 
         // Clear filter hanya didaftarkan sekali
         document.getElementById("ClearFilter").addEventListener("click", function () {
             // Reset semua select dan input ke nilai default
             $('#PilihKelas').val(null).trigger('change');
-            $('#PilihPetugas').val(null).trigger('change');
             $('#PilihKategoriTagihan').val(null).trigger('change');
             $('#PilihJenisTagihan').val(null).trigger('change');
-            $('#PilihMetodePembayaran').val(null).trigger('change');
-
-            document.getElementById('startDate').value = "";
-            document.getElementById('endDate').value = "";
 
             // Emit event ke Livewire untuk clear filter
             Livewire.emit("clearFilters");
@@ -129,10 +100,8 @@
         document.getElementById("ApplyFilter").addEventListener("click", function () {
             const filters = {
                 selectedKelas: $("#PilihKelas").val(),
-                selectedPetugas: $("#PilihPetugas").val(),
                 selectedKategoriTagihanSiswa: $("#PilihKategoriTagihan").val(),
                 selectedJenisTagihanSiswa: $("#PilihJenisTagihan").val(),
-                selectedMetode: $("#PilihMetodePembayaran").val(),
             };
 
             // Emit filters ke Livewire
