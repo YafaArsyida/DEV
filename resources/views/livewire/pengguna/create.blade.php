@@ -24,6 +24,7 @@
                                     <option value="superadmin">Super Admin</option>
                                     <option value="administrasi">Administrasi</option>
                                     <option value="kantin">Petugas Kantin</option>
+                                    <option value="koperasi">Petugas Koperasi</option>
                                 </select>
                                 @error('peran') 
                                     <footer class="text-danger mt-0">{{ $message }}</footer>

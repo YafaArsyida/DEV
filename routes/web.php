@@ -85,7 +85,7 @@ Route::get('/', [LoginController::class, 'index'])->name('login.index')->middlew
 Route::post('/login', [LoginController::class, 'authenticate'])->name('login.authenticate');
 Route::post('/logout', [LoginController::class, 'logOut'])->name('logout');
 
-Route::middleware(['auth', 'peran:superadmin,admin,kantin'])->group(function () {
+Route::middleware(['auth', 'peran:superadmin,administrasi,kantin'])->group(function () {
     // SMARTCANTEEN 
     Route::get('/smartCanteen/dashboard', [SmartCanteenDashboard::class, 'index'])->name('smartCanteen.dashboard');
 

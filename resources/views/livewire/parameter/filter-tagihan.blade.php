@@ -15,29 +15,15 @@
                             style="cursor: pointer;" 
                             data-bs-toggle="tooltip" 
                             data-bs-placement="top" 
-                            title="Pilih rentang tanggal jatuh tempo untuk menampilkan piutang dalam periode tersebut.">
+                            title="Pilih tanggal jatuh tempo untuk menampilkan piutang sampai tempo akhir.">
                             </i>
                         </div>
                         <div class="row g-2 align-items-center">
-                            <div class="col-lg">
-                                <input type="date" class="form-control" id="startDate" placeholder="0">
-                            </div>
-                            <div class="col-lg-auto">-</div>
                             <div class="col-lg">
                                 <input type="date" class="form-control" id="endDate" placeholder="0">
                             </div>
                         </div>
                     </div>
-                    {{-- <div class="mb-4">
-                        <p class="text-muted text-uppercase fs-12 fw-medium mb-2">Kelas</p>
-                        <select id="PilihKelas" style="cursor: pointer" wire:model="selectedKelas" class="form-select" multiple="multiple">
-                            @foreach ($select_kelas as $item)
-                                <option value="{{ $item->ms_kelas_id }}">
-                                    {{ $item->nama_kelas }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div> --}}
 
                     <div class="mb-4">
                          <div class="d-flex align-items-center mb-2">

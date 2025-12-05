@@ -16,42 +16,62 @@ class LaporanTagihanSiswa extends Controller
     }
     public function generatePDF($msPenempatanSiswaId)
     {
-        // Ambil parameter tambahan dari query string
+        // Ambil parameter dari query string
         $selectedJenjang = request()->query('selectedJenjang');
-        $selectedJenisTagihan = request()->query('selectedJenisTagihan') ? json_decode(request()->query('selectedJenisTagihan'), true) : [];
-        $selectedKategoriTagihan = request()->query('selectedKategoriTagihan') ? json_decode(request()->query('selectedKategoriTagihan'), true) : [];
-        // Ambil parameter tanggal tanpa waktu
-        $startDate = request()->query('startDate');
+        $selectedJenisTagihan = request()->query('selectedJenisTagihan')
+            ? json_decode(request()->query('selectedJenisTagihan'), true) : [];
+
+        $selectedKategoriTagihan = request()->query('selectedKategoriTagihan')
+            ? json_decode(request()->query('selectedKategoriTagihan'), true) : [];
+
         $endDate = request()->query('endDate');
 
-        $startDate = (!empty($startDate) && Carbon::hasFormat($startDate, 'Y-m-d')) ? Carbon::createFromFormat('Y-m-d', $startDate)->toDateString() : null;
-        $endDate = (!empty($endDate) && Carbon::hasFormat($endDate, 'Y-m-d')) ? Carbon::createFromFormat('Y-m-d', $endDate)->toDateString() : null;
+        // Validasi endDate
+        if (!empty($endDate) && Carbon::hasFormat($endDate, 'Y-m-d')) {
+            $endDate = Carbon::createFromFormat('Y-m-d', $endDate)->endOfDay();
+        } else {
+            $endDate = null;
+        }
 
         $penempatanSiswa = PenempatanSiswa::with([
             'ms_siswa',
             'ms_kelas',
-            'ms_tagihan_siswa' => function ($query) use ($selectedJenisTagihan, $selectedKategoriTagihan, $startDate, $endDate) {
+            'ms_tagihan_siswa' => function ($query) use ($selectedJenisTagihan, $selectedKategoriTagihan, $endDate) {
+
+                // Join ke tabel ms_jenis_tagihan_siswa
+                $query->join(
+                    'ms_jenis_tagihan_siswa',
+                    'ms_jenis_tagihan_siswa.ms_jenis_tagihan_siswa_id',
+                    '=',
+                    'ms_tagihan_siswa.ms_jenis_tagihan_siswa_id'
+                );
+                // Filter jenis tagihan
                 if (!empty($selectedJenisTagihan)) {
                     $query->whereIn('ms_jenis_tagihan_siswa_id', $selectedJenisTagihan);
                 }
 
+                // Filter kategori tagihan
                 if (!empty($selectedKategoriTagihan)) {
                     $query->whereHas('ms_jenis_tagihan_siswa', function ($q) use ($selectedKategoriTagihan) {
                         $q->whereIn('ms_kategori_tagihan_siswa_id', $selectedKategoriTagihan);
                     });
                 }
 
-                if ($startDate && $endDate) {
-                    $query->whereHas('ms_jenis_tagihan_siswa', function ($q) use ($startDate, $endDate) {
-                        $q->whereBetween('tanggal_jatuh_tempo', [$startDate, $endDate]);
-                    });
+                // Hanya pakai endDate
+                if (!empty($endDate)) {
+                    $query->whereDate('tanggal_jatuh_tempo', '<=', $endDate);
                 }
 
+                // Hanya tagihan belum lunas
                 $query->where('status', '!=', 'Lunas');
+
+                // Urutkan berdasarkan jatuh tempo
+                $query->orderBy('tanggal_jatuh_tempo', 'ASC');
             },
             'ms_tagihan_siswa.ms_jenis_tagihan_siswa',
             'ms_tagihan_siswa.dt_transaksi_tagihan_siswa'
         ])->find($msPenempatanSiswaId);
+
         // Hitung total tagihan
         $totalTagihan = $penempatanSiswa->ms_tagihan_siswa->sum(function ($tagihan) {
             return $tagihan->jumlah_tagihan_siswa - $tagihan->jumlah_sudah_dibayar();
@@ -289,7 +309,7 @@ class LaporanTagihanSiswa extends Controller
         // $stylet = array('width' => 0.1, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0));
         // $pdf::Line(10, 46, 202, 46, $style);
         // $pdf::Line(10, 47, 202, 47, $stylet);
-        
+
         // Rincian Tagihan
         $htmlTagihan = "<p><b>Rincian Tagihan Administrasi Sekolah</b></p>";
 
@@ -398,7 +418,16 @@ class LaporanTagihanSiswa extends Controller
             $penempatanSiswa = PenempatanSiswa::with([
                 'ms_siswa',
                 'ms_kelas',
-                'ms_tagihan_siswa' => function ($query) use ($selectedJenisTagihan, $selectedKategoriTagihan, $startDate, $endDate) {
+                'ms_tagihan_siswa' => function ($query) use ($selectedJenisTagihan, $selectedKategoriTagihan, $endDate) {
+
+                    // Join ke tabel ms_jenis_tagihan_siswa
+                    $query->join(
+                        'ms_jenis_tagihan_siswa',
+                        'ms_jenis_tagihan_siswa.ms_jenis_tagihan_siswa_id',
+                        '=',
+                        'ms_tagihan_siswa.ms_jenis_tagihan_siswa_id'
+                    );
+
                     if (!empty($selectedJenisTagihan)) {
                         $query->whereIn('ms_jenis_tagihan_siswa_id', $selectedJenisTagihan);
                     }
@@ -409,13 +438,15 @@ class LaporanTagihanSiswa extends Controller
                         });
                     }
 
-                    if ($startDate && $endDate) {
-                        $query->whereHas('ms_jenis_tagihan_siswa', function ($q) use ($startDate, $endDate) {
-                            $q->whereBetween('tanggal_jatuh_tempo', [$startDate, $endDate]);
-                        });
+                    // Hanya pakai endDate
+                    if (!empty($endDate)) {
+                        $query->whereDate('tanggal_jatuh_tempo', '<=', $endDate);
                     }
 
                     $query->where('status', '!=', 'Lunas');
+
+                    // Urutkan berdasarkan jatuh tempo
+                    $query->orderBy('tanggal_jatuh_tempo', 'ASC');
                 },
                 'ms_tagihan_siswa.ms_jenis_tagihan_siswa',
                 'ms_tagihan_siswa.dt_transaksi_tagihan_siswa'

@@ -39,8 +39,6 @@ class FilterRekapitulasiKeuanganSiswa extends Component
         $this->showJenisTagihan = !empty($this->selectedKategoriTagihanSiswa);
 
         $this->selectedJenisTagihanSiswa = $filters['selectedJenisTagihanSiswa'] ?? [];
-
-        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
     }
 
     public function clearFilters()
@@ -50,8 +48,6 @@ class FilterRekapitulasiKeuanganSiswa extends Component
         $this->selectedJenisTagihanSiswa = [];
 
         $this->showJenisTagihan = false;
-
-        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
     }
 
     public function render()

@@ -26,7 +26,7 @@ class Index extends Component
     public $selectedJenjang = null;
     public $selectedTahunAjar = null;
 
-    public $startDate = null;
+    // public $startDate = null;
     public $endDate = null;
 
     // public $selectedKelas = [];
@@ -40,6 +40,12 @@ class Index extends Component
         'applyFilters' => 'applyFilters',
         'clearFilters' => 'clearFilters',
     ];
+
+    public function mount()
+    {
+        // Default end date adalah akhir bulan berjalan
+        $this->endDate = Carbon::now()->endOfMonth()->toDateString();
+    }
 
     public function updatingSearch()
     {
@@ -56,7 +62,27 @@ class Index extends Component
         $this->selectedJenjang = $jenjang;
         $this->selectedTahunAjar = $tahunAjar;
         $this->selectedKelas = null;
+
+        // Reset endDate kembali ke akhir bulan ini setiap ganti parameter
+        $this->endDate = Carbon::now()->endOfMonth()->toDateString();
+
         $this->resetPage(); // Reset paginasi saat parameter berubah
+    }
+
+    public function applyFilters($filters)
+    {
+        // Simpan filter yang diterima
+        $this->endDate = $filters['endDate'] ?? null;
+        $this->selectedKategoriTagihan = $filters['selectedKategoriTagihan'] ?? [];
+        $this->selectedJenisTagihan = $filters['selectedJenisTagihan'] ?? [];
+    }
+
+    public function clearFilters()
+    {
+        $this->endDate = null;
+
+        $this->selectedKategoriTagihan = [];
+        $this->selectedJenisTagihan = [];
     }
 
     public function kirimWhatsappTagihan($msPenempatanSiswaId)
@@ -66,22 +92,37 @@ class Index extends Component
             'ms_siswa',
             'ms_kelas',
             'ms_tagihan_siswa' => function ($query) {
+                // Join ke jenis tagihan
+                $query->join(
+                    'ms_jenis_tagihan_siswa',
+                    'ms_jenis_tagihan_siswa.ms_jenis_tagihan_siswa_id',
+                    '=',
+                    'ms_tagihan_siswa.ms_jenis_tagihan_siswa_id'
+                );
+
+                // Filter Jenis Tagihan
                 if (!empty($this->selectedJenisTagihan)) {
                     $query->whereIn('ms_jenis_tagihan_siswa_id', $this->selectedJenisTagihan);
                 }
 
+                // Filter Kategori Tagihan
                 if (!empty($this->selectedKategoriTagihan)) {
                     $query->whereHas('ms_jenis_tagihan_siswa', function ($q) {
                         $q->whereIn('ms_kategori_tagihan_siswa_id', $this->selectedKategoriTagihan);
                     });
                 }
 
-                if (!empty($this->startDate) && !empty($this->endDate)) {
-                    $startDate = Carbon::createFromFormat('Y-m-d', $this->startDate)->startOfDay();
-                    $endDate = Carbon::createFromFormat('Y-m-d', $this->endDate)->endOfDay();
-                    $query->whereBetween('tanggal_jatuh_tempo', [$startDate, $endDate]);
-                }
+                $endDate = Carbon::createFromFormat('Y-m-d', $this->endDate)
+                    ->endOfDay();
 
+                $query->where('tanggal_jatuh_tempo', '<=', $endDate);
+
+                // ===============================
+                // 🔥 Urutkan berdasarkan jatuh tempo ASC
+                // ===============================
+                $query->orderBy('tanggal_jatuh_tempo', 'asc');
+
+                // Hanya tagihan yang belum lunas
                 $query->where('status', '!=', 'Lunas');
             },
             'ms_tagihan_siswa.ms_jenis_tagihan_siswa',
@@ -186,27 +227,6 @@ class Index extends Component
         // Emit event untuk membuka tab baru dengan URL WhatsApp
         $this->emit('openNewTab', $url);
     }
-
-    public function applyFilters($filters)
-    {
-        // Simpan filter yang diterima
-        $this->startDate = $filters['startDate'] ?? null;
-        $this->endDate = $filters['endDate'] ?? null;
-        // $this->selectedKelas = $filters['selectedKelas'] ?? [];
-        $this->selectedKategoriTagihan = $filters['selectedKategoriTagihan'] ?? [];
-        $this->selectedJenisTagihan = $filters['selectedJenisTagihan'] ?? [];
-    }
-
-    public function clearFilters()
-    {
-        $this->startDate = null;
-        $this->endDate = null;
-
-        // $this->selectedKelas = [];
-        $this->selectedKategoriTagihan = [];
-        $this->selectedJenisTagihan = [];
-    }
-
     public function showExportTagihanSiswa()
     {
         // Inisialisasi data dan total
@@ -236,11 +256,11 @@ class Index extends Component
         }
 
         // Filter Berdasarkan Tanggal Jatuh Tempo
-        if ($this->startDate && $this->endDate) {
-            $startDate = Carbon::createFromFormat('Y-m-d', $this->startDate)->startOfDay();
-            $endDate = Carbon::createFromFormat('Y-m-d', $this->endDate)->endOfDay();
-            $query->whereBetween('tanggal_jatuh_tempo', [$startDate, $endDate]);
-        }
+        // if ($this->startDate && $this->endDate) {
+        //     $startDate = Carbon::createFromFormat('Y-m-d', $this->startDate)->startOfDay();
+        //     $endDate = Carbon::createFromFormat('Y-m-d', $this->endDate)->endOfDay();
+        //     $query->whereBetween('tanggal_jatuh_tempo', [$startDate, $endDate]);
+        // }
 
         // Filter Berdasarkan Kategori Tagihan
         if (!empty($this->selectedKategoriTagihan)) {
@@ -314,7 +334,6 @@ class Index extends Component
             'msPenempatanSiswaId' => $msPenempatanSiswaId,
             'selectedJenisTagihan' => json_encode($this->selectedJenisTagihan),
             'selectedKategoriTagihan' => json_encode($this->selectedKategoriTagihan),
-            'startDate' => $this->startDate,
             'endDate' => $this->endDate,
         ]);
 
@@ -341,7 +360,6 @@ class Index extends Component
             'selectedJenjang' => $this->selectedJenjang,
             'selectedJenisTagihan' => json_encode($this->selectedJenisTagihan),
             'selectedKategoriTagihan' => json_encode($this->selectedKategoriTagihan),
-            'startDate' => $this->startDate,
             'endDate' => $this->endDate,
         ]);
 
@@ -383,14 +401,13 @@ class Index extends Component
             });
         }
 
-        // Filter Berdasarkan Tanggal Jatuh Tempo
-        if ($this->startDate && $this->endDate) {
-            $startDate = Carbon::createFromFormat('Y-m-d', $this->startDate)->startOfDay();
-            $endDate = Carbon::createFromFormat('Y-m-d', $this->endDate)->endOfDay();
-            $query->whereHas('ms_jenis_tagihan_siswa', function ($q) use ($startDate, $endDate) {
-                $q->whereBetween('tanggal_jatuh_tempo', [$startDate, $endDate]);
-            });
-        }
+        $endDate = Carbon::createFromFormat('Y-m-d', $this->endDate)
+            ->endOfDay();
+
+        // Filter jatuh tempo s/d endDate
+        $query->whereHas('ms_jenis_tagihan_siswa', function ($q) use ($endDate) {
+            $q->where('tanggal_jatuh_tempo', '<=', $endDate);
+        });
 
         // Filter Berdasarkan Kategori Tagihan
         if (!empty($this->selectedKategoriTagihan)) {
@@ -403,6 +420,8 @@ class Index extends Component
         if (!empty($this->selectedJenisTagihan)) {
             $query->whereIn('ms_tagihan_siswa.ms_jenis_tagihan_siswa_id', $this->selectedJenisTagihan);
         }
+
+        $query->orderBy('ms_jenis_tagihan_siswa.tanggal_jatuh_tempo', 'asc');
 
         // Terapkan Paginate
         $tagihans = $query->paginate(1000); // Mengatur jumlah data per halaman
