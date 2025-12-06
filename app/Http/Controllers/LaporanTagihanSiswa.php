@@ -122,7 +122,7 @@ class LaporanTagihanSiswa extends Controller
         $kopBase64 = 'data:image/' . pathinfo($kopPath, PATHINFO_EXTENSION) . ';base64,' . base64_encode(file_get_contents($kopPath));
 
         $htmlHeader = '
-            <table border="0" cellpadding="1" cellspacing="0">
+            <table border="0" cellpadding="0" cellspacing="0">
                 <tr>
                     <td style="text-align: center;">
                         <img src="' . $kopBase64 . '" width="1400px"/>
@@ -297,7 +297,7 @@ class LaporanTagihanSiswa extends Controller
             <table border="0" cellpadding="1" cellspacing="0">
                 <tr>
                     <td style="text-align: center;">
-                        <img src="' . $kopBase64 . '" height="100px"/>
+                        <img src="' . $kopBase64 . '" width="1400px"/>
                     </td>
                 </tr>
             </table>
@@ -386,6 +386,7 @@ class LaporanTagihanSiswa extends Controller
         // Output PDF
         $pdf::Output('Surat_Tagihan_' . $namaSiswa . '.pdf', 'I');
     }
+
     public function generatePDFByClass($ms_kelas_id)
     {
         $selectedJenjang = request()->query('selectedJenjang');
@@ -685,7 +686,7 @@ class LaporanTagihanSiswa extends Controller
             <table border="0" cellpadding="1" cellspacing="0">
                 <tr>
                     <td style="text-align: center;">
-                        <img src="' . $kopBase64 . '" height="100px"/>
+                        <img src="' . $kopBase64 . '" widht="1400px"/>
                     </td>
                 </tr>
             </table>
@@ -771,6 +772,6 @@ class LaporanTagihanSiswa extends Controller
 
             $pdf::writeHTML($catatan, true, false, true, false, '');
         }
-        $pdf::Output('Surat_Tagihan_Kelas' . $namaSiswa . '.pdf', 'I');
+        $pdf::Output('Surat_Tagihan_Kelas' . $namaKelas . '.pdf', 'I');
     }
 }

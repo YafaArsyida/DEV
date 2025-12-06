@@ -20,7 +20,7 @@
                         </div>
                         <div class="row g-2 align-items-center">
                             <div class="col-lg">
-                                <input type="date" class="form-control" id="endDate" placeholder="0">
+                                <input type="date" class="form-control" id="endDate" wire:model="endDate">
                             </div>
                         </div>
                     </div>

@@ -47,16 +47,19 @@ class FilterTagihan extends Component
         $this->selectedJenisTagihan = $filters['selectedJenisTagihan'] ?? [];
     }
 
+    public function mount()
+    {
+        $this->endDate = now()->endOfMonth()->format('Y-m-d');
+    }
+
     public function clearFilters()
     {
-        // $this->endDate = null;
         $this->endDate = now()->endOfMonth()->format('Y-m-d');
-
-        // $this->selectedKelas = [];
         $this->selectedKategoriTagihan = [];
         $this->selectedJenisTagihan = [];
         $this->showJenisTagihan = false;
     }
+
 
     public function render()
     {

@@ -88,8 +88,10 @@
                             <td>
                                 {{ ($pagination->currentPage() - 1) * $pagination->perPage() + $loop->iteration }}.
                             </td>
-                            <td class="text-start">
-                                <strong>{{ $laporan['nama_siswa'] }}</strong>
+                            <td>
+                                <span class="fw-medium">
+                                   {{ $laporan['nama_siswa'] }}
+                                </span>
                                 <p class="text-muted mb-0">{{ $laporan['nama_kelas'] }}</p>
                             </td>
 
@@ -99,14 +101,14 @@
                                 </span>
                             </td>
 
-                            <td>
+                            <td class="text-primary">
                                 @foreach ($laporan['rincian_tagihan'] as $r)
                                     {{ $r['nama_jenis_tagihan_siswa'] }}
-                                    <span class="text-primary">
-                                        RP{{ number_format($r['jumlah_kekurangan'], 0, ',', '.') }}
-                                    </span>
+                                    RP{{ number_format($r['jumlah_kekurangan'], 0, ',', '.') }}
+                                    {{-- <span class="text-primary">
+                                    </span> --}}
 
-                                    @unless($loop->last), @endunless
+                                    @unless($loop->last); @endunless
                                 @endforeach
                             </td>
 
