@@ -7,6 +7,7 @@ use App\Models\JenisTagihanSiswa;
 use App\Models\KategoriTagihan;
 use App\Models\KategoriTagihanSiswa;
 use App\Models\Kelas;
+use Carbon\Carbon;
 use Livewire\Component;
 
 class FilterTagihan extends Component
@@ -14,7 +15,6 @@ class FilterTagihan extends Component
     public $selectedJenjang = null;
     public $selectedTahunAjar = null;
 
-    public $startDate = null;
     public $endDate = null;
 
     public $selectedKelas = [];
@@ -37,7 +37,6 @@ class FilterTagihan extends Component
 
     public function applyFilters($filters)
     {
-        $this->startDate = $filters['startDate'] ?? null;
         $this->endDate = $filters['endDate'] ?? null;
 
         // $this->selectedKelas = $filters['selectedKelas'] ?? [];
@@ -50,8 +49,8 @@ class FilterTagihan extends Component
 
     public function clearFilters()
     {
-        $this->startDate = null;
-        $this->endDate = null;
+        // $this->endDate = null;
+        $this->endDate = now()->endOfMonth()->format('Y-m-d');
 
         // $this->selectedKelas = [];
         $this->selectedKategoriTagihan = [];

@@ -389,29 +389,39 @@ class LaporanTagihanSiswa extends Controller
     public function generatePDFByClass($ms_kelas_id)
     {
         $selectedJenjang = request()->query('selectedJenjang');
-        $penempatanSiswaList = request()->query('penempatanSiswaList') ? json_decode(request()->query('penempatanSiswaList'), true) : [];
-        $selectedJenisTagihan = request()->query('selectedJenisTagihan') ? json_decode(request()->query('selectedJenisTagihan'), true) : [];
-        $selectedKategoriTagihan = request()->query('selectedKategoriTagihan') ? json_decode(request()->query('selectedKategoriTagihan'), true) : [];
-        // Ambil parameter tanggal tanpa waktu
-        $startDate = request()->query('startDate');
-        $endDate = request()->query('endDate');
+        $selectedJenisTagihan = json_decode(request()->query('selectedJenisTagihan', '[]'), true);
+        $selectedKategoriTagihan = json_decode(request()->query('selectedKategoriTagihan', '[]'), true);
 
-        $startDate = (!empty($startDate) && Carbon::hasFormat($startDate, 'Y-m-d')) ? Carbon::createFromFormat('Y-m-d', $startDate)->toDateString() : null;
-        $endDate = (!empty($endDate) && Carbon::hasFormat($endDate, 'Y-m-d')) ? Carbon::createFromFormat('Y-m-d', $endDate)->toDateString() : null;
+        $endDate = request()->query('endDate')
+            ? Carbon::parse(request()->query('endDate'))->endOfDay()
+            : Carbon::now()->endOfMonth();
 
-        // Pastikan `penempatanSiswaList` tidak kosong
-        if (empty($penempatanSiswaList) || !is_array($penempatanSiswaList)) {
-            return response()->json(['error' => 'Penempatan Siswa List kosong atau tidak valid'], 400);
-        }
+        // ==========================================================
+        // 1) Ambil seluruh siswa dalam kelas
+        // ==========================================================
+        $penempatanSiswaList = PenempatanSiswa::with([
+            'ms_siswa',
+            'ms_kelas',
+            'ms_tagihan_siswa.ms_jenis_tagihan_siswa',
+        ])
+            ->where('ms_kelas_id', $ms_kelas_id)
+            ->where('ms_jenjang_id', $selectedJenjang)
+            ->pluck('ms_penempatan_siswa_id')   // <-- penting
+            ->toArray();                        // <-- biar pasti array
 
         // return response()->json([
         //     'selectedJenjang' => $selectedJenjang,
         //     'penempatanSiswaList' => $penempatanSiswaList,
         //     'selectedJenisTagihan' => $selectedJenisTagihan,
         //     'selectedKategoriTagihan' => $selectedKategoriTagihan,
-        //     'startDate' => $startDate,
         //     'endDate' => $endDate,
         // ]);
+
+        // Pastikan `penempatanSiswaList` tidak kosong
+        if (empty($penempatanSiswaList) || !is_array($penempatanSiswaList)) {
+            return response()->json(['error' => 'Penempatan Siswa List kosong atau tidak valid'], 400);
+        }
+
 
         // Proses setiap ID siswa dalam `penempatanSiswaList`
         foreach ($penempatanSiswaList as $msPenempatanSiswaId) {

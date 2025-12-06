@@ -77,41 +77,39 @@
                         <tr>
                             <th class="text-uppercase" style="width: 50px;">NO</th>
                             <th style="white-space: nowrap;" class="text-uppercase">Nama Siswa</th>
-                            <th class="text-uppercase text-center">Tagihan</th>
-                            <th class="text-uppercase" style="min-width: 650px;">Rincian</th>
+                            <th class="text-uppercase text-center">Total</th>
+                            <th class="text-uppercase" style="min-width: 650px;">Rincian Piutang</th>
                             <th class="text-uppercase" style="min-width: 250px;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                    @forelse ($laporans as $laporan)
+                    @foreach ($laporans as $laporan)
                         <tr>
-                            <td>{{ $loop->iteration }}. </td>
-                            <td style="white-space: nowrap;" class="text-start">
-                                <span class="fw-medium">
-                                    {{ $laporan['nama_siswa'] }}
-                                </span>
+                            <td>
+                                {{ ($pagination->currentPage() - 1) * $pagination->perPage() + $loop->iteration }}.
+                            </td>
+                            <td class="text-start">
+                                <strong>{{ $laporan['nama_siswa'] }}</strong>
                                 <p class="text-muted mb-0">{{ $laporan['nama_kelas'] }}</p>
                             </td>
+
                             <td class="text-center bg-light">
-                                <span class="fs-14 text-danger">
+                                <span class="fs-14 text-primary">
                                     RP{{ number_format($laporan['total_tagihan'], 0, ',', '.') }}
                                 </span>
                             </td>
+
                             <td>
-                                @foreach ($laporan['rincian_tagihan'] as $rincian)
-                                    {{ $rincian['nama_jenis_tagihan_siswa'] }}
-                                    <span class="fs-14 text-danger">
-                                        RP{{ number_format($rincian['jumlah_kekurangan'], 0, ',', '.') }}
+                                @foreach ($laporan['rincian_tagihan'] as $r)
+                                    {{ $r['nama_jenis_tagihan_siswa'] }}
+                                    <span class="text-primary">
+                                        RP{{ number_format($r['jumlah_kekurangan'], 0, ',', '.') }}
                                     </span>
-                                    @php
-                                        $status = $rincian['status'];
-                                    @endphp
-                                    {{-- <span class="text-muted">{{ $status }}</span> --}}
-                                    @if (!$loop->last)
-                                        ,
-                                    @endif
+
+                                    @unless($loop->last), @endunless
                                 @endforeach
                             </td>
+
                             <td>
                                 <ul class="list-inline hstack gap-2 mb-0">
                                     <li class="list-inline-item detail" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Kirim Tagihan">
@@ -128,35 +126,29 @@
                                 </ul>
                             </td>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6">
-                                <div class="noresult text-center py-3">
-                                    <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop"
-                                        colors="primary:#405189,secondary:#08a88a"
-                                        style="width:75px;height:75px">
-                                    </lord-icon>
-                                    <h5 class="mt-2">Maaf, Tidak Ada Data yang Ditemukan</h5>
-                                    <p class="text-muted mb-0">Kami telah mencari keseluruhan data, namun tidak ditemukan hasil yang sesuai.</p>
-                                </div>
-                            </td>
-                        </tr>
-                    @endforelse
+                    @endforeach
                     </tbody>
                     <tfoot>
-                        <tr class="">
+                        <tr>
                             <td></td>
                             <td class="text-start"><strong>TOTAL</strong></td>
-                            <td class="text-center bg-light">
-                                <span class="fs-14 text-danger">RP {{ number_format($totalTagihan, 0, ',', '.') }}</span>
+                            <td style="white-space: nowrap;" class="text-center bg-light">
+                                <span class="fs-14 text-primary">
+                                    RP {{ number_format($totalTagihan, 0, ',', '.') }}
+                                </span>
                             </td>
                         </tr>
                     </tfoot>
                 </table>
-                {{ $laporans->links() }}
             </div>
             @endif
         </div>
+        
+        {{-- Pagination --}}
+        <div class="mt-3">
+            {{ $pagination->links() }}
+        </div>
+
         {{-- end data --}}
     </div>
     <div class="modal fade zoomIn" id="tipsCetakSuratModal" tabindex="-1" aria-labelledby="tipsCetakSuratLabel" aria-hidden="true" wire:ignore.self>

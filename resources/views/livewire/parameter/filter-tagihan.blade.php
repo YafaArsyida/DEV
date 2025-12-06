@@ -102,7 +102,6 @@
             $('#PilihKategoriTagihan').val(null).trigger('change');
             $('#PilihJenisTagihan').val(null).trigger('change');
 
-            document.getElementById('startDate').value = "";
             document.getElementById('endDate').value = "";
 
             // Emit event ke Livewire untuk clear filter
@@ -112,11 +111,9 @@
 
         // Fungsi untuk mengirim data filter hanya didaftarkan sekali
         document.getElementById("ApplyFilter").addEventListener("click", function () {
-            const startDate = document.getElementById("startDate").value;
             const endDate = document.getElementById("endDate").value;
 
             const filters = {
-                startDate: startDate,
                 endDate: endDate,
                 // selectedKelas: $("#PilihKelas").val(),
                 selectedKategoriTagihan: $("#PilihKategoriTagihan").val(),
