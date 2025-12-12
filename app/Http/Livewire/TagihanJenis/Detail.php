@@ -79,9 +79,16 @@ class Detail extends Component
             ->orderBy('ms_siswa.nama_siswa', 'ASC')
             ->paginate(1000);
 
+        $totalEstimasi = $tagihans->sum('jumlah_tagihan_siswa');
+        $totalDibayarkan = $tagihans->sum(fn($item) => $item->jumlah_sudah_dibayar());
+        $totalKekurangan = $totalEstimasi - $totalDibayarkan;
+
         return view('livewire.tagihan-jenis.detail', [
             'select_kelas' => $select_kelas,
             'tagihans' => $tagihans,
+            'totalEstimasi' => $totalEstimasi,
+            'totalDibayarkan' => $totalDibayarkan,
+            'totalKekurangan' => $totalKekurangan,
         ]);
     }
 }

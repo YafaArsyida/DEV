@@ -46,7 +46,7 @@
                         <td class="text-start">{{ $index + 1 }}.</td>
 
                         <td class="text-uppercase text-start">
-                            {{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($item->tanggal_transaksi, 'd F Y') }}
+                            {{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($item->tanggal_settlement, 'd F Y') }}
                         </td>
 
                         <td class="text-start">

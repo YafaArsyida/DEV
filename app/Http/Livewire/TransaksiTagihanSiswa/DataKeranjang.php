@@ -105,8 +105,8 @@ class DataKeranjang extends Component
         try {
             $ms_pengguna_id = Auth::id();
 
-            $keranjang = KeranjangTagihanSiswa::where('ms_pengguna_id', $ms_pengguna_id)
-                ->where('ms_penempatan_siswa_id', $this->ms_penempatan_siswa_id)
+            // $keranjang = KeranjangTagihanSiswa::where('ms_pengguna_id', $ms_pengguna_id)
+            $keranjang = KeranjangTagihanSiswa::where('ms_penempatan_siswa_id', $this->ms_penempatan_siswa_id)
                 ->get();
 
             if ($keranjang->isEmpty()) {
@@ -220,8 +220,8 @@ class DataKeranjang extends Component
                     'deskripsi' => $deskripsi,
                 ]);
             }
-            KeranjangTagihanSiswa::where('ms_pengguna_id', $ms_pengguna_id)
-                ->where('ms_penempatan_siswa_id', $this->ms_penempatan_siswa_id)
+            // KeranjangTagihanSiswa::where('ms_pengguna_id', $ms_pengguna_id)
+            KeranjangTagihanSiswa::where('ms_penempatan_siswa_id', $this->ms_penempatan_siswa_id)
                 ->delete();
 
             $this->metode_pembayaran = 'Teller Tunai';
@@ -281,8 +281,7 @@ class DataKeranjang extends Component
             $ms_pengguna_id = auth()->id();
 
             // Ambil data keranjang berdasarkan ms_pengguna_id dan ms_penempatan_siswa_id
-            $keranjangs = KeranjangTagihanSiswa::where('ms_pengguna_id', $ms_pengguna_id)
-                ->where('ms_penempatan_siswa_id', $this->ms_penempatan_siswa_id)
+            $keranjangs = KeranjangTagihanSiswa::where('ms_penempatan_siswa_id', $this->ms_penempatan_siswa_id)
                 ->get();
             // Hitung total jumlah_bayar
             $this->totalKeranjang = $keranjangs->sum('jumlah_bayar');

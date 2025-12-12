@@ -467,6 +467,11 @@ class LaporanTagihanSiswa extends Controller
                 return $tagihan->jumlah_tagihan_siswa - $tagihan->jumlah_sudah_dibayar();
             });
 
+            // Jika total tagihan 0, skip cetak siswa ini
+            if ($totalTagihan <= 0) {
+                continue; // langsung ke siswa berikutnya
+            }
+
             $surat = SuratTagihanSiswa::where('ms_jenjang_id', $selectedJenjang)->first();
             // Pastikan transaksi ditemukan
             if (!$penempatanSiswa) {

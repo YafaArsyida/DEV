@@ -73,7 +73,10 @@ class Detail extends Component
         }
 
         // Paginasi dan urutan berdasarkan kategori tagihan
-        $tagihans = $query->orderBy('ms_kategori_tagihan_siswa.ms_kategori_tagihan_siswa_id', 'ASC')->paginate(1000);
+        $tagihans = $query
+        ->orderBy('ms_kategori_tagihan_siswa.ms_kategori_tagihan_siswa_id', 'ASC')
+        ->orderBy('ms_jenis_tagihan_siswa.ms_jenis_tagihan_siswa_id', 'ASC')
+        ->paginate(1000);
 
         $totalEstimasi = $tagihans->sum('jumlah_tagihan_siswa');
         $totalDibayarkan = $tagihans->sum(fn($item) => $item->jumlah_sudah_dibayar());

@@ -16,10 +16,23 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-xxl-10 col-sm-6">
+                        <div class="col-xxl-8 col-sm-6">
                             <div class="search-box">
                                 <input type="text" class="form-control search" wire:model.debounce.300ms="search" placeholder="cari nama, deskripsi atau lainnya...">
                                 <i class="ri-search-line search-icon"></i>
+                            </div>
+                        </div>
+                        <!-- Tombol Action -->
+                        <div class="col-xxl-2 col-md-3">
+                            <div class="d-flex flex-wrap gap-2 justify-content-xxl-end justify-content-start">
+                                <button wire:click="cetakPdfTagihan"
+                                    class="btn btn-danger d-inline-flex align-items-center gap-1">
+                                    <i class="ri-printer-line"></i>Cetak Laporan
+                                </button>
+                                <button id="exportExcelTagihanDetail"
+                                    class="btn btn-success d-inline-flex align-items-center gap-1">
+                                    <i class="ri-file-excel-2-line"></i>Export Excel
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -36,7 +49,7 @@
                         </div>
                         @else
                         <div class="table-responsive">
-                            <table class="table table-hover nowrap align-middle" style="width:100%">
+                            <table id="laporanTagihanDetail" class="table table-hover nowrap align-middle" style="width:100%">
                                 <thead class="table-light">
                                     <tr style="white-space: nowrap;">
                                         <th class="text-uppercase" style="width: 50px;">NO</th>
@@ -107,6 +120,32 @@
                                         </tr>
                                     @endforelse
                                 </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td class="text-start">TOTAL</td>
+                                        <td class="text-center">
+                                            <span class="fs-14 fw-medium text-info">
+                                                RP{{ number_format($totalEstimasi, 0, ',', '.') }}
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="fs-14 fw-medium text-success">
+                                                RP{{ number_format($totalDibayarkan, 0, ',', '.') }}
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="fs-14 fw-medium text-danger">
+                                                RP{{ number_format($totalKekurangan, 0, ',', '.') }}
+                                            </span>
+                                        </td>
+                                        <td colspan="2"></td>
+                                    </tr>
+                                </tfoot>
                             </table>
                             {{ $tagihans->links() }}
                         </div>
@@ -120,4 +159,22 @@
             </div>
         </div>
     </div>
+    <script>
+        document.getElementById('exportExcelTagihanDetail').addEventListener('click', function () {
+            //   console.log("🔵 Tombol export diklik");
+            alertify.success("Menyiapkan Dokumen");
+
+            // Tambahkan delay 1 detik
+            setTimeout(function () {
+                // Ambil elemen tabel berdasarkan ID
+                var table = document.getElementById("laporanTagihanDetail");
+                
+                // Konversi tabel ke format Excel
+                var workbook = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+                
+                // Simpan file Excel
+                XLSX.writeFile(workbook, "Laporan-Detail-Tagihan.xlsx");
+            }, 1000); // 1000 ms = 1 detik
+        });
+    </script>
 </div>

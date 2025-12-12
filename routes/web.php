@@ -64,27 +64,37 @@ use App\Http\Controllers\TransaksiTagihanSiswa;
 //     return view('v_home');
 // });
 
-Route::get('/home', function () {
-    $user = auth()->user();
-    if (!$user) {
+Route::get('/', function () {
+    // Jika belum login → tampilkan halaman login
+    if (!auth()->check()) {
         return redirect()->route('login.index');
     }
+
+    // Jika sudah login → arahkan sesuai role
+    $user = auth()->user();
 
     if ($user->peran === 'kantin') {
         return redirect()->route('smartCanteen.dashboard');
     }
 
     return redirect()->route('dashboard.index');
-});
-
-Route::get('/landing/ekstrakurikuler', [LandingEkstrakurikuler::class, 'index'])->name('landing.ekstrakurikuler');
+})->name('home');
 
 // login
-// Route::get('/login', [LoginController::class, 'index'])->name('login.index')->middleware('guest');
-Route::get('/', [LoginController::class, 'index'])->name('login.index')->middleware('guest');
-Route::post('/login', [LoginController::class, 'authenticate'])->name('login.authenticate');
-Route::post('/logout', [LoginController::class, 'logOut'])->name('logout');
+Route::get('/login', [LoginController::class, 'index'])
+    ->name('login.index')
+    ->middleware('guest');
 
+Route::post('/login', [LoginController::class, 'authenticate'])
+    ->name('login.authenticate');
+
+Route::post('/logout', [LoginController::class, 'logOut'])
+    ->name('logout');
+
+
+// LANDING
+Route::get('/landing/ekstrakurikuler', [LandingEkstrakurikuler::class, 'index'])->name('landing.ekstrakurikuler');
+// LANDING
 Route::middleware(['auth', 'peran:superadmin,administrasi,kantin'])->group(function () {
     // SMARTCANTEEN 
     Route::get('/smartCanteen/dashboard', [SmartCanteenDashboard::class, 'index'])->name('smartCanteen.dashboard');
@@ -117,7 +127,7 @@ Route::middleware(['auth', 'peran:superadmin,administrasi,kantin'])->group(funct
 
 // SISTEM
 // JENJANG TAHUN AJAR
-Route::middleware(['auth', 'peran:superadmin,admin'])->group(function () {
+Route::middleware(['auth', 'peran:superadmin,administrasi'])->group(function () {
     Route::middleware(['auth'])->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
     Route::get('/sistem/jenjang-tahun-ajar',  [JenjangTahunAjar::class, 'index'])->name('sistem.jenjang-tahun-ajar');

@@ -14,10 +14,15 @@ class SuperAdminMiddleware
      * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next, ...$roles)
     {
-        // Periksa apakah pengguna adalah superadmin
-        if (auth()->check() && auth()->user()->peran == 'superadmin') {
+        // Cek apakah user login
+        if (!auth()->check()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Cek apakah user memiliki salah satu peran yang diperbolehkan
+        if (in_array(auth()->user()->peran, $roles)) {
             return $next($request);
         }
         abort(403, 'Unauthorized action.');

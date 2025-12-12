@@ -8,21 +8,48 @@
                 </div>
                 <div class="modal-body">
                     <div class="row g-3 mb-3">
-                        <div class="col-xxl-2 col-sm-6"> 
-                            <select wire:model="selectedKategori" style="cursor: pointer" class="form-select" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Kelas">
+                        <!-- Filter Kategori -->
+                        <div class="col-xxl-2 col-md-4 col-sm-6">
+                            <select wire:model="selectedKategori" style="cursor: pointer"
+                                class="form-select"
+                                data-bs-toggle="tooltip"
+                                data-bs-trigger="hover"
+                                data-bs-placement="top"
+                                title="Pilih Kategori">
                                 <option value="">Semua Kategori</option>
                                 @foreach ($select_kategori as $kategori)
-                                    <option value="{{ $kategori->ms_kategori_tagihan_siswa_id }}">{{ $kategori->nama_kategori_tagihan_siswa }}</option>
+                                    <option value="{{ $kategori->ms_kategori_tagihan_siswa_id }}">
+                                        {{ $kategori->nama_kategori_tagihan_siswa }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-xxl-10 col-sm-6">
+
+                        <!-- Search -->
+                        <div class="col-xxl-8 col-md-5 col-sm-6">
                             <div class="search-box">
-                                <input type="text" class="form-control search" wire:model.debounce.300ms="search" placeholder="cari nama, deskripsi atau lainnya...">
+                                <input type="text" class="form-control search"
+                                    wire:model.debounce.300ms="search"
+                                    placeholder="cari nama, deskripsi atau lainnya...">
                                 <i class="ri-search-line search-icon"></i>
                             </div>
                         </div>
+
+                        <!-- Tombol Action -->
+                        <div class="col-xxl-2 col-md-3">
+                            <div class="d-flex flex-wrap gap-2 justify-content-xxl-end justify-content-start">
+                                <button wire:click="cetakPdfTagihan"
+                                    class="btn btn-danger d-inline-flex align-items-center gap-1">
+                                    <i class="ri-printer-line"></i>Cetak Laporan
+                                </button>
+                                <button id="exportExcelTagihanDetail"
+                                    class="btn btn-success d-inline-flex align-items-center gap-1">
+                                    <i class="ri-file-excel-2-line"></i>Export Excel
+                                </button>
+                            </div>
+                        </div>
                     </div>
+
                      <div class="live-preview">
                         <!-- Jika Jenjang atau Tahun Ajar belum dipilih -->
                         @if (!$selectedJenjang || !$selectedTahunAjar)
@@ -36,7 +63,7 @@
                         </div>
                         @else
                         <div class="table-responsive">
-                            <table class="table table-hover nowrap align-middle" style="width:100%">
+                            <table id="laporanTagihanDetail" class="table table-hover nowrap align-middle" style="width:100%">
                                 <thead class="table-light">
                                     <tr style="white-space: nowrap;">
                                         <th class="text-uppercase" style="width: 50px;">NO</th>
@@ -141,11 +168,28 @@
                         @endif
                     </div>
                 </div>
-
                 <div class="modal-footer">
                     <a href="javascript:void(0);" class="btn btn-link link-success shadow-none fw-medium" data-bs-dismiss="modal"><i class="ri-close-line me-1 align-middle"></i> Tutup</a>
                 </div>
             </div>
         </div>
     </div>
+    <script>
+        document.getElementById('exportExcelTagihanDetail').addEventListener('click', function () {
+            //   console.log("🔵 Tombol export diklik");
+            alertify.success("Menyiapkan Dokumen");
+
+            // Tambahkan delay 1 detik
+            setTimeout(function () {
+                // Ambil elemen tabel berdasarkan ID
+                var table = document.getElementById("laporanTagihanDetail");
+                
+                // Konversi tabel ke format Excel
+                var workbook = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+                
+                // Simpan file Excel
+                XLSX.writeFile(workbook, "Laporan-Detail-Tagihan.xlsx");
+            }, 1000); // 1000 ms = 1 detik
+        });
+    </script>
 </div>

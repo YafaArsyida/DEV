@@ -9,6 +9,7 @@
                         <i class="ri-printer-line align-bottom"></i>
                         <span>Cetak Laporan</span>
                     </button>
+                    <button data-bs-toggle="modal" data-bs-target="#ExportLaporanExcel" class="btn btn-soft-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button>
                     <button data-bs-toggle="modal" id="create-btn" data-bs-target="#ModalAddTagihan" wire:click.prevent="$emit('showCreateTagihan', {{ $selectedJenjang }}, {{ $selectedTahunAjar }})" class="btn btn-primary"><i class="ri-play-list-add-line"></i> Tagihan Baru</button>
                 </div>
             </div>
@@ -48,7 +49,7 @@
             @else
             <div class="table-responsive">
                 {{-- <div class="table-responsive" style="max-height: 1000px;" data-simplebar> --}}
-                <table class="table table-hover nowrap align-middle" style="width:100%">
+                <table id="Laporan" class="table table-hover nowrap align-middle" style="width:100%">
                     <thead class="table-light">
                         <tr>
                             <th class="text-uppercase" style="width: 50px;">NO</th>
@@ -71,7 +72,7 @@
                                 <span class="fw-medium">
                                     {{ $item->ms_siswa->nama_siswa }}
                                 </span>
-                                <p class="text-muted mb-0">{{ $item->ms_siswa->deskripsi }}</p>
+                                {{-- <p class="text-muted mb-0">{{ $item->ms_siswa->deskripsi }}</p> --}}
                             </td>
                             <td>{{ $item->ms_kelas->nama_kelas }}</td>
                             <td>{{ $item->jumlah_jenis_tagihan_siswa() }} item</td>
@@ -212,4 +213,80 @@
         </div>
         {{-- end data --}}
     </div>
+    {{-- MODAL --}}
+    <div class="modal fade zoomIn" id="ExportLaporanExcel" tabindex="-1" aria-labelledby="exportRecordLabel" aria-hidden="true" wire:ignore.self>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-5 text-center">
+                    <lord-icon src="https://cdn.lordicon.com/fjvfsqea.json" trigger="loop" colors="primary:#405189,secondary:#f06548" style="width:90px;height:90px"></lord-icon>
+                    <div class="mt-4 text-center">
+                        <h4 class="fs-semibold">Konfirmasi Export</h4>
+                        <p class="text-muted fs-14 mb-4 pt-1">
+                            Apakah Anda yakin ingin mengekspor laporan Administrasi Tagihan Siswa? Data yang diekspor akan sesuai dengan tabel yang ditampilkan.
+                        </p>
+                        <div class="hstack gap-2 justify-content-center remove">
+                            <button class="btn btn-link link-success fw-medium text-decoration-none shadow-none" data-bs-dismiss="modal">
+                                <i class="ri-close-line me-1 align-middle"></i> Batal
+                            </button>
+                            <button class="btn btn-primary" id="konfirmasiExportLaporan" data-bs-dismiss="modal">Ya, Export!</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('konfirmasiExportLaporan').addEventListener('click', function () {
+            alertify.success("Menyiapkan Dokumen");
+
+            setTimeout(function () {
+                var table = document.getElementById("Laporan");
+
+                var data = [];
+                // Kolom yang ingin diexport (NO=0, Siswa=1, Kelas=2, Tagihan=3, Estimasi=4, Dibayarkan=5, Kekurangan=6, Lunas=7)
+                var exportCols = [0,1,2,3,4,5,6,7];
+
+                // Ambil header
+                var headers = [];
+                for(var i=0; i<exportCols.length; i++){
+                    headers.push(table.tHead.rows[0].cells[exportCols[i]].innerText.trim());
+                }
+                data.push(headers);
+
+                // Ambil data tbody
+                for(var i=0; i<table.tBodies[0].rows.length; i++){
+                    var row = table.tBodies[0].rows[i];
+                    var rowData = [];
+                    for(var j=0; j<exportCols.length; j++){
+                        rowData.push(row.cells[exportCols[j]].innerText.trim());
+                    }
+                    data.push(rowData);
+                }
+
+                // Ambil data tfoot (jika ada)
+                if(table.tFoot){
+                    for(var i=0; i<table.tFoot.rows.length; i++){
+                        var row = table.tFoot.rows[i];
+                        var rowData = [];
+                        for(var j=0; j<exportCols.length; j++){
+                            rowData.push(row.cells[exportCols[j]].innerText.trim());
+                        }
+                        data.push(rowData);
+                    }
+                }
+
+                // Buat workbook
+                var wb = XLSX.utils.book_new();
+                var ws = XLSX.utils.aoa_to_sheet(data);
+                XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+                XLSX.writeFile(wb, "Laporan-Administrasi-Siswa.xlsx");
+
+            }, 1000);
+        });
+
+    </script>
 </div>
