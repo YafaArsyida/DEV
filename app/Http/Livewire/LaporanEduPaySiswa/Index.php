@@ -43,6 +43,34 @@ class Index extends Component
         $this->selectedTahunAjar = $tahunAjar;
     }
 
+
+    public function mount()
+    {
+        $this->startDate = now()->startOfMonth()->format('Y-m-d');
+        $this->endDate   = now()->format('Y-m-d');
+    }
+
+    public function updatedStartDate()
+    {
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Periode mulai diperbarui'
+        ]);
+    }
+
+    public function updatedEndDate()
+    {
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Periode selesai diperbarui'
+        ]);
+    }
+
+    public function resetTanggal()
+    {
+        $this->startDate = now()->startOfMonth()->format('Y-m-d');
+        $this->endDate   = now()->format('Y-m-d');
+        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
+    }
+
     public function refreshSaldoEduPay()
     {
         $this->resetPage(); // Reset paginasi saat pencarian berubah
@@ -50,17 +78,12 @@ class Index extends Component
 
     public function applyFilters($filters)
     {
-        // Simpan filter yang diterima
-        $this->startDate = $filters['startDate'] ?? null;
-        $this->endDate = $filters['endDate'] ?? null;
         $this->selectedPetugas = $filters['selectedPetugas'] ?? [];
         $this->selectedJenisTransaksi = $filters['selectedJenisTransaksi'] ?? [];
     }
 
     public function clearFilters()
     {
-        $this->startDate = null;
-        $this->endDate = null;
         $this->selectedPetugas = [];
         $this->selectedJenisTransaksi = [];
     }
@@ -68,60 +91,6 @@ class Index extends Component
     public function updatingSearch()
     {
         $this->resetPage(); // Reset paginasi saat pencarian berubah
-    }
-
-    public function showExportEduPay()
-    {
-        $query = TransaksiEduPay::query()
-            ->with(['ms_siswa', 'ms_pengguna', 'ms_penempatan_siswa'])
-            ->join('ms_siswa', 'ms_siswa.ms_siswa_id', '=', 'ms_transaksi_edupay.user_id')
-            ->join('ms_penempatan_siswa', 'ms_penempatan_siswa.ms_penempatan_siswa_id', '=', 'ms_transaksi_edupay.ms_penempatan_siswa_id')
-            ->select('ms_transaksi_edupay.*', 'ms_siswa.nama_siswa', 'ms_penempatan_siswa.ms_jenjang_id', 'ms_penempatan_siswa.ms_tahun_ajar_id')
-            ->where('ms_penempatan_siswa.ms_jenjang_id', $this->selectedJenjang)
-            ->where('ms_penempatan_siswa.ms_tahun_ajar_id', $this->selectedTahunAjar)
-            ->orderBy('tanggal', 'ASC');
-
-        // Filter berdasarkan tahun ajar
-        if ($this->selectedKelas) {
-            $query->where('ms_penempatan_siswa.ms_kelas_id', $this->selectedKelas);
-        }
-
-        if ($this->selectedPetugas) {
-            $query->where('ms_transaksi_edupay.ms_pengguna_id', $this->selectedPetugas);
-        }
-
-        // Filter berdasarkan rentang tanggal
-        if ($this->startDate && $this->endDate) {
-            $startDate = Carbon::createFromFormat('Y-m-d', $this->startDate)->startOfDay();
-            $endDate = Carbon::createFromFormat('Y-m-d', $this->endDate)->endOfDay();
-            $query->whereBetween('tanggal', [$startDate, $endDate]);
-        }
-
-        // Mapping kategori
-        $pemasukanJenis = ['topup tunai', 'topup online', 'pengembalian dana'];
-        $pengeluaranJenis = ['penarikan', 'pembayaran', 'kantin'];
-
-        // Filter berdasarkan pilihan
-        if ($this->selectedJenisTransaksi) {
-            $query->whereIn('jenis_transaksi', $this->selectedJenisTransaksi);
-        }
-
-        // Hitung total pemasukan
-        $totalPemasukan = $query->clone()
-            ->whereIn('jenis_transaksi', $pemasukanJenis)
-            ->sum('nominal');
-
-        // Hitung total pengeluaran
-        $totalPengeluaran = $query->clone()
-            ->whereIn('jenis_transaksi', $pengeluaranJenis)
-            ->sum('nominal');
-
-        $totalSaldo = $totalPemasukan - $totalPengeluaran;
-
-        $laporans = $query->get();
-
-        // Emit data ke komponen lain untuk diexport
-        $this->emit('prepareExportEduPay', $laporans->toArray(), $totalPemasukan, $totalPengeluaran, $totalSaldo);
     }
 
     public function cetakLaporan()

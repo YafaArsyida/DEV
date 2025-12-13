@@ -123,10 +123,23 @@ class Index extends Component
             $this->dispatchBrowserEvent('alertify-error', ['message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
     }
+    public function updatedStartDate()
+    {
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Periode mulai diperbarui'
+        ]);
+    }
+
+    public function updatedEndDate()
+    {
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Periode selesai diperbarui'
+        ]);
+    }
     public function resetTanggal()
     {
-        $this->startDate = null;
-        $this->endDate   = null;
+        $this->startDate = now()->startOfMonth()->format('Y-m-d');
+        $this->endDate   = now()->format('Y-m-d');
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
     }
 
@@ -149,6 +162,12 @@ class Index extends Component
         ]);
 
         $this->emit('openNewTab', $url);
+    }
+
+    public function mount()
+    {
+        $this->startDate = now()->startOfMonth()->format('Y-m-d');
+        $this->endDate   = now()->format('Y-m-d');
     }
 
     public function render()
@@ -187,7 +206,7 @@ class Index extends Component
         $data = $query->get();
 
         $this->totalPengeluaran = (clone $query)->sum('nominal');
-   
+
         return view('livewire.transaksi-pengeluaran.index', [
             'data' => $data,
             'select_transaksi' => $select_transaksi,

@@ -21,9 +21,33 @@ class Index extends Component
         'parameterUpdated' => 'updateParameters',
     ];
 
-    public function updatingSearch()
+    public function mount()
     {
-        $this->emitSelf('$refresh'); //ringan
+        // Default ke hari ini
+        // $this->startDate = now()->format('Y-m-d');
+        $this->startDate = now()->startOfMonth()->format('Y-m-d');
+        $this->endDate   = now()->format('Y-m-d');
+    }
+
+    public function updateParameters($jenjang, $tahunAjar)
+    {
+        // Update nilai selectedJenjang dan selectedTahunAjar
+        $this->selectedJenjang = $jenjang;
+        $this->selectedTahunAjar = $tahunAjar;
+    }
+
+    public function updatedStartDate()
+    {
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Periode mulai diperbarui'
+        ]);
+    }
+
+    public function updatedEndDate()
+    {
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Periode selesai diperbarui'
+        ]);
     }
 
     public function resetTanggal()
@@ -34,11 +58,9 @@ class Index extends Component
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
     }
 
-    public function updateParameters($jenjang, $tahunAjar)
+    public function updatingSearch()
     {
-        // Update nilai selectedJenjang dan selectedTahunAjar
-        $this->selectedJenjang = $jenjang;
-        $this->selectedTahunAjar = $tahunAjar;
+        $this->emitSelf('$refresh'); //ringan
     }
 
     public function updateBulan($bulan)
@@ -65,15 +87,6 @@ class Index extends Component
 
         $this->emit('openNewTab', $url);
     }
-
-    public function mount()
-    {
-        // Default ke hari ini
-        // $this->startDate = now()->format('Y-m-d');
-        $this->startDate = now()->startOfMonth()->format('Y-m-d');
-        $this->endDate   = now()->format('Y-m-d');
-    }
-
 
     public function render()
     {

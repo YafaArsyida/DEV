@@ -38,20 +38,41 @@ class Index extends Component
         $this->selectedJenjang = $jenjang;
         $this->selectedTahunAjar = $tahunAjar;
     }
+    public function mount()
+    {
+        $this->startDate = now()->startOfMonth()->format('Y-m-d');
+        $this->endDate   = now()->format('Y-m-d');
+    }
+
+    public function updatedStartDate()
+    {
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Periode mulai diperbarui'
+        ]);
+    }
+
+    public function updatedEndDate()
+    {
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Periode selesai diperbarui'
+        ]);
+    }
+
+    public function resetTanggal()
+    {
+        $this->startDate = now()->startOfMonth()->format('Y-m-d');
+        $this->endDate   = now()->format('Y-m-d');
+        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
+    }
 
     public function applyFilters($filters)
     {
-        // Simpan filter yang diterima
-        $this->startDate = $filters['startDate'] ?? null;
-        $this->endDate = $filters['endDate'] ?? null;
         $this->selectedJenisTransaksi = $filters['selectedJenisTransaksi'] ?? [];
         $this->selectedPetugas = $filters['selectedPetugas'] ?? [];
     }
 
     public function clearFilters()
     {
-        $this->startDate = null;
-        $this->endDate = null;
         $this->selectedJenisTransaksi = [];
         $this->selectedPetugas = [];
     }

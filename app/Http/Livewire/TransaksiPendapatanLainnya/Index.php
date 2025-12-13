@@ -123,10 +123,24 @@ class Index extends Component
         }
     }
 
+    public function updatedStartDate()
+    {
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Periode mulai diperbarui'
+        ]);
+    }
+
+    public function updatedEndDate()
+    {
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Periode selesai diperbarui'
+        ]);
+    }
+
     public function resetTanggal()
     {
-        $this->startDate = null;
-        $this->endDate   = null;
+        $this->startDate = now()->startOfMonth()->format('Y-m-d');
+        $this->endDate   = now()->format('Y-m-d');
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
     }
 
@@ -149,6 +163,12 @@ class Index extends Component
         ]);
 
         $this->emit('openNewTab', $url);
+    }
+
+    public function mount()
+    {
+        $this->startDate = now()->startOfMonth()->format('Y-m-d');
+        $this->endDate   = now()->format('Y-m-d');
     }
 
     public function render()

@@ -8,7 +8,7 @@
                     <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                 </div>
                 <div class="offcanvas-body">
-                    <div class="mb-4">
+                    {{-- <div class="mb-4">
                         <div class="d-flex align-items-center mb-2">
                             <p class="text-muted text-uppercase fs-12 fw-medium mb-0 me-1">Tanggal Jatuh Tempo</p>
                             <i class="mdi mdi-information-outline fs-14 text-primary" 
@@ -23,7 +23,7 @@
                                 <input type="date" class="form-control" id="endDate" wire:model="endDate">
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
 
                     <div class="mb-4">
                          <div class="d-flex align-items-center mb-2">
@@ -102,7 +102,7 @@
             $('#PilihKategoriTagihan').val(null).trigger('change');
             $('#PilihJenisTagihan').val(null).trigger('change');
 
-            document.getElementById('endDate').value = "";
+            // document.getElementById('endDate').value = "";
 
             // Emit event ke Livewire untuk clear filter
             Livewire.emit("clearFilters");
@@ -111,10 +111,10 @@
 
         // Fungsi untuk mengirim data filter hanya didaftarkan sekali
         document.getElementById("ApplyFilter").addEventListener("click", function () {
-            const endDate = document.getElementById("endDate").value;
+            // const endDate = document.getElementById("endDate").value;
 
             const filters = {
-                endDate: endDate,
+                // endDate: endDate,
                 // selectedKelas: $("#PilihKelas").val(),
                 selectedKategoriTagihan: $("#PilihKategoriTagihan").val(),
                 selectedJenisTagihan: $("#PilihJenisTagihan").val(),

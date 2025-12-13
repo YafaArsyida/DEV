@@ -26,6 +26,20 @@ class Overview extends Component
         $this->selectedTahunAjar = $tahunAjar;
     }
 
+    public function updatedStartDate()
+    {
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Periode mulai diperbarui'
+        ]);
+    }
+
+    public function updatedEndDate()
+    {
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Periode selesai diperbarui'
+        ]);
+    }
+
     public function resetTanggal()
     {
         $this->startDate = null;

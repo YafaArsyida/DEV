@@ -9,18 +9,6 @@
                 </div>
                 <div class="offcanvas-body">
                     <div class="mb-4">
-                        <p class="text-muted text-uppercase fs-12 fw-medium mb-2">Tanggal Transaksi</p>
-                        <div class="row g-2 align-items-center">
-                            <div class="col-lg">
-                                <input type="date" class="form-control" id="startDate" placeholder="0">
-                            </div>
-                            <div class="col-lg-auto">-</div>
-                            <div class="col-lg">
-                                <input type="date" class="form-control" id="endDate" placeholder="0">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mb-4">
                         <p class="text-muted text-uppercase fs-12 fw-medium mb-2">Petugas</p>
                         <select id="PilihPetugas" style="cursor: pointer" wire:model="selectedPetugas" class="form-select" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Kelas" multiple="multiple">
                             @foreach ($select_petugas as $item)    
@@ -44,16 +32,6 @@
                     <button id="ClearFilter" class="btn btn-light w-100" data-bs-dismiss="offcanvas">Clear Filter</button>
                     <button id="ApplyFilter" class="btn btn-primary w-100" data-bs-dismiss="offcanvas">Filters</button>
                 </div>
-                            
-                {{-- <div class="card mt-3">
-                    <div class="card-header">
-                        <h5>Debugging Filters</h5>
-                    </div>
-                    <div class="card-body">
-                        <p><strong>Start Date:</strong> {{ $startDate ?? 'Tidak ada' }}</p>
-                        <p><strong>End Date:</strong> {{ $endDate ?? 'Tidak ada' }}</p>
-                    </div>
-                </div> --}}
             </div>
         </div>
     </div>
@@ -70,9 +48,6 @@
             $('#PilihPetugas').val(null).trigger('change');
             $('#PilihJenisTransaksi').val(null).trigger('change');
 
-            document.getElementById('startDate').value = "";
-            document.getElementById('endDate').value = "";
-
             // Emit event ke Livewire untuk clear filter
             Livewire.emit("clearFilters");
             alertify.success("Memperbarui...");
@@ -80,12 +55,7 @@
 
         // Fungsi untuk mengirim data filter hanya didaftarkan sekali
         document.getElementById("ApplyFilter").addEventListener("click", function () {
-            const startDate = document.getElementById("startDate").value;
-            const endDate = document.getElementById("endDate").value;
-
             const filters = {
-                startDate: startDate,
-                endDate: endDate,
                 selectedPetugas: $("#PilihPetugas").val(),
                 selectedJenisTransaksi: $("#PilihJenisTransaksi").val(),
             };

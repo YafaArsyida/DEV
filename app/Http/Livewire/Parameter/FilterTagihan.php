@@ -37,7 +37,7 @@ class FilterTagihan extends Component
 
     public function applyFilters($filters)
     {
-        $this->endDate = $filters['endDate'] ?? null;
+        // $this->endDate = $filters['endDate'] ?? null;
 
         // $this->selectedKelas = $filters['selectedKelas'] ?? [];
         $this->selectedKategoriTagihan = $filters['selectedKategoriTagihan'] ?? [];
@@ -47,14 +47,14 @@ class FilterTagihan extends Component
         $this->selectedJenisTagihan = $filters['selectedJenisTagihan'] ?? [];
     }
 
-    public function mount()
-    {
-        $this->endDate = now()->endOfMonth()->format('Y-m-d');
-    }
+    // public function mount()
+    // {
+    //     $this->endDate = now()->endOfMonth()->format('Y-m-d');
+    // }
 
     public function clearFilters()
     {
-        $this->endDate = now()->endOfMonth()->format('Y-m-d');
+        // $this->endDate = now()->endOfMonth()->format('Y-m-d');
         $this->selectedKategoriTagihan = [];
         $this->selectedJenisTagihan = [];
         $this->showJenisTagihan = false;

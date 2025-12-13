@@ -187,6 +187,20 @@ class Index extends Component
         $this->endDate   = now()->format('Y-m-d');
     }
 
+    public function updatedStartDate()
+    {
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Periode mulai diperbarui'
+        ]);
+    }
+
+    public function updatedEndDate()
+    {
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Periode selesai diperbarui'
+        ]);
+    }
+
     public function resetTanggal()
     {
         // $this->startDate = now()->format('Y-m-d');

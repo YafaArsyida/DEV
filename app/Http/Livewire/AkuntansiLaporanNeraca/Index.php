@@ -35,6 +35,13 @@ class Index extends Component
         $this->namaJenjang = $janjang ? $janjang->nama_jenjang : 'Tidak Diketahui';
     }
 
+    public function updatedEndDate()
+    {
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Periode selesai diperbarui'
+        ]);
+    }
+
     public function resetTanggal()
     {
         $this->endDate = null;

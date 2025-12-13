@@ -8,7 +8,7 @@
                     <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                 </div>
                 <div class="offcanvas-body">
-                    <div class="mb-4">
+                    {{-- <div class="mb-4">
                         <p class="text-muted text-uppercase fs-12 fw-medium mb-2">Tanggal Transaksi</p>
                         <div class="row g-2 align-items-center">
                             <div class="col-lg">
@@ -19,7 +19,7 @@
                                 <input type="date" class="form-control" id="endDate" placeholder="0">
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
 
                     <div class="mb-4">
                         <p class="text-muted text-uppercase fs-12 fw-medium mb-2">Petugas</p>
@@ -69,8 +69,8 @@
         document.getElementById("ClearFilter").addEventListener("click", function () {
             $('#PilihPetugas').val(null).trigger('change');
 
-            document.getElementById('startDate').value = "";
-            document.getElementById('endDate').value = "";
+            // document.getElementById('startDate').value = "";
+            // document.getElementById('endDate').value = "";
 
             // Emit event ke Livewire untuk clear filter
             Livewire.emit("clearFilters");
@@ -79,12 +79,12 @@
 
         // Fungsi untuk mengirim data filter hanya didaftarkan sekali
         document.getElementById("ApplyFilter").addEventListener("click", function () {
-            const startDate = document.getElementById("startDate").value;
-            const endDate = document.getElementById("endDate").value;
+            // const startDate = document.getElementById("startDate").value;
+            // const endDate = document.getElementById("endDate").value;
 
             const filters = {
-                startDate: startDate,
-                endDate: endDate,
+                // startDate: startDate,
+                // endDate: endDate,
                 selectedPetugas: $("#PilihPetugas").val(),
                 selectedJenisTransaksi: $("#PilihJenisTransaksi").val(),
             };

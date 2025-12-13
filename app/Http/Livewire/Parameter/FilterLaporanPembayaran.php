@@ -95,7 +95,7 @@ class FilterLaporanPembayaran extends Component
 
         $select_petugas = [];
         if ($this->selectedJenjang && $this->selectedTahunAjar) {
-            $select_petugas = User::get();
+            $select_petugas = User::whereNotIn('peran', ['kantin', 'koperasi'])->get();
         }
 
         return view('livewire.parameter.filter-laporan-pembayaran', [

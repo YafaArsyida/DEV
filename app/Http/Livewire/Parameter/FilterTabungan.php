@@ -11,8 +11,8 @@ use Livewire\Component;
 
 class FilterTabungan extends Component
 {
-    public $startDate = null;
-    public $endDate = null;
+    // public $startDate = null;
+    // public $endDate = null;
     public $selectedPetugas = [];
     public $selectedJenjang = [];
     public $selectedJenisTransaksi = [];
@@ -25,8 +25,8 @@ class FilterTabungan extends Component
 
     public function applyFilters($filters)
     {
-        $this->startDate = $filters['startDate'] ?? null;
-        $this->endDate = $filters['endDate'] ?? null;
+        // $this->startDate = $filters['startDate'] ?? null;
+        // $this->endDate = $filters['endDate'] ?? null;
 
         $this->selectedPetugas = $filters['selectedPetugas'] ?? [];
         $this->selectedJenisTransaksi = $filters['selectedJenisTransaksi'] ?? [];
@@ -34,8 +34,8 @@ class FilterTabungan extends Component
 
     public function clearFilters()
     {
-        $this->startDate = null;
-        $this->endDate = null;
+        // $this->startDate = null;
+        // $this->endDate = null;
 
         $this->selectedJenisTransaksi = [];
         $this->selectedPetugas = [];
@@ -44,7 +44,7 @@ class FilterTabungan extends Component
     public function render()
     {
         // Ambil daftar petugas
-        $select_petugas = User::get();
+        $select_petugas = User::whereNotIn('peran', ['kantin', 'koperasi'])->get();
 
         return view('livewire.parameter.filter-tabungan', [
             'select_petugas' => $select_petugas,

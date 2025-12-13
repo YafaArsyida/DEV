@@ -82,14 +82,14 @@ class Index extends Component
     public function applyFilters($filters)
     {
         // Simpan filter yang diterima
-        $this->endDate = $filters['endDate'] ?? null;
+        // $this->endDate = $filters['endDate'] ?? null;
         $this->selectedKategoriTagihan = $filters['selectedKategoriTagihan'] ?? [];
         $this->selectedJenisTagihan = $filters['selectedJenisTagihan'] ?? [];
     }
 
     public function clearFilters()
     {
-        $this->endDate = Carbon::now()->endOfMonth()->toDateString();
+        // $this->endDate = Carbon::now()->endOfMonth()->toDateString();
         $this->selectedKategoriTagihan = [];
         $this->selectedJenisTagihan = [];
     }
@@ -360,6 +360,20 @@ class Index extends Component
             })
             ->sortBy(fn($t) => $t->ms_jenis_tagihan_siswa->tanggal_jatuh_tempo)
             ->values();
+    }
+
+    public function updatedEndDate()
+    {
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Tanggal diperbarui'
+        ]);
+    }
+
+    public function resetTanggal()
+    {
+        $this->endDate = Carbon::now()->endOfMonth()->toDateString();
+
+        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
     }
 
     public function render()

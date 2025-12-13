@@ -23,6 +23,20 @@ class Index extends Component
     protected $listeners = [
         'parameterUpdated' => 'updateParameters',
     ];
+    
+    public function updatedStartDate()
+    {
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Periode mulai diperbarui'
+        ]);
+    }
+
+    public function updatedEndDate()
+    {
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Periode selesai diperbarui'
+        ]);
+    }
 
     public function updatingSearch()
     {

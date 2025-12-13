@@ -30,7 +30,7 @@
     <div class="card-body">
         <div class="row g-3 align-items-end mb-3">
             <!-- Dropdown Kelas -->
-            <div class="col-xxl-2 col-sm-6"> 
+            <div class="col-xxl-2 col-sm-2"> 
                 <label for="selectKelas" class="form-label">Kelas</label>
                 <select id="selectKelas" 
                         wire:model="selectedKelas" 
@@ -45,7 +45,7 @@
             </div>
 
             <!-- Input Pencarian -->
-            <div class="col-xxl-10 col-sm-6">
+            <div class="col-xxl-8 col-sm-8">
                 <label for="searchInput" class="form-label">Pencarian</label>
                 <div class="position-relative">
                     <input type="text" id="searchInput" 
@@ -53,6 +53,18 @@
                         wire:model.debounce.300ms="search" 
                         placeholder="Cari nama, deskripsi, atau lainnya...">
                     <i class="ri-search-line position-absolute top-50 start-0 translate-middle-y ms-2 text-muted"></i>
+                </div>
+            </div>
+            <!-- Filter Periode -->
+            <div class="col-xxl-2 col-sm-2">
+                <label class="form-label fw-semibold">Jatuh Tempo</label>
+                <div class="d-flex align-items-center gap-2">
+                    <input type="date" id="endDate" class="form-control" wire:model="endDate" value="{{ $endDate }}">
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-soft-secondary btn-icon rounded-circle" wire:click="resetTanggal" title="Reset Tanggal">
+                            <i class="ri-refresh-line fs-16"></i>
+                        </button>    
+                    </div>
                 </div>
             </div>
         </div>

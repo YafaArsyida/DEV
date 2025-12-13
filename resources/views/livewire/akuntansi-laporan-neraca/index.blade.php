@@ -15,6 +15,7 @@
                             @if ($selectedJenjang && $selectedTahunAjar)
                             <div class="flex-shrink-0">
                                 <div class="d-flex gap-2 flex-wrap">
+                                    <button data-bs-toggle="modal" data-bs-target="#ExportLaporan" class="btn btn-soft-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button>
                                     <button wire:click="cetakLaporan" class="btn btn-danger d-inline-flex align-items-center gap-1">
                                         <i class="ri-printer-line align-bottom"></i>
                                         <span>Cetak Laporan</span>
@@ -154,7 +155,7 @@
                         <div class="mt-4 text-center">
                             <h4 class="fs-semibold">Konfirmasi Export</h4>
                             <p class="text-muted fs-14 mb-4 pt-1">
-                                Apakah Anda yakin ingin mengekspor laporan Rekapitulasi? Data yang diekspor akan sesuai dengan tabel yang ditampilkan.
+                                Apakah Anda yakin ingin mengekspor laporan Neraca? Data yang diekspor akan sesuai dengan tabel yang ditampilkan.
                             </p>
                             <div class="hstack gap-2 justify-content-center remove">
                                 <button class="btn btn-link link-success fw-medium text-decoration-none shadow-none" data-bs-dismiss="modal">

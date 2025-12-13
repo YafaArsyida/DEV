@@ -60,7 +60,7 @@
                             <th class="text-uppercase">Dibayarkan</th>
                             <th class="text-uppercase">Kekurangan</th>
                             <th class="text-uppercase">Lunas</th>
-                            <th class="text-uppercase">Dokumen</th>
+                            {{-- <th class="text-uppercase">Dokumen</th> --}}
                             <th class="text-uppercase">Aksi</th>
                         </tr>
                     </thead>
@@ -103,7 +103,7 @@
                                     -
                                 @endif</span>
                             </td>                            
-                            <td>
+                            {{-- <td>
                                 <div class="hstack gap-2">
                                     <button class="btn btn-sm btn-success d-inline-flex align-items-center"
                                             title="Surat Tagihan"
@@ -116,7 +116,7 @@
                                         <i class="ri-printer-line align-bottom me-1"></i> Surat
                                     </button>
                                 </div>
-                            </td>                            
+                            </td>                             --}}
                             <td>
                                 <div class="hstack gap-2">
                                     {{-- Tombol Kelola Tagihan --}}
