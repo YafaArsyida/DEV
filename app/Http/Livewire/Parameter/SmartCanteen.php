@@ -5,8 +5,8 @@ namespace App\Http\Livewire\Parameter;
 use App\Models\AkuntansiJurnalDetail;
 use Livewire\Component;
 use App\Models\Jenjang;
+use App\Models\SmartCanteen\TransaksiSmartCanteen;
 use App\Models\TahunAjar;
-use App\Models\TransaksiSmartCanteen;
 use Illuminate\Support\Facades\Auth;
 
 class SmartCanteen extends Component

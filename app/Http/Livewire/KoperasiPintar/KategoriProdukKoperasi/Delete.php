@@ -2,8 +2,8 @@
 
 namespace App\Http\Livewire\KoperasiPintar\KategoriProdukKoperasi;
 
-use App\Models\KategoriProdukKoperasi;
-use App\Models\ProdukKoperasi;
+use App\Models\KoperasiPintar\KategoriProdukKoperasi;
+use App\Models\KoperasiPintar\ProdukKoperasi;
 use Livewire\Component;
 
 class Delete extends Component

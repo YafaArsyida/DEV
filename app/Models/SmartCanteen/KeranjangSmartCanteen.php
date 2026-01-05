@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\SmartCanteen;
 
+use App\Models\Pegawai;
+use App\Models\Siswa;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 

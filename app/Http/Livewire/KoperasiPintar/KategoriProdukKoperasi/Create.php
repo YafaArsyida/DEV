@@ -2,9 +2,9 @@
 
 namespace App\Http\Livewire\KoperasiPintar\KategoriProdukKoperasi;
 
+use App\Models\KoperasiPintar\KategoriProdukKoperasi;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
-use App\Models\KategoriProdukKoperasi;
 
 class Create extends Component
 {

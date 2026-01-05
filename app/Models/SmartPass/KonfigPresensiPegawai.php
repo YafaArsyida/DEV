@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\SmartPass;
 
+use App\Models\Jenjang;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class KonfigAbsensiPegawai extends Model
+class KonfigPresensiPegawai extends Model
 {
     use HasFactory;
 

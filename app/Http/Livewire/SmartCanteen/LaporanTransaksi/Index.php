@@ -2,7 +2,9 @@
 
 namespace App\Http\Livewire\SmartCanteen\LaporanTransaksi;
 
-use App\Models\TransaksiSmartCanteen;
+use App\Models\Jenjang;
+use App\Models\SmartCanteen\TransaksiSmartCanteen;
+use App\Models\TahunAjar;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +16,10 @@ class Index extends Component
     use WithPagination;
     protected $paginationTheme = 'bootstrap'; // Menggunakan tema Bootstrap untuk paginasi
 
+    // Parameter dari listener
+    public $selectedJenjang = null;
+    public $selectedTahunAjar = null;
+
     public $selectedPetugas = [];
     public $select_petugas = [];
 
@@ -24,21 +30,55 @@ class Index extends Component
 
     public $search = '';
 
+    protected $listeners = [
+        'parameterUpdated' => 'updateParameters',
+    ];
+
+    public function updateParameters($jenjang, $tahunAjar)
+    {
+        $this->selectedJenjang = $jenjang;
+        $this->selectedTahunAjar = $tahunAjar;
+
+        // Reset petugas setiap parameter berubah
+        $this->selectedPetugas = null;
+
+        // Reload petugas sesuai jenjang
+        $this->loadPetugasByJenjang();
+
+        $this->resetPage();
+    }
+
     public function mount()
+    {
+        // Default tanggal
+        $this->startDate = now()->startOfMonth()->format('Y-m-d');
+        $this->endDate   = now()->format('Y-m-d');
+    }
+
+    protected function loadPetugasByJenjang()
     {
         $user = auth()->user();
 
-        // kalau peran kantin → langsung set otomatis
-        if ($user->peran === 'kantin') {
-            $this->selectedPetugas = $user->ms_pengguna_id;
-        } else {
-            // kalau bukan kantin → bisa pilih dari semua petugas
-            $this->select_petugas = User::all();
+        // Jika jenjang belum dipilih → kosongkan
+        if (!$this->selectedJenjang) {
+            $this->select_petugas = collect();
+            return;
         }
 
-        // Default ke hari ini
-        $this->startDate = now()->format('Y-m-d');
-        $this->endDate   = now()->format('Y-m-d');
+        // Jika login sebagai kantin → auto set, tidak perlu list
+        if ($user->peran === 'kantin') {
+            $this->selectedPetugas = $user->ms_pengguna_id;
+            $this->select_petugas = collect();
+            return;
+        }
+
+        // Admin / TU → load petugas kantin sesuai akses jenjang
+        $this->select_petugas = User::where('peran', 'kantin')
+            ->whereHas('ms_akses_jenjang', function ($q) {
+                $q->where('ms_jenjang_id', $this->selectedJenjang);
+            })
+            ->orderBy('nama')
+            ->get();
     }
 
     public function updatingSearch()
@@ -52,9 +92,24 @@ class Index extends Component
             'message' => 'Memperbarui...'
         ]);
     }
+
+    public function updatedStartDate()
+    {
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Periode mulai diperbarui'
+        ]);
+    }
+
+    public function updatedEndDate()
+    {
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Periode selesai diperbarui'
+        ]);
+    }
+
     public function resetTanggal()
     {
-        $this->startDate = now()->format('Y-m-d');
+        $this->startDate = now()->startOfMonth()->format('Y-m-d');
         $this->endDate   = now()->format('Y-m-d');
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
     }
@@ -77,7 +132,7 @@ class Index extends Component
     {
         $user = Auth::user();
 
-        $query = TransaksiSmartCanteen::query();
+        $query = TransaksiSmartCanteen::where('ms_jenjang_id', $this->selectedJenjang);
 
         if ($user->peran === 'kantin') {
             $query->where('ms_pengguna_id', $user->ms_pengguna_id);

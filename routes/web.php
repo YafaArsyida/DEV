@@ -38,7 +38,11 @@ use App\Http\Controllers\SmartCanteenDashboard;
 use App\Http\Controllers\SmartCanteenLaporanTransaksi;
 use App\Http\Controllers\SmartCanteenSettlementTransaksi;
 use App\Http\Controllers\SmartCanteenTransaksiProduk;
+use App\Http\Controllers\SmartPassAdministrasiPegawai;
 use App\Http\Controllers\SmartPassDashboard;
+use App\Http\Controllers\SmartPassKonfigurasiPresensiPegawai;
+use App\Http\Controllers\SmartPassLaporanPresensiPegawai;
+use App\Http\Controllers\SmartPassPresensiPegawai;
 use App\Http\Controllers\TagihanJenis;
 use App\Http\Controllers\TagihanSiswa;
 use App\Http\Controllers\TransaksiEduPayPegawai;
@@ -94,6 +98,7 @@ Route::post('/logout', [LoginController::class, 'logOut'])
 
 // LANDING
 Route::get('/landing/ekstrakurikuler', [LandingEkstrakurikuler::class, 'index'])->name('landing.ekstrakurikuler');
+
 // LANDING
 Route::middleware(['auth', 'peran:superadmin,administrasi,kantin'])->group(function () {
     // SMARTCANTEEN 
@@ -122,6 +127,11 @@ Route::middleware(['auth', 'peran:superadmin,administrasi,kantin'])->group(funct
 
     // SMARTPASS
     Route::get('/smartPass/dashboard', [SmartPassDashboard::class, 'index'])->name('smartPass.dashboard');
+    Route::get('/smartPass/konfigurasi/pegawai', [SmartPassKonfigurasiPresensiPegawai::class, 'index'])->name('smartPass.konfigurasi.pegawai');
+    Route::get('/smartPass/administrasi/pegawai', [SmartPassAdministrasiPegawai::class, 'index'])->name('smartPass.administrasi.pegawai');
+    Route::get('/smartPass/laporan/pegawai', [SmartPassLaporanPresensiPegawai::class, 'index'])->name('smartPass.laporan.pegawai');
+
+    Route::get('/smartPass/presensi/pegawai', [SmartPassPresensiPegawai::class, 'index'])->name('smartPass.presensi.pegawai');
 });
 
 

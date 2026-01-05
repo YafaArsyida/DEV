@@ -2,10 +2,8 @@
 
 namespace App\Http\Livewire\SmartCanteen\ProdukKantin;
 
-use App\Models\KategoriProdukKantin;
-use App\Models\KategoriProdukSmartCanteen;
-use App\Models\ProdukKantin;
-use App\Models\ProdukSmartCanteen;
+use App\Models\SmartCanteen\KategoriProdukSmartCanteen;
+use App\Models\SmartCanteen\ProdukSmartCanteen;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;

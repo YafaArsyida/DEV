@@ -2,7 +2,7 @@
 
 namespace App\Http\Livewire\SmartCanteen\LaporanTransaksi;
 
-use App\Models\TransaksiSmartCanteen;
+use App\Models\SmartCanteen\TransaksiSmartCanteen;
 use Carbon\Carbon;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
@@ -42,7 +42,7 @@ class Overview extends Component
         $user = Auth::user();
 
         // base query
-        $query = TransaksiSmartCanteen::query();
+        $query = TransaksiSmartCanteen::where('ms_jenjang_id', $this->selectedJenjang);
 
         // filter sesuai peran
         if ($user->peran === 'kantin') {

@@ -3,10 +3,10 @@
 namespace App\Http\Livewire\SmartCanteen\TransaksiProduk;
 
 use App\Models\AkuntansiJurnalDetail;
-use App\Models\DetailTransaksiSmartCanteen;
-use App\Models\KeranjangSmartCanteen;
+use App\Models\SmartCanteen\DetailTransaksiSmartCanteen;
+use App\Models\SmartCanteen\KeranjangSmartCanteen;
+use App\Models\SmartCanteen\TransaksiSmartCanteen;
 use App\Models\TransaksiEduPay;
-use App\Models\TransaksiSmartCanteen;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -33,6 +33,7 @@ class KeranjangProduk extends Component
 
     protected $listeners = [
         'scanSuccess',
+        'resetScan',
         'tambahKeranjang',
     ];
 
@@ -258,6 +259,7 @@ class KeranjangProduk extends Component
                 'user_id' => $this->user_id,
                 'ms_penempatan_siswa_id' => $this->ms_penempatan_siswa_id,
                 'ms_pengguna_id' => $ms_pengguna_id,
+                'ms_jenjang_id' => $this->ms_jenjang_id,
                 'tanggal_transaksi' => now(),
                 'total_transaksi' => $totalBayar,
                 'metode_pembayaran' => $this->metode_pembayaran,

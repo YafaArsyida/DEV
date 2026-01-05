@@ -2,8 +2,8 @@
 
 namespace App\Http\Livewire\SmartCanteen\Widget;
 
-use App\Models\KategoriProdukSmartCanteen;
-use App\Models\ProdukSmartCanteen;
+use App\Models\SmartCanteen\KategoriProdukSmartCanteen;
+use App\Models\SmartCanteen\ProdukSmartCanteen;
 use Livewire\Component;
 use Livewire\WithPagination;
 

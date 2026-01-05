@@ -3,7 +3,7 @@
 namespace App\Http\Livewire\KoperasiPintar\KategoriProdukKoperasi;
 
 use App\Models\Jenjang;
-use App\Models\KategoriProdukKoperasi;
+use App\Models\KoperasiPintar\KategoriProdukKoperasi;
 use Livewire\Component;
 
 class Index extends Component

@@ -2,52 +2,72 @@
 
 namespace App\Http\Livewire\Parameter;
 
-use App\Models\Kelas;
-use App\Models\TahunAjar;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class FilterTabungan extends Component
 {
-    // public $startDate = null;
-    // public $endDate = null;
+    public $selectedJenjang = null;
+    public $selectedTahunAjar = null;
+
+    public $select_petugas = [];
     public $selectedPetugas = [];
-    public $selectedJenjang = [];
+
     public $selectedJenisTransaksi = [];
 
     // Listener untuk Livewire
     protected $listeners = [
+        'parameterUpdated' => 'updateParameters',
         'applyFilters' => 'applyFilters',
         'clearFilters' => 'clearFilters',
     ];
 
     public function applyFilters($filters)
     {
-        // $this->startDate = $filters['startDate'] ?? null;
-        // $this->endDate = $filters['endDate'] ?? null;
-
         $this->selectedPetugas = $filters['selectedPetugas'] ?? [];
         $this->selectedJenisTransaksi = $filters['selectedJenisTransaksi'] ?? [];
     }
 
     public function clearFilters()
     {
-        // $this->startDate = null;
-        // $this->endDate = null;
-
         $this->selectedJenisTransaksi = [];
         $this->selectedPetugas = [];
     }
 
+    public function updateParameters($jenjang, $tahunAjar)
+    {
+        $this->selectedJenjang = $jenjang;
+        $this->selectedTahunAjar = $tahunAjar;
+
+        $this->loadPetugasByJenjang();
+    }
+
+    protected function loadPetugasByJenjang()
+    {
+        $user = auth()->user();
+
+        // Kantin tidak perlu select petugas
+        if ($user->peran === 'kantin') {
+            return;
+        }
+
+        if (!$this->selectedJenjang || !$this->selectedTahunAjar) {
+            $this->select_petugas = collect();
+            return;
+        }
+
+        $this->select_petugas = User::whereHas('ms_akses_jenjang', function ($q) {
+            $q->where('ms_jenjang_id', $this->selectedJenjang);
+        })
+            ->whereNotIn('peran', ['kantin', 'koperasi'])
+            ->orderBy('nama')
+            ->get();
+    }
+
     public function render()
     {
-        // Ambil daftar petugas
-        $select_petugas = User::whereNotIn('peran', ['kantin', 'koperasi'])->get();
-
         return view('livewire.parameter.filter-tabungan', [
-            'select_petugas' => $select_petugas,
+            'select_petugas' => $this->select_petugas,
         ]);
     }
 }

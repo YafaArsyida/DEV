@@ -2,7 +2,7 @@
 
 namespace App\Http\Livewire\KoperasiPintar\ProdukKoperasi;
 
-use App\Models\ProdukKoperasi;
+use App\Models\KoperasiPintar\ProdukKoperasi;
 use Livewire\Component;
 
 class Detail extends Component

@@ -2,7 +2,7 @@
 
 namespace App\Http\Livewire\SmartCanteen\Widget;
 
-use App\Models\DetailTransaksiSmartCanteen;
+use App\Models\SmartCanteen\DetailTransaksiSmartCanteen;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;

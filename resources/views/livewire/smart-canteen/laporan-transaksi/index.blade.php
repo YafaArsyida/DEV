@@ -27,22 +27,22 @@
     </div>
     <div class="card-body">
         <div class="row g-3 align-items-end mb-3">
-            <div class="col-xxl-2 col-sm-6">
-                <label for="selectPetugas" class="form-label">Petugas</label>
-                
-                @if(auth()->user()->peran !== 'kantin')
-                    <select id="selectPetugas" 
-                            wire:model="selectedPetugas" 
-                            class="form-select" style="cursor: pointer"
-                            data-bs-toggle="tooltip" data-bs-trigger="hover" 
-                            data-bs-placement="top" title="Pilih Petugas">
-                        <option value="">Semua Petugas</option>
-                        @foreach ($select_petugas as $item)    
-                            <option value="{{ $item->ms_pengguna_id }}">{{ $item->nama }}</option>
-                        @endforeach
-                    </select>
+           <div class="col-xxl-2 col-sm-6">
+                <label class="form-label">Petugas</label>
+            
+                @if(auth()->user()->peran === 'kantin')
+                {{-- TAMPIL READONLY --}}
+                <input type="text" class="form-control" value="{{ auth()->user()->nama }}" readonly>
                 @else
-                    <input type="text" class="form-control" value="{{ auth()->user()->nama }}" readonly>
+                {{-- TAMPIL DROPDOWN --}}
+                <select wire:model="selectedPetugas" class="form-select">
+                    <option value="">-- Semua Petugas --</option>
+                    @foreach ($select_petugas as $petugas)
+                    <option value="{{ $petugas->ms_pengguna_id }}">
+                        {{ $petugas->nama }}
+                    </option>
+                    @endforeach
+                </select>
                 @endif
             </div>
 
@@ -74,10 +74,12 @@
                     <input type="date" id="startDate" class="form-control" wire:model="startDate">
                     <span class="text-muted">–</span>
                     <input type="date" id="endDate" class="form-control" wire:model="endDate">
-                    <button type="button" class="btn text-info btn-icon" 
-                        wire:click="resetTanggal" title="Reset Tanggal">
-                        <i class="ri-refresh-line fs-16"></i>
-                    </button>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-soft-secondary btn-icon rounded-circle" wire:click="resetTanggal"
+                            title="Reset Tanggal">
+                            <i class="ri-refresh-line fs-16"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 

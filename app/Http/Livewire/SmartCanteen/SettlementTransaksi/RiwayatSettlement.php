@@ -2,35 +2,82 @@
 
 namespace App\Http\Livewire\SmartCanteen\SettlementTransaksi;
 
-use App\Models\SettlementSmartCanteen;
+use App\Models\Jenjang;
+use App\Models\SmartCanteen\SettlementSmartCanteen;
+use App\Models\TahunAjar;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class RiwayatSettlement extends Component
 {
+    use WithPagination;
+    protected $paginationTheme = 'bootstrap';
+
     public $startDate;
     public $endDate;
-    public $selectedPetugas = null;       // filter petugas kantin
-    public $listPetugas = [];             // data dropdown
 
+    // Parameter dari listener
+    public $selectedJenjang = null;
+    public $selectedTahunAjar = null;
+
+    public $namaJenjang = '-';
+    public $namaTahunAjar = '-';
+
+    public $selectedPetugas = null;       // filter petugas kantin
+    public $select_petugas = [];
+
+    protected $listeners = [
+        'parameterUpdated' => 'updateParameters',
+        'refreshSettlement'
+    ];
+
+    public function updateParameters($jenjang, $tahunAjar)
+    {
+        $this->selectedJenjang = $jenjang;
+        $this->selectedTahunAjar = $tahunAjar;
+
+        $this->loadPetugasByJenjang();
+
+        $this->resetPage();
+    }
+    public function refreshSettlement()
+    {
+        $this->resetPage(); // Reset paginasi saat pencarian berubah
+    }
     public function mount()
     {
-        $user = Auth::user();
-
-        // $this->startDate = now()->format('Y-m-d');
-        // Default periode: awal bulan sampai hari ini
+        // Default tanggal
         $this->startDate = now()->startOfMonth()->format('Y-m-d');
         $this->endDate   = now()->format('Y-m-d');
+    }
 
-        // Jika peran kantin → otomatis set
+    protected function loadPetugasByJenjang()
+    {
+        $user = auth()->user();
+
+        // Jika jenjang belum dipilih → kosongkan
+        if (!$this->selectedJenjang) {
+            $this->select_petugas = collect();
+            return;
+        }
+
+        // Jika login sebagai kantin → auto set, tidak perlu list
         if ($user->peran === 'kantin') {
             $this->selectedPetugas = $user->ms_pengguna_id;
-        } else {
-            // Admin TU → load semua petugas kantin
-            $this->listPetugas = User::where('peran', 'kantin')->get();
+            $this->select_petugas = collect();
+            return;
         }
+
+        // Admin / TU → load petugas kantin sesuai akses jenjang
+        $this->select_petugas = User::where('peran', 'kantin')
+            ->whereHas('ms_akses_jenjang', function ($q) {
+                $q->where('ms_jenjang_id', $this->selectedJenjang);
+            })
+            ->orderBy('nama')
+            ->get();
     }
 
     public function resetTanggal()
@@ -39,6 +86,7 @@ class RiwayatSettlement extends Component
         $this->startDate = now()->startOfMonth()->format('Y-m-d');
         $this->endDate   = now()->format('Y-m-d');
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
+        $this->resetPage();
     }
 
     public function updatedSelectedPetugas()
@@ -54,6 +102,7 @@ class RiwayatSettlement extends Component
         $user = Auth::user();
 
         $query = SettlementSmartCanteen::query()
+            ->where('ms_jenjang_id', $this->selectedJenjang)
             ->orderBy('tanggal_settlement', 'desc');
 
         // Jika role kantin → otomatis filter
@@ -75,7 +124,8 @@ class RiwayatSettlement extends Component
             ]);
         }
 
-        return $query->get();
+        // return $query->get();
+    return $query->paginate(10);
     }
 
     public function render()

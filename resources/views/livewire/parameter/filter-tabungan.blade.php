@@ -8,19 +8,6 @@
                     <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                 </div>
                 <div class="offcanvas-body">
-                    {{-- <div class="mb-4">
-                        <p class="text-muted text-uppercase fs-12 fw-medium mb-2">Tanggal Transaksi</p>
-                        <div class="row g-2 align-items-center">
-                            <div class="col-lg">
-                                <input type="date" class="form-control" id="startDate" placeholder="0">
-                            </div>
-                            <div class="col-lg-auto">-</div>
-                            <div class="col-lg">
-                                <input type="date" class="form-control" id="endDate" placeholder="0">
-                            </div>
-                        </div>
-                    </div> --}}
-
                     <div class="mb-4">
                         <p class="text-muted text-uppercase fs-12 fw-medium mb-2">Petugas</p>
                         <select id="PilihPetugas" style="cursor: pointer" wire:model="selectedPetugas" class="form-select" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Petugas" multiple="multiple">

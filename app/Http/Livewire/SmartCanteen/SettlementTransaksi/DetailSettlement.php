@@ -2,8 +2,8 @@
 
 namespace App\Http\Livewire\SmartCanteen\SettlementTransaksi;
 
-use App\Models\SettlementSmartCanteen;
-use App\Models\TransaksiSmartCanteen;
+use App\Models\SmartCanteen\SettlementSmartCanteen;
+use App\Models\SmartCanteen\TransaksiSmartCanteen;
 use Livewire\Component;
 
 class DetailSettlement extends Component

@@ -1,12 +1,15 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\SmartPass;
 
+use App\Models\PenempatanSiswa;
+use App\Models\Siswa;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class AbsensiSiswa extends Model
+class PresensiSiswa extends Model
 {
     use HasFactory;
     use SoftDeletes;

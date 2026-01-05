@@ -14,18 +14,6 @@
             </div>
         </div>
         <!--end col-->
-        {{-- <div class="col-auto">
-            <button type="button" class="btn btn-soft-success shadow-none">
-                <i class="ri-add-circle-line align-middle me-1"></i> Export
-            </button>
-        </div>
-        <!--end col-->
-        <div class="col-auto">
-            <button type="button" class="btn btn-soft-info btn-icon waves-effect waves-light layout-rightside-btn shadow-none">
-                <i class="ri-pulse-line"></i>
-            </button>
-        </div> --}}
-        <!--end col-->
     </div>
     <script>
         document.addEventListener('livewire:load', function () {

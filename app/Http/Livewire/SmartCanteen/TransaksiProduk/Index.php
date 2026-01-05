@@ -4,9 +4,9 @@ namespace App\Http\Livewire\SmartCanteen\TransaksiProduk;
 
 use App\Models\EduCard;
 use App\Models\Jenjang;
-use App\Models\KategoriProdukSmartCanteen;
 use App\Models\PenempatanSiswa;
-use App\Models\ProdukSmartCanteen;
+use App\Models\SmartCanteen\KategoriProdukSmartCanteen;
+use App\Models\SmartCanteen\ProdukSmartCanteen;
 use Livewire\Component;
 
 class Index extends Component
@@ -80,34 +80,6 @@ class Index extends Component
         $this->selectedKategori = $kategoriId;
     }
 
-    // public function openScanModal()
-    // {
-    //     $this->reset([
-    //         'user_type',
-    //         'user_id',
-    //         'ms_penempatan_siswa_id',
-    //         'nama',
-    //         'nama_kelas',
-    //         'educard',
-    //         'saldo_edupay',
-
-    //         'nama_jabatan',
-    //     ]);
-    // }
-
-    // public function scanSuccess($data)
-    // {
-    //     $this->user_type                = $data['user_type'];   // 'siswa' atau 'pegawai'
-    //     $this->user_id                  = $data['user_id'];     // ms_siswa_id atau ms_pegawai_id
-    //     $this->ms_penempatan_siswa_id   = $data['ms_penempatan_siswa_id'];     // ms_siswa_id atau ms_pegawai_id
-    //     $this->nama                     = $data['nama'];        // nama siswa/pegawai
-    //     $this->nama_kelas               = $data['nama_kelas'];        // nama siswa/pegawai
-    //     $this->educard                  = $data['educard'];
-    //     $this->saldo_edupay             = $data['saldo_edupay'];
-
-    //     $this->nama_jabatan               = $data['nama_jabatan'];        // nama siswa/pegawai
-    // }
-
     public function prosesSmartcard()
     {
         $value = trim($this->smartcardInput);
@@ -123,6 +95,8 @@ class Index extends Component
         if (!$card) {
             $this->dispatchBrowserEvent('alertify-error', ['message' => 'Kartu tidak terdaftar.']);
             $this->resetSmartcardInput();
+            $this->resetScan();
+            $this->emit('resetScan');
             return;
         }
 

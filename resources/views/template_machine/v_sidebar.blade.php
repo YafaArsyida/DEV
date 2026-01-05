@@ -450,7 +450,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link menu-link" target="_blank" href="{{ route('smartCanteen.dashboard') }}">
+                        <a class="nav-link menu-link" target="_blank" href="{{ route('smartPass.dashboard') }}">
                             <i class="mdi mdi-card-account-details-outline"></i> <span data-key="t-tahun-ajaran">SmartPass - eAbsensi</span>
                         </a>
                     </li>

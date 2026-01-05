@@ -3,9 +3,8 @@
 namespace App\Http\Livewire\KoperasiPintar\TransaksiPembelianProduk;
 
 use App\Models\Jenjang;
-use App\Models\KategoriProdukKoperasi;
-use App\Models\ProdukKoperasi;
-use App\Models\SupplierKoperasi;
+use App\Models\KoperasiPintar\ProdukKoperasi;
+use App\Models\KoperasiPintar\SupplierKoperasi;
 use Livewire\Component;
 
 class Index extends Component

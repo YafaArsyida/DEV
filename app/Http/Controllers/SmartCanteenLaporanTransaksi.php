@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\TransaksiSmartCanteen;
 use Carbon\Carbon;
 use App\Http\Controllers\HelperController;
+use App\Models\SmartCanteen\TransaksiSmartCanteen;
 use Illuminate\Http\Request;
 use Elibyy\TCPDF\Facades\TCPDF;
 

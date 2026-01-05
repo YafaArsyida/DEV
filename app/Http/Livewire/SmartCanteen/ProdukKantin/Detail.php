@@ -2,8 +2,7 @@
 
 namespace App\Http\Livewire\SmartCanteen\ProdukKantin;
 
-use App\Models\ProdukKantin;
-use App\Models\ProdukSmartCanteen;
+use App\Models\SmartCanteen\ProdukSmartCanteen;
 use Livewire\Component;
 
 class Detail extends Component

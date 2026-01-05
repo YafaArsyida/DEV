@@ -2,8 +2,8 @@
 
 namespace App\Http\Livewire\KoperasiPintar\ProdukKoperasi;
 
-use App\Models\KategoriProdukKoperasi;
-use App\Models\ProdukKoperasi;
+use App\Models\KoperasiPintar\KategoriProdukKoperasi;
+use App\Models\KoperasiPintar\ProdukKoperasi;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;

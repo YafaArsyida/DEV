@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\SmartCanteen;
 
+use App\Models\Jenjang;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -18,6 +20,7 @@ class SettlementSmartCanteen extends Model
         'metode_pembayaran', // tunai / transfer
         'deskripsi',
         'ms_pengguna_id',
+        'ms_jenjang_id',
         'ms_pengguna_kantin_id',
         'akun_jurnal_debit_id',
         'akun_jurnal_kredit_id',
@@ -32,5 +35,9 @@ class SettlementSmartCanteen extends Model
     public function ms_pengguna()
     {
         return $this->belongsTo(User::class, 'ms_pengguna_id', 'ms_pengguna_id');
+    }
+    public function ms_jenjang()
+    {
+        return $this->belongsTo(Jenjang::class, 'ms_jenjang_id', 'ms_jenjang_id');
     }
 }

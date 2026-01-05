@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class Edit extends Component
 {
-    public $ms_whatsapp_histori_tagihan_id;
+    public $ms_whatsapp_pembayaran_tagihan_siswa_id;
     public $judul;
     public $salam_pembuka;
     public $kalimat_pembuka;
@@ -20,11 +20,11 @@ class Edit extends Component
 
     protected $listeners = ['loadPesanTransaksi'];
 
-    public function loadPesanTransaksi($ms_whatsapp_histori_tagihan_id)
+    public function loadPesanTransaksi($ms_whatsapp_pembayaran_tagihan_siswa_id)
     {
-        $pesan = WhatsAppPembayaranTagihanSiswa::findOrFail($ms_whatsapp_histori_tagihan_id);
+        $pesan = WhatsAppPembayaranTagihanSiswa::findOrFail($ms_whatsapp_pembayaran_tagihan_siswa_id);
 
-        $this->ms_whatsapp_histori_tagihan_id = $pesan->ms_whatsapp_histori_tagihan_id;
+        $this->ms_whatsapp_pembayaran_tagihan_siswa_id = $pesan->ms_whatsapp_pembayaran_tagihan_siswa_id;
         $this->judul = $pesan->judul;
         $this->salam_pembuka = $pesan->salam_pembuka;
         $this->kalimat_pembuka = $pesan->kalimat_pembuka;
@@ -74,7 +74,7 @@ class Edit extends Component
 
         try {
             // Cari data pesan yang akan diperbarui
-            $pesan = WhatsAppPembayaranTagihanSiswa::withTrashed()->findOrFail($this->ms_whatsapp_histori_tagihan_id);
+            $pesan = WhatsAppPembayaranTagihanSiswa::withTrashed()->findOrFail($this->ms_whatsapp_pembayaran_tagihan_siswa_id);
 
             // Perbarui data pesan
             $pesan->update([

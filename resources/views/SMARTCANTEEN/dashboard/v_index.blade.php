@@ -3,18 +3,6 @@
 
 <div class="page-content">
     <div class="container-fluid" style="max-width: 100%">
-        {{-- <div class="row mb-3 pb-1">
-            <div class="col-12">
-                <div class="d-flex align-items-lg-center flex-lg-row flex-column">
-                    <div class="flex-grow-1">
-                        <h4 class="fs-16 mb-1">Dashboard SmartCanteen</h4>
-                        <p class="text-muted mb-0">Dashboard > SmartCanteen</p>
-                    </div>
-                    @livewire('parameter.smart-canteen')   
-                </div><!-- end card header -->
-            </div>
-            <!--end col-->
-        </div> --}}
         <div class="row">
             <div class="col-xxl-5">
                 <div class="d-flex flex-column h-100">
@@ -25,11 +13,10 @@
                     </div> <!-- end row-->
 
                     <div class="row">
-                        {{-- kartu jumlah siswa --}}
-                        @livewire('widget.kartu-jumlah-siswa')   
-                        @livewire('widget.kartu-jumlah-tagihan-siswa')   
-                        @livewire('widget.kartu-jumlah-jurnal-pendapatan')   
-                        @livewire('widget.kartu-jumlah-jurnal-pengeluaran')   
+                        @livewire('smart-canteen.widget.kartu-jumlah-produk')
+                        @livewire('smart-canteen.widget.kartu-settlement')
+                        @livewire('smart-canteen.widget.kartu-pendapatan')
+                        @livewire('smart-canteen.widget.kartu-volume-transaksi')
                     </div> <!-- end row-->
                 </div>
             </div> <!-- end col-->
@@ -41,8 +28,8 @@
             </div><!-- end col -->
         </div>
          <div class="row">
-            @livewire('widget.kartu-transaksi-jurnal')   
-            @livewire('widget.kartu-jurnal-detail')   
+            @livewire('smart-canteen.widget.kartu-top-jajan')
+            @livewire('smart-canteen.widget.kartu-jurnal-kantin')
         </div><!-- end row -->
     </div>
 </div>

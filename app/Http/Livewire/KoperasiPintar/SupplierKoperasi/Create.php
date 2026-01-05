@@ -2,7 +2,7 @@
 
 namespace App\Http\Livewire\KoperasiPintar\SupplierKoperasi;
 
-use App\Models\SupplierKoperasi;
+use App\Models\KoperasiPintar\SupplierKoperasi;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 

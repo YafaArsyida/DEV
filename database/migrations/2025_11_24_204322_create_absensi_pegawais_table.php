@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ms_absensi_pegawai', function (Blueprint $table) {
-            $table->id('ms_absensi_pegawai_id');
+        Schema::create('ms_presensi_pegawai', function (Blueprint $table) {
+            $table->id('ms_presensi_pegawai_id');
 
             $table->unsignedBigInteger('ms_pegawai_id')->nullable();
             $table->unsignedBigInteger('ms_pengguna_id')->nullable();
@@ -38,6 +38,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ms_absensi_pegawai');
+        Schema::dropIfExists('ms_presensi_pegawai');
     }
 };

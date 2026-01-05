@@ -14,11 +14,13 @@ class FilterLaporanPembayaran extends Component
     public $selectedTahunAjar = null;
 
     public $selectedKelas = [];
-    public $selectedPetugas = [];
     public $selectedKategoriTagihanSiswa = [];
     public $showJenisTagihan = false;
     public $selectedJenisTagihanSiswa = [];
     public $selectedMetode = [];
+
+    public $select_petugas = [];
+    public $selectedPetugas = [];
 
     // Listener untuk Livewire
     protected $listeners = [
@@ -31,6 +33,30 @@ class FilterLaporanPembayaran extends Component
     {
         $this->selectedJenjang = $jenjang;
         $this->selectedTahunAjar = $tahunAjar;
+
+        $this->loadPetugasByJenjang();
+    }
+
+    protected function loadPetugasByJenjang()
+    {
+        $user = auth()->user();
+
+        // Kantin tidak perlu select petugas
+        if ($user->peran === 'kantin') {
+            return;
+        }
+
+        if (!$this->selectedJenjang || !$this->selectedTahunAjar) {
+            $this->select_petugas = collect();
+            return;
+        }
+
+        $this->select_petugas = User::whereHas('ms_akses_jenjang', function ($q) {
+            $q->where('ms_jenjang_id', $this->selectedJenjang);
+        })
+            ->whereNotIn('peran', ['kantin', 'koperasi'])
+            ->orderBy('nama')
+            ->get();
     }
 
     public function applyFilters($filters)
@@ -93,13 +119,9 @@ class FilterLaporanPembayaran extends Component
                 ->get();
         }
 
-        $select_petugas = [];
-        if ($this->selectedJenjang && $this->selectedTahunAjar) {
-            $select_petugas = User::whereNotIn('peran', ['kantin', 'koperasi'])->get();
-        }
 
         return view('livewire.parameter.filter-laporan-pembayaran', [
-            'select_petugas' => $select_petugas,
+            'select_petugas' => $this->select_petugas,
             'select_kelas' => $select_kelas,
             'select_kategori_tagihan' => $select_kategori_tagihan,
             'select_jenis_tagihan' => $select_jenis_tagihan,

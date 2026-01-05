@@ -1,7 +1,13 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\SmartCanteen;
 
+use App\Models\AkuntansiJurnalDetail;
+use App\Models\Jenjang;
+use App\Models\Pegawai;
+use App\Models\PenempatanSiswa;
+use App\Models\Siswa;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
@@ -19,6 +25,7 @@ class TransaksiSmartCanteen extends Model
         'user_id',
         'ms_penempatan_siswa_id',
         'ms_pengguna_id',
+        'ms_jenjang_id',
         'tanggal_transaksi',
         'total_transaksi',
         'metode_pembayaran',
@@ -69,5 +76,9 @@ class TransaksiSmartCanteen extends Model
     public function dt_transaksi_kantin()
     {
         return $this->hasMany(DetailTransaksiSmartCanteen::class, 'ms_transaksi_kantin_id');
+    }
+    public function ms_jenjang()
+    {
+        return $this->belongsTo(Jenjang::class, 'ms_jenjang_id', 'ms_jenjang_id');
     }
 }

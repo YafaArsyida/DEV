@@ -4,9 +4,9 @@ namespace App\Http\Livewire\SmartCanteen\SettlementTransaksi;
 
 use App\Models\AkuntansiJurnalDetail;
 use App\Models\Jenjang;
-use App\Models\SettlementSmartCanteen;
+use App\Models\SmartCanteen\SettlementSmartCanteen;
+use App\Models\SmartCanteen\TransaksiSmartCanteen;
 use App\Models\TahunAjar;
-use App\Models\TransaksiSmartCanteen;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -236,6 +236,7 @@ class Index extends Component
                 'metode_pembayaran' => $this->metodePembayaran,
                 'deskripsi' =>  $deskripsi,
                 'ms_pengguna_id' => Auth::id(),            // yg memproses
+                'ms_jenjang_id' => $this->selectedJenjang,
                 'ms_pengguna_kantin_id' => $this->selectedKantin, // kantin yg menerima
                 'akun_jurnal_debit_id' => $jurnalDebit->akuntansi_jurnal_detail_id,
                 'akun_jurnal_kredit_id' => $jurnalKredit->akuntansi_jurnal_detail_id,
@@ -259,6 +260,7 @@ class Index extends Component
             // Refresh list
             $this->dispatchBrowserEvent('hide-modal', ['modalId' => 'ModalSettlement']);
             $this->reset(['startDate', 'endDate', 'search']);
+            $this->emit('refreshSettlement');
             $this->hitungTotalSettlement();
         } catch (\Exception $e) {
             DB::rollBack();
@@ -279,7 +281,6 @@ class Index extends Component
                 ->get(),
 
             // tampil setelah pilih
-            // 'dataTransaksi' => $this->selectedKantin ? $this->getDataTransaksi() : collect([]),
             'dataTransaksi' => $this->getDataTransaksi(),
         ]);
     }

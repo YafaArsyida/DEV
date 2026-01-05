@@ -2,7 +2,7 @@
 
 namespace App\Http\Livewire\SmartCanteen\LaporanTransaksi;
 
-use App\Models\TransaksiSmartCanteen;
+use App\Models\SmartCanteen\TransaksiSmartCanteen;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -10,15 +10,29 @@ use Livewire\Component;
 
 class TopJajan extends Component
 {
+    public $selectedJenjang = null;
+    public $selectedTahunAjar = null;
+
     public $selectedJenis = '';   // siswa / pegawai / semua
     public $search = '';
     public $selectedPeriode = 'bulan_ini'; // default bulan ini
+
+    protected $listeners = [
+        'parameterUpdated' => 'updateParameters',
+    ];
+
+    public function updateParameters($jenjang, $tahunAjar)
+    {
+        // Update nilai selectedJenjang dan selectedTahunAjar
+        $this->selectedJenjang = $jenjang;
+        $this->selectedTahunAjar = $tahunAjar;
+    }
 
     public function render()
     {
         $user = Auth::user();
 
-        $query = TransaksiSmartCanteen::query();
+        $query = TransaksiSmartCanteen::where('ms_jenjang_id', $this->selectedJenjang);
 
         // filter sesuai peran
         if ($user->peran === 'kantin') {
