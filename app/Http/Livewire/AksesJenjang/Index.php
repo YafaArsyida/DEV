@@ -2,7 +2,6 @@
 
 namespace App\Http\Livewire\AksesJenjang;
 
-use App\Models\AksesJenjang;
 use App\Models\User;
 use Livewire\Component;
 

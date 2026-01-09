@@ -51,7 +51,8 @@
                         <thead class="table-light">
                             <tr>
                                 <th class="text-uppercase" style="width: 50px;">NO</th>
-                                <th class="text-uppercase">Siswa</th>
+                                <th class="text-uppercase">Nama</th>
+                                <th class="text-uppercase">Pelanggan</th>
                                 <th class="text-uppercase">EduCard</th>
                                 <th class="text-uppercase text-center">Total Jajan</th>
                             </tr>
@@ -65,6 +66,15 @@
                                     {{ $item->ms_siswa->nama_siswa }}
                                     @elseif ($item->user_type === 'pegawai' && $item->ms_pegawai)
                                     {{ $item->ms_pegawai->nama_pegawai }}
+                                    @else
+                                    -
+                                    @endif
+                                </td>
+                                <td>
+                                    @if ($item->user_type === 'siswa' && $item->ms_siswa)
+                                    Siswa
+                                    @elseif ($item->user_type === 'pegawai' && $item->ms_pegawai)
+                                    {{ $item->ms_pegawai->ms_jabatan->nama_jabatan }}
                                     @else
                                     -
                                     @endif

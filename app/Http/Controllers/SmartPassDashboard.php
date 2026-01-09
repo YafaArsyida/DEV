@@ -9,6 +9,6 @@ class SmartPassDashboard extends Controller
 {
     public function index()
     {
-        return view('SMARTPASS.dashboard.v_index');
+        return view('SMARTPASS.DASHBOARD.v_index');
     }
 }

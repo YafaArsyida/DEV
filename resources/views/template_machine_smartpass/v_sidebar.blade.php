@@ -62,7 +62,7 @@
                 </li>
             
                 <!-- ================= MASTER DATA ================= -->
-                <li class="menu-title"><span>Master Data</span></li>
+                <li class="menu-title"><span>Adminnistrasi</span></li>
             
                 <li class="nav-item">
                     <a href="{{ route('administrasi.kelas-siswa') }}"
@@ -73,8 +73,8 @@
                 </li>
             
                 <li class="nav-item">
-                    <a href="{{ route('administrasi.manajemen-kepegawaian') }}"
-                        class="nav-link menu-link {{ request()->routeIs('administrasi.manajemen-kepegawaian*') ? 'active' : '' }}">
+                    <a href="{{ route('smartPass.administrasi.pegawai') }}"
+                        class="nav-link menu-link {{ request()->routeIs('smartPass.administrasi.pegawai*') ? 'active' : '' }}">
                         <i class="mdi mdi-account-tie-outline"></i>
                         <span>Data Pegawai</span>
                     </a>

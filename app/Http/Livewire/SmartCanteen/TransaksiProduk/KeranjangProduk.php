@@ -4,7 +4,7 @@ namespace App\Http\Livewire\SmartCanteen\TransaksiProduk;
 
 use App\Models\AkuntansiJurnalDetail;
 use App\Models\SmartCanteen\DetailTransaksiSmartCanteen;
-use App\Models\SmartCanteen\KeranjangSmartCanteen;
+use App\Models\SmartCanteen\ProdukSmartCanteen;
 use App\Models\SmartCanteen\TransaksiSmartCanteen;
 use App\Models\TransaksiEduPay;
 use Livewire\Component;
@@ -14,8 +14,6 @@ use Exception;
 
 class KeranjangProduk extends Component
 {
-    public $totalKeranjang = 0;
-
     public $user_type;
     public $user_id;
     public $ms_penempatan_siswa_id;
@@ -30,6 +28,8 @@ class KeranjangProduk extends Component
 
     public $ms_jenjang_id;
     public $ms_tahun_ajar_id;
+
+    public $keranjang = []; // IN-MEMORY CART
 
     protected $listeners = [
         'scanSuccess',
@@ -51,6 +51,9 @@ class KeranjangProduk extends Component
         $this->ms_tahun_ajar_id         = $data['ms_tahun_ajar_id'];
 
         $this->nama_jabatan               = $data['nama_jabatan'];        // nama siswa/pegawai
+
+        // reset transaksi lama
+        $this->keranjang = [];
     }
 
     public function resetScan()
@@ -69,143 +72,146 @@ class KeranjangProduk extends Component
 
             'nama_jabatan',
         ]);
+
+        // reset transaksi lama
+        $this->keranjang = [];
     }
 
     public function tambahKeranjang($produkId)
     {
         if (!$this->user_id || !$this->user_type) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Gagal, Scan EduCard']);
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Gagal, Scan EduCard'
+            ]);
             return;
         }
 
-        // cek apakah produk sudah ada di keranjang
-        $item = KeranjangSmartCanteen::where('user_type', $this->user_type)
-            ->where('user_id', $this->user_id)
-            ->where('ms_pengguna_id', auth()->id())
-            ->where('ms_produk_kantin_id', $produkId)
-            ->first();
+        // Ambil produk (lookup SAJA)
+        $produk = ProdukSmartCanteen::find($produkId);
 
-        if ($item) {
-            // jika sudah ada, update jumlah
-            $item->increment('jumlah_produk');
+        if (!$produk) {
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Produk tidak ditemukan'
+            ]);
+            return;
+        }
+
+        // Cek apakah produk sudah ada di keranjang
+        foreach ($this->keranjang as $index => $item) {
+            if ($item['produk_id'] == $produk->ms_produk_kantin_id) {
+
+                $this->keranjang[$index]['jumlah'] += 1;
+                $this->keranjang[$index]['subtotal'] =
+                    $this->keranjang[$index]['jumlah'] * $this->keranjang[$index]['harga'];
+
+                $this->dispatchBrowserEvent('alertify-success', [
+                    'message' => 'Jumlah produk ditambah'
+                ]);
+                return;
+            }
+        }
+
+        // Produk baru
+        $this->keranjang[] = [
+            'produk_id' => $produk->ms_produk_kantin_id,
+            'nama'      => $produk->nama_produk_kantin,
+            'harga'     => $produk->harga,
+            'jumlah'    => 1,
+            'subtotal'  => $produk->harga,
+        ];
+
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Produk ditambahkan'
+        ]);
+    }
+
+    public function incrementQty($index)
+    {
+        if (!isset($this->keranjang[$index])) return;
+
+        $this->keranjang[$index]['jumlah']++;
+        $this->keranjang[$index]['subtotal'] = $this->keranjang[$index]['jumlah'] * $this->keranjang[$index]['harga'];
+
+        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Berhasil menambah produk']);
+    }
+
+    public function decrementQty($index)
+    {
+        if (!isset($this->keranjang[$index])) return;
+
+        if ($this->keranjang[$index]['jumlah'] > 1) {
+            $this->keranjang[$index]['jumlah']--;
+            $this->keranjang[$index]['subtotal'] = $this->keranjang[$index]['jumlah'] * $this->keranjang[$index]['harga'];
+
+            $this->dispatchBrowserEvent('alertify-success', ['message' => 'Berhasil mengurangi produk']);
         } else {
-            // jika belum ada, buat baru
-            KeranjangSmartCanteen::create([
-                'user_type' => $this->user_type,
-                'user_id' => $this->user_id,
-                'ms_produk_kantin_id' => $produkId,
-                'ms_pengguna_id' => auth()->id(),
-                'jumlah_produk' => 1,
+            unset($this->keranjang[$index]);
+            $this->keranjang = array_values($this->keranjang); // reindex
+
+            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Produk dihapus dari keranjang']);
+        }
+    }
+
+    public function hapusKeranjang($index)
+    {
+        if (isset($this->keranjang[$index])) {
+            unset($this->keranjang[$index]);
+            $this->keranjang = array_values($this->keranjang);
+
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Produk dihapus'
             ]);
         }
-
-        // reload keranjang
-        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Berhasil menambah produk']);
-        $this->emitSelf('$refresh'); // Memicu render ulang komponen sendiri
     }
 
-    public function incrementQty($ms_keranjang_kantin_id)
+    public function getTotalKeranjangProperty()
     {
-        $ms_pengguna_id = auth()->id();
-
-        $item = KeranjangSmartCanteen::where('ms_keranjang_kantin_id', $ms_keranjang_kantin_id)
-            ->where('user_id', $this->user_id)
-            ->where('ms_pengguna_id', $ms_pengguna_id)
-            ->first();
-
-        if ($item) {
-            $item->increment('jumlah_produk');
-            $this->emitSelf('$refresh');
-            $this->dispatchBrowserEvent('alertify-success', ['message' => 'Berhasil menambah produk']);
-        }
+        return collect($this->keranjang)->sum('subtotal');
     }
 
-    public function decrementQty($ms_keranjang_kantin_id)
-    {
-        $ms_pengguna_id = auth()->id();
-
-        $item = KeranjangSmartCanteen::where('ms_keranjang_kantin_id', $ms_keranjang_kantin_id)
-            ->where('user_id', $this->user_id)
-            ->where('ms_pengguna_id', $ms_pengguna_id)
-            ->first();
-
-        if ($item) {
-            if ($item->jumlah_produk > 1) {
-                $item->decrement('jumlah_produk');
-                $this->dispatchBrowserEvent('alertify-success', ['message' => 'Berhasil mengurangi produk']);
-            } else {
-                $this->dispatchBrowserEvent('alertify-error', ['message' => 'Produk dihapus dari keranjang']);
-                $item->delete();
-            }
-            $this->emitSelf('$refresh');
-        }
-    }
-
-    public function hapusKeranjang($ms_keranjang_kantin_id)
-    {
-        $ms_pengguna_id = auth()->id();
-
-        $item = KeranjangSmartCanteen::where('ms_keranjang_kantin_id', $ms_keranjang_kantin_id)
-            ->where('user_id', $this->user_id)
-            ->where('ms_pengguna_id', $ms_pengguna_id)
-            ->first();
-
-        if ($item) {
-            $item->delete();
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Produk dihapus dari keranjang']);
-            $this->emitSelf('$refresh');
-        } else {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Produk tidak ditemukan']);
-        }
-    }
 
     public function simpanTransaksiKantin()
     {
         try {
             $ms_pengguna_id = Auth::id();
 
-            $keranjang = KeranjangSmartCanteen::with('ms_produk_kantin')
-                ->where('user_id', $this->user_id)
-                ->where('ms_pengguna_id', $ms_pengguna_id)
-                ->get();
-
-            if ($keranjang->isEmpty()) {
-                $this->dispatchBrowserEvent('alertify-error', ['message' => 'Keranjang kosong, tidak ada transaksi yang bisa disimpan.']);
+            // 1️⃣ VALIDASI KERANJANG
+            if (empty($this->keranjang)) {
+                $this->dispatchBrowserEvent('alertify-error', [
+                    'message' => 'Keranjang kosong, tidak ada transaksi yang bisa disimpan.'
+                ]);
                 return;
             }
 
             DB::beginTransaction();
 
-            // Deskripsi untuk jurnal
-            $detailProduk = $keranjang->map(function ($item) {
-                return $item->ms_produk_kantin->nama_produk_kantin . ' x' . $item->jumlah_produk;
+            // 2️⃣ DESKRIPSI PRODUK (DARI ARRAY)
+            $detailProduk = collect($this->keranjang)->map(function ($item) {
+                return $item['nama'] . ' x' . $item['jumlah'];
             })->join(', ');
 
             $deskripsiJurnal = "Pembelian kantin {$this->nama} dengan metode {$this->metode_pembayaran}: $detailProduk.";
 
-            // Kode rekening
+            // 3️⃣ KODE REKENING
             $kode_rekening_kas = 11001;
             $kode_rekening_edupay_siswa = 22002;
             $kode_rekening_edupay_pegawai = 22005;
             $kode_rekening_hutang_kantin = 21001.01;
 
-            // Pilih debit akun berdasarkan metode pembayaran
-            if ($this->metode_pembayaran == 'Tunai') {
+            if ($this->metode_pembayaran === 'Tunai') {
                 $debitAkunId = $kode_rekening_kas;
-            } elseif ($this->metode_pembayaran == 'EduPay') {
-                if ($this->user_type === 'siswa') {
-                    $debitAkunId = $kode_rekening_edupay_siswa;
-                } elseif ($this->user_type === 'pegawai') {
-                    $debitAkunId = $kode_rekening_edupay_pegawai;
-                }
+            } elseif ($this->metode_pembayaran === 'EduPay') {
+                $debitAkunId = $this->user_type === 'siswa'
+                    ? $kode_rekening_edupay_siswa
+                    : $kode_rekening_edupay_pegawai;
             } else {
-                throw new Exception('Metode pembayaran tidak valid.');
+                throw new \Exception('Metode pembayaran tidak valid.');
             }
 
-            // Total transaksi
+            // 4️⃣ TOTAL TRANSAKSI (🔥 COMPUTED PROPERTY)
             $totalBayar = $this->totalKeranjang;
 
-            // Jurnal - Debit
+            // 5️⃣ JURNAL DEBIT
             $jurnalDetailDebit = AkuntansiJurnalDetail::create([
                 'kode_rekening' => $debitAkunId,
                 'posisi' => 'debit',
@@ -218,7 +224,7 @@ class KeranjangProduk extends Component
                 'deskripsi' => $deskripsiJurnal,
             ]);
 
-            // Jurnal - Kredit
+            // 6️⃣ JURNAL KREDIT
             $jurnalDetailKredit = AkuntansiJurnalDetail::create([
                 'kode_rekening' => $kode_rekening_hutang_kantin,
                 'posisi' => 'kredit',
@@ -231,29 +237,25 @@ class KeranjangProduk extends Component
                 'deskripsi' => $deskripsiJurnal,
             ]);
 
-            // Jika metode pembayaran adalah EduPay
-            if ($this->metode_pembayaran == 'EduPay') {
+            // 7️⃣ EDU PAY (LOCK SALDO)
+            if ($this->metode_pembayaran === 'EduPay') {
                 if (!$this->user_id) {
-                    $this->dispatchBrowserEvent('alertify-error', ['message' => 'Scan kartu siswa']);
-                    return;
+                    throw new \Exception('Scan kartu siswa terlebih dahulu.');
                 }
 
-                $totalBayar = $this->totalKeranjang;
-                $saldoEduPay = $this->saldo_edupay;
-
-                if ($saldoEduPay < $totalBayar) {
-                    $this->dispatchBrowserEvent('alertify-error', ['message' => 'Saldo EduPay tidak cukup.']);
-                    return;
+                if ($this->saldo_edupay < $totalBayar) {
+                    throw new \Exception('Saldo EduPay tidak cukup.');
                 }
 
-                $deskripsiEduPay = $keranjang->map(function ($item) {
-                    return $item->ms_produk_kantin->nama_produk_kantin . ' x' . $item->jumlah_produk;
-                })->join(', ');
-
-                $this->simpanTransaksiEduPay($totalBayar, $deskripsiEduPay, $jurnalDetailDebit->akuntansi_jurnal_detail_id, $jurnalDetailKredit->akuntansi_jurnal_detail_id);
+                $this->simpanTransaksiEduPay(
+                    $totalBayar,
+                    $deskripsiJurnal,
+                    $jurnalDetailDebit->akuntansi_jurnal_detail_id,
+                    $jurnalDetailKredit->akuntansi_jurnal_detail_id
+                );
             }
 
-            // Insert transaksi utama
+            // 8️⃣ TRANSAKSI UTAMA
             $transaksi = TransaksiSmartCanteen::create([
                 'user_type' => $this->user_type,
                 'user_id' => $this->user_id,
@@ -269,35 +271,37 @@ class KeranjangProduk extends Component
                 'is_settled' => 'belum',
             ]);
 
-            // Insert detail transaksi
-            foreach ($keranjang as $item) {
+            // 9️⃣ DETAIL TRANSAKSI
+            foreach ($this->keranjang as $item) {
                 DetailTransaksiSmartCanteen::create([
                     'ms_transaksi_kantin_id' => $transaksi->ms_transaksi_kantin_id,
-                    'ms_produk_kantin_id' => $item->ms_produk_kantin_id,
-                    'jumlah_produk' => $item->jumlah_produk,
-                    'jumlah_bayar' => ($item->ms_produk_kantin->harga ?? 0) * $item->jumlah_produk,
-                    'deskripsi' => "Pembelian {$item->ms_produk_kantin->nama_produk_kantin} x{$item->jumlah_produk}",
+                    'ms_produk_kantin_id' => $item['produk_id'],
+                    'jumlah_produk' => $item['jumlah'],
+                    'jumlah_bayar' => $item['subtotal'],
+                    'deskripsi' => "Pembelian {$item['nama']} x{$item['jumlah']}",
                 ]);
             }
 
-            // Kosongkan keranjang
-            KeranjangSmartCanteen::where('ms_pengguna_id', $ms_pengguna_id)
-                ->where('user_type', $this->user_type)
-                ->where('user_id', $this->user_id)
-                ->delete();
+            // 🔟 RESET STATE
+            $this->keranjang = [];
 
             DB::commit();
 
-            $this->dispatchBrowserEvent('alertify-success', ['message' => 'Transaksi kantin berhasil disimpan.']);
-            $this->emitSelf('$refresh');
+            $this->dispatchBrowserEvent('alertify-success', [
+                'message' => 'Transaksi kantin berhasil disimpan.'
+            ]);
 
             $this->emit('resetScan');
             $this->resetScan();
         } catch (\Exception $e) {
             DB::rollBack();
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ]);
         }
     }
+
     public function simpanTransaksiEduPay($totalBayar, $deskripsiEduPay, $akuntansi_jurnal_detail_debit_id, $akuntansi_jurnal_detail_kredit_id)
     {
         // Simpan transaksi EduPay dengan jenis transaksi 'pembayaran'
@@ -317,25 +321,6 @@ class KeranjangProduk extends Component
 
     public function render()
     {
-        // default collection kosong
-        $keranjang = collect();
-        $this->totalKeranjang = 0;
-        if ($this->user_id) {
-            $ms_pengguna_id = auth()->id();
-            $keranjang = KeranjangSmartCanteen::with('ms_produk_kantin')
-                ->where('user_id', $this->user_id)
-                ->where('ms_pengguna_id', $ms_pengguna_id)
-                ->get();
-
-            // Hitung total keranjang
-            $this->totalKeranjang = $keranjang->sum(function ($item) {
-                return ($item->ms_produk_kantin->harga ?? 0) * $item->jumlah_produk;
-            });
-        }
-
-        return view('livewire.smart-canteen.transaksi-produk.keranjang-produk', [
-            'keranjang' => $keranjang,
-            'totalKeranjang' => $this->totalKeranjang,
-        ]);
+        return view('livewire.smart-canteen.transaksi-produk.keranjang-produk');
     }
 }

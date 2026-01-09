@@ -19,36 +19,38 @@
                 </thead>
                 <tbody>
                     @if ($user_id)
-                        @forelse($keranjang as $item)
-                            <tr>
-                                {{-- <td class="text-center">
-                                    <button type="button" class="btn btn-sm btn-soft-danger"
-                                            wire:click="hapusKeranjang({{ $item->ms_keranjang_kantin_id }})">
-                                        <i class="ri-delete-bin-5-line"></i>
-                                    </button>
-                                </td> --}}
-                                <td class="text-start">
-                                    <span class="fs-12 fw-semibold text-uppercase">{{ $item->ms_produk_kantin->nama_produk_kantin ?? '-' }}</span>
-                                    <p class="text-muted mb-0">RP{{ number_format($item->ms_produk_kantin->harga, 0, ',', '.') }}</p>
-                                </td>
-                               <td class="text-center align-middle">
-                                    <div class="d-flex justify-content-center align-items-center gap-1" style="border: 0;">
-                                        <button type="button" class="minus shadow btn btn-sm btn-light" wire:click="decrementQty({{ $item->ms_keranjang_kantin_id }})">–</button>
-
-                                        <input type="text" class="product-quantity form-control form-control-sm text-center" style="width: 50px;" value="{{ $item->jumlah_produk }}" readonly>
-
-                                        <button type="button" class="plus shadow btn btn-sm btn-light" wire:click="incrementQty({{ $item->ms_keranjang_kantin_id }})">+</button>
-                                    </div>
-                                </td>
-
-                                <td class="text-end fw-medium text-success fs-14">
-                                    RP{{ number_format(($item->ms_produk_kantin->harga ?? 0) * $item->jumlah_produk, 0, ',', '.') }}
-                                </td>
-                            </tr>
+                        @forelse($keranjang as $index => $item)
+                        <tr>
+                            <td class="text-start">
+                                <span class="fs-12 fw-semibold text-uppercase">
+                                    {{ $item['nama'] }}
+                                </span>
+                                <p class="text-muted mb-0">
+                                    RP{{ number_format($item['harga'], 0, ',', '.') }}
+                                </p>
+                            </td>
+                        
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center gap-1">
+                                    <button class="btn btn-sm btn-light" wire:click="decrementQty({{ $index }})">–</button>
+                        
+                                    <input class="form-control form-control-sm text-center" style="width:50px" value="{{ $item['jumlah'] }}"
+                                        readonly>
+                        
+                                    <button class="btn btn-sm btn-light" wire:click="incrementQty({{ $index }})">+</button>
+                                </div>
+                            </td>
+                        
+                            <td class="text-end fw-medium fs-14 text-success">
+                                RP{{ number_format($item['subtotal'], 0, ',', '.') }}
+                            </td>
+                        </tr>
                         @empty
-                            <tr>
-                                <td colspan="3" class="text-center text-muted">Keranjang masih kosong</td>
-                            </tr>
+                        <tr>
+                            <td colspan="3" class="text-center text-muted">
+                                Keranjang masih kosong
+                            </td>
+                        </tr>
                         @endforelse
                     @else
                         <tr>
@@ -64,7 +66,7 @@
                 <tbody>
                     <tr class="border-top border-top-dashed fs-15">
                         <th scope="row">TOTAL</th>
-                        <th class="text-end">RP{{ number_format($totalKeranjang, 2, ',', '.') }}</th>
+                        <th class="text-end">RP{{ number_format($this->totalKeranjang, 0, ',', '.') }}</th>
                     </tr>
                 </tbody>
             </table>
