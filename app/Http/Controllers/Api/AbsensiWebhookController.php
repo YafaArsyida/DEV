@@ -13,12 +13,12 @@ class AbsensiWebhookController extends Controller
 
         // 🔐 Cek Header Token
         // dd($request->header('X-ABSEN-KEY'), env('ABSEN_WEBHOOK_KEY'));
-        if ($request->header('X-ABSEN-KEY') !== config('webhook.key')) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized'
-            ], 401);
-        }
+        // if ($request->header('X-ABSEN-KEY') !== config('webhook.key')) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Unauthorized'
+        //     ], 401);
+        // }
 
         $payload = $request->all();
 
