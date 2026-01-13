@@ -90,6 +90,13 @@
                         <span>Presensi Pegawai</span>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="{{ route('smartPass.laporan-fingerspot.pegawai') }}"
+                        class="nav-link menu-link {{ request()->routeIs('smartPass.laporan-fingerspot.pegawai*') ? 'active' : '' }}">
+                        <i class="mdi mdi-file-chart-outline"></i>
+                        <span>FingerSpot Pegawai</span>
+                    </a>
+                </li>
             
                 <li class="nav-item">
                     <a href="{{ route('smartPass.laporan.pegawai') }}"

@@ -40,6 +40,7 @@ use App\Http\Controllers\SmartCanteenSettlementTransaksi;
 use App\Http\Controllers\SmartCanteenTransaksiProduk;
 use App\Http\Controllers\SmartPassAdministrasiPegawai;
 use App\Http\Controllers\SmartPassDashboard;
+use App\Http\Controllers\SmartPassLaporanFingerSpotPegawai;
 use App\Http\Controllers\SmartPassLaporanPresensiPegawai;
 use App\Http\Controllers\SmartPassPresensiPegawai;
 use App\Http\Controllers\TagihanJenis;
@@ -131,6 +132,7 @@ Route::middleware(['auth', 'peran:superadmin,administrasi,kantin'])->group(funct
     Route::get('/smartPass/administrasi/siswa', [SmartPassAdministrasiPegawai::class, 'index'])->name('smartPass.administrasi.siswa');
 
     Route::get('/smartPass/laporan/pegawai', [SmartPassLaporanPresensiPegawai::class, 'index'])->name('smartPass.laporan.pegawai');
+    Route::get('/smartPass/laporan-fingerspot/pegawai', [SmartPassLaporanFingerSpotPegawai::class, 'index'])->name('smartPass.laporan-fingerspot.pegawai');
 
     Route::get('/smartPass/presensi/pegawai', [SmartPassPresensiPegawai::class, 'index'])->name('smartPass.presensi.pegawai');
     // SMARTPASS

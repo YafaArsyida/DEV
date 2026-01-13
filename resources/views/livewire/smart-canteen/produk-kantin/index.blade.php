@@ -69,7 +69,7 @@
             <li class="nav-item">
                 <button data-bs-toggle="modal" 
                     data-bs-target="#ModalTambahKategori" wire:click="$emit('showCreateKategori', {{ $selectedJenjang ?? 'null' }})" class="btn btn-sm shadow-none nav-link py-3">
-                    <i class="ri-add-line me-1 align-bottom"></i> Tambah Kategori
+                    <i class="ri-add-line me-1 align-bottom"></i> Tambah Desa
                 </button>
             </li>
         </ul>

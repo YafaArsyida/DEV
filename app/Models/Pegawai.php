@@ -20,6 +20,7 @@ class Pegawai extends Model
         'ms_jabatan_id',  // ID Jabatan
         'ms_jenjang_id',  // ID Jenjang
         'ms_pengguna_id', // ID Pengguna
+        'pin_fingerspot', // ID Pengguna
         'email',          // Email Pegawai
         'telepon',        // Nomor Telepon Pegawai
         'alamat',         // Alamat Pegawai

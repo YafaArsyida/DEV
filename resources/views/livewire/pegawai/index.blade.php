@@ -51,6 +51,7 @@
                             <th class="text-uppercase">kontak</th>
                             <th class="text-uppercase">Nomor Induk</th>
                             <th class="text-uppercase">Educard</th>
+                            <th class="text-uppercase">PIN Fingerspot</th>
                             <th class="text-uppercase">aksi</th>
                         </tr>
                     </thead>
@@ -89,6 +90,11 @@
                                     @else
                                         <em>Belum memiliki kartu</em>
                                     @endif
+                                </td>
+                                <td>
+                                    <span class="fw-medium fs-14 text-danger">
+                                        {{ $item->pin_fingerspot }}
+                                    </span>
                                 </td>
                                 <td>
                                     <div class="hstack gap-2">
