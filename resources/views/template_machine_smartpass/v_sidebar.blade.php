@@ -53,30 +53,30 @@
                     </a>
                 </li>
             
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <a href="{{ route('smartPass.presensi.pegawai') }}"
                         class="nav-link menu-link {{ request()->routeIs('smartPass.presensi.pegawai*') ? 'active' : '' }}">
                         <i class="mdi mdi-card-account-details"></i>
                         <span>Presensi Siswa</span>
                     </a>
                 </li>
-            
+             --}}
                 <!-- ================= MASTER DATA ================= -->
                 <li class="menu-title"><span>Adminnistrasi</span></li>
             
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <a href="{{ route('administrasi.kelas-siswa') }}"
                         class="nav-link menu-link {{ request()->routeIs('administrasi.kelas-siswa*') ? 'active' : '' }}">
                         <i class="mdi mdi-account-school-outline"></i>
                         <span>Data Siswa</span>
                     </a>
-                </li>
+                </li> --}}
             
                 <li class="nav-item">
                     <a href="{{ route('smartPass.administrasi.pegawai') }}"
                         class="nav-link menu-link {{ request()->routeIs('smartPass.administrasi.pegawai*') ? 'active' : '' }}">
                         <i class="mdi mdi-account-tie-outline"></i>
-                        <span>Data Pegawai</span>
+                        <span>Kepegawaian</span>
                     </a>
                 </li>
             

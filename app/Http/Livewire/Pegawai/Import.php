@@ -112,14 +112,14 @@ class Import extends Component
             DB::commit();
 
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'Data pegawai berhasil diimport.']);
-            $this->dispatchBrowserEvent('hide-edit-modal', ['modalId' => 'ModalImportPegawai']);
+            $this->dispatchBrowserEvent('hide-modal', ['modalId' => 'ModalImportPegawai']);
 
             // Reset data setelah sukses
             $this->newPegawaiList = null;
             $this->file_import = null;
 
-            $this->emit('refreshPegawais');
-            $this->emit('refreshJabatans');
+            $this->emit('PegawaiIndex');
+            $this->emit('JabatanIndex');
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi error
             DB::rollBack();

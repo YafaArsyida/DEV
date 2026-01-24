@@ -19,7 +19,6 @@ class Edit extends Component
         $this->nama_jabatan = $jabatan->nama_jabatan;
         $this->deskripsi = $jabatan->deskripsi;
 
-        $this->dispatchBrowserEvent('show-edit-modal'); // Menampilkan modal
     }
 
     public function rules()
@@ -47,8 +46,10 @@ class Edit extends Component
         $jabatan->update($validatedData);
 
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Berhasil mengubah jabatan!']);
-        $this->dispatchBrowserEvent('hide-edit-modal', ['modalId' => 'ModalEditJabatan']);
-        $this->emit('refreshJabatans');
+        $this->dispatchBrowserEvent('hide-modal', ['modalId' => 'ModalEditJabatan']);
+        $this->emit('JabatanIndex'); // Refresh data di komponen Index
+        $this->emit('PegawaiIndex'); // Refresh data di komponen Index
+
     }
     public function render()
     {

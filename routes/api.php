@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::post('/absensi/webhook', [AbsensiWebhookController::class, 'receive']);
+// Route::post('/webhook/fingerspot', [\App\Http\Controllers\FingerspotWebhookController::class, 'handle']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

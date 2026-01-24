@@ -19,10 +19,10 @@ class Create extends Component
     public $selectedJenjang; // Tambahkan variabel untuk menyimpan jenjang
 
     protected $listeners = [
-        'showAddPegawai',
+        'PegawaiCreate',
     ];
 
-    public function showAddPegawai($selectedJenjang)
+    public function PegawaiCreate($selectedJenjang)
     {
         $this->selectedJenjang = $selectedJenjang;
         $this->nama_jenjang = Jenjang::where('ms_jenjang_id', $selectedJenjang)->value('nama_jenjang');
@@ -106,10 +106,10 @@ class Create extends Component
             $this->resetInput();
 
             // Tutup modal dan refresh data siswa
-            // $this->dispatchBrowserEvent('hide-create-modal', ['modalId' => 'ModalAddPegawai']);
+            $this->dispatchBrowserEvent('hide-modal', ['modalId' => 'ModalPegawaiCreate']);
 
-            $this->emit('refreshJabatans');
-            $this->emit('refreshPegawais');
+            $this->emit('JabatanIndex');
+            $this->emit('PegawaiIndex');
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi error
             DB::rollBack();

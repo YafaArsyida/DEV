@@ -135,7 +135,7 @@ class ImportKontak extends Component
         $this->newPegawaiList = [];
         $this->file_import = null;
 
-        $this->emit('refreshPegawais');
+        $this->emit('PegawaiIndex');
     }
 
     public function render()

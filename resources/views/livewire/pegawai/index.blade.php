@@ -1,145 +1,144 @@
-{{-- Do your work, then step back. --}}
-<div class="card">
-    <div class="card-header border-0 pb-0">
-        <div class="d-flex align-items-center">
-            <h5 class="card-title mb-0 flex-grow-1">Data Pegawai</h5>
-            <div class="flex-shrink-0">
-                <div class="d-flex gap-2 flex-wrap">
+<div class="card" id="generusList">
+    <div class="card-header border-0">
+        <div class="row align-items-center gy-3">
+            <div class="col-sm">
+                <h5 class="card-title mb-0">Data Pegawai</h5>
+            </div>
+
+            <div class="col-sm-auto">
+                <div class="d-flex gap-1 flex-wrap">
                     @if ($selectedJenjang)
-                    <button data-bs-toggle="modal" data-bs-target="#ModalImportKontakPegawai" wire:click.prevent="$emit('showImportKontakPegawai', {{ $selectedJenjang }})" class="btn btn-success"><i class="ri-whatsapp-line me-1 align-bottom"></i> Import Kontak</button>                        
-                    <button data-bs-toggle="modal" data-bs-target="#ModalImportEduCardPegawai" wire:click.prevent="$emit('showImportEduCardPegawai', {{ $selectedJenjang }})" class="btn btn-warning"><i class="ri-bank-card-line me-1 align-bottom"></i> Import EduCard</button>                        
+                    <button data-bs-toggle="modal" data-bs-target="#ModalImportKontakPegawai" wire:click.prevent="$emit('showImportKontakPegawai', {{ $selectedJenjang }})" class="btn btn-success"><i class="ri-whatsapp-line me-1 align-bottom"></i> Import Kontak</button>
+                    <button data-bs-toggle="modal" data-bs-target="#ModalImportEduCardPegawai" wire:click.prevent="$emit('showImportEduCardPegawai', {{ $selectedJenjang }})" class="btn btn-warning"><i class="ri-bank-card-line me-1 align-bottom"></i> Import EduCard</button>
                     <button data-bs-toggle="modal" data-bs-target="#ModalImportPegawai" wire:click.prevent="$emit('showImportPegawai', {{ $selectedJenjang }})" class="btn btn-secondary"><i class="ri-contacts-line me-1 align-bottom"></i> Import Pegawai</button>
-                    <button data-bs-toggle="modal" data-bs-target="#ModalAddPegawai" wire:click.prevent="$emit('showAddPegawai', {{ $selectedJenjang }})" class="btn btn-primary"><i class="ri-play-list-add-line align-bottom me-1"></i>Pegawai Baru</button>
+                    <button data-bs-toggle="modal" data-bs-target="#ModalPegawaiCreate" wire:click.prevent="$emit('PegawaiCreate', {{ $selectedJenjang }})" class="btn btn-primary"><i class="ri-play-list-add-line align-bottom me-1"></i>Pegawai Baru</button>
                     @endif
-                    <button data-bs-toggle="modal" data-bs-target="#ModalExportSiswa" wire:click.prevent="showExportSiswa"  class="btn btn-soft-success"><i class="ri-file-excel-2-line me-1 align-bottom"></i> Export</button>
+                    <button data-bs-toggle="modal" data-bs-target="#ModalPegawaiExport" class="btn btn-soft-success"><i class="ri-file-excel-2-line align-bottom me-1"></i> Export</button>
                 </div>
             </div>
         </div>
     </div>
-    <div class="card-body">
-        <div class="row g-3 mb-3">
-            <div class="col-xxl-8 col-sm-6">
+
+    <!-- Search & Filter -->
+    <div class="card-body border border-dashed border-start-0 border-end-0">
+        <div class="row g-3">
+
+            {{-- Search --}}
+            <div class="col-xxl-10 col-sm-8">
                 <div class="search-box">
-                    <input type="text" class="form-control search" wire:model.debounce.300ms="search" placeholder="cari nama, deskripsi atau lainnya...">
+                    <input type="text" class="form-control" wire:model.debounce.400ms="search"
+                        placeholder="Cari nama pegawai ...">
                     <i class="ri-search-line search-icon"></i>
                 </div>
             </div>
-            <div class="col-xxl-4 col-sm-6"> 
-                <div class="input-group">
-                    <select wire:model="selectedJenjang" style="cursor: pointer" class="form-select border-1 dash-filter-picker shadow" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Unit">
-                        <option value="">Semua Unit</option>
-                        @foreach ($select_jenjang as $item)
-                            <option value="{{ $item->ms_jenjang_id }}">{{ $item->nama_jenjang }}</option>
-                        @endforeach
-                    </select>
-                    <div class="input-group-text bg-primary border-primary text-white">
-                        <i class=" ri-government-line"></i>
+            <div class="col-xxl-2 col-sm-4">
+                <button type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasJabatan"
+                    aria-controls="offcanvasJabatan" class="btn btn-primary w-100">
+                    <i class="ri-equalizer-fill me-1 align-bottom"></i> Master Data Jabatan
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="card-body pt-0">
+        <ul class="nav nav-tabs nav-tabs-custom nav-success" role="tablist">
+        
+            {{-- TAB SEMUA --}}
+            <li class="nav-item">
+                <a class="nav-link py-3 {{ $activeTab === 'semua' ? 'active' : '' }}" wire:click="setActiveTab('semua')"
+                    data-bs-toggle="tab" href="#tabSemua" role="tab">
+                    <i class="ri-team-fill me-1 align-bottom"></i>
+                    Semua Pegawai
+                </a>
+            </li>
+        
+            {{-- TAB DINAMIS JABATAN --}}
+            @foreach($jabatan as $item)
+            <li class="nav-item">
+                <a class="nav-link py-3 {{ $activeTab === 'jabatan-'.$item->ms_jabatan_id ? 'active' : '' }}"
+                    wire:click="setActiveTab('jabatan-{{ $item->ms_jabatan_id }}')" data-bs-toggle="tab"
+                    href="#tabJabatan{{ $item->ms_jabatan_id }}" role="tab">
+                    <i class="ri-medal-fill me-1 align-bottom"></i>
+                    {{ $item->nama_jabatan }}
+                </a>
+            </li>
+            @endforeach
+            <li class="nav-item">
+                <button data-bs-toggle="modal" data-bs-target="#ModalJabatanCreate" wire:click="$emit('JabatanCreate')"
+                    class="btn btn-sm shadow-none nav-link py-3">
+                    <i class="ri-add-line me-1 align-bottom"></i> Tambah Jabatan
+                </button>
+            </li>
+        </ul>
+        <div class="tab-content mt-3">
+        
+            {{-- TAB SEMUA --}}
+            <div class="tab-pane fade {{ $activeTab === 'semua' ? 'show active' : '' }}" id="tabSemua" role="tabpanel">
+        
+                @php $listPegawai = $allPegawai; @endphp
+                @include('livewire.pegawai.data', compact('listPegawai'))
+            </div>
+        
+            {{-- TAB PER JABATAN --}}
+            @foreach($jabatan as $grp)
+            <div class="tab-pane fade {{ $activeTab === 'jabatan-'.$grp->ms_jabatan_id ? 'show active' : '' }}"
+                id="tabJabatan{{ $grp->ms_jabatan_id }}" role="tabpanel">
+        
+                @php
+                $listPegawai = $allPegawai->where('ms_jabatan_id', $grp->ms_jabatan_id);
+                @endphp
+        
+                @include('livewire.pegawai.data', compact('listPegawai'))
+            </div>
+            @endforeach
+        
+        </div>
+    </div>
+    {{-- MODAL --}}
+    <div class="modal fade zoomIn" id="ModalPegawaiExport" tabindex="-1" aria-labelledby="exportRecordLabel"
+        aria-hidden="true" wire:ignore.self>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-5 text-center">
+                    <lord-icon src="https://cdn.lordicon.com/fjvfsqea.json" trigger="loop"
+                        colors="primary:#405189,secondary:#f06548" style="width:90px;height:90px"></lord-icon>
+                    <div class="mt-4 text-center">
+                        <h4 class="fs-semibold">Konfirmasi Export</h4>
+                        <p class="text-muted fs-14 mb-4 pt-1">
+                            Apakah Anda yakin ingin mengekspor laporan Data Pegawai? Data yang diekspor akan
+                            sesuai dengan tabel yang ditampilkan.
+                        </p>
+                        <div class="hstack gap-2 justify-content-center remove">
+                            <button class="btn btn-link link-success fw-medium text-decoration-none shadow-none"
+                                data-bs-dismiss="modal">
+                                <i class="ri-close-line me-1 align-middle"></i> Batal
+                            </button>
+                            <button class="btn btn-primary" id="konfirmasiExportLaporan" data-bs-dismiss="modal">Ya,
+                                Export!</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <!--end row-->
-        {{-- DATA --}}
-        <div class="live-preview">
-           <div class="table-responsive">
-                <table class="table table-hover nowrap align-middle" style="width:100%">
-                    <thead class="table-light">
-                        <tr>
-                            <th class="text-uppercase" width="50px">no</th>
-                            <th class="text-uppercase">pegawai</th>
-                            <th class="text-uppercase">jabatan</th>
-                            <th class="text-uppercase">kontak</th>
-                            <th class="text-uppercase">Nomor Induk</th>
-                            <th class="text-uppercase">Educard</th>
-                            <th class="text-uppercase">PIN Fingerspot</th>
-                            <th class="text-uppercase">aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($pegawais as $item)
-                            <tr>
-                                <td>{{ $loop->iteration }}.</td>
-                                <td>
-                                    <span class="fw-medium">
-                                        {{ $item->nama_pegawai }}
-                                    </span>
-                                    <p class="text-muted mb-0">{{ $item->deskripsi }}</p>
-                                </td>
-                                <td>
-                                    <span class="fw-medium">
-                                        {{ $item->ms_jabatan->nama_jabatan }}
-                                    </span>
-                                    <p class="text-muted mb-0">Unit : {{ $item->ms_jenjang->nama_jenjang }}</p>
-                                </td>
-                                <td>
-                                    <span class="fw-medium text-success">
-                                        Telepon : {{ $item->telepon }}
-                                    </span>
-                                    <p class="text-primary mb-0">e-mail : <i>{{ $item->email }}</i></p>
-                                </td>
-                                <td>
-                                    <span class="fw-medium fs-14 text-info">
-                                    {{ $item->nip }}
-                                    </span>
-                                </td>
-                                <td>
-                                    @if ($item->ms_educard)
-                                    <span class="fw-medium fs-14 text-warning">
-                                        {{ $item->ms_educard->kode_kartu }}
-                                    </span>
-                                    @else
-                                        <em>Belum memiliki kartu</em>
-                                    @endif
-                                </td>
-                                <td>
-                                    <span class="fw-medium fs-14 text-danger">
-                                        {{ $item->pin_fingerspot }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="hstack gap-2">
-                                        {{-- Tombol Edit Pegawai --}}
-                                        <button class="btn btn-sm btn-info d-inline-flex align-items-center"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#ModalEditPegawai"
-                                                title="Edit Pegawai"
-                                                wire:click.prevent="$emit('loadDataPegawai', {{ $item->ms_pegawai_id }})">
-                                            <i class="ri-quill-pen-line align-bottom me-1"></i> Edit
-                                        </button>
-
-                                        {{-- Tombol Hapus Pegawai --}}
-                                        <button class="btn btn-sm btn-soft-danger d-inline-flex align-items-center"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#deletePegawai"
-                                                title="Hapus Pegawai"
-                                                wire:click.prevent="$emit('confirmDeletePegawai', {{ $item->ms_pegawai_id }})">
-                                            <i class="ri-delete-bin-5-line align-bottom me-1"></i>
-                                        </button>
-                                    </div>
-                                </td>
-
-                            </tr>
-                        @empty
-                            <!-- Jika Tidak Ada Data Kelas -->
-                            <tr>
-                                <td colspan="7">
-                                    <div class="noresult text-center py-3">
-                                        <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop"
-                                            colors="primary:#405189,secondary:#08a88a"
-                                            style="width:75px;height:75px">
-                                        </lord-icon>
-                                        <h5 class="mt-2">Maaf, Tidak Ada Data yang Ditemukan</h5>
-                                        <p class="text-muted mb-0">Kami telah mencari keseluruhan data, namun tidak ditemukan hasil yang sesuai.</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-                <!-- Pagination -->
-                {{ $pegawais->links() }}
-            </div>
-        </div>
-        {{-- DATA --}}
     </div>
+    <script>
+        document.getElementById('konfirmasiExportLaporan').addEventListener('click', function () {
+                alertify.success("Menyiapkan Dokumen");
+                // Tambahkan delay 1 detik
+                setTimeout(function () {
+                    // Ambil elemen tabel berdasarkan ID
+                    var table = document.getElementById("PegawaiData");
+                    
+                    // Konversi tabel ke format Excel
+                    var workbook = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+                    
+                    // Simpan file Excel
+                    XLSX.writeFile(workbook, "Data Pegawai.xlsx");
+                }, 1000); // 1000 ms = 1 detik
+            });
+    </script>
 </div>

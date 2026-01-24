@@ -10,16 +10,28 @@
                 <form wire:submit.prevent="updateJabatan">
                     <div class="modal-body">
                         <div class="row g-3">
-                            <div class="col-lg-12">
-                                <label for="nama_jabatan" class="form-label">Nama Jabatan</label>
-                                <input type="text" id="nama_jabatan" wire:model="nama_jabatan" class="form-control">
-                                @error('nama_jabatan') 
-                                    <footer class="text-danger mt-0">{{ $message }}</footer> 
+                            <div class="col-12">
+                                <label for="nama_jabatan" class="form-label fw-semibold">
+                                    Nama Jabatan <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" wire:model.defer="nama_jabatan" id="nama_jabatan"
+                                    class="form-control @error('nama_jabatan') is-invalid @enderror" placeholder="Contoh: Kepala Sekolah" />
+                        
+                                @error('nama_jabatan')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <div class="col-lg-12">
-                                <label for="deskripsi" class="form-label">Deskripsi</label>
-                                <textarea id="deskripsi" wire:model="deskripsi" class="form-control"></textarea>
+                            <div class="col-12">
+                                <label for="deskripsi" class="form-label fw-semibold">
+                                    Deskripsi
+                                </label>
+                                <textarea wire:model.defer="deskripsi" id="deskripsi"
+                                    class="form-control @error('deskripsi') is-invalid @enderror" rows="3"
+                                    placeholder="Contoh: Bertanggung jawab atas operasional sekolah"></textarea>
+                        
+                                @error('deskripsi')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
                     </div>

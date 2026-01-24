@@ -49,8 +49,8 @@ class Delete extends Component
             $pegawai->delete();
 
             // Tutup modal dan refresh data
-            $this->dispatchBrowserEvent('hide-delete-modal', ['modalId' => 'deletePegawai']);
-            $this->emit('refreshPegawais');
+            $this->dispatchBrowserEvent('hide-modal', ['modalId' => 'deletePegawai']);
+            $this->emit('PegawaiIndex');
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'Pegawai berhasil dihapus.']);
         } catch (\Exception $e) {
             // Penanganan error jika penghapusan gagal

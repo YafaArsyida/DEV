@@ -9,6 +9,14 @@ class Create extends Component
 {
     public $nama_jabatan, $deskripsi;
 
+    protected $listeners = [
+        'JabatanCreate',
+    ];
+
+    public function JabatanCreate(){
+        $this->resetInput();
+    }
+    
     protected function rules()
     {
         return [
@@ -33,7 +41,7 @@ class Create extends Component
 
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Berhasil menambah jabatan!']);
         $this->resetInput();
-        $this->dispatchBrowserEvent('hide-create-modal', ['modalId' => 'ModalAddJabatan']);
+        $this->dispatchBrowserEvent('hide-create-modal', ['modalId' => 'ModalJabatanCreate']);
         $this->emit('refreshJabatans');
     }
 

@@ -120,9 +120,9 @@ class Edit extends Component
             DB::commit();
 
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'Berhasil memperbarui data pegawai!']);
-            $this->dispatchBrowserEvent('hide-edit-modal', ['modalId' => 'ModalEditPegawai']);
-            $this->emit('refreshPegawais');
-            $this->emit('refreshJabatans');
+            $this->dispatchBrowserEvent('hide-modal', ['modalId' => 'ModalEditPegawai']);
+            $this->emit('PegawaiIndex');
+            $this->emit('JabatanIndex');
         } catch (\Exception $e) {
             DB::rollBack();
 

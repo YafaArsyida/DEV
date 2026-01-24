@@ -10,12 +10,11 @@ class Delete extends Component
 {
     public $ms_jabatan_id;
 
-    protected $listeners = ['confirmDelete' => 'setJabatanId'];
+    protected $listeners = ['confirmDeleteJabatan' => 'setJabatanId'];
 
     public function setJabatanId($id)
     {
         $this->ms_jabatan_id = $id;
-        $this->dispatchBrowserEvent('show-delete-modal'); // Tampilkan modal
     }
 
     public function deleteJabatan()
@@ -34,8 +33,9 @@ class Delete extends Component
                 } else {
                     // Jika belum digunakan, hapus Jabatan
                     $jabatan->delete();
-                    $this->dispatchBrowserEvent('hide-delete-modal', ['modalId' => 'ModalDeleteJabatan']);
-                    $this->emit('refreshJabatans'); // Refresh data di komponen Index
+                    $this->dispatchBrowserEvent('hide-modal', ['modalId' => 'ModalDeleteJabatan']);
+                    $this->emit('JabatanIndex'); // Refresh data di komponen Index
+                    $this->emit('PegawaiIndex'); // Refresh data di komponen Index
                     $this->dispatchBrowserEvent('alertify-success', ['message' => 'Jabatan berhasil dihapus.']);
                 }
             } else {

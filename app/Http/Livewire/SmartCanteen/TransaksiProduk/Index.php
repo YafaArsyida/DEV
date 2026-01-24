@@ -183,6 +183,15 @@ class Index extends Component
             $query->where('nama_produk_kantin', 'like', '%' . $this->search . '%');
         }
 
+        if (auth()->check()) {
+            $peran = auth()->user()->peran;
+
+            if ($peran === 'kantin') {
+                $query->where('ms_pengguna_id', auth()->id());
+            }
+            // superadmin → tidak difilter (lihat semua)
+        }
+
         // ini ambil SEMUA produk sesuai jenjang + search
         $allProduk = $query->get();
 

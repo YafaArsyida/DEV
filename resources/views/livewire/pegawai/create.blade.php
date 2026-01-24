@@ -1,6 +1,6 @@
 {{-- Be like water. --}}
 <div>
-    <div wire:ignore.self class="modal fade" id="ModalAddPegawai" tabindex="-1" aria-labelledby="ModalAddPegawai" aria-hidden="true">
+    <div wire:ignore.self class="modal fade" id="ModalPegawaiCreate" tabindex="-1" aria-labelledby="ModalPegawaiCreate" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-light p-3">

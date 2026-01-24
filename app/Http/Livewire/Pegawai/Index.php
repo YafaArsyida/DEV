@@ -10,48 +10,64 @@ use Livewire\WithPagination;
 
 class Index extends Component
 {
-    use WithPagination;
-    protected $paginationTheme = 'bootstrap'; // Gunakan tema Bootstrap
-
     public $search = '';
-
     public $selectedJenjang = null;
 
-    protected $listeners = ['refreshPegawais' => '$refresh']; // Gunakan Livewire refresh untuk memuat ulang data
+    public $activeTab = 'semua';
 
-    public function updatingSearch()
+    protected $listeners = [
+        'parameterUpdated',
+        'PegawaiIndex' => '$refresh',
+    ];
+
+    public function setActiveTab($tab)
     {
-        $this->resetPage();
+        $this->activeTab = $tab;
     }
 
-    public function updatingSelectedJenjang()
+    public function parameterUpdated($jenjangId)
     {
-        $this->resetPage();
+        $this->selectedJenjang = $jenjangId;
+        $this->activeTab = 'semua';
     }
 
-    public function render()
+    public function getJabatanProperty()
     {
-        $select_jenjang = [];
-        $select_jenjang = Jenjang::get();
+        return Jabatan::orderBy('nama_jabatan')
+            ->get();
+    }
 
-        $query = Pegawai::query()->with('ms_educard');;
+    public function getAllPegawaiProperty()
+    {
+        $query = Pegawai::with([
+            'ms_jabatan',
+            'ms_jenjang',
+            'ms_educard'
+        ]);
 
         if ($this->selectedJenjang) {
             $query->where('ms_jenjang_id', $this->selectedJenjang);
         }
 
-        $pegawais = $query->where(function ($query) {
-            $query->where('nama_pegawai', 'like', '%' . $this->search . '%')
-                ->orWhere('deskripsi', 'like', '%' . $this->search . '%');
-        })
-            ->orderBy('ms_jenjang_id', 'ASC') // Tambahkan pengurutan berdasarkan ms_jabatan_id
-            ->orderBy('ms_jabatan_id', 'ASC') // Tambahkan pengurutan berdasarkan ms_jabatan_id
-            ->orderBy('nama_pegawai', 'ASC') // Lanjutkan pengurutan berdasarkan nama_pegawai
-            ->paginate(500);
+        if ($this->search) {
+            $query->where(function ($q) {
+                $q->where('nama_pegawai', 'like', '%' . $this->search . '%')
+                    ->orWhere('deskripsi', 'like', '%' . $this->search . '%');
+            });
+        }
 
+        return $query
+            ->orderBy('ms_jenjang_id', 'ASC')
+            ->orderBy('ms_jabatan_id', 'ASC')
+            ->orderBy('nama_pegawai', 'ASC')
+            ->get();
+    }
+
+    public function render()
+    {
         return view('livewire.pegawai.index', [
-            'select_jenjang' => $select_jenjang,
-            'pegawais' => $pegawais
+            'jabatan'    => $this->jabatan,
+            'allPegawai' => $this->allPegawai,
         ]);
     }
 }

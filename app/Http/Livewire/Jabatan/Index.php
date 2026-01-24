@@ -8,17 +8,9 @@ use Livewire\WithPagination;
 
 class Index extends Component
 {
-    use WithPagination;
-    protected $paginationTheme = 'bootstrap'; // Gunakan tema Bootstrap
-
     public $search = '';
 
-    protected $listeners = ['refreshJabatans' => '$refresh']; // Gunakan Livewire refresh untuk memuat ulang data
-
-    public function updatingSearch()
-    {
-        $this->resetPage();
-    }
+    protected $listeners = ['JabatanIndex' => '$refresh']; // Gunakan Livewire refresh untuk memuat ulang data
 
     public function render()
     {
