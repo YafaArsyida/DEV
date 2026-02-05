@@ -11,8 +11,8 @@
                 <div class="text-muted">Kelas : <span class="text-body fw-medium">{{ $nama_kelas ?? 'Belum ada' }}</span></div>
                 <div class="vr"></div>
                 <div class="text-muted">Telepon : <span class="text-body fw-medium">{{ $telepon ?? 'Tidak tersedia' }}</span></div>
-                <div class="vr"></div>
-                <div class="text-muted">Virtual Akun : <span class="text-body fw-medium">9888838383838</span></div>
+                {{-- <div class="vr"></div> --}}
+                {{-- <div class="text-muted">Virtual Akun : <span class="text-body fw-medium">9888838383838</span></div> --}}
             </div>
         </div>
         <div class="flex-shrink-0">

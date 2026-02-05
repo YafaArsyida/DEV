@@ -11,6 +11,7 @@ use App\Models\PenempatanSiswa;
 use App\Models\Siswa;
 use App\Models\TransaksiEduPay;
 use App\Models\WhatsAppTransaksiEduPay;
+use Carbon\Carbon;
 use Exception;
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
@@ -40,6 +41,13 @@ class Index extends Component
     public $nominal_penarikan;
     public $deskripsi_penarikan;
 
+    public $startDate = null;
+    public $endDate = null;
+
+    public $selectedJenis = '';     // topup tunai, pembayaran, kantin, dll
+    public $search = '';
+    public $selectedRekening = '';  // kas/bank (opsional kalau ada kolomnya)
+
     protected $listeners = [
         'showEduPay',
         'refreshEduPays'
@@ -51,13 +59,14 @@ class Index extends Component
         $siswa = Siswa::find($this->ms_siswa_id);
         $this->saldo_edupay_siswa = $siswa->saldo_edupay_siswa(); // Menghitung saldo secara dinamis
         $this->total_pemasukan_edupay_siswa = $siswa->total_pemasukan_edupay();
-        $this->total_penarikan_edupay_siswa = $siswa->total_penarikan_edupay();
-        $this->total_pembayaran_edupay_siswa = $siswa->total_pembayaran_edupay();
         $this->total_pengeluaran_edupay_siswa = $siswa->total_pengeluaran_edupay();
     }
 
     public function showEduPay($params)
     {
+        $this->startDate = now()->startOfMonth()->format('Y-m-d');
+        $this->endDate   = now()->format('Y-m-d');
+        
         $this->ms_penempatan_siswa_id = $params['ms_penempatan_siswa_id'];
 
         // Ambil penempatan siswa + relasi lengkap
@@ -242,7 +251,7 @@ class Index extends Component
             $ms_pengguna_id = Auth::id();
 
             $kode_rekening_kas = 11001;
-            $kode_rekening_bank = 11002;
+            // $kode_rekening_bank = 11002;
             $kode_rekening_edupay = 22002;
 
             $deskripsiJurnal = "Penarikan Tunai EduPay Rp {$this->nominal_penarikan} siswa {$this->nama_siswa}";
@@ -317,10 +326,11 @@ class Index extends Component
     {
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Pesan sedang diproses.']);
 
-        // Ambil transaksi berdasarkan ID
+        // Ambil transaksi target
         $targetTransaksi = TransaksiEduPay::with(['ms_siswa', 'ms_pengguna'])
             ->where('user_type', 'siswa')
             ->where('ms_transaksi_edupay_id', $edupayId)
+            ->where('user_id', $this->ms_siswa_id)
             ->first();
 
         if (!$targetTransaksi) {
@@ -328,31 +338,38 @@ class Index extends Component
             return;
         }
 
-        // Ambil semua transaksi siswa untuk hitung saldo
+        // Ambil semua transaksi sebelum transaksi target (urut ASC)
         $edupayTransaksi = TransaksiEduPay::where('user_id', $this->ms_siswa_id)
-            // ->orderBy('ms_transaksi_edupay_id', 'ASC')
+            ->where(function ($q) use ($targetTransaksi) {
+                $q->where('tanggal', '<', $targetTransaksi->tanggal)
+                    ->orWhere(function ($sub) use ($targetTransaksi) {
+                        $sub->where('tanggal', $targetTransaksi->tanggal)
+                            ->where('ms_transaksi_edupay_id', '<', $targetTransaksi->ms_transaksi_edupay_id);
+                    });
+            })
             ->orderBy('tanggal', 'ASC')
+            ->orderBy('ms_transaksi_edupay_id', 'ASC')
             ->get();
 
-        // Hitung saldo sampai transaksi yang diminta
-        $saldo = 0;
-        foreach ($edupayTransaksi as $transaksi) {
-            switch ($transaksi->jenis_transaksi) {
-                case 'topup tunai':
-                case 'topup online':
-                case 'pengembalian dana':
-                    $saldo += $transaksi->nominal;
-                    break;
-                case 'penarikan':
-                case 'pembayaran':
-                case 'kantin':
-                    $saldo -= $transaksi->nominal;
-                    break;
+        // ============================
+        // 1️⃣ Saldo sebelum transaksi
+        // ============================
+        $saldoSebelum = 0;
+        foreach ($edupayTransaksi as $trx) {
+            if (in_array($trx->jenis_transaksi, ['topup tunai', 'topup online', 'pengembalian dana'])) {
+                $saldoSebelum += $trx->nominal;
+            } elseif (in_array($trx->jenis_transaksi, ['penarikan', 'pembayaran', 'kantin'])) {
+                $saldoSebelum -= $trx->nominal;
             }
+        }
 
-            if ($transaksi->ms_transaksi_edupay_id === $edupayId) {
-                break;
-            }
+        // ============================
+        // 2️⃣ Saldo setelah transaksi
+        // ============================
+        if (in_array($targetTransaksi->jenis_transaksi, ['topup tunai', 'topup online', 'pengembalian dana'])) {
+            $saldoSetelah = $saldoSebelum + $targetTransaksi->nominal;
+        } else {
+            $saldoSetelah = $saldoSebelum - $targetTransaksi->nominal;
         }
 
         // Ambil nomor telepon siswa
@@ -391,7 +408,13 @@ class Index extends Component
         $pesan .= $templatePesan->kalimat_pembuka . "\n\n";
         $pesan .= "Kami informasikan bahwa *Transaksi EduPay* atas nama siswa *" . $targetTransaksi->ms_siswa->nama_siswa . "* telah berhasil. Berikut adalah rincian transaksinya:\n\n";
         $pesan .= "*" . $jenisTransaksi . " : Rp" . number_format($targetTransaksi->nominal, 0, ',', '.') . "*\n";
-        $pesan .= "*Saldo EduPay : Rp" . number_format($saldo, 0, ',', '.') . "*";
+        $pesan .= "*Saldo EduPay : Rp"
+            . number_format($saldoSebelum, 0, ',', '.')
+            . " → Rp"
+            . number_format($saldoSetelah, 0, ',', '.')
+            . "*";
+        // $pesan .= "*Saldo EduPay : Rp" . number_format($saldoSetelah, 0, ',', '.') . "*";
+
         $pesan .= $rincianPembayaran . "\n\n";
         $pesan .= $templatePesan->kalimat_penutup . "\n";
         $pesan .= "\n" . $templatePesan->salam_penutup . "\n\n";
@@ -430,30 +453,103 @@ class Index extends Component
         $this->emit('openNewTab', $url);
     }
 
+    public function updated($property)
+    {
+        if (in_array($property, ['startDate', 'endDate', 'selectedJenis', 'selectedRekening', 'search'])) {
+            $this->emitSelf('$refresh');
+        }
+    }
+
+    public function mount()
+    {
+        $this->startDate = now()->startOfMonth()->format('Y-m-d');
+        $this->endDate   = now()->format('Y-m-d');
+    }
+
+    public function resetTanggal()
+    {
+        // $this->startDate = now()->format('Y-m-d');
+        $this->startDate = now()->startOfMonth()->format('Y-m-d');
+        $this->endDate   = now()->format('Y-m-d');
+        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
+    }
+
+    protected function baseQuery()
+    {
+        return TransaksiEduPay::query()
+            ->with('ms_pengguna')
+            ->where('user_type', 'siswa')
+            ->where('user_id', $this->ms_siswa_id);
+    }
+
     public function render()
     {
-        $saldo = 0; // Inisialisasi di luar closure
+        $saldoAwal = 0;
+        $totalMasukSebelum = 0;
+        $totalKeluarSebelum = 0;
+
+        if ($this->ms_siswa_id && $this->startDate) {
+
+            $baseSebelum = $this->baseQuery()
+                ->when(
+                    $this->selectedRekening,
+                    fn($q) =>
+                    $q->where('rekening_id', $this->selectedRekening)
+                );
+
+            $totalMasukSebelum = (clone $baseSebelum)
+                ->whereDate('tanggal', '<', $this->startDate)
+                ->whereIn('jenis_transaksi', ['topup tunai', 'topup online', 'pengembalian dana'])
+                ->sum('nominal');
+
+            $totalKeluarSebelum = (clone $baseSebelum)
+                ->whereDate('tanggal', '<', $this->startDate)
+                ->whereIn('jenis_transaksi', ['penarikan', 'pembayaran', 'kantin'])
+                ->sum('nominal');
+
+            $saldoAwal = $totalMasukSebelum - $totalKeluarSebelum;
+        }
+
+        $saldo = $saldoAwal;
 
         $transaksiEduPay = $this->ms_siswa_id
-            ? TransaksiEduPay::where('user_type', 'siswa')
-            ->where('user_id', $this->ms_siswa_id)
+            ? $this->baseQuery()
+            ->when($this->startDate && $this->endDate, function ($q) {
+                $startDate = Carbon::parse($this->startDate)->startOfDay();
+                $endDate   = Carbon::parse($this->endDate)->endOfDay();
+
+                $q->whereBetween('tanggal', [$startDate, $endDate]);
+            })
+            ->when(
+                $this->selectedJenis,
+                fn($q) =>
+                $q->where('jenis_transaksi', $this->selectedJenis)
+            )
+            ->when(
+                $this->selectedRekening,
+                fn($q) =>
+                $q->where('rekening_id', $this->selectedRekening)
+            )
+            ->when(
+                $this->search,
+                fn($q) =>
+                $q->where(function ($sub) {
+                    $sub->where('deskripsi', 'like', '%' . $this->search . '%')
+                        ->orWhereHas(
+                            'ms_pengguna',
+                            fn($u) =>
+                            $u->where('nama', 'like', '%' . $this->search . '%')
+                        );
+                })
+            )
             ->orderBy('tanggal', 'ASC')
             ->get()
             ->map(function ($item) use (&$saldo) {
-                switch ($item->jenis_transaksi) {
-                    case 'pengembalian dana':
-                    case 'topup tunai':
-                    case 'topup online':
-                        $saldo += $item->nominal;
-                        break;
-
-                    case 'penarikan':
-                    case 'pembayaran':
-                    case 'kantin': // 👈 transaksi kantin kurangi saldo
-                        $saldo -= $item->nominal;
-                        break;
+                if (in_array($item->jenis_transaksi, ['topup tunai', 'topup online', 'pengembalian dana'])) {
+                    $saldo += $item->nominal;
+                } else {
+                    $saldo -= $item->nominal;
                 }
-
                 $item->saldo = $saldo;
                 return $item;
             })
@@ -461,6 +557,9 @@ class Index extends Component
 
         return view('livewire.transaksi-edu-pay-siswa.index', [
             'transaksiEduPay' => $transaksiEduPay,
+            'saldoAwal' => $saldoAwal,
+            'totalMasukSebelum' => $totalMasukSebelum,
+            'totalKeluarSebelum' => $totalKeluarSebelum,
         ]);
     }
 }

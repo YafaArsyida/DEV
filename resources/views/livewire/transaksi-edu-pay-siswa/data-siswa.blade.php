@@ -24,21 +24,6 @@
             <div class="p-2 border border-dashed rounded">
                 <div class="d-flex align-items-center">
                     <div class="avatar-sm me-2">
-                        <div class="avatar-title rounded bg-transparent text-info fs-24">
-                            <i class="ri-inbox-archive-fill"></i>
-                        </div>
-                    </div>
-                    <div class="flex-grow-1">
-                        <p class="text-muted mb-1">Saldo :</p>
-                        <h5 class="mb-0">RP{{ number_format($saldo_edupay_siswa, 0, ',', '.') }}</h5>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-4 col-sm-6">
-            <div class="p-2 border border-dashed rounded">
-                <div class="d-flex align-items-center">
-                    <div class="avatar-sm me-2">
                         <div class="avatar-title rounded bg-transparent text-success fs-24">
                             <i class="ri-money-dollar-circle-fill"></i>
                         </div>
@@ -67,6 +52,21 @@
             </div>
         </div>
         <!-- end col -->
+        <div class="col-lg-4 col-sm-6">
+            <div class="p-2 border border-dashed rounded">
+                <div class="d-flex align-items-center">
+                    <div class="avatar-sm me-2">
+                        <div class="avatar-title rounded bg-transparent text-info fs-24">
+                            <i class="ri-inbox-archive-fill"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1">
+                        <p class="text-muted mb-1">Saldo :</p>
+                        <h5 class="mb-0">RP{{ number_format($saldo_edupay_siswa, 0, ',', '.') }}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="mt-4">        
         <!-- Base Example -->
@@ -74,7 +74,7 @@
             <div class="accordion-item shadow">
                 <h2 class="accordion-header" id="headingTwo">
                     <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
-                        topup
+                        Top-Up
                     </button>
                 </h2>
                 <div id="collapseTwo" class="accordion-collapse collapse show" aria-labelledby="headingTwo">

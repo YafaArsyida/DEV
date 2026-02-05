@@ -1,18 +1,34 @@
 {{-- Success is as dangerous as failure. --}}
 <div class="card">
-    <div class="card-body p-4">
-        <div class="row g-4 align-items-center mb-2">
-            <div class="col-sm-4">
-                <p class="text-muted mb-2 text-uppercase fw-semibold">
-                    Data Transaksi EduPay
-                </p>
+    <div class="card-header border-0 pb-0">
+        <div class="d-flex align-items-center flex-wrap gap-3">
+            {{-- Judul --}}
+            <h5 class="card-title mb-0 flex-grow-1">Riwayat Transaksi EduPay</h5>
+    
+            {{-- Tombol Export & Cetak --}}
+            <div class="d-flex gap-2 flex-wrap">
+                <button data-bs-toggle="modal" data-bs-target="#ExportLaporan" class="btn btn-soft-success">
+                    <i class="ri-file-excel-2-line pb-0"></i> Export
+                </button>
+                {{-- <button wire:click="cetakLaporan" class="btn btn-danger d-inline-flex align-items-center gap-1">
+                    <i class="ri-printer-line align-bottom"></i>
+                    <span>Cetak Laporan</span>
+                </button> --}}
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <input type="date" class="form-control" wire:model="startDate">
+                <span class="text-muted">–</span>
+                <input type="date" class="form-control" wire:model="endDate">
+                <button type="button" class="btn btn-soft-secondary" wire:click="resetTanggal" title="Reset Tanggal">
+                    <i class="ri-refresh-line"></i>
+                </button>
             </div>
         </div>
+    </div>
+    <div class="card-body">
         <div class="table-responsive">
-            @php
-                $saldo = 0;
-            @endphp
-            <table class="table table-borderless table-hover text-center table-nowrap align-middle mb-0">
+            <table id="data" class="table table-borderless table-hover text-center table-nowrap align-middle mb-0">
                 <thead class="table-light">
                     <tr class="table-active">
                         <th style="width: 50px;" class="text-uppercase">NO</th>
@@ -27,6 +43,18 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {{-- @if($transaksiEduPay->count()) --}}
+                    <tr class="table-secondary fw-semibold">
+                        <td colspan="5">
+                            <i class="ri-wallet-3-line me-1"></i>
+                            Saldo Awal Periode
+                        </td>
+                        <td class="fs-14 text-success">Rp{{ number_format($totalMasukSebelum, 0, ',', '.') }}</td>
+                        <td class="fs-14 text-danger">Rp{{ number_format($totalKeluarSebelum, 0, ',', '.') }}</td>
+                        <td class="fs-14 text-info">Rp{{ number_format($saldoAwal, 0, ',', '.') }}</td>
+                        <td></td>
+                    </tr>
+                    {{-- @endif --}}
                     @forelse ($transaksiEduPay as $item)
                         <tr>
                             <td style="width: 50px">{{ $loop->iteration }}.</td>
@@ -77,16 +105,8 @@
                                 </span>
                             </td>
                             <td>
-                                @php
-                                    // Perhitungan saldo
-                                    if (in_array($item->jenis_transaksi, ['topup tunai', 'topup online', 'pengembalian dana'])) {
-                                        $saldo += $item->nominal; // Tambahkan saldo
-                                    } elseif (in_array($item->jenis_transaksi, ['penarikan', 'pembayaran','kantin'])) {
-                                        $saldo -= $item->nominal; // Kurangi saldo
-                                    }
-                                @endphp
                                 <span class="fs-14 text-info">
-                                    RP{{ number_format($saldo, 0, ',', '.') }}
+                                    Rp{{ number_format($item->saldo, 0, ',', '.') }}
                                 </span>
                             </td>
 
@@ -139,4 +159,49 @@
             </table><!--end table-->
         </div>
     </div>
+    <div class="modal fade zoomIn" id="ExportLaporan" tabindex="-1" aria-labelledby="exportRecordLabel" aria-hidden="true"
+        wire:ignore.self>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-5 text-center">
+                    <lord-icon src="https://cdn.lordicon.com/fjvfsqea.json" trigger="loop"
+                        colors="primary:#405189,secondary:#f06548" style="width:90px;height:90px"></lord-icon>
+                    <div class="mt-4 text-center">
+                        <h4 class="fs-semibold">Konfirmasi Export</h4>
+                        <p class="text-muted fs-14 mb-4 pt-1">
+                            Apakah Anda yakin ingin mengekspor laporan Transaksi EduPay? Data yang diekspor akan
+                            sesuai dengan tabel yang ditampilkan.
+                        </p>
+                        <div class="hstack gap-2 justify-content-center remove">
+                            <button class="btn btn-link link-success fw-medium text-decoration-none shadow-none"
+                                data-bs-dismiss="modal">
+                                <i class="ri-close-line me-1 align-middle"></i> Batal
+                            </button>
+                            <button class="btn btn-primary" id="konfirmasiExportLaporan" data-bs-dismiss="modal">Ya,
+                                Export!</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('konfirmasiExportLaporan').addEventListener('click', function () {
+            alertify.success("Menyiapkan Dokumen");
+            // Tambahkan delay 1 detik
+            setTimeout(function () {
+                // Ambil elemen tabel berdasarkan ID
+                var table = document.getElementById("data");
+                
+                // Konversi tabel ke format Excel
+                var workbook = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+                
+                // Simpan file Excel
+                XLSX.writeFile(workbook, "Data Transaksi EduPay.xlsx");
+            }, 1000); // 1000 ms = 1 detik
+        });
+    </script>
 </div>

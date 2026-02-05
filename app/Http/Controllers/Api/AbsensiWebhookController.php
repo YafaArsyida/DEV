@@ -32,9 +32,10 @@ class AbsensiWebhookController extends Controller
             'raw'           => $payload
         ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Webhook received'
-        ]);
+        // return response()->json([
+        //     'success' => true,
+        //     'message' => 'Webhook received'
+        // ]);
+        echo "OK";
     }
 }

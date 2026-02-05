@@ -8,176 +8,194 @@
         <div class="row">
             {{-- DATA SISWA --}}
             <div class="col-xxl-4 pe-1">
-                <div class="card">
-                    <div class="card-body p-4">
-                        <div class="d-flex">
-                            <div class="flex-grow-1">
-                                <h4>{{ $nama_siswa ?? 'Siswa belum dipilih' }}</h4>
-                                <div class="hstack gap-3 flex-wrap">
-                                    <div><a href="#" class="text-primary d-block">{{ $ms_penempatan_siswa_id }}-TemanSekolah</a></div>
-                                    <div class="vr"></div>
-                                    <div class="text-muted">EduCard : <span class="text-warning fw-medium">{{ $educard ?? 'Belum ada' }}</span></div>
-                                    <div class="vr"></div>
-                                    <div class="text-muted">Kelas : <span class="text-body fw-medium">{{ $nama_kelas ?? 'Belum ada' }}</span></div>
-                                    <div class="vr"></div>
-                                    <div class="text-muted">Telepon : <span class="text-body fw-medium">{{ $telepon ?? 'Tidak tersedia' }}</span></div>
-                                    {{-- <div class="vr"></div> --}}
-                                    {{-- <div class="text-muted">Virtual Akun : <span class="text-body fw-medium">9888838383838</span></div> --}}
+                <div style="top: 0;" class="sticky-side-div">
+                    <div class="card">
+                        <div class="card-body p-4">
+                            <div class="d-flex">
+                                <div class="flex-grow-1">
+                                    <h4>{{ $nama_siswa ?? 'Siswa belum dipilih' }}</h4>
+                                    <div class="hstack gap-3 flex-wrap">
+                                        <div><a href="#" class="text-primary d-block">{{ $ms_penempatan_siswa_id }}-TemanSekolah</a></div>
+                                        <div class="vr"></div>
+                                        <div class="text-muted">EduCard : <span class="text-warning fw-medium">{{ $educard ?? 'Belum ada' }}</span></div>
+                                        <div class="vr"></div>
+                                        <div class="text-muted">Kelas : <span class="text-body fw-medium">{{ $nama_kelas ?? 'Belum ada' }}</span></div>
+                                        <div class="vr"></div>
+                                        <div class="text-muted">Telepon : <span class="text-body fw-medium">{{ $telepon ?? 'Tidak tersedia' }}</span></div>
+                                        {{-- <div class="vr"></div> --}}
+                                        {{-- <div class="text-muted">Virtual Akun : <span class="text-body fw-medium">9888838383838</span></div> --}}
+                                    </div>
+                                </div>
+                            </div>
+                            {{-- <div class="mt-4 text-muted">
+                                <p>{{ $alamat ?? 'Tidak ada alamat' }}</p>
+                            </div> --}}
+                            <div class="mt-4 row">
+                                <div class="col-lg-4 col-sm-6">
+                                    <div class="p-2 border border-dashed rounded">
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-sm me-2">
+                                                <div class="avatar-title rounded bg-transparent text-success fs-24">
+                                                    <i class="ri-money-dollar-circle-fill"></i>
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <p class="text-muted mb-1">Masuk :</p>
+                                                <h5 class="mb-0">RP{{ number_format($total_pemasukan_edupay_siswa, 0, ',', '.') }}</h5>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- end col -->
+                                <div class="col-lg-4 col-sm-6">
+                                    <div class="p-2 border border-dashed rounded">
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-sm me-2">
+                                                <div class="avatar-title rounded bg-transparent text-danger fs-24">
+                                                    <i class="ri-file-copy-2-fill"></i>
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <p class="text-muted mb-1">Keluar :</p>
+                                                <h5 class="mb-0">RP{{ number_format($total_pengeluaran_edupay_siswa, 0, ',', '.') }}</h5>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- end col -->
+                                <div class="col-lg-4 col-sm-6">
+                                    <div class="p-2 border border-dashed rounded">
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-sm me-2">
+                                                <div class="avatar-title rounded bg-transparent text-info fs-24">
+                                                    <i class="ri-inbox-archive-fill"></i>
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <p class="text-muted mb-1">Saldo :</p>
+                                                <h5 class="mb-0">RP{{ number_format($saldo_edupay_siswa, 0, ',', '.') }}</h5>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-4">        
+                                <!-- Base Example -->
+                                <div class="accordion" id="default-accordion-example">
+                                    <div class="accordion-item shadow">
+                                        <h2 class="accordion-header" id="headingTwo">
+                                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                                                Top-Up
+                                            </button>
+                                        </h2>
+                                        <div id="collapseTwo" class="accordion-collapse collapse show" aria-labelledby="headingTwo">
+                                            <div class="accordion-body">
+                                                <h5 class="fs-15">Top Up EduPay</h5>
+                                                <p class="text-muted">Top-Up adalah pencatatan <b>penambahan</b> nominal saldo EduPay melalui transaksi pengisian ulang.</p>
+                                                <div class="input-group flex-nowrap">
+                                                    <span class="input-group-text" id="addon-wrapping">Rp</span>
+                                                    <input type="number" class="form-control" placeholder="123" wire:model.defer="nominal_topup" aria-label="123" aria-describedby="addon-wrapping">
+                                                </div>
+                                                @error('nominal_topup') <span class="text-danger">{{ $message }}</span> @enderror
+
+                                                <!-- Input deskripsi topup -->
+                                                <div class="hstack gap-2 justify-content-end d-print-none mt-4">
+                                                    <input type="text" 
+                                                        class="form-control" 
+                                                        wire:model.defer="deskripsi_topup" 
+                                                        placeholder="deskripsi transaksi (bila perlu)" 
+                                                        aria-label="Deskripsi">
+                                                    @error('deskripsi_topup') <span class="text-danger">{{ $message }}</span> @enderror
+                                                    <select class="form-select w-auto" 
+                                                            wire:model.defer="jenis_transaksi_topup" 
+                                                            aria-label="Pilih jenis pembayaran">
+                                                        <option value="topup tunai">Teller Tunai</option>
+                                                        <option value="topup online">Transfer ke Rekening Sekolah</option>
+                                                    </select>
+                                                    <!-- Tombol simpan -->
+                                                    <a wire:click="simpanTopUp" class="btn btn-success">
+                                                        <i class="ri-printer-line align-bottom me-1"></i> Bayar
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item shadow">
+                                        <h2 class="accordion-header" id="headingThree">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                                Tarik Tunai
+                                            </button>
+                                        </h2>
+                                        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree">
+                                            <div class="accordion-body">
+                                                <h5 class="fs-15">Tarik Tunai EduPay</h5>
+                                                <p class="text-muted">Tarik Tunai adalah pencatatan <b>pengeluaran</b> nominal saldo EduPay yang diberikan kepada siswa atau orang tua untuk kebutuhan tertentu.</p>
+                                                <div class="input-group flex-nowrap">
+                                                    <span class="input-group-text" id="addon-wrapping">RP</span>
+                                                    <input type="number" 
+                                                        class="form-control" 
+                                                        placeholder="123" 
+                                                        wire:model.defer="nominal_penarikan" 
+                                                        aria-label="123" 
+                                                        aria-describedby="addon-wrapping">
+                                                </div>
+                                                @error('nominal_penarikan') <span class="text-danger">{{ $message }}</span> @enderror
+
+                                                <!-- Input deskripsi pengeluaran -->
+                                                <div class="hstack gap-2 justify-content-end d-print-none mt-4">
+                                                    <input type="text" 
+                                                        class="form-control" 
+                                                        wire:model.defer="deskripsi_penarikan" 
+                                                        placeholder="deskripsi transaksi (bila perlu)" 
+                                                        aria-label="deskripsi">
+                                                    @error('deskripsi_penarikan') <span class="text-danger">{{ $message }}</span> @enderror
+
+                                                    <!-- Tombol simpan -->
+                                                    <button wire:click="simpanPengeluaran" class="btn btn-sm btn-danger">
+                                                        <i class="ri-printer-line align-bottom me-1"></i> Bayar
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        {{-- <div class="mt-4 text-muted">
-                            <p>{{ $alamat ?? 'Tidak ada alamat' }}</p>
-                        </div> --}}
-                        <div class="mt-4 row">
-                            <div class="col-lg-4 col-sm-6">
-                                <div class="p-2 border border-dashed rounded">
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar-sm me-2">
-                                            <div class="avatar-title rounded bg-transparent text-info fs-24">
-                                                <i class="ri-inbox-archive-line"></i>
-                                            </div>
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            <p class="text-muted mb-1">Saldo :</p>
-                                            <h5 class="mb-0">RP{{ number_format($saldo_edupay_siswa, 0, ',', '.') }}</h5>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-4 col-sm-6">
-                                <div class="p-2 border border-dashed rounded">
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar-sm me-2">
-                                            <div class="avatar-title rounded bg-transparent text-success fs-24">
-                                                <i class="ri-money-dollar-circle-line"></i>
-                                            </div>
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            <p class="text-muted mb-1">Masuk :</p>
-                                            <h5 class="mb-0">RP{{ number_format($total_pemasukan_edupay_siswa, 0, ',', '.') }}</h5>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- end col -->
-                            <div class="col-lg-4 col-sm-6">
-                                <div class="p-2 border border-dashed rounded">
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar-sm me-2">
-                                            <div class="avatar-title rounded bg-transparent text-danger fs-24">
-                                                <i class="ri-file-copy-2-line"></i>
-                                            </div>
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            <p class="text-muted mb-1">Keluar :</p>
-                                            <h5 class="mb-0">RP{{ number_format($total_pengeluaran_edupay_siswa, 0, ',', '.') }}</h5>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- end col -->
-                        </div>
-                        <div class="mt-4">        
-                            <!-- Base Example -->
-                            <div class="accordion" id="default-accordion-example">
-                                <div class="accordion-item shadow">
-                                    <h2 class="accordion-header" id="headingTwo">
-                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
-                                            Top-Up
-                                        </button>
-                                    </h2>
-                                    <div id="collapseTwo" class="accordion-collapse collapse show" aria-labelledby="headingTwo">
-                                        <div class="accordion-body">
-                                            <h5 class="fs-15">Top Up EduPay</h5>
-                                            <p class="text-muted">Top-Up adalah pencatatan <b>penambahan</b> nominal saldo EduPay melalui transaksi pengisian ulang.</p>
-                                            <div class="input-group flex-nowrap">
-                                                <span class="input-group-text" id="addon-wrapping">Rp</span>
-                                                <input type="number" class="form-control" placeholder="123" wire:model.defer="nominal_topup" aria-label="123" aria-describedby="addon-wrapping">
-                                            </div>
-                                            @error('nominal_topup') <span class="text-danger">{{ $message }}</span> @enderror
-
-                                            <!-- Input deskripsi topup -->
-                                            <div class="hstack gap-2 justify-content-end d-print-none mt-4">
-                                                <input type="text" 
-                                                    class="form-control" 
-                                                    wire:model.defer="deskripsi_topup" 
-                                                    placeholder="deskripsi transaksi (bila perlu)" 
-                                                    aria-label="Deskripsi">
-                                                @error('deskripsi_topup') <span class="text-danger">{{ $message }}</span> @enderror
-                                                <select class="form-select w-auto" 
-                                                        wire:model.defer="jenis_transaksi_topup" 
-                                                        aria-label="Pilih jenis pembayaran">
-                                                    <option value="topup tunai">Teller Tunai</option>
-                                                    <option value="topup online">Transfer ke Rekening Sekolah</option>
-                                                </select>
-                                                <!-- Tombol simpan -->
-                                                <a wire:click="simpanTopUp" class="btn btn-success">
-                                                    <i class="ri-printer-line align-bottom me-1"></i> Bayar
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="accordion-item shadow">
-                                    <h2 class="accordion-header" id="headingThree">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                                            Tarik Tunai
-                                        </button>
-                                    </h2>
-                                    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree">
-                                        <div class="accordion-body">
-                                            <h5 class="fs-15">Tarik Tunai EduPay</h5>
-                                            <p class="text-muted">Tarik Tunai adalah pencatatan <b>pengeluaran</b> nominal saldo EduPay yang diberikan kepada siswa atau orang tua untuk kebutuhan tertentu.</p>
-                                            <div class="input-group flex-nowrap">
-                                                <span class="input-group-text" id="addon-wrapping">RP</span>
-                                                <input type="number" 
-                                                    class="form-control" 
-                                                    placeholder="123" 
-                                                    wire:model.defer="nominal_penarikan" 
-                                                    aria-label="123" 
-                                                    aria-describedby="addon-wrapping">
-                                            </div>
-                                            @error('nominal_penarikan') <span class="text-danger">{{ $message }}</span> @enderror
-
-                                            <!-- Input deskripsi pengeluaran -->
-                                            <div class="hstack gap-2 justify-content-end d-print-none mt-4">
-                                                <input type="text" 
-                                                    class="form-control" 
-                                                    wire:model.defer="deskripsi_penarikan" 
-                                                    placeholder="deskripsi transaksi (bila perlu)" 
-                                                    aria-label="deskripsi">
-                                                @error('deskripsi_penarikan') <span class="text-danger">{{ $message }}</span> @enderror
-
-                                                <!-- Tombol simpan -->
-                                                <button wire:click="simpanPengeluaran" class="btn btn-sm btn-danger">
-                                                    <i class="ri-printer-line align-bottom me-1"></i> Bayar
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div><!-- end card -->
+                    </div><!-- end card -->
+                </div> 
             </div>
             <!--end col-->
             {{-- DATA EduPay --}}
             <div class="col-xxl-8 ps-0">
                 <div class="card">
-                    <div class="card-body p-4">
-                        <div class="row g-4 align-items-center mb-2">
-                            <div class="col-sm-4">
-                                <p class="text-muted mb-2 text-uppercase fw-semibold">
-                                    Data Transaksi EduPay
-                                </p>
+                    <div class="card-header border-0 pb-0">
+                        <div class="d-flex align-items-center flex-wrap gap-3">
+                            {{-- Judul --}}
+                            <h5 class="card-title mb-0 flex-grow-1">Riwayat Transaksi EduPay</h5>
+                    
+                            {{-- Tombol Export & Cetak --}}
+                            <div class="d-flex gap-2 flex-wrap">
+                                <button data-bs-toggle="modal" data-bs-target="#ExportLaporan" class="btn btn-soft-success">
+                                    <i class="ri-file-excel-2-line pb-0"></i> Export
+                                </button>
+                                {{-- <button wire:click="cetakLaporan" class="btn btn-danger d-inline-flex align-items-center gap-1">
+                                    <i class="ri-printer-line align-bottom"></i>
+                                    <span>Cetak Laporan</span>
+                                </button> --}}
+                            </div>
+                    
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="date" class="form-control" wire:model="startDate">
+                                <span class="text-muted">–</span>
+                                <input type="date" class="form-control" wire:model="endDate">
+                                <button type="button" class="btn btn-soft-secondary" wire:click="resetTanggal" title="Reset Tanggal">
+                                    <i class="ri-refresh-line"></i>
+                                </button>
                             </div>
                         </div>
+                    </div>
+                    <div class="card-body p-4">
                         <div class="table-responsive">
-                            @php
-                                $saldo = 0;
-                            @endphp
                             <table class="table table-borderless table-hover text-center table-nowrap align-middle mb-0">
                                 <thead class="table-light">
                                     <tr class="table-active">
@@ -193,6 +211,16 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    <tr class="table-secondary fw-semibold">
+                                        <td colspan="5">
+                                            <i class="ri-wallet-3-line me-1"></i>
+                                            Saldo Awal Periode
+                                        </td>
+                                        <td class="fs-14 text-success">Rp{{ number_format($totalMasukSebelum, 0, ',', '.') }}</td>
+                                        <td class="fs-14 text-danger">Rp{{ number_format($totalKeluarSebelum, 0, ',', '.') }}</td>
+                                        <td class="fs-14 text-info">Rp{{ number_format($saldoAwal, 0, ',', '.') }}</td>
+                                        <td></td>
+                                    </tr>
                                     @forelse ($transaksiEduPay as $item)
                                         <tr>
                                             <td style="width: 50px">{{ $loop->iteration }}.</td>
@@ -243,16 +271,8 @@
                                                 </span>
                                             </td>
                                             <td>
-                                                @php
-                                                    // Perhitungan saldo
-                                                    if (in_array($item->jenis_transaksi, ['topup tunai', 'topup online', 'pengembalian dana'])) {
-                                                        $saldo += $item->nominal; // Tambahkan saldo
-                                                    } elseif (in_array($item->jenis_transaksi, ['penarikan', 'pembayaran','kantin'])) {
-                                                        $saldo -= $item->nominal; // Kurangi saldo
-                                                    }
-                                                @endphp
                                                 <span class="fs-14 text-info">
-                                                    RP{{ number_format($saldo, 0, ',', '.') }}
+                                                    Rp{{ number_format($item->saldo, 0, ',', '.') }}
                                                 </span>
                                             </td>
 

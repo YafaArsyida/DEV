@@ -21,17 +21,17 @@
                         <div class="tab-pane active" id="tabSiswaKelas" role="tabpanel">
                             <div class="row">
                                 <div class="col-xxl-4 pe-1">
-                                    <div class="card">
-                                        @livewire('transaksi-edu-pay-siswa.data-siswa')   
-                                        @livewire('transaksi-edu-pay-siswa.edit')   
-                                        @livewire('transaksi-edu-pay-siswa.delete')   
+                                    <div class="sticky-side-div">
+                                        <div class="card">
+                                            @livewire('transaksi-edu-pay-siswa.data-siswa')   
+                                        </div>
                                     </div><!-- end card -->
+                                    @livewire('transaksi-edu-pay-siswa.edit')   
+                                    @livewire('transaksi-edu-pay-siswa.delete')   
                                 </div>
                                 <!--end col-->
                                 <div class="col-xxl-8 ps-0">
-                                    <div class="sticky-side-div">
-                                        @livewire('transaksi-edu-pay-siswa.data-edu-pay') 
-                                    </div>
+                                    @livewire('transaksi-edu-pay-siswa.data-edu-pay') 
                                 </div>
                             </div>
                             <!--end row-->

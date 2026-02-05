@@ -88,12 +88,11 @@
                                             </a>
 
                                             <!-- Tombol Kirim WhatsApp -->
-                                            <a href="" wire:click.prevent="kirimWhatsapp({{ $transaksi->ms_transaksi_tagihan_siswa_id }})" 
-                                                class="btn btn-sm btn-success d-inline-flex align-items-center gap-1">
-                                                <i class="ri-whatsapp-line align-bottom"></i>
-                                                <span>Kirim WhatsApp</span>
+                                            <a wire:click.prevent="kegiatanPengumuman({{ $kegiatan->ms_kegiatan_id }})" class="text-success fw-medium">
+                                                <i class="mdi mdi-whatsapp me-1"></i>
+                                                Cetak Pengumuman
                                             </a>
-
+                                            
                                             <!-- Tombol Cetak -->
                                             <a wire:click="cetakTransaksi({{ $transaksi->ms_transaksi_tagihan_siswa_id }})" 
                                                 class="btn btn-sm btn-danger d-inline-flex align-items-center gap-1">

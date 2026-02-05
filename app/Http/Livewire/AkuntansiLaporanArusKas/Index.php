@@ -12,6 +12,7 @@ class Index extends Component
     public $selectedJenjang = null;
     public $selectedTahunAjar = null;
     public $selectedBulan = null;
+   
     public $startDate = null;
     public $endDate = null;
 

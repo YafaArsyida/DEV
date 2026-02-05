@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\KuitansiTransaksiEduPay;
 use App\Models\TransaksiEduPay;
 use Elibyy\TCPDF\Facades\TCPDF;
+use Carbon\Carbon;
 
 class TransaksiEduPaySiswa extends Controller
 {
@@ -18,53 +19,53 @@ class TransaksiEduPaySiswa extends Controller
         $ms_jenjang_id = request()->query('selectedJenjang');
         $user_id = request()->query('userId');
 
-        // Ambil data transaksi EduPay berdasarkan ID siswa
-        $edupayTransaksi = TransaksiEduPay::with(['ms_siswa', 'ms_penempatan_siswa.ms_kelas', 'ms_pengguna'])->where('user_id', $user_id)
-            ->get();
-
-        $actualTransaction = TransaksiEduPay::where('ms_transaksi_edupay_id', $eduPayId)->first();
-
-        // Pastikan data transaksi ditemukan
-        if ($edupayTransaksi->isEmpty()) {
-            return response()->json(['error' => 'Transaksi tidak ditemukan ini'], 404);
-        }
-
-        // Cari transaksi spesifik berdasarkan ID
-        $targetTransaksi = $edupayTransaksi->where('ms_transaksi_edupay_id', $eduPayId)->first();
+        // Ambil transaksi target
+        $targetTransaksi = TransaksiEduPay::with(['ms_siswa', 'ms_penempatan_siswa.ms_kelas', 'ms_pengguna'])
+            ->where('ms_transaksi_edupay_id', $eduPayId)
+            ->where('user_id', $user_id)
+            ->first();
 
         if (!$targetTransaksi) {
             return response()->json(['error' => 'Transaksi tidak ditemukan'], 404);
         }
 
-        // Hitung saldo berdasarkan urutan transaksi
-        $saldo = 0;
-        foreach ($edupayTransaksi as $transaksi) {
-            // Periksa jenis transaksi dan update saldo sesuai dengan jenisnya
-            switch ($transaksi->jenis_transaksi) {
-                case 'topup tunai':
-                case 'topup online':
-                case 'pengembalian dana':
-                    $saldo += $transaksi->nominal;
-                    break;
-                case 'penarikan':
-                case 'pembayaran':
-                case 'kantin':
-                    $saldo -= $transaksi->nominal;
-                    break;
-            }
+        // Ambil semua transaksi sebelum & sampai target (urut ASC)
+        $edupayTransaksi = TransaksiEduPay::where('user_id', $user_id)
+            ->where(function ($q) use ($targetTransaksi) {
+                $q->where('tanggal', '<', $targetTransaksi->tanggal)
+                    ->orWhere(function ($sub) use ($targetTransaksi) {
+                        $sub->where('tanggal', $targetTransaksi->tanggal)
+                            ->where('ms_transaksi_edupay_id', '<', $targetTransaksi->ms_transaksi_edupay_id);
+                    });
+            })
+            ->orderBy('tanggal', 'ASC')
+            ->orderBy('ms_transaksi_edupay_id', 'ASC')
+            ->get();
 
-            if ($transaksi->ms_transaksi_edupay_id === $eduPayId) {
-                break;
+        // ============================
+        // 1️⃣ Saldo sebelum transaksi
+        // ============================
+        $saldoSebelum = 0;
+        foreach ($edupayTransaksi as $trx) {
+            if (in_array($trx->jenis_transaksi, ['topup tunai', 'topup online', 'pengembalian dana'])) {
+                $saldoSebelum += $trx->nominal;
+            } elseif (in_array($trx->jenis_transaksi, ['penarikan', 'pembayaran', 'kantin'])) {
+                $saldoSebelum -= $trx->nominal;
             }
+        }
+
+        // ============================
+        // 2️⃣ Saldo setelah transaksi
+        // ============================
+        if (in_array($targetTransaksi->jenis_transaksi, ['topup tunai', 'topup online', 'pengembalian dana'])) {
+            $saldoSetelah = $saldoSebelum + $targetTransaksi->nominal;
+        } else {
+            $saldoSetelah = $saldoSebelum - $targetTransaksi->nominal;
         }
 
         // dd($eduPayId);
         $kuitansi = KuitansiTransaksiEduPay::where('ms_jenjang_id', $ms_jenjang_id)->first();
 
-        // Pastikan transaksi ditemukan
-        if (!$transaksi) {
-            return response()->json(['error' => 'Transaksi tidak ditemukan'], 404);
-        }
         if (!$kuitansi) {
             return response()->json(['error' => 'Template kuitansi tidak ditemukan'], 404);
         }
@@ -110,14 +111,14 @@ class TransaksiEduPaySiswa extends Controller
         $pdf::SetFont('times', 'B', 12);
         $pdf::Cell(0, 5, $kuitansi->judul, 0, 1, 'C');
         $pdf::SetFont('times', 'B', 10);
-        $pdf::Cell(0, 5, strtoupper($actualTransaction->jenis_transaksi) . ' EDUPAY', 0, 1, 'C');
+        $pdf::Cell(0, 5, strtoupper($targetTransaksi->jenis_transaksi) . ' EDUPAY', 0, 1, 'C');
         $pdf::Ln(4);
         $pdf::SetFont('times', 'B', 14);
-        $pdf::Cell(0, 5, 'Rp' . number_format($actualTransaction->nominal, 0, ',', '.'), 0, 1, 'C');
-        if ($actualTransaction->deskripsi) {
+        $pdf::Cell(0, 5, 'Rp' . number_format($targetTransaksi->nominal, 0, ',', '.'), 0, 1, 'C');
+        if ($targetTransaksi->deskripsi) {
             $pdf::Ln(1);
             $pdf::SetFont('times', 'I', 8);
-            $pdf::MultiCell(0, 5, $actualTransaction->deskripsi, 0, 'C');
+            $pdf::MultiCell(0, 5, $targetTransaksi->deskripsi, 0, 'C');
         }
         $pdf::Ln(4);
         // Salam Pmbuka
@@ -126,21 +127,25 @@ class TransaksiEduPaySiswa extends Controller
 
         // Informasi Pembayaran
         $pdf::SetFont('times', '', 10);
-        $pdf::Cell(0, 5, 'Siswa : ' . $actualTransaction->ms_siswa->nama_siswa, 0, 1, 'L');
-        if ($actualTransaction->ms_penempatan_siswa_id) {
-            $pdf::Cell(0, 5, 'Kelas : ' . $actualTransaction->ms_penempatan_siswa->ms_kelas->nama_kelas, 0, 1, 'L');
+        $pdf::Cell(0, 5, 'Siswa : ' . $targetTransaksi->ms_siswa->nama_siswa, 0, 1, 'L');
+        if ($targetTransaksi->ms_penempatan_siswa_id) {
+            $pdf::Cell(0, 5, 'Kelas : ' . $targetTransaksi->ms_penempatan_siswa->ms_kelas->nama_kelas, 0, 1, 'L');
         }
         $pdf::SetFont('times', 'B', 10);
-        $pdf::Cell(0, 5, 'Saldo : Rp ' . number_format($saldo, 0, ',', '.'), 0, 1, 'L');
+        $pdf::Cell(0, 5, 'Saldo Sebelum Transaksi : Rp ' . number_format($saldoSebelum, 0, ',', '.'), 0, 1);
+        $pdf::Cell(0, 5, 'Nominal Transaksi      : Rp ' . number_format($targetTransaksi->nominal, 0, ',', '.'), 0, 1);
+        $pdf::Cell(0, 5, 'Saldo Setelah Transaksi: Rp ' . number_format($saldoSetelah, 0, ',', '.'), 0, 1);
+
+
 
         $pdf::Ln(2);
         // Footer
         $pdf::SetFont('times', '', 9);
         $pdf::MultiCell(0, 5, $kuitansi->pesan, 0, 'C');
         $pdf::Ln(2);
-        $pdf::Cell(0, 5, $kuitansi->tempat . ', ' .  HelperController::formatTanggalIndonesia($transaksi->tanggal, 'd F Y'), 0, 1, 'C');
+        $pdf::Cell(0, 5, $kuitansi->tempat . ', ' .  HelperController::formatTanggalIndonesia($targetTransaksi->tanggal, 'd F Y'), 0, 1, 'C');
         $pdf::Ln(5);
-        $pdf::Cell(0, 5, $transaksi->ms_pengguna->nama, 0, 1, 'C');
+        $pdf::Cell(0, 5, $targetTransaksi->ms_pengguna->nama, 0, 1, 'C');
         $pdf::Ln(10);
 
         // Penutup
