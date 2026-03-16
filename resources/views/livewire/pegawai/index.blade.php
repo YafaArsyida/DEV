@@ -7,12 +7,10 @@
 
             <div class="col-sm-auto">
                 <div class="d-flex gap-1 flex-wrap">
-                    @if ($selectedJenjang)
                     <button data-bs-toggle="modal" data-bs-target="#ModalImportKontakPegawai" wire:click.prevent="$emit('showImportKontakPegawai', {{ $selectedJenjang }})" class="btn btn-success"><i class="ri-whatsapp-line me-1 align-bottom"></i> Import Kontak</button>
                     <button data-bs-toggle="modal" data-bs-target="#ModalImportEduCardPegawai" wire:click.prevent="$emit('showImportEduCardPegawai', {{ $selectedJenjang }})" class="btn btn-warning"><i class="ri-bank-card-line me-1 align-bottom"></i> Import EduCard</button>
                     <button data-bs-toggle="modal" data-bs-target="#ModalImportPegawai" wire:click.prevent="$emit('showImportPegawai', {{ $selectedJenjang }})" class="btn btn-secondary"><i class="ri-contacts-line me-1 align-bottom"></i> Import Pegawai</button>
                     <button data-bs-toggle="modal" data-bs-target="#ModalPegawaiCreate" wire:click.prevent="$emit('PegawaiCreate', {{ $selectedJenjang }})" class="btn btn-primary"><i class="ri-play-list-add-line align-bottom me-1"></i>Pegawai Baru</button>
-                    @endif
                     <button data-bs-toggle="modal" data-bs-target="#ModalPegawaiExport" class="btn btn-soft-success"><i class="ri-file-excel-2-line align-bottom me-1"></i> Export</button>
                 </div>
             </div>

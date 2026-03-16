@@ -2,13 +2,16 @@
 
 namespace App\Http\Livewire\Pegawai;
 
+use App\Http\Controllers\HelperController;
 use App\Models\EduCard;
 use App\Models\Jabatan;
 use App\Models\Jenjang;
 use App\Models\Pegawai;
+use App\Models\User;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class Create extends Component
 {
@@ -60,62 +63,65 @@ class Create extends Component
 
     public function save()
     {
-        // Validasi data input
         $validatedData = $this->validate();
 
         DB::beginTransaction();
 
         try {
-            // Insert data pegawai
-            $ms_pengguna_id = Auth::id();
+            // 1️⃣ Generate email jika kosong (2 kata nama)
+            $email = $this->email ?: HelperController::generateEmailFromNama($this->nama_pegawai);
+            $email = HelperController::makeUniqueEmail($email);
 
+            // 2️⃣ Buat akun user
+            $user = User::firstOrCreate(
+                ['email' => $email],
+                [
+                    'nama'     => $this->nama_pegawai,
+                    'telepon'  => $this->telepon ?: null,
+                    'password' => Hash::make('123456'),
+                    'peran'    => HelperController::mapRoleDariJabatan($this->ms_jabatan_id),
+                    'current_session' => null,
+                ]
+            );
+
+            // 3️⃣ Insert data pegawai + simpan user_id
             $pegawai = Pegawai::create([
                 'nama_pegawai' => $this->nama_pegawai,
-                'nip' => $this->nip,
-                'ms_pengguna_id' => $ms_pengguna_id, // ID pengguna yang login
-                'ms_jabatan_id' => $this->ms_jabatan_id, // ID pengguna yang login
+                'nip'          => $this->nip,
+                'user_id'      => $user->ms_pengguna_id,   // FK ke user
+                'ms_jabatan_id' => $this->ms_jabatan_id,
                 'ms_jenjang_id' => $this->selectedJenjang,
-                'telepon' => $this->telepon ?: null,
-                'email' => $this->email,
-                'alamat' => $this->alamat,
-                'deskripsi' => $this->deskripsi,
+                'telepon'      => $this->telepon ?: null,
+                'email'        => $email,
+                'alamat'       => $this->alamat,
+                'deskripsi'    => $this->deskripsi,
+                'ms_pengguna_id' => auth()->id(), // petugas yang input
             ]);
 
-            // Logika untuk menangani kolom educard
+            // 4️⃣ EduCard (kalau ada)
             if (!empty($this->educard)) {
-                // Insert data di tabel ms_educard
-                EduCard::Create(
-                    [
-                        'ms_pegawai_id' => $pegawai->ms_pegawai_id, // Kondisi untuk cek apakah data sudah ada
-                        'ms_pengguna_id' => Auth::id(),
-                        'kode_kartu' => $this->educard, // Input dari form
-                        'jenis_pemilik' => 'pegawai', // Disesuaikan dengan jenis pemilik
-                        'status_kartu' => 'aktif', // Status default
-                        'deskripsi' => 'EduCard ' . $this->nama_pegawai, // Bisa diubah sesuai kebutuhan
-                    ]
-                );
+                EduCard::create([
+                    'ms_pegawai_id'  => $pegawai->ms_pegawai_id,
+                    'ms_pengguna_id' => auth()->id(), // petugas yang input
+                    'kode_kartu'     => $this->educard,
+                    'jenis_pemilik'  => 'pegawai',
+                    'status_kartu'   => 'aktif',
+                    'deskripsi'      => 'EduCard ' . $this->nama_pegawai,
+                ]);
             }
 
-            // Commit transaksi
             DB::commit();
 
-            // Notifikasi sukses
-            $this->dispatchBrowserEvent('alertify-success', ['message' => 'Berhasil menambah pegawai!']);
-
-            // Reset form input
+            $this->dispatchBrowserEvent('alertify-success', ['message' => 'Berhasil menambah pegawai + akun login!']);
             $this->resetInput();
-
-            // Tutup modal dan refresh data siswa
             $this->dispatchBrowserEvent('hide-modal', ['modalId' => 'ModalPegawaiCreate']);
-
             $this->emit('JabatanIndex');
             $this->emit('PegawaiIndex');
         } catch (\Exception $e) {
-            // Rollback transaksi jika terjadi error
             DB::rollBack();
-
-            // Notifikasi error
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Gagal menambah pegawai: ' . $e->getMessage()]);
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Gagal menambah pegawai: ' . $e->getMessage()
+            ]);
         }
     }
 

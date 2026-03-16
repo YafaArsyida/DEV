@@ -13,6 +13,10 @@ use App\Models\Pegawai;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
+use Illuminate\Support\Facades\Hash;
+use App\Http\Controllers\HelperController;
+use App\Models\User;
+
 class Import extends Component
 {
     use WithFileUploads;
@@ -83,49 +87,69 @@ class Import extends Component
 
     public function createPegawai()
     {
-        // Validasi data input
         $validatedData = $this->validate();
 
         DB::beginTransaction();
 
         try {
-            // Loop melalui daftar pegawai baru
             foreach ($this->newPegawaiList as $pegawaiData) {
-                // Pastikan semua data pegawai lengkap sebelum insert
-                if (!isset($pegawaiData['nama_pegawai']) || !isset($pegawaiData['telepon']) || !isset($pegawaiData['nip']) || !isset($pegawaiData['deskripsi'])) {
+
+                // Validasi minimal per baris
+                if (empty($pegawaiData['nama_pegawai']) || empty($pegawaiData['nip'])) {
                     continue;
                 }
 
-                // Insert data pegawai
+                // 1️⃣ Generate email (jika kosong)
+                $email = !empty($pegawaiData['email'])
+                    ? $pegawaiData['email']
+                    : HelperController::generateEmailFromNama($pegawaiData['nama_pegawai']);
+
+                $email = HelperController::makeUniqueEmail($email);
+
+                // 2️⃣ Create / Ambil user (hindari duplikat)
+                $user = User::firstOrCreate(
+                    ['email' => $email],
+                    [
+                        'nama'     => $pegawaiData['nama_pegawai'],
+                        'telepon'  => $pegawaiData['telepon'] ?? null,
+                        'password' => Hash::make('123456'),
+                        'peran'    => HelperController::mapRoleDariJabatan($this->ms_jabatan_id),
+                        'current_session' => null,
+                    ]
+                );
+
+                // 3️⃣ Insert pegawai + simpan user_id
                 Pegawai::create([
-                    'nama_pegawai' => $pegawaiData['nama_pegawai'],
-                    'nip' => $pegawaiData['nip'],
-                    'ms_pengguna_id'   => Auth::id(),
+                    'nama_pegawai'  => $pegawaiData['nama_pegawai'],
+                    'nip'           => $pegawaiData['nip'],
+                    'user_id'       => $user->ms_pengguna_id,   // FK user
+                    'ms_pengguna_id' => auth()->id(),             // petugas import
                     'ms_jabatan_id' => $this->ms_jabatan_id,
-                    'ms_jenjang_id'    => $this->selectedJenjang,
-                    'telepon' => $pegawaiData['telepon'],
-                    'deskripsi' => $pegawaiData['deskripsi'],
+                    'ms_jenjang_id' => $this->selectedJenjang,
+                    'telepon'       => $pegawaiData['telepon'] ?? null,
+                    'email'         => $email,
+                    'deskripsi'     => $pegawaiData['deskripsi'] ?? null,
                 ]);
             }
 
-            // Commit transaksi jika semua proses berhasil
             DB::commit();
 
-            $this->dispatchBrowserEvent('alertify-success', ['message' => 'Data pegawai berhasil diimport.']);
+            $this->dispatchBrowserEvent('alertify-success', [
+                'message' => 'Import pegawai + pembuatan akun login berhasil.'
+            ]);
             $this->dispatchBrowserEvent('hide-modal', ['modalId' => 'ModalImportPegawai']);
 
-            // Reset data setelah sukses
             $this->newPegawaiList = null;
             $this->file_import = null;
 
             $this->emit('PegawaiIndex');
             $this->emit('JabatanIndex');
         } catch (\Exception $e) {
-            // Rollback transaksi jika terjadi error
             DB::rollBack();
 
-            // Informasikan error kepada pengguna
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Terjadi kesalahan saat import: ' . $e->getMessage()
+            ]);
         }
     }
 

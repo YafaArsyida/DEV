@@ -100,7 +100,7 @@ Route::post('/logout', [LoginController::class, 'logOut'])
 Route::get('/landing/ekstrakurikuler', [LandingEkstrakurikuler::class, 'index'])->name('landing.ekstrakurikuler');
 
 // LANDING
-Route::middleware(['auth', 'peran:superadmin,administrasi,kantin'])->group(function () {
+Route::middleware(['auth', 'peran:SUPERADMIN,ADMINISTRASI,KANTIN'])->group(function () {
     // SMARTCANTEEN 
     Route::get('/smartCanteen/dashboard', [SmartCanteenDashboard::class, 'index'])->name('smartCanteen.dashboard');
 
@@ -141,7 +141,7 @@ Route::middleware(['auth', 'peran:superadmin,administrasi,kantin'])->group(funct
 
 // SISTEM
 // JENJANG TAHUN AJAR
-Route::middleware(['auth', 'peran:superadmin,administrasi'])->group(function () {
+Route::middleware(['auth', 'peran:SUPERADMIN,ADMINISTRASI'])->group(function () {
     Route::middleware(['auth'])->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
     Route::get('/sistem/jenjang-tahun-ajar',  [JenjangTahunAjar::class, 'index'])->name('sistem.jenjang-tahun-ajar');

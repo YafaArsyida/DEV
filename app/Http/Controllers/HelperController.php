@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
@@ -69,5 +70,43 @@ class HelperController extends Controller
 
         // Pastikan hanya angka yang tersisa
         return preg_match('/^0\d+$/', $normalized) ? $normalized : null;
+    }
+    public static function generateEmailFromNama(string $nama): string
+    {
+        $words = collect(preg_split('/\s+/', strtolower(trim($nama))))
+            ->filter()
+            ->take(2)
+            ->toArray();
+
+        $base = implode('.', $words) ?: 'user';
+        return $base . '@sekolah.local';
+    }
+
+    public static function makeUniqueEmail(string $email): string
+    {
+        $base = Str::before($email, '@');
+        $domain = Str::after($email, '@');
+
+        $final = $email;
+        $i = 1;
+
+        while (User::where('email', $final)->exists()) {
+            $final = $base . $i . '@' . $domain;
+            $i++;
+        }
+
+        return $final;
+    }
+
+    public static function mapRoleDariJabatan($jabatanId): string
+    {
+        return match ((int) $jabatanId) {
+            1  => 'KOMITE_SEKOLAH',
+            2  => 'KEPALA_SEKOLAH',
+            3  => 'GURU',
+            9  => 'TATA_USAHA',
+            10 => 'BK',
+            default => 'PEGAWAI',
+        };
     }
 }

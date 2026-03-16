@@ -15,6 +15,7 @@ class Pegawai extends Model
     protected $primaryKey = 'ms_pegawai_id'; // Nama kolom primary key
 
     protected $fillable = [
+        'user_id', // ID Pengguna
         'nama_pegawai',   // Nama Pegawai
         'nip',            // Nomor Induk Pegawai
         'ms_jabatan_id',  // ID Jabatan
@@ -30,10 +31,10 @@ class Pegawai extends Model
     /**
      * Relasi ke model Petugas
      */
-    public function ms_pengguna()
-    {
-        return $this->belongsTo(User::class, 'ms_pengguna_id', 'ms_pengguna_id');
-    }
+    // public function ms_pengguna()
+    // {
+    //     return $this->belongsTo(User::class, 'ms_pengguna_id', 'ms_pengguna_id');
+    // }
 
     /**
      * Relasi ke model Jabatan

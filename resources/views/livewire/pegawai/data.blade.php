@@ -67,6 +67,11 @@
                     <div class="hstack gap-2 justify-content-center">
         
                         {{-- Edit --}}
+                        <a href="#ModalEditPegawai" data-bs-toggle="modal" class="text-primary d-inline-block"
+                            title="Edit Pegawai" wire:click.prevent="$emit('loadDataPegawai', {{ $row->ms_pegawai_id }})">
+                            <i class="ri-user-line fs-17 align-middle"></i> Aktifkan Akun
+                        </a>
+
                         <a href="#ModalEditPegawai" data-bs-toggle="modal" class="text-warning d-inline-block"
                             title="Edit Pegawai" wire:click.prevent="$emit('loadDataPegawai', {{ $row->ms_pegawai_id }})">
                             <i class="ri-mark-pen-line fs-17 align-middle"></i> Edit

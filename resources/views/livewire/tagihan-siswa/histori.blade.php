@@ -88,9 +88,10 @@
                                             </a>
 
                                             <!-- Tombol Kirim WhatsApp -->
-                                            <a wire:click.prevent="kegiatanPengumuman({{ $kegiatan->ms_kegiatan_id }})" class="text-success fw-medium">
+                                            <a wire:click="kirimWhatsapp({{ $transaksi->ms_transaksi_tagihan_siswa_id }})"
+                                                class="btn btn-sm btn-success d-inline-flex align-items-center gap-1">
                                                 <i class="mdi mdi-whatsapp me-1"></i>
-                                                Cetak Pengumuman
+                                                <span>Kirim Pesan</span>
                                             </a>
                                             
                                             <!-- Tombol Cetak -->

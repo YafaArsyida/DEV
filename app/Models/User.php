@@ -37,6 +37,7 @@ class User extends Authenticatable
         'nama',
         'email',
         'password',
+        'telepon',
         'peran',
         'current_session',
     ];
