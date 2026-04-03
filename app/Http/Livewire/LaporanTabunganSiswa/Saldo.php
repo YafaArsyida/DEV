@@ -94,32 +94,60 @@ class Saldo extends Component
                 ->where('ms_tahun_ajar_id', $this->selectedTahunAjar)
                 ->get();
         }
+
         $siswas = collect();
-        $siswas = PenempatanSiswa::with(['ms_siswa.ms_educard', 'ms_kelas', 'ms_tahun_ajar', 'ms_jenjang'])
+        $siswas = PenempatanSiswa::query()
+            ->with([
+                'ms_siswa.ms_educard',
+                'ms_siswa.ms_saldo_tabungan',
+                'ms_kelas',
+                'ms_tahun_ajar',
+                'ms_jenjang'
+            ])
+
             ->join('ms_siswa', 'ms_penempatan_siswa.ms_siswa_id', '=', 'ms_siswa.ms_siswa_id')
-            ->where('ms_jenjang_id', $this->selectedJenjang)
-            ->where('ms_tahun_ajar_id', $this->selectedTahunAjar)
-            ->when($this->selectedKelas, fn($q) => $q->where('ms_kelas_id', $this->selectedKelas))
-            ->whereHas('ms_siswa.ms_transaksi_tabungan', fn($q) => $q->whereNotNull('ms_penempatan_siswa_id'))
+
+            // 🔥 JOIN SALDO
+            ->leftJoin('ms_saldo_tabungan', function ($join) {
+                $join->on('ms_saldo_tabungan.user_id', '=', 'ms_siswa.ms_siswa_id')
+                    ->where('ms_saldo_tabungan.user_type', 'siswa');
+            })
+
+            ->where('ms_penempatan_siswa.ms_jenjang_id', $this->selectedJenjang)
+            ->where('ms_penempatan_siswa.ms_tahun_ajar_id', $this->selectedTahunAjar)
+
+            ->when(
+                $this->selectedKelas,
+                fn($q) =>
+                $q->where('ms_penempatan_siswa.ms_kelas_id', $this->selectedKelas)
+            )
+
+            // 🔍 SEARCH
             ->when($this->search, function ($query) {
                 $query->where(function ($query) {
-                    $query->whereHas(
-                        'ms_siswa',
-                        fn($q) =>
-                        $q->where('nama_siswa', 'like', '%' . $this->search . '%')
-                    )->orWhereHas(
-                        'ms_siswa.ms_educard',
-                        fn($q) =>
-                        $q->where('kode_kartu', 'like', '%' . $this->search . '%')
-                    );
+                    $query->where('ms_siswa.nama_siswa', 'like', '%' . $this->search . '%')
+                        ->orWhereHas(
+                            'ms_siswa.ms_educard',
+                            fn($q) => $q->where('kode_kartu', 'like', '%' . $this->search . '%')
+                        );
                 });
             })
-            ->get()
-            ->filter(fn($item) => $item->ms_siswa->saldo_tabungan_siswa() !== 0)
-            ->sortByDesc(fn($item) => $item->ms_siswa->saldo_tabungan_siswa() ?? 0)
-            ->values(); // reset keys
 
-        $this->totalSaldo = $siswas->sum(fn($item) => $item->ms_siswa->saldo_tabungan_siswa() ?? 0);
+            // 🔥 FILTER SALDO ≠ 0
+            ->whereRaw('COALESCE(ms_saldo_tabungan.saldo_tabungan, 0) != 0')
+
+            // 🔥 SORT BY SALDO
+            ->orderByDesc('ms_saldo_tabungan.saldo_tabungan')
+
+            ->select('ms_penempatan_siswa.*') // penting biar model tetap normal
+
+            ->get();
+
+        // 🔥 TOTAL SALDO (dari DB, bukan PHP loop berat)
+        $this->totalSaldo = $siswas->sum(
+            fn($item) =>
+            $item->ms_siswa->ms_saldo_tabungan->saldo_tabungan ?? 0
+        );
 
         // Cek apakah koleksi siswa kosong.
         if (!$siswas || $siswas->isEmpty()) {

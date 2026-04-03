@@ -114,7 +114,6 @@ class Index extends Component
             // Reset input
             $this->reset(['nominal', 'deskripsi']);
             $this->emitSelf('$refresh'); //ringan
-            $this->emit('refreshSaldo');
 
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'Transaksi berhasil disimpan.']);
         } catch (\Exception $e) {
@@ -171,46 +170,79 @@ class Index extends Component
         $this->endDate   = now()->format('Y-m-d');
     }
 
+    private function baseQuery()
+    {
+        return PendapatanLainnya::query()
+            ->with(['akuntansi_rekening', 'ms_pengguna'])
+            ->where('ms_tahun_ajar_id', $this->selectedTahunAjar)
+            ->where('ms_jenjang_id', $this->selectedJenjang);
+    }
     public function render()
     {
-        $select_transaksi = [];
+        // SELECT OPTION
         $select_transaksi = AkuntansiRekening::where('akuntansi_kelompok_rekening_id', 4)
             ->where('tipe_akun', 'Pendapatan Lainnya')
             ->orderBy('kode_rekening', 'ASC')
             ->get();
 
-        $query = PendapatanLainnya::query()
-            ->where('ms_tahun_ajar_id', $this->selectedTahunAjar)
-            ->where('ms_jenjang_id', $this->selectedJenjang)
-            ->when($this->startDate && $this->endDate, function ($query) {
-                $startDate = Carbon::parse($this->startDate)->startOfDay();
-                $endDate   = Carbon::parse($this->endDate)->endOfDay();
+        // ======================
+        // ✅ TOTAL GLOBAL (TIDAK BOLEH KENA FILTER TANGGAL)
+        // ======================
+        $this->totalPendapatanLainnya = (clone $this->baseQuery())
+            ->when($this->selectedRekening, fn($q) => $q->where('kode_rekening', $this->selectedRekening))
+            ->sum('nominal');
 
-                $query->whereBetween('tanggal', [$startDate, $endDate]);
-            });
+        // ======================
+        // ✅ HITUNG SALDO AWAL
+        // ======================
+        $saldoAwal = 0;
 
-        if (!empty($this->selectedRekening)) {
-            $query->where('kode_rekening', $this->selectedRekening);
+        if ($this->startDate) {
+
+            $saldoAwal = (clone $this->baseQuery())
+                ->when($this->selectedRekening, fn($q) => $q->where('kode_rekening', $this->selectedRekening))
+                ->whereDate('tanggal', '<', $this->startDate)
+                ->sum('nominal');
         }
 
-        if (!empty($this->search)) {
-            $query->where(function ($q) {
-                $q->where('deskripsi', 'like', '%' . $this->search . '%')
-                    ->orWhereHas('akuntansi_rekening', function ($qr) {
-                        $qr->where('nama_rekening', 'like', '%' . $this->search . '%');
-                    });
+        // ======================
+        // ✅ DATA PERIODE
+        // ======================
+        $saldo = $saldoAwal;
+
+        $data = $this->baseQuery()
+
+            ->when($this->selectedRekening, fn($q) => $q->where('kode_rekening', $this->selectedRekening))
+
+            ->when($this->search, function ($q) {
+                $q->where(function ($sub) {
+                    $sub->where('deskripsi', 'like', '%' . $this->search . '%')
+                        ->orWhereHas('akuntansi_rekening', function ($qr) {
+                            $qr->where('nama_rekening', 'like', '%' . $this->search . '%');
+                        });
+                });
+            })
+
+            ->when($this->startDate && $this->endDate, function ($q) {
+                $q->whereBetween('tanggal', [
+                    Carbon::parse($this->startDate)->startOfDay(),
+                    Carbon::parse($this->endDate)->endOfDay()
+                ]);
+            })
+
+            ->orderBy('tanggal', 'ASC')
+            ->get()
+
+            ->map(function ($item) use (&$saldo) {
+                $saldo += $item->nominal;
+                $item->saldo = $saldo;
+                return $item;
             });
-        }
-
-        $query->orderBy('tanggal', 'ASC');
-
-        $data = $query->get();
-
-        $this->totalPendapatanLainnya = (clone $query)->sum('nominal');
 
         return view('livewire.transaksi-pendapatan-lainnya.index', [
             'data' => $data,
             'select_transaksi' => $select_transaksi,
+            'saldoAwal' => $saldoAwal,
         ]);
     }
 }

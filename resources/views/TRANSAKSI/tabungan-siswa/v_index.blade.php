@@ -19,18 +19,18 @@
                 <div class="tab-content text-muted">
                     <div class="tab-pane active" id="tabSiswaKelas" role="tabpanel">
                         <div class="row">
-                            <div class="col-xxl-4 pe-1">
-                                <div class="card">
-                                    @livewire('transaksi-tabungan-siswa.data-siswa')   
-                                    @livewire('transaksi-tabungan-siswa.delete')  
-                                    @livewire('transaksi-tabungan-siswa.edit') 
-                                </div><!-- end card -->
+                            <div class="col-xxl-4">
+                                <div class="sticky-side-div">
+                                    <div class="card">
+                                        @livewire('transaksi-tabungan-siswa.data-siswa')   
+                                    </div><!-- end card -->
+                                </div>
                             </div>
                             <!--end col-->
-                            <div class="col-xxl-8 ps-0">
-                                <div class="sticky-side-div">
-                                    @livewire('transaksi-tabungan-siswa.data-tabungan')   
-                                </div>
+                            <div class="col-xxl-8">
+                                @livewire('transaksi-tabungan-siswa.data-tabungan')   
+                                @livewire('transaksi-tabungan-siswa.delete')
+                                @livewire('transaksi-tabungan-siswa.edit')
                             </div>
                         </div>
                         <!--end row-->

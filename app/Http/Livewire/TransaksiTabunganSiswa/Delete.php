@@ -3,8 +3,9 @@
 namespace App\Http\Livewire\TransaksiTabunganSiswa;
 
 use App\Models\AkuntansiJurnalDetail;
-use App\Models\TabunganSiswa;
+use App\Models\SaldoTabungan;
 use App\Models\TransaksiTabungan;
+
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
@@ -16,9 +17,56 @@ class Delete extends Component
         'confirmDeleteTabungan'
     ];
 
-    public function confirmDeleteTabungan($ms_transaksi_tabungan_id)
+    public function confirmDeleteTabungan($id)
     {
-        $this->ms_transaksi_tabungan_id = $ms_transaksi_tabungan_id;
+        $this->ms_transaksi_tabungan_id = $id;
+    }
+
+    protected function validateSaldoDelete($transaksi, $saldo)
+    {
+        $saldoValue = $saldo->saldo_tabungan;
+
+        $saldoSetelahHapus = $transaksi->jenis_transaksi === 'setoran'
+            ? $saldoValue - $transaksi->nominal
+            : $saldoValue + $transaksi->nominal;
+
+        if ($saldoSetelahHapus < 0) {
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Saldo sudah digunakan'
+            ]);
+        }
+    }
+
+    protected function processDelete($transaksi, $saldo)
+    {
+        // update saldo dulu
+        if ($transaksi->jenis_transaksi === 'setoran') {
+            $saldo->decrement('saldo_tabungan', $transaksi->nominal);
+        } else {
+            $saldo->increment('saldo_tabungan', $transaksi->nominal);
+        }
+
+        // soft delete jurnal (1 query)
+        AkuntansiJurnalDetail::whereIn('akuntansi_jurnal_detail_id', [
+            $transaksi->akuntansi_jurnal_detail_debit_id,
+            $transaksi->akuntansi_jurnal_detail_kredit_id,
+        ])->delete();
+
+        // delete transaksi
+        $transaksi->delete();
+    }
+
+    protected function afterDeleteSuccess()
+    {
+        $this->emit('successTransaksiTabungan');
+
+        $this->dispatchBrowserEvent('hide-modal', [
+            'modalId' => 'ModalDeleteTabungan'
+        ]);
+
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Transaksi berhasil dihapus.'
+        ]);
     }
 
     public function deleteTabungan()
@@ -26,73 +74,33 @@ class Delete extends Component
         DB::beginTransaction();
 
         try {
-            // Validasi apakah ID tabungan ada
-            if (!$this->ms_transaksi_tabungan_id) {
-                $this->dispatchBrowserEvent('alertify-error', ['message' => 'Transaksi tidak ditemukan.']);
-                return;
-            }
-
-            // Ambil data transaksi berdasarkan ID
+            
             $transaksi = TransaksiTabungan::find($this->ms_transaksi_tabungan_id);
 
             if (!$transaksi) {
-                $this->dispatchBrowserEvent('alertify-error', ['message' => 'Transaksi tidak ditemukan.']);
-                return;
-            }
-
-            if ($transaksi->user_type == 'siswa') {
-                $saldoSaatIni = $transaksi->ms_siswa->saldo_tabungan_siswa();
-            } elseif ($transaksi->user_type == 'pegawai') {
-                $saldoSaatIni = $transaksi->ms_pegawai->saldo_tabungan_pegawai();
-            } else {
-                // default 0 atau error
-                $this->dispatchBrowserEvent('alertify-error', ['message' => 'User tidak ditemukan']);
-            }
-
-            // Hitung saldo setelah penghapusan transaksi
-            $saldoSetelahHapus = $saldoSaatIni - ($transaksi->jenis_transaksi === 'setoran' ? $transaksi->nominal : -$transaksi->nominal);
-
-            // Validasi apakah saldo menjadi negatif setelah penghapusan
-            if ($saldoSetelahHapus < 0) {
                 $this->dispatchBrowserEvent('alertify-error', [
-                    'message' => "Gagal! saldo telah digunakan. Saldo saat ini {$saldoSaatIni}, batas {$saldoSetelahHapus}"
+                    'message' => 'Transaksi tidak ditemukan!'
                 ]);
                 return;
             }
 
-            // Tambahkan log di deskripsi transaksi sebelum penghapusan
-            $transaksi->deskripsi = $transaksi->deskripsi . ' (Dihapus oleh petugas ID: ' . auth()->id() . ')';
-            $transaksi->save();
+            $saldo = SaldoTabungan::getSaldo(
+                $transaksi->user_id,
+                $transaksi->user_type
+            );
 
-            // Dapatkan ID jurnal terkait
-            $jurnalIds = [
-                $transaksi->akuntansi_jurnal_detail_debit_id,
-                $transaksi->akuntansi_jurnal_detail_kredit_id,
-            ];
+            $this->validateSaldoDelete($transaksi, $saldo);
 
-            // Validasi dan soft delete jurnal
-            AkuntansiJurnalDetail::whereIn('akuntansi_jurnal_detail_id', $jurnalIds)->get()->each(function ($jurnal) {
-                $jurnal->delete();
-            });
-
-            // Hapus transaksi
-            $transaksi->delete();
+            $this->processDelete($transaksi, $saldo);
 
             DB::commit();
 
-            // Emit event untuk memperbarui data di tabel
-            $this->emit('refreshTabungans');
-            $this->emit('refreshSaldo');
-            $this->emit('refreshTabunganSiswa');
-            $this->emit('tagihanUpdated');
-            $this->dispatchBrowserEvent('hide-delete-modal', ['modalId' => 'ModalDeleteTabungan']);
-
-            // Berikan notifikasi sukses
-            $this->dispatchBrowserEvent('alertify-success', ['message' => 'Transaksi berhasil dihapus.']);
+            $this->afterDeleteSuccess();
         } catch (\Exception $e) {
             DB::rollBack();
-            // Notifikasi error jika terjadi kesalahan
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Terjadi kesalahan sistem'
+            ]);
         }
     }
     public function render()

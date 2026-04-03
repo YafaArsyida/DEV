@@ -22,16 +22,12 @@
                             <th scope="row">Petugas</th>
                             <td>
                                 {{ $transaksi->ms_pengguna->nama }} 
-                                {{-- <span class="fs-14 fw-semibold text-warning">
-                                </span> --}}
                             </td>
                         </tr>
                         <tr>
                             <th scope="row">Tanggal Transaksi</th>
                             <td>
                                 {{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($transaksi->tanggal, 'd F Y H:i:s') }}
-                                {{-- <span class="fs-14 fw-semibold text-info">
-                                </span> --}}
                             </td>
                         </tr>
                         <tr>
@@ -45,7 +41,8 @@
                             <th scope="row" class="text-warning">Perubahan Tanggal</th>
                             <td>
                                 <div class="input-group input-group-sm">
-                                    <input type="datetime-local" class="form-control" wire:model.defer="tanggal" aria-label="Tanggal Transaksi">
+                                    <input type="date" class="form-control" wire:model.defer="tanggal">
+                                    {{-- <input type="datetime-local" class="form-control" wire:model.defer="tanggal" aria-label="Tanggal Transaksi"> --}}
                                 </div>
                                 @error('tanggal') <span class="text-danger text-sm">{{ $message }}</span> @enderror
                             </td>
@@ -67,7 +64,7 @@
                 <a href="javascript:void(0);" class="btn btn-link link-success shadow-none fw-medium" data-bs-dismiss="modal"><i class="ri-close-line me-1 align-middle"></i> Tutup</a>
                 @if($transaksi)
                 <button type="button" class="btn btn-primary" 
-                    wire:click.prevent="updateTanggal">
+                    wire:click.prevent="updateTransaksi">
                     <i class="ri-printer-line align-bottom me-1"></i> Edit
                 </button>
                 @endif

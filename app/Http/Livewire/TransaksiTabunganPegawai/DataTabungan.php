@@ -7,11 +7,15 @@ use App\Models\KuitansiTransaksiTabungan;
 use App\Models\Pegawai;
 use App\Models\TransaksiTabungan;
 use App\Models\WhatsAppTransaksiTabungan;
+use Carbon\Carbon;
 use Livewire\Component;
 
 class DataTabungan extends Component
 {
     public $ms_pegawai_id;
+
+    public $startDate = null;
+    public $endDate = null;
 
     public $selectedJenjang = null;
 
@@ -40,6 +44,20 @@ class DataTabungan extends Component
 
         // Emit refresh agar data di render diperbaruip
         $this->emitSelf('$refresh');
+    }
+
+    public function mount()
+    {
+        $this->startDate = now()->startOfMonth()->format('Y-m-d');
+        $this->endDate   = now()->format('Y-m-d');
+    }
+
+    public function resetTanggal()
+    {
+        // $this->startDate = now()->format('Y-m-d');
+        $this->startDate = now()->startOfMonth()->format('Y-m-d');
+        $this->endDate   = now()->format('Y-m-d');
+        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
     }
 
     public function kirimWhatsapp($tabunganId)
@@ -152,32 +170,74 @@ class DataTabungan extends Component
         $this->emit('openNewTab', $url);
     }
 
+    private function baseQuery()
+    {
+        return TransaksiTabungan::query()
+            ->with('ms_pengguna')
+            ->where('user_id', $this->ms_pegawai_id);
+    }
+
     public function render()
     {
-        $saldo = 0; // Inisialisasi di luar closure
+        $saldoAwal = 0;
+        $totalSetoranSebelum = 0;
+        $totalPenarikanSebelum = 0;
+
+        if ($this->ms_pegawai_id && $this->startDate) {
+
+            $baseSebelum = $this->baseQuery();
+
+            $totalSetoranSebelum = (clone $baseSebelum)
+                ->whereDate('tanggal', '<', $this->startDate)
+                ->where('jenis_transaksi', 'setoran')
+                ->sum('nominal');
+
+            $totalPenarikanSebelum = (clone $baseSebelum)
+                ->whereDate('tanggal', '<', $this->startDate)
+                ->where('jenis_transaksi', 'penarikan')
+                ->sum('nominal');
+
+            $saldoAwal = $totalSetoranSebelum - $totalPenarikanSebelum;
+        }
+
+        $saldo = $saldoAwal;
+
         $transaksiTabungan = $this->ms_pegawai_id
-            ? TransaksiTabungan::query()
-            ->where('user_id', $this->ms_pegawai_id)
-            // ->where('user_type', 'siswa')
-            // ->when($this->ms_penempatan_siswa_id, function ($query) {
-            //     $query->where('ms_penempatan_siswa_id', $this->ms_penempatan_siswa_id);
-            // })
+            ? $this->baseQuery()
+
+            ->when($this->startDate && $this->endDate, function ($q) {
+
+                $startDate = Carbon::parse($this->startDate)->startOfDay();
+                $endDate   = Carbon::parse($this->endDate)->endOfDay();
+
+                $q->whereBetween('tanggal', [$startDate, $endDate]);
+            })
+
             ->orderBy('tanggal', 'ASC')
             ->orderBy('ms_transaksi_tabungan_id', 'ASC')
+
             ->get()
+
             ->map(function ($item) use (&$saldo) {
-                if (in_array($item->jenis_transaksi, ['setoran'])) {
+
+                if ($item->jenis_transaksi === 'setoran') {
                     $saldo += $item->nominal;
                 } else {
-                    $saldo -= $item->nominal; // penarikan, transfer keluar
+                    $saldo -= $item->nominal;
                 }
+
                 $item->saldo = $saldo;
+
                 return $item;
             })
+
             : collect();
 
         return view('livewire.transaksi-tabungan-pegawai.data-tabungan', [
             'transaksiTabungan' => $transaksiTabungan,
+            'saldoAwal' => $saldoAwal,
+            'totalSetoranSebelum' => $totalSetoranSebelum,
+            'totalPenarikanSebelum' => $totalPenarikanSebelum,
         ]);
     }
 }

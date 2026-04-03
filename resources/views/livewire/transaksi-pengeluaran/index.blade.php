@@ -122,14 +122,12 @@
                         <div class="col-xxl-4">
                             <label class="form-label fw-semibold">Periode</label>
                             <div class="d-flex align-items-center gap-2">
-                                <input type="date" id="startDate" class="form-control" wire:model="startDate" value="{{ $startDate }}">
+                                <input type="date" class="form-control" wire:model="startDate">
                                 <span class="text-muted">–</span>
-                                <input type="date" id="endDate" class="form-control" wire:model="endDate" value="{{ $endDate }}">
-                                <div class="col-auto">
-                                    <button type="button" class="btn btn-soft-secondary btn-icon rounded-circle" wire:click="resetTanggal" title="Reset Tanggal">
-                                        <i class="ri-refresh-line fs-16"></i>
-                                    </button>    
-                                </div>
+                                <input type="date" class="form-control" wire:model="endDate">
+                                <button type="button" class="btn btn-soft-secondary" wire:click="resetTanggal" title="Reset Tanggal">
+                                    <i class="ri-refresh-line"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -149,9 +147,22 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                @php
-                                    $saldo = 0;
-                                @endphp
+                                    <tr class="table-secondary fw-semibold">
+                                        <td colspan="5">
+                                            <i class="ri-wallet-3-line me-1"></i>
+                                            Pengeluaran Awal Periode
+                                        </td>
+                                    
+                                        <td class="text-center text-success">-</td>
+                                    
+                                        <td>
+                                            <span class="fs-14 text-info">
+                                                RP{{ number_format($saldoAwal, 0, ',', '.') }}
+                                            </span>
+                                        </td>
+                                    
+                                        <td></td>
+                                    </tr>
                                 @forelse ($data as $item)
                                     <tr>
                                         <!-- Kolom nomor urut -->
@@ -182,17 +193,13 @@
                                         </td>
                                         <!-- Kolom nominal pendapatan -->
                                         <td class="text-center">
-                                            <span class="fs-14 text-success">
+                                            <span class="fs-14 text-danger">
                                             RP{{ number_format($item->nominal, 0, ',', '.') }}
                                             </span>
                                         </td>
                                         <td>
-                                            @php
-                                                // Perhitungan saldo
-                                                $saldo += $item->nominal; // Tambahkan saldo
-                                            @endphp
                                             <span class="fs-14 text-info">
-                                                RP{{ number_format($saldo, 0, ',', '.') }}
+                                                RP{{ number_format($item->saldo, 0, ',', '.') }}
                                             </span>
                                         </td>
                                         <!-- Kolom aksi -->

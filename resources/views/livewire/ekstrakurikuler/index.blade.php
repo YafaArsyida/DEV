@@ -1,7 +1,7 @@
 <div class="card">
     <div class="card-header border-0 pb-0">
         <div class="d-flex align-items-center">
-            <h5 class="card-title mb-0 flex-grow-1"> Ekstrakurikuler</h5>
+            <h5 class="card-title mb-0 flex-grow-1">Data Ekstrakurikuler</h5>
             @if ($selectedJenjang)
             <div class="flex-shrink-0">
                 <div class="d-flex gap-2 flex-wrap">
@@ -14,8 +14,10 @@
     <div class="card-body">
         <div class="row g-3 mb-3">
             <div class="col-xxl-12 col-sm-12">
+                <label for="searchEkstrakurikuler" class="form-label">Pencarian</label>
                 <div class="search-box">
-                    <input type="text" class="form-control search" wire:model.debounce.300ms="search" placeholder="cari nama, deskripsi atau lainnya...">
+                    <input type="text" id="searchEkstrakurikuler" class="form-control search" wire:model.debounce.300ms="search"
+                        placeholder="Cari Ekstrakurikuler...">
                     <i class="ri-search-line search-icon"></i>
                 </div>
             </div>
@@ -66,7 +68,7 @@
                                         <span class="fw-medium" style="white-space: nowrap;">
                                             {{ $item->nama_ekstrakurikuler }}
                                         </span>
-                                        <p class="text-muted mb-0">{{ $item->deskripsi }}</p>
+                                        {{-- <p class="text-muted mb-0">{{ $item->deskripsi }}</p> --}}
                                     </td>
                                     <td class="" style="white-space: nowrap;">
                                         <span class="fw-medium fs-14 text-success">

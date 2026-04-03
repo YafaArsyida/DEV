@@ -37,10 +37,9 @@
                                     @livewire('transaksi-tabungan-siswa.delete') 
                                     @livewire('transaksi-tabungan-siswa.edit') 
                                     
-                                    @livewire('transaksi-edu-pay-siswa.index')   
-                                    @livewire('transaksi-edu-pay-siswa.delete')   
-                                    @livewire('transaksi-edu-pay-siswa.edit')   
-    
+                                    @livewire('transaksi-edu-pay-siswa.index') 
+                                    @livewire('transaksi-edu-pay-siswa.delete')
+                                    @livewire('transaksi-edu-pay-siswa.edit')  
                                 </div><!-- end card -->
                             </div>
                             <!--end col-->

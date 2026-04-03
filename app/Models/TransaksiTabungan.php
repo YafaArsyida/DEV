@@ -24,6 +24,11 @@ class TransaksiTabungan extends Model
         'akuntansi_jurnal_detail_debit_id',
         'akuntansi_jurnal_detail_kredit_id',
     ];
+
+    protected $casts = [
+        'tanggal' => 'datetime',
+    ];
+    
     /**
      * Relasi ke model Pengguna
      */

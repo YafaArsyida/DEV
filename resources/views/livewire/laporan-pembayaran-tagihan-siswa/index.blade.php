@@ -35,14 +35,12 @@
             <div class="col-xxl-4 col-sm-6">
                 <label class="form-label fw-semibold">Periode</label>
                 <div class="d-flex align-items-center gap-2">
-                    <input type="date" id="startDate" class="form-control" wire:model="startDate" value="{{ $startDate }}">
+                    <input type="date" class="form-control" wire:model="startDate">
                     <span class="text-muted">–</span>
-                    <input type="date" id="endDate" class="form-control" wire:model="endDate" value="{{ $endDate }}">
-                    <div class="col-auto">
-                        <button type="button" class="btn btn-soft-secondary btn-icon rounded-circle" wire:click="resetTanggal" title="Reset Tanggal">
-                            <i class="ri-refresh-line fs-16"></i>
-                        </button>    
-                    </div>
+                    <input type="date" class="form-control" wire:model="endDate">
+                    <button type="button" class="btn btn-soft-secondary" wire:click="resetTanggal" title="Reset Tanggal">
+                        <i class="ri-refresh-line"></i>
+                    </button>
                 </div>
             </div>
         </div>

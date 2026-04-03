@@ -22,23 +22,30 @@
                     <div class="row">
                         <div class="col-xxl-12">
                             <!-- Pencarian dan Pilihan Kelas -->
-                            <div class="row g-3 mb-3">
+                            <div class="row g-3 align-items-end mb-3">
+                            
                                 <!-- Kotak Pencarian -->
                                 <div class="col-xxl-8 col-sm-6">
+                                    <label for="searchSiswa" class="form-label">Pencarian Siswa</label>
                                     <div class="search-box">
-                                        <input type="text" class="form-control search" wire:model.debounce.300ms="searchSiswa" placeholder="Cari nama, deskripsi, atau lainnya...">
+                                        <input type="text" id="searchSiswa" class="form-control search" wire:model.debounce.300ms="searchSiswa"
+                                            placeholder="Cari nama, deskripsi, atau lainnya...">
                                         <i class="ri-search-line search-icon"></i>
                                     </div>
                                 </div>
+                            
                                 <!-- Dropdown Pilihan Kelas -->
-                                <div class="col-xxl-4 col-sm-6"> 
-                                    <select wire:model="kelasTujuan" style="cursor: pointer" class="form-select" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Kelas Tujian">
+                                <div class="col-xxl-4 col-sm-6">
+                                    <label for="kelasTujuan" class="form-label">Kelas Tujuan</label>
+                                    <select id="kelasTujuan" wire:model="kelasTujuan" style="cursor: pointer" class="form-select"
+                                        data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Kelas Tujuan">
                                         <option value="">Pilih Kelas Tujuan</option>
                                         @foreach ($select_kelas as $kelas)
-                                            <option value="{{ $kelas->ms_kelas_id }}">{{ $kelas->nama_kelas }}</option>
+                                        <option value="{{ $kelas->ms_kelas_id }}">{{ $kelas->nama_kelas }}</option>
                                         @endforeach
                                     </select>
                                 </div>
+                            
                             </div>
                             
                             <!-- Tabel Data Siswa -->

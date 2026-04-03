@@ -1,12 +1,12 @@
 <div class="card">
     <div class="card-header border-0 pb-0">
         <div class="d-flex align-items-center">
-            <h5 class="card-title mb-0 flex-grow-1">Jenis Tagihan</h5>
+            <h5 class="card-title mb-0 flex-grow-1">Data Jenis Tagihan</h5>
             @if ($selectedJenjang && $selectedTahunAjar)
             <div class="flex-shrink-0">
                 <div class="d-flex gap-2 flex-wrap">
-                    <button data-bs-toggle="modal" data-bs-target="#ModalImportTagihan" wire:click.prevent="$emit('showImportTagihan', {{ $selectedJenjang }}, {{ $selectedTahunAjar }})"  class="btn btn-soft-info"><i class="ri-file-text-line me-1 align-bottom"></i> Import</button>
-                    <button data-bs-toggle="modal" data-bs-target="#ModalAddJenisTagihan" wire:click.prevent="$emit('showCreateJenis', {{ $selectedJenjang }}, {{ $selectedTahunAjar }})" class="btn btn-primary"><i class="ri-play-list-add-line me-1 align-bottom"></i> Jenis Baru</button>
+                    <button data-bs-toggle="modal" data-bs-target="#ModalImportTagihan" wire:click.prevent="$emit('showImportTagihan', {{ $selectedJenjang }}, {{ $selectedTahunAjar }})"  class="btn btn-soft-primary"><i class="ri-file-text-line me-1 align-bottom"></i> Import Jenis Tagihan</button>
+                    <button data-bs-toggle="modal" data-bs-target="#ModalAddJenisTagihan" wire:click.prevent="$emit('showCreateJenis', {{ $selectedJenjang }}, {{ $selectedTahunAjar }})" class="btn btn-primary"><i class="ri-play-list-add-line me-1 align-bottom"></i> Jenis Tagihan Baru</button>
                 </div>
             </div>
             @endif
@@ -14,19 +14,26 @@
     </div>
     <div class="card-body">
         <div class="row g-3 mb-3">
-            <div class="col-xxl-2 col-sm-6"> 
-                <select wire:model="selectedKategoriTagihan" style="cursor: pointer" class="form-select" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Kategori">
+            <!-- Dropdown Kategori -->
+            <div class="col-xxl-2 col-sm-6">
+                <label for="filterKategoriTagihan" class="form-label">Kategori</label>
+                <select id="filterKategoriTagihan" wire:model="selectedKategoriTagihan" style="cursor: pointer" class="form-select"
+                    data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Kategori">
                     <option value="">Semua Kategori</option>
-                    @foreach ($select_kategori as $item)    
-                        <option value="{{ $item->ms_kategori_tagihan_siswa_id }}">
-                            {{ $item->nama_kategori_tagihan_siswa }}
-                        </option>
+                    @foreach ($select_kategori as $item)
+                    <option value="{{ $item->ms_kategori_tagihan_siswa_id }}">
+                        {{ $item->nama_kategori_tagihan_siswa }}
+                    </option>
                     @endforeach
                 </select>
             </div>
+            
+            <!-- Input Pencarian -->
             <div class="col-xxl-10 col-sm-6">
+                <label for="searchTagihan" class="form-label">Pencarian</label>
                 <div class="search-box">
-                    <input type="text" class="form-control search" wire:model.debounce.300ms="search" placeholder="cari nama, deskripsi atau lainnya...">
+                    <input type="text" id="searchTagihan" class="form-control search" wire:model.debounce.300ms="search"
+                        placeholder="Cari nama, kategori, atau deskripsi...">
                     <i class="ri-search-line search-icon"></i>
                 </div>
             </div>

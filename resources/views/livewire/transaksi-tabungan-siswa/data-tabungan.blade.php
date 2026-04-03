@@ -1,22 +1,33 @@
 {{-- The Master doesn't talk, he acts. --}}
 <div class="card">
-    <div class="card-body p-4">
-        <div class="row g-4 align-items-center mb-2">
-            <div class="col-sm-4">
-                <p class="text-muted mb-2 text-uppercase fw-semibold">
-                    Data Transaksi Tabungan 
-                    {{-- @if ($siswa)
-                        : {{ $siswa->nama }}
-                    @else
-                        <span class="text-danger">Silakan pilih siswa untuk melihat data tabungan.</span>
-                    @endif --}}
-                </p>
+    <div class="card-header border-0 pb-0">
+        <div class="d-flex align-items-center flex-wrap gap-3">
+            {{-- Judul --}}
+            <h4 class="card-title mb-0 flex-grow-1 fw-bold">Riwayat Transaksi Tabungan</h4>
+    
+            {{-- Tombol Export & Cetak --}}
+            <div class="d-flex gap-2 flex-wrap">
+                <button data-bs-toggle="modal" data-bs-target="#ExportLaporan" class="btn btn-soft-success">
+                    <i class="ri-file-excel-2-line pb-0"></i> Export
+                </button>
+                {{-- <button wire:click="cetakLaporan" class="btn btn-danger d-inline-flex align-items-center gap-1">
+                    <i class="ri-printer-line align-bottom"></i>
+                    <span>Cetak Laporan</span>
+                </button> --}}
+            </div>
+    
+            <div class="d-flex align-items-center gap-2">
+                <input type="date" class="form-control" wire:model="startDate">
+                <span class="text-muted">–</span>
+                <input type="date" class="form-control" wire:model="endDate">
+                <button type="button" class="btn btn-soft-secondary" wire:click="resetTanggal" title="Reset Tanggal">
+                    <i class="ri-refresh-line"></i>
+                </button>
             </div>
         </div>
+    </div>
+    <div class="card-body">
         <div class="table-responsive">
-            @php
-                $saldo = 0;
-            @endphp
             <table class="table table-borderless table-hover text-center table-nowrap align-middle mb-0">
                 <thead class="table-light">
                     <tr class="table-active">
@@ -32,6 +43,26 @@
                     </tr>
                 </thead>
                 <tbody id="products-list">
+                    <tr class="table-secondary fw-semibold">
+                        <td colspan="5">
+                            <i class="ri-wallet-3-line me-1"></i>
+                            Saldo Awal Periode
+                        </td>
+                    
+                        <td class="fs-14 text-success">
+                            Rp{{ number_format($totalSetoranSebelum, 0, ',', '.') }}
+                        </td>
+                    
+                        <td class="fs-14 text-danger">
+                            Rp{{ number_format($totalPenarikanSebelum, 0, ',', '.') }}
+                        </td>
+                    
+                        <td class="fs-14 text-info">
+                            Rp{{ number_format($saldoAwal, 0, ',', '.') }}
+                        </td>
+                    
+                        <td></td>
+                    </tr>
                     @forelse ($transaksiTabungan as $item)
                         <tr>
                             <td style="width: 50px">{{ $loop->iteration }}.</td>

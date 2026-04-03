@@ -1,7 +1,7 @@
 <div class="card">
     <div class="card-header border-0 pb-0">
         <div class="d-flex align-items-center">
-            <h5 class="card-title mb-0 flex-grow-1"> Jenis Tagihan Siswa</h5>
+            <h5 class="card-title mb-0 flex-grow-1">Data Jenis Tagihan</h5>
             @if ($selectedJenjang && $selectedTahunAjar)
             <div class="flex-shrink-0">
                 <div class="d-flex gap-2 flex-wrap">
@@ -16,21 +16,33 @@
         </div>
     </div>
     <div class="card-body">
-        <div class="row g-3 mb-3">
-             <div class="col-xxl-2 col-sm-6"> 
-                <select wire:model="selectedKategoriTagihan" style="cursor: pointer" class="form-select" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Kelas">
+        <div class="row g-3 align-items-end mb-3">
+        
+            <!-- Filter Kategori -->
+            <div class="col-xxl-2 col-sm-6">
+                <label for="filterKategoriTagihan" class="form-label">Kategori</label>
+                <select id="filterKategoriTagihan" wire:model="selectedKategoriTagihan" style="cursor: pointer"
+                    class="form-select" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top"
+                    title="Pilih Kategori">
                     <option value="">Semua Kategori</option>
                     @foreach ($select_kategori as $kategori)
-                        <option value="{{ $kategori->ms_kategori_tagihan_siswa_id }}">{{ $kategori->nama_kategori_tagihan_siswa }}</option>
+                    <option value="{{ $kategori->ms_kategori_tagihan_siswa_id }}">
+                        {{ $kategori->nama_kategori_tagihan_siswa }}
+                    </option>
                     @endforeach
                 </select>
             </div>
+        
+            <!-- Pencarian -->
             <div class="col-xxl-10 col-sm-6">
+                <label for="searchTagihan" class="form-label">Pencarian</label>
                 <div class="search-box">
-                    <input type="text" class="form-control search" wire:model.debounce.300ms="search" placeholder="cari nama, deskripsi atau lainnya...">
+                    <input type="text" id="searchTagihan" class="form-control search" wire:model.debounce.300ms="search"
+                        placeholder="Cari nama tagihan, kategori, atau deskripsi...">
                     <i class="ri-search-line search-icon"></i>
                 </div>
             </div>
+        
         </div>
         <!--end row-->
         {{-- DATA --}}

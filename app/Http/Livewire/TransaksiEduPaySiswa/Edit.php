@@ -4,84 +4,136 @@ namespace App\Http\Livewire\TransaksiEduPaySiswa;
 
 use App\Models\AkuntansiJurnalDetail;
 use App\Models\TransaksiEduPay;
+
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class Edit extends Component
 {
-    public $ms_jenjang_id = null;
-    public $ms_tahun_ajar_id = null;
-
     public $transaksi;
-    public $tanggal; // Tanggal transaksi yang akan diedit
+
+    public $tanggal;
     public $deskripsi;
 
     protected $listeners = [
         'loadTransaksiEduPay',
     ];
 
-    public function loadTransaksiEduPay($ms_transkasi_edupay_id)
+    public function loadTransaksiEduPay($id)
     {
-        // Ambil data transaksi
-        $transaksi = TransaksiEduPay::find($ms_transkasi_edupay_id);
+        $transaksi = TransaksiEduPay::find($id);
 
         if (!$transaksi) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Transaksi tidak ditemukan.']);
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Transaksi tidak ditemukan!'
+            ]);
+
             return;
         }
 
-        // Ambil data penempatan siswa melalui relasi
-        $siswa = $transaksi->user_id;
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Transaksi dimuat'
+        ]);
 
-        if (!$siswa) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Siswa tidak ditemukan.']);
-            return;
-        }
+        // 🔥 INI WAJIB
+        $this->resetErrorBag();
+        $this->resetValidation();
 
         $this->transaksi = $transaksi;
-        $this->tanggal = $transaksi->tanggal;
+
+        $this->tanggal = Carbon::parse($transaksi->tanggal)->format('Y-m-d');
+        $this->deskripsi = $transaksi->deskripsi;
     }
-    protected $rules = [
-        'tanggal' => 'required|date',
-        'deskripsi' => 'nullable|string|max:255',
+
+    public function rules()
+    {
+        return [
+            'tanggal' => 'required|date',
+            'deskripsi' => 'nullable|string|max:255',
+        ];
+    }
+
+    protected $messages = [
+        'tanggal.required' => 'Tanggal tidak boleh kosong',
+        'tanggal.date' => 'Format tanggal tidak valid',
+
+        'deskripsi.string' => 'Deskripsi harus berupa teks',
+        'deskripsi.max' => 'Deskripsi maksimal 255 karakter',
     ];
 
-    public function updateTanggal()
+    public function updated($field)
     {
-        $this->validate();
+        $this->validateOnly($field);
+    }
 
-        if (!$this->transaksi) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Tidak ada data transaksi untuk diperbarui.']);
-            return;
-        }
-
-        // Format tanggal baru
-        $newTanggal = Carbon::parse($this->tanggal)->format('Y-m-d H:i:s');
-        $this->transaksi->tanggal = $newTanggal;
-
-        // Perbarui deskripsi jika ada perubahan
-        if (!empty($this->deskripsi)) {
-            $this->transaksi->deskripsi = $this->deskripsi;
-        }
-
-        // Simpan transaksi
-        $this->transaksi->save();
-
-        // Reset deskripsi
-        $this->deskripsi = '';
-
-        // Update jurnal terkait
-        $jurnalIds = [
-            $this->transaksi->akuntansi_jurnal_detail_debit_id,
-            $this->transaksi->akuntansi_jurnal_detail_kredit_id,
+    protected function processUpdateTransaksi()
+    {
+        $data = [
+            'deskripsi' => $this->deskripsi,
         ];
 
-        AkuntansiJurnalDetail::whereIn('akuntansi_jurnal_detail_id', $jurnalIds)
-            ->update(['tanggal_transaksi' => $newTanggal]);
+        if ($this->tanggal) {
+            $old = Carbon::parse($this->transaksi->tanggal);
+            $new = Carbon::parse($this->tanggal);
 
-        $this->emit('refreshEduPays');
-        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Tanggal transaksi berhasil diperbarui.']);
-        $this->dispatchBrowserEvent('hide-create-modal', ['modalId' => 'editTransaksiEduPay']);
+            // gabungkan tanggal baru + jam lama
+            $newTanggal = $new->setTimeFrom($old);
+
+            if (!$newTanggal->equalTo($old)) {
+
+                $data['tanggal'] = $newTanggal->format('Y-m-d H:i:s');
+
+                AkuntansiJurnalDetail::whereIn('akuntansi_jurnal_detail_id', [
+                    $this->transaksi->akuntansi_jurnal_detail_debit_id,
+                    $this->transaksi->akuntansi_jurnal_detail_kredit_id,
+                ])->update([
+                    'tanggal_transaksi' => $data['tanggal']
+                ]);
+            }
+        }
+
+        $this->transaksi->update($data);
+    }
+    protected function afterUpdateSuccess()
+    {
+        $this->emit('successTransaksiEduPay');
+
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Transaksi berhasil diperbarui.'
+        ]);
+
+        $this->dispatchBrowserEvent('hide-modal', [
+            'modalId' => 'loadTransaksiEduPay'
+        ]);
+    }
+
+    public function updateTransaksi()
+    {
+        DB::beginTransaction();
+
+        try {
+            $this->validate();
+
+            if (!$this->transaksi) {
+                $this->dispatchBrowserEvent('alertify-error', [
+                    'message' => 'Transaksi tidak ditemukan!'
+                ]);
+                return;
+            }
+
+            $this->processUpdateTransaksi();
+
+            DB::commit();
+
+            $this->transaksi->refresh();
+            $this->afterUpdateSuccess();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Terjadi kesalahan sistem'
+            ]);
+        }
     }
 
     public function render()

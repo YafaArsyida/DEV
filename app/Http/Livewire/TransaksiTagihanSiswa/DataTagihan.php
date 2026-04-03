@@ -50,7 +50,7 @@ class DataTagihan extends Component
             $this->ms_jenjang_id = $penempatanSiswa->ms_jenjang_id;
             $this->ms_tahun_ajar_id = $penempatanSiswa->ms_tahun_ajar_id;
             $this->ms_siswa_id = $penempatanSiswa->ms_siswa_id;
-            $this->saldoTabunganSiswa = $penempatanSiswa->ms_siswa->saldo_tabungan_siswa();
+            $this->saldoTabunganSiswa = $penempatanSiswa->ms_siswa->ms_saldo_tabungan->saldo_tabungan;
             $this->saldoEduPaySiswa = $penempatanSiswa->ms_siswa->saldo_edupay_siswa();
         } else {
             $this->ms_jenjang_id = null;
@@ -64,7 +64,7 @@ class DataTagihan extends Component
         $penempatanSiswa = PenempatanSiswa::find($this->ms_penempatan_siswa_id);
 
         if ($penempatanSiswa) {
-            $this->saldoTabunganSiswa = $penempatanSiswa->ms_siswa->saldo_tabungan_siswa();
+            $this->saldoTabunganSiswa = $penempatanSiswa->ms_siswa->ms_saldo_tabungan->saldo_tabungan;
             $this->saldoEduPaySiswa = $penempatanSiswa->ms_siswa->saldo_edupay_siswa();
         }
         $this->emitSelf('$refresh'); //ringan

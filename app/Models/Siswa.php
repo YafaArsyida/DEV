@@ -59,11 +59,18 @@ class Siswa extends Model
         return $this->hasManyThrough(TagihanSiswa::class, PenempatanSiswa::class, 'ms_siswa_id', 'ms_penempatan_siswa_id', 'ms_siswa_id', 'ms_penempatan_siswa_id');
     }
 
+    public function ms_saldo_tabungan()
+    {
+        return $this->hasOne(SaldoTabungan::class, 'user_id', 'ms_siswa_id')
+            ->where('user_type', 'siswa');
+    }
+
     public function ms_transaksi_tabungan()
     {
         return $this->hasMany(TransaksiTabungan::class, 'user_id', 'ms_siswa_id')
             ->where('user_type', 'siswa');
     }
+    
     public function total_kredit_tabungan()
     {
         // Menghitung total nominal kredit (Setoran)
@@ -74,18 +81,16 @@ class Siswa extends Model
 
     public function total_debit_tabungan()
     {
-        // Menghitung total nominal debit (Penarikan)
         return $this->ms_transaksi_tabungan()
             ->where('jenis_transaksi', 'penarikan')
             ->sum('nominal');
     }
 
-    /**
-     * Total saldo terakhir untuk siswa ini
-     */
+    // /**
+    //  * Total saldo terakhir untuk siswa ini
+    //  */
     public function saldo_tabungan_siswa()
     {
-        // Menghitung saldo berdasarkan total kredit dikurangi total debit
         return $this->total_kredit_tabungan() - $this->total_debit_tabungan();
     }
 

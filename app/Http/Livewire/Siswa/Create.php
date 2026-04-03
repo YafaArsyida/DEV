@@ -8,12 +8,13 @@ use App\Models\Kelas as KelasModel;
 use App\Models\PenempatanSiswa as PenempatanSiswaModel;
 
 use App\Http\Controllers\HelperController;
-use App\Models\AktifitasPengguna;
 use App\Models\EduCard;
 use App\Models\Jenjang;
 use App\Models\TahunAjar;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+
+use Illuminate\Validation\ValidationException;
 
 class Create extends Component
 {
@@ -81,16 +82,13 @@ class Create extends Component
 
     public function save()
     {
-        // Validasi data input
-        $validatedData = $this->validate();
-
         DB::beginTransaction();
 
         try {
-            // Normalisasi nomor telepon
+            $validatedData = $this->validate();
+
             $normalizedPhone = HelperController::normalizePhoneNumber($this->telepon);
 
-            // Insert data siswa
             $siswa = SiswaModel::create([
                 'nama_siswa' => $this->nama_siswa,
                 'nisn' => $this->nisn ?: null,
@@ -104,53 +102,50 @@ class Create extends Component
                 'deskripsi' => $this->deskripsi,
             ]);
 
-            // Mendapatkan ID pengguna yang sedang login
-            $ms_pengguna_id = Auth::id();
-
-            // Insert data penempatan siswa
             PenempatanSiswaModel::create([
-                'ms_siswa_id' => $siswa->ms_siswa_id, // Menggunakan ID siswa yang baru dibuat
+                'ms_siswa_id' => $siswa->ms_siswa_id,
                 'ms_kelas_id' => $this->ms_kelas_id,
                 'ms_tahun_ajar_id' => $this->ms_tahun_ajar_id,
                 'ms_jenjang_id' => $this->ms_jenjang_id,
-                'ms_pengguna_id' => $ms_pengguna_id, // ID pengguna yang login
+                'ms_pengguna_id' => Auth::id(),
             ]);
 
-            // Logika untuk menangani kolom educard
             if (!empty($this->educard)) {
-                // Insert data di tabel ms_educard
-                EduCard::Create(
-                    [
-                        'ms_siswa_id' => $siswa->ms_siswa_id, // Kondisi untuk cek apakah data sudah ada
-                        'ms_pengguna_id' => Auth::id(),
-                        'kode_kartu' => $this->educard, // Input dari form
-                        'jenis_pemilik' => 'siswa', // Disesuaikan dengan jenis pemilik
-                        'status_kartu' => 'aktif', // Status default
-                        'deskripsi' => 'EduCard ' . $this->nama_siswa, // Bisa diubah sesuai kebutuhan
-                    ]
-                );
+                EduCard::create([
+                    'ms_siswa_id' => $siswa->ms_siswa_id,
+                    'ms_pengguna_id' => Auth::id(),
+                    'kode_kartu' => $this->educard,
+                    'jenis_pemilik' => 'siswa',
+                    'status_kartu' => 'aktif',
+                    'deskripsi' => 'EduCard ' . $this->nama_siswa,
+                ]);
             }
 
-            // Commit transaksi
             DB::commit();
 
-            // Notifikasi sukses
-            $this->dispatchBrowserEvent('alertify-success', ['message' => 'Berhasil menambah siswa!']);
+            $this->dispatchBrowserEvent('alertify-success', [
+                'message' => 'Berhasil menambah siswa!'
+            ]);
 
-            // Reset form input
             $this->resetInput();
-
-            // Tutup modal dan refresh data siswa
-            // $this->dispatchBrowserEvent('hide-create-modal', ['modalId' => 'ModalAddSiswa']);
-
             $this->emit('refreshSiswas');
             $this->emit('refreshKelass');
-        } catch (\Exception $e) {
-            // Rollback transaksi jika terjadi error
+        } catch (ValidationException $e) {
             DB::rollBack();
 
-            // Notifikasi error
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Gagal menambah siswa: ' . $e->getMessage()]);
+            // 🔥 INI KUNCINYA
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Validasi gagal, cek kembali input!'
+            ]);
+
+            throw $e; // supaya error tetap tampil di blade
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Gagal menambah siswa: ' . $e->getMessage()
+            ]);
         }
     }
 

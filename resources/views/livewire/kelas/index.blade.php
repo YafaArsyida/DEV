@@ -1,7 +1,7 @@
 <div class="card">
     <div class="card-header border-0 pb-0">
         <div class="d-flex align-items-center">
-            <h5 class="card-title mb-0 flex-grow-1"> Kelas</h5>
+            <h5 class="card-title mb-0 flex-grow-1">Data Kelas</h5>
             @if ($selectedJenjang && $selectedTahunAjar)
             <div class="flex-shrink-0">
                 <div class="d-flex gap-2 flex-wrap">
@@ -14,9 +14,11 @@
     <div class="card-body">
         <div class="row g-3 mb-3">
             <div class="col-xxl-12 col-sm-12">
-                <div class="search-box">
-                    <input type="text" class="form-control search" wire:model.debounce.300ms="search" placeholder="cari nama, deskripsi atau lainnya...">
-                    <i class="ri-search-line search-icon"></i>
+                <label for="searchInput" class="form-label">Pencarian</label>
+                <div class="position-relative">
+                    <input type="text" id="searchInput" class="form-control ps-4" wire:model.debounce.300ms="search"
+                        placeholder="Cari nama, deskripsi, atau lainnya...">
+                    <i class="ri-search-line position-absolute top-50 start-0 translate-middle-y ms-2 text-muted"></i>
                 </div>
             </div>
         </div>

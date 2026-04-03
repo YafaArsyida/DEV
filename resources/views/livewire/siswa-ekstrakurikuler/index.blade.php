@@ -1,7 +1,7 @@
 <div class="card">
     <div class="card-header border-0 pb-0">
         <div class="d-flex align-items-center">
-            <h5 class="card-title mb-0 flex-grow-1"> Siswa</h5>
+            <h5 class="card-title mb-0 flex-grow-1">Data Siswa</h5>
             @if ($selectedJenjang && $selectedTahunAjar)
             <div class="flex-shrink-0">
                 <div class="d-flex gap-2 flex-wrap">
@@ -24,21 +24,30 @@
         </div>
     </div>
     <div class="card-body">
-        <div class="row g-3 mb-3">
-            <div class="col-xxl-2 col-sm-6"> 
-                <select wire:model="selectedKelas" style="cursor: pointer" class="form-select" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Kelas">
+        <div class="row g-3 align-items-end mb-3">
+        
+            <!-- Filter Kelas -->
+            <div class="col-xxl-4 col-sm-6">
+                <label for="filterKelas" class="form-label">Kelas</label>
+                <select id="filterKelas" wire:model="selectedKelas" style="cursor: pointer" class="form-select"
+                    data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Kelas">
                     <option value="">Semua Kelas</option>
-                    @foreach ($select_kelas as $item)    
+                    @foreach ($select_kelas as $item)
                     <option value="{{ $item->ms_kelas_id }}">{{ $item->nama_kelas }}</option>
                     @endforeach
                 </select>
             </div>
-            <div class="col-xxl-10 col-sm-6">
+        
+            <!-- Pencarian -->
+            <div class="col-xxl-8 col-sm-6">
+                <label for="searchData" class="form-label">Pencarian</label>
                 <div class="search-box">
-                    <input type="text" class="form-control search" wire:model.debounce.300ms="search" placeholder="cari nama, deskripsi atau lainnya...">
+                    <input type="text" id="searchData" class="form-control search" wire:model.debounce.300ms="search"
+                        placeholder="Cari nama, kelas, atau deskripsi...">
                     <i class="ri-search-line search-icon"></i>
                 </div>
             </div>
+        
         </div>
         <!--end row-->
         {{-- DATA --}}

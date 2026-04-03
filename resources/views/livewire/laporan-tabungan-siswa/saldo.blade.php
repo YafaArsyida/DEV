@@ -66,7 +66,7 @@
                                     </td>
                                     <td class="text-center">
                                         <span class="fs-14 text-info">
-                                            RP{{ number_format($item->ms_siswa->saldo_tabungan_siswa() ?? 0, 0, ',', '.') }}
+                                            RP{{ number_format($item->ms_siswa->ms_saldo_tabungan->saldo_tabungan ?? 0, 0, ',', '.') }}
                                         </span>
                                     </td>
                                 </tr>

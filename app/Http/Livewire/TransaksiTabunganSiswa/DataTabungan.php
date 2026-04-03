@@ -7,6 +7,7 @@ use App\Models\KuitansiTransaksiTabungan;
 use App\Models\PenempatanSiswa;
 use App\Models\TransaksiTabungan;
 use App\Models\WhatsAppTransaksiTabungan;
+use Carbon\Carbon;
 use Livewire\Component;
 
 class DataTabungan extends Component
@@ -14,29 +15,55 @@ class DataTabungan extends Component
     public $ms_siswa_id;
     public $ms_penempatan_siswa_id;
 
+    public $startDate = null;
+    public $endDate = null;
+
     public $selectedJenjang = null;
 
     protected $listeners = [
-        'refreshTabungans',
+        'successTransaksiTabungan' => '$refresh',
         'siswaSelected'
     ];
 
-    public function refreshTabungans()
-    {
-        $this->emitSelf('$refresh');
-    }
-
     public function siswaSelected($ms_penempatan_siswa_id)
     {
-        $this->ms_penempatan_siswa_id = $ms_penempatan_siswa_id;
-        $penempatanSiswa = PenempatanSiswa::with('ms_siswa', 'ms_jenjang', 'ms_tahun_ajar', 'ms_kelas', 'ms_pengguna')
+        $penempatan = PenempatanSiswa::select(
+            'ms_siswa_id',
+            'ms_jenjang_id'
+        )
             ->findOrFail($ms_penempatan_siswa_id);
 
-        $this->ms_siswa_id = $penempatanSiswa->ms_siswa_id;
-        $this->selectedJenjang = $penempatanSiswa->ms_jenjang_id;
+        $this->ms_penempatan_siswa_id = $penempatan->ms_penempatan_siswa_id;
+        $this->ms_siswa_id = $penempatan->ms_siswa_id;
+        $this->selectedJenjang = $penempatan->ms_jenjang_id;
+    }
 
-        // Emit refresh agar data di render diperbarui
-        $this->emitSelf('$refresh');
+    public function mount()
+    {
+        $this->startDate = now()->startOfMonth()->format('Y-m-d');
+        $this->endDate   = now()->endOfMonth()->format('Y-m-d');
+    }
+
+    public function updatedStartDate()
+    {
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Periode mulai diperbarui'
+        ]);
+    }
+
+    public function updatedEndDate()
+    {
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Periode selesai diperbarui'
+        ]);
+    }
+
+    public function resetTanggal()
+    {
+        $this->startDate = now()->startOfMonth()->format('Y-m-d');
+        $this->endDate   = now()->endOfMonth()->format('Y-m-d');
+
+        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
     }
 
     public function kirimWhatsapp($tabunganId)
@@ -149,32 +176,78 @@ class DataTabungan extends Component
         $this->emit('openNewTab', $url);
     }
 
-    public function render()
+    private function baseQuery()
     {
-        $saldo = 0; // Inisialisasi di luar closure
-        $transaksiTabunganSiswa = $this->ms_siswa_id
-            ? TransaksiTabungan::query()
-            ->where('user_id', $this->ms_siswa_id)
-            // ->where('user_type', 'siswa')
-            // ->when($this->ms_penempatan_siswa_id, function ($query) {
-            //     $query->where('ms_penempatan_siswa_id', $this->ms_penempatan_siswa_id);
-            // })
-            ->orderBy('tanggal', 'ASC')
-            ->orderBy('ms_transaksi_tabungan_id', 'ASC')
+        return TransaksiTabungan::query()
+            ->with('ms_pengguna')
+            ->where('user_id', $this->ms_siswa_id);
+    }
+
+    protected function getSaldoSummary()
+    {
+        if (!$this->ms_siswa_id || !$this->startDate) {
+            return [
+                'saldoAwal' => 0,
+                'totalSetoranSebelum' => 0,
+                'totalPenarikanSebelum' => 0,
+            ];
+        }
+
+        $result = $this->baseQuery()
+            ->whereDate('tanggal', '<', $this->startDate)
+            ->selectRaw("
+                SUM(CASE WHEN jenis_transaksi = 'setoran' THEN nominal ELSE 0 END) as total_setoran,
+                SUM(CASE WHEN jenis_transaksi = 'penarikan' THEN nominal ELSE 0 END) as total_penarikan
+            ")
+            ->first();
+
+        $setoran = $result->total_setoran ?? 0;
+        $penarikan = $result->total_penarikan ?? 0;
+
+        return [
+            'saldoAwal' => $setoran - $penarikan,
+            'totalSetoranSebelum' => $setoran,
+            'totalPenarikanSebelum' => $penarikan,
+        ];
+    }
+
+    protected function getTransaksi($saldoAwal)
+    {
+        if (!$this->ms_siswa_id) return collect();
+
+        $saldo = $saldoAwal;
+
+        return $this->baseQuery()
+            ->when($this->startDate && $this->endDate, function ($q) {
+                $q->whereBetween('tanggal', [
+                    Carbon::parse($this->startDate)->startOfDay(),
+                    Carbon::parse($this->endDate)->endOfDay()
+                ]);
+            })
+            ->orderBy('tanggal')
+            ->orderBy('ms_transaksi_tabungan_id')
             ->get()
             ->map(function ($item) use (&$saldo) {
-                if (in_array($item->jenis_transaksi, ['setoran'])) {
-                    $saldo += $item->nominal;
-                } else {
-                    $saldo -= $item->nominal; // penarikan, transfer keluar
-                }
+
+                $saldo += $item->jenis_transaksi === 'setoran'
+                    ? $item->nominal
+                    : -$item->nominal;
+
                 $item->saldo = $saldo;
+
                 return $item;
-            })
-            : collect();
+            });
+    }
+
+    public function render()
+    {
+        $summary = $this->getSaldoSummary();
+
+        $transaksiTabungan = $this->getTransaksi($summary['saldoAwal']);
 
         return view('livewire.transaksi-tabungan-siswa.data-tabungan', [
-            'transaksiTabungan' => $transaksiTabunganSiswa,
+            'transaksiTabungan' => $transaksiTabungan,
+            ...$summary
         ]);
     }
 }

@@ -112,6 +112,7 @@ class TagihanSiswa extends Model
     {
         return $this->dt_transaksi_tagihan_siswa()->sum('jumlah_bayar');
     }
+    
     public function jumlah_kekurangan()
     {
         return $this->jumlah_tagihan_siswa - $this->jumlah_sudah_dibayar();

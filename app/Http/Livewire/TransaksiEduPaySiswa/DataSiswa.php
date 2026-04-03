@@ -4,294 +4,308 @@ namespace App\Http\Livewire\TransaksiEduPaySiswa;
 
 use App\Models\AkuntansiJurnalDetail;
 use App\Models\PenempatanSiswa;
-use App\Models\Siswa;
+use App\Models\SaldoEduPay;
 use App\Models\TransaksiEduPay;
 use Exception;
 use Livewire\Component;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 class DataSiswa extends Component
 {
-    public $ms_siswa_id;
-    public $ms_penempatan_siswa_id = null, $nama_siswa = null, $educard = null, $nama_kelas = null, $nisn = null, $tanggal_lahir = null, $alamat = null, $telepon = null;
+    // IDENTITAS SISWA
+    public $ms_siswa_id = null;
+    public $ms_penempatan_siswa_id = null;
+    public $nama_siswa = null;
+    public $nama_kelas = null;
+    public $educard = null;
+    public $nisn = null;
+    public $tanggal_lahir = null;
+    public $alamat = null;
+    public $telepon = null;
 
+    // FILTER / RELASI
     public $ms_jenjang_id = null;
     public $ms_tahun_ajar_id = null;
 
-    public $saldo_edupay_siswa;
-    public $total_pemasukan_edupay;
-    public $total_penarikan;
-    public $total_pembayaran;
-    public $total_pengeluaran_edupay;
+    // SALDO & REKAP EDUPAY
+    public $saldoEduPaySiswa;
 
-    // save topup
+    // TRANSAKSI TOPUP
     public $jenis_transaksi_topup = 'topup tunai';
-    public $nominal_topup;
-    public $deskripsi_topup;
+    public $nominal_topup = null;
+    public $deskripsi_topup = null;
 
-    // save penarikan
-    public $nominal_penarikan;
-    public $deskripsi_penarikan;
+    // TRANSAKSI PENARIKAN
+    public $nominal_penarikan = null;
+    public $deskripsi_penarikan = null;
 
     protected $listeners = [
         'siswaSelected',
-        'refreshEduPays'
+
+        'siswaUpdated' => 'siswaUpdated',
+
+        'successTransaksiEduPay'
     ];
 
-    public function refreshEduPays()
+    protected function fillSiswaData($siswa): void
     {
-        // Jika siswa sedang dipilih, perbarui data siswa
-        if ($this->ms_penempatan_siswa_id) {
-            $this->siswaSelected($this->ms_penempatan_siswa_id);
-        }
-    }
-
-    public function siswaSelected($ms_penempatan_siswa_id)
-    {
-        // Mengambil detail siswa berdasarkan ms_penempatan_siswa_id
-        $siswa = PenempatanSiswa::with('ms_siswa', 'ms_jenjang', 'ms_tahun_ajar', 'ms_kelas', 'ms_pengguna')
-            ->findOrFail($ms_penempatan_siswa_id);
-
-        // Mengisi properti dengan data yang ditemukan
-        $this->ms_penempatan_siswa_id = $ms_penempatan_siswa_id;
-
+        $this->ms_penempatan_siswa_id = $siswa->ms_penempatan_siswa_id;
+        $this->ms_siswa_id = $siswa->ms_siswa_id;
         $this->ms_jenjang_id = $siswa->ms_jenjang_id;
         $this->ms_tahun_ajar_id = $siswa->ms_tahun_ajar_id;
 
-        $this->ms_siswa_id = $siswa->ms_siswa_id;
-        $this->nama_siswa = $siswa->ms_siswa->nama_siswa;
-        $this->educard = $siswa->ms_siswa->ms_educard->kode_kartu ?? null;
-        $this->nama_kelas = $siswa->ms_kelas->nama_kelas;
-        $this->nisn = $siswa->ms_siswa->nisn;
-        $this->tanggal_lahir = $siswa->ms_siswa->tanggal_lahir;
-        $this->alamat = $siswa->ms_siswa->alamat;
-        $this->telepon = $siswa->ms_siswa->telepon;
+        $this->nama_siswa = $siswa->ms_siswa->nama_siswa ?? null;
+        $this->nama_kelas = $siswa->ms_kelas->nama_kelas ?? null;
 
-        // Hitung saldo tabungan siswa
-        $this->saldo_edupay_siswa = $siswa->ms_siswa->saldo_edupay_siswa(); // Menghitung saldo secara dinamis
-        $this->total_pemasukan_edupay = $siswa->ms_siswa->total_pemasukan_edupay();
-        $this->total_pengeluaran_edupay = $siswa->ms_siswa->total_pengeluaran_edupay();
+        $this->educard = $siswa->ms_siswa->ms_educard->kode_kartu ?? null;
+        $this->nisn = $siswa->ms_siswa->nisn ?? null;
+        $this->tanggal_lahir = $siswa->ms_siswa->tanggal_lahir ?? null;
+        $this->alamat = $siswa->ms_siswa->alamat ?? null;
+        $this->telepon = $siswa->ms_siswa->telepon ?? null;
     }
 
+    public function successTransaksiEduPay()
+    {
+        if ($this->ms_siswa_id) {
+            $this->updateSaldoEdupay();
+        }
+    }
+
+    protected function updateSaldoEdupay()
+    {
+        $saldo = SaldoEduPay::getSaldo($this->ms_siswa_id, 'siswa');
+
+        $this->saldoEduPaySiswa = $saldo->saldo_edupay;
+    }
+
+
+    public function siswaSelected($id)
+    {
+        $siswa = PenempatanSiswa::with('ms_siswa', 'ms_kelas', 'ms_jenjang', 'ms_tahun_ajar')
+            ->findOrFail($id);
+
+        $this->fillSiswaData($siswa);
+
+        // 🔥 modular update
+        $this->updateSaldoEdupay();
+    }
+
+    public function siswaUpdated()
+    {
+        if (!$this->ms_penempatan_siswa_id) return;
+
+        $siswa = PenempatanSiswa::with([
+            'ms_siswa.ms_educard',
+            'ms_jenjang',
+            'ms_tahun_ajar',
+            'ms_kelas'
+        ])->find($this->ms_penempatan_siswa_id);
+
+        if (!$siswa) return;
+
+        $this->fillSiswaData($siswa); // 🔥 hanya ini
+    }
+
+    private function processTopUp($saldo)
+    {
+        $ms_pengguna_id = Auth::id();
+
+        $kode_rekening_kas = 11001;
+        $kode_rekening_bank = 11002;
+        $kode_rekening_edupay = 22002;
+
+        $debitAkunId = match ($this->jenis_transaksi_topup) {
+            'topup tunai' => $kode_rekening_kas,
+            'topup online' => $kode_rekening_bank,
+            default => throw new \Exception('Metode pembayaran tidak valid.')
+        };
+
+        $deskripsiJurnal = "{$this->jenis_transaksi_topup} EduPay Rp {$this->nominal_topup} siswa {$this->nama_siswa}";
+
+        $jurnalDebitId = AkuntansiJurnalDetail::create([
+            'kode_rekening' => $debitAkunId,
+            'posisi' => 'debit',
+            'nominal' => $this->nominal_topup,
+            'tanggal_transaksi' => now(),
+            'ms_pengguna_id' => $ms_pengguna_id,
+            'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
+            'ms_jenjang_id' => $this->ms_jenjang_id,
+            'is_canceled' => 'active',
+            'deskripsi' => $deskripsiJurnal,
+        ])->akuntansi_jurnal_detail_id;
+
+        $jurnalKreditId = AkuntansiJurnalDetail::create([
+            'kode_rekening' => $kode_rekening_edupay,
+            'posisi' => 'kredit',
+            'nominal' => $this->nominal_topup,
+            'tanggal_transaksi' => now(),
+            'ms_pengguna_id' => $ms_pengguna_id,
+            'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
+            'ms_jenjang_id' => $this->ms_jenjang_id,
+            'is_canceled' => 'active',
+            'deskripsi' => $deskripsiJurnal,
+        ])->akuntansi_jurnal_detail_id;
+
+        TransaksiEduPay::create([
+            'user_type' => 'siswa',
+            'user_id' => $this->ms_siswa_id,
+            'ms_penempatan_siswa_id' => $this->ms_penempatan_siswa_id,
+            'ms_pengguna_id' => $ms_pengguna_id,
+            'jenis_transaksi' => $this->jenis_transaksi_topup,
+            'nominal' => $this->nominal_topup,
+            'tanggal' => now(),
+            'akuntansi_jurnal_detail_debit_id' => $jurnalDebitId,
+            'akuntansi_jurnal_detail_kredit_id' => $jurnalKreditId,
+            'deskripsi' => $this->deskripsi_topup,
+        ]);
+
+        $saldo->increment('saldo_edupay', $this->nominal_topup);
+    }
+
+    protected function processPenarikan($saldo)
+    {
+        $ms_pengguna_id = Auth::id();
+
+        // kode rekening
+        $kode_rekening_kas = 11001;
+        $kode_rekening_edupay = 22002;
+
+        $deskripsiJurnal = "Penarikan Tunai EduPay Rp {$this->nominal_penarikan} siswa {$this->nama_siswa}";
+
+        // JURNAL DEBIT (EdupAy berkurang)
+        $jurnalDebitId = AkuntansiJurnalDetail::create([
+            'kode_rekening' => $kode_rekening_edupay,
+            'posisi' => 'debit',
+            'nominal' => $this->nominal_penarikan,
+            'tanggal_transaksi' => now(),
+            'ms_pengguna_id' => $ms_pengguna_id,
+            'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
+            'ms_jenjang_id' => $this->ms_jenjang_id,
+            'is_canceled' => 'active',
+            'deskripsi' => $deskripsiJurnal,
+        ])->akuntansi_jurnal_detail_id;
+
+        // JURNAL KREDIT (Kas keluar)
+        $jurnalKreditId = AkuntansiJurnalDetail::create([
+            'kode_rekening' => $kode_rekening_kas,
+            'posisi' => 'kredit',
+            'nominal' => $this->nominal_penarikan,
+            'tanggal_transaksi' => now(),
+            'ms_pengguna_id' => $ms_pengguna_id,
+            'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
+            'ms_jenjang_id' => $this->ms_jenjang_id,
+            'is_canceled' => 'active',
+            'deskripsi' => $deskripsiJurnal,
+        ])->akuntansi_jurnal_detail_id;
+
+        // SIMPAN TRANSAKSI
+        TransaksiEduPay::create([
+            'user_type' => 'siswa',
+            'user_id' => $this->ms_siswa_id,
+            'ms_penempatan_siswa_id' => $this->ms_penempatan_siswa_id,
+            'ms_pengguna_id' => $ms_pengguna_id,
+            'jenis_transaksi' => 'penarikan',
+            'nominal' => $this->nominal_penarikan,
+            'tanggal' => now(),
+            'akuntansi_jurnal_detail_debit_id' => $jurnalDebitId,
+            'akuntansi_jurnal_detail_kredit_id' => $jurnalKreditId,
+            'deskripsi' => $this->deskripsi_penarikan,
+        ]);
+        // 🔥 penting: pakai object yang sama (anti race condition ringan)
+        $saldo->decrement('saldo_edupay', $this->nominal_penarikan);
+    }
+
+
+    protected function afterSuccess()
+    {
+        $this->reset([
+            'nominal_topup',
+            'deskripsi_topup',
+            'nominal_penarikan',
+            'deskripsi_penarikan'
+        ]);
+
+        // update saldo & rekap
+        $this->updateSaldoEdupay();
+
+        // refresh table / komponen lain
+        $this->emit('successTransaksiEduPay');
+
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Transaksi berhasil disimpan.'
+        ]);
+    }
+    
     public function simpanTopUp()
     {
-        DB::beginTransaction();
-
         try {
-            // Pastikan siswa dipilih
-            if (!$this->ms_siswa_id) {
-                $this->dispatchBrowserEvent('alertify-error', ['message' => 'Silakan pilih siswa terlebih dahulu.']);
-                return;
-            }
-            if (!$this->ms_penempatan_siswa_id) {
-                $this->dispatchBrowserEvent('alertify-error', ['message' => 'Silakan pilih PENEMPATAN terlebih dahulu.']);
-                return;
-            }
-
-            // Validasi input untuk topup
-            $validatedData = $this->validate([
+            $this->validate([
                 'nominal_topup' => 'required|numeric|min:1000',
                 'deskripsi_topup' => 'nullable|string|max:255',
             ], [
                 'nominal_topup.required' => 'Nominal top-up harus diisi.',
                 'nominal_topup.numeric' => 'Nominal top-up harus berupa angka.',
-                'nominal_topup.min' => 'Nominal top-up harus minimal 1000.',
+                'nominal_topup.min' => 'Nominal top-up minimal 1000.',
                 'deskripsi_topup.max' => 'Deskripsi tidak boleh lebih dari 255 karakter.',
             ]);
 
-            $ms_pengguna_id = Auth::id();
-
-            // simpan jurnal
-            $kode_rekening_kas = 11001;
-            $kode_rekening_bank = 11002;
-            $kode_rekening_edupay = 22002;
-
-            if ($this->jenis_transaksi_topup == 'topup tunai') {
-                $debitAkunId = $kode_rekening_kas; // ID Akun Kas
-            } elseif ($this->jenis_transaksi_topup == 'topup online') {
-                $debitAkunId = $kode_rekening_bank; // ID Akun Bank
-            } else {
-                throw new Exception('Metode pembayaran tidak valid.');
+            if (!$this->ms_siswa_id) {
+                $this->dispatchBrowserEvent('alertify-error', [
+                    'message' => 'Siswa tidak ditemukan!'
+                ]);
+                return;
             }
 
-            $deskripsiJurnal = "{$this->jenis_transaksi_topup} EduPay Rp {$this->nominal_topup} siswa {$this->nama_siswa}";
+            DB::transaction(function () {
+                $saldo = SaldoEduPay::getSaldo($this->ms_siswa_id, 'siswa');
+                $this->processTopUp($saldo);
+            });
 
-            // Data untuk jurnal debit
-            $jurnalDebit = [
-                'kode_rekening' => $debitAkunId,
-                'posisi' => 'debit',
-                'nominal' => $this->nominal_topup,
-                'tanggal_transaksi' => now(),
-                'ms_pengguna_id' => $ms_pengguna_id,
-                'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
-                'ms_jenjang_id' => $this->ms_jenjang_id,
-                'is_canceled' => 'active',
-                'deskripsi' => $deskripsiJurnal,
-            ];
-            $jurnalDebitId = AkuntansiJurnalDetail::create($jurnalDebit)->akuntansi_jurnal_detail_id;
-
-            // Data untuk jurnal kredit
-            $jurnalKredit = [
-                'kode_rekening' => $kode_rekening_edupay,
-                'posisi' => 'kredit',
-                'nominal' => $this->nominal_topup,
-                'tanggal_transaksi' => now(),
-                'ms_pengguna_id' => $ms_pengguna_id,
-                'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
-                'ms_jenjang_id' => $this->ms_jenjang_id,
-                'is_canceled' => 'active',
-                'deskripsi' => $deskripsiJurnal,
-            ];
-            $jurnalKreditId = AkuntansiJurnalDetail::create($jurnalKredit)->akuntansi_jurnal_detail_id;
-
-            // Simpan transaksi topup
-            TransaksiEduPay::create([
-                'user_type' => 'siswa',
-                'user_id' => $this->ms_siswa_id,
-                'ms_penempatan_siswa_id' => $this->ms_penempatan_siswa_id,
-                'ms_pengguna_id' => $ms_pengguna_id,
-                'jenis_transaksi' => $this->jenis_transaksi_topup,
-                'nominal' => $this->nominal_topup,
-                'tanggal' => now(),
-                'akuntansi_jurnal_detail_debit_id' => $jurnalDebitId,
-                'akuntansi_jurnal_detail_kredit_id' => $jurnalKreditId,
-                'deskripsi' => $this->deskripsi_topup,
-            ]);
-
-            // Commit transaksi
-            DB::commit();
-
-            // Reset input
-            $this->reset(['nominal_topup', 'deskripsi_topup']);
-            $this->jenis_transaksi_topup = 'topup tunai';
-
-            // Refresh saldo siswa EduPay
-            $siswa = Siswa::find($this->ms_siswa_id);
-            $this->saldo_edupay_siswa = $siswa->saldo_edupay_siswa();
-            $this->total_pemasukan_edupay = $siswa->total_pemasukan_edupay();
-            $this->total_pengeluaran_edupay = $siswa->total_pengeluaran_edupay();
-
-            // Emit event & notifikasi sukses
-            $this->emit('refreshEduPays');
-            $this->emit('refreshSaldo');
-            $this->dispatchBrowserEvent('alertify-success', ['message' => 'Transaksi top-up berhasil disimpan.']);
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            // Notifikasi error
+            $this->afterSuccess();
+        } catch (\Throwable $e) {
             $this->dispatchBrowserEvent('alertify-error', [
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+                'message' => $e->getMessage() ?? 'Terjadi kesalahan sistem'
             ]);
         }
     }
 
-    public function simpanPengeluaran()
+    public function simpanPenarikan()
     {
-        DB::beginTransaction();
-
         try {
-            // Pastikan siswa dipilih
-            if (!$this->ms_siswa_id) {
-                $this->dispatchBrowserEvent('alertify-error', ['message' => 'Silakan pilih siswa terlebih dahulu.']);
-                return;
-            }
-            if (!$this->ms_penempatan_siswa_id) {
-                $this->dispatchBrowserEvent('alertify-error', ['message' => 'Silakan pilih PENEMPATAN terlebih dahulu.']);
-                return;
-            }
-
-            // Validasi input untuk pengeluaran
-            $validatedData = $this->validate([
+            $this->validate([
                 'nominal_penarikan' => 'required|numeric|min:1000',
                 'deskripsi_penarikan' => 'nullable|string|max:255',
             ], [
-                'nominal_penarikan.required' => 'Nominal tarik tunai harus diisi.',
-                'nominal_penarikan.numeric' => 'Nominal tarik tunai harus berupa angka.',
-                'nominal_penarikan.min' => 'Nominal tarik tunai harus minimal 1000.',
+                'nominal_penarikan.required' => 'Nominal penarikan harus diisi.',
+                'nominal_penarikan.numeric' => 'Nominal penarikan harus berupa angka.',
+                'nominal_penarikan.min' => 'Nominal penarikan minimal 1000.',
                 'deskripsi_penarikan.max' => 'Deskripsi tidak boleh lebih dari 255 karakter.',
             ]);
 
-            // Periksa saldo siswa saat ini
-            $siswa = Siswa::find($this->ms_siswa_id);
-            $saldo_sekarang = $siswa->saldo_edupay_siswa(); // Saldo dihitung secara dinamis dari saldo EduPay
-
-            // Periksa apakah saldo cukup
-            if ($this->nominal_penarikan > $saldo_sekarang) {
-                $this->dispatchBrowserEvent('alertify-error', ['message' => 'Saldo tidak mencukupi untuk transaksi ini.']);
+            if (!$this->ms_siswa_id) {
+                $this->dispatchBrowserEvent('alertify-error', [
+                    'message' => 'Siswa tidak ditemukan!'
+                ]);
                 return;
             }
 
-            $ms_pengguna_id = Auth::id();
+            DB::transaction(function () {
+                $saldo = SaldoEduPay::getSaldo($this->ms_siswa_id, 'siswa');
 
-            // simpan jurnal
-            $kode_rekening_kas = 11001;
-            $kode_rekening_edupay = 22002;
+                if ($this->nominal_penarikan > $saldo->saldo_edupay) {
+                    throw new \Exception('Saldo tidak cukup');
+                }
 
-            $deskripsiJurnal = "Penarikan Tunai EduPay Rp {$this->nominal_penarikan} siswa {$this->nama_siswa}";
+                $this->processPenarikan($saldo);
+            });
 
-            // Data untuk jurnal debit
-            $jurnalDebit = [
-                'kode_rekening' => $kode_rekening_edupay,
-                'posisi' => 'debit',
-                'nominal' => $this->nominal_penarikan,
-                'tanggal_transaksi' => now(),
-                'ms_pengguna_id' => auth()->id(),
-                'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
-                'ms_jenjang_id' => $this->ms_jenjang_id,
-                'is_canceled' => 'active',
-                'deskripsi' => $deskripsiJurnal,
-            ];
-            $jurnalDebitId = AkuntansiJurnalDetail::create($jurnalDebit)->akuntansi_jurnal_detail_id;
-
-            // Data untuk jurnal kredit
-            $jurnalKredit = [
-                'kode_rekening' => $kode_rekening_kas,
-                'posisi' => 'kredit',
-                'nominal' => $this->nominal_penarikan,
-                'tanggal_transaksi' => now(),
-                'ms_pengguna_id' => auth()->id(),
-                'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
-                'ms_jenjang_id' => $this->ms_jenjang_id,
-                'is_canceled' => 'active',
-                'deskripsi' => $deskripsiJurnal,
-            ];
-            $jurnalKreditId = AkuntansiJurnalDetail::create($jurnalKredit)->akuntansi_jurnal_detail_id;
-
-            // Simpan transaksi pengeluaran
-            TransaksiEduPay::create([
-                'user_type' => 'siswa',
-                'user_id' => $this->ms_siswa_id,
-                'ms_penempatan_siswa_id' => $this->ms_penempatan_siswa_id,
-                'ms_pengguna_id' => $ms_pengguna_id,
-                'jenis_transaksi' => 'penarikan', // Jenis transaksi untuk tarik tunai
-                'nominal' => $this->nominal_penarikan,
-                'tanggal' => now(),
-                'akuntansi_jurnal_detail_debit_id' => $jurnalDebitId,
-                'akuntansi_jurnal_detail_kredit_id' => $jurnalKreditId,
-                'deskripsi' => $this->deskripsi_penarikan,
+            $this->afterSuccess();
+        } catch (\Throwable $e) {
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => $e->getMessage() ?? 'Terjadi kesalahan sistem'
             ]);
-
-            // Commit transaksi
-            DB::commit();
-
-            // Reset input
-            $this->reset(['nominal_penarikan', 'deskripsi_penarikan']);
-
-            // Refresh saldo siswa
-            $this->saldo_edupay_siswa = $siswa->saldo_edupay_siswa(); // Menghitung saldo secara dinamis
-            $this->total_pemasukan_edupay = $siswa->total_pemasukan_edupay();
-            $this->total_pengeluaran_edupay = $siswa->total_pengeluaran_edupay();
-
-            // Notifikasi sukses
-            $this->emit('refreshEduPays');
-            $this->emit('refreshSaldo');
-            $this->dispatchBrowserEvent('alertify-success', ['message' => 'Tarik tunai berhasil disimpan.']);
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            // Notifikasi error
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
     }
 

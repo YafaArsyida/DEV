@@ -21,23 +21,30 @@
                                 </div><!-- end card header -->
                                 <div class="card-body">
                                     <!-- Pencarian dan Pilihan Kelas -->
-                                    <div class="row g-3 mb-3">
-                                        <!-- Dropdown Pilihan Kelas -->
-                                        <div class="col-xxl-4 col-sm-6"> 
-                                            <select wire:model="selectedKelas" style="cursor: pointer" class="form-select" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Kelas">
+                                    <div class="row g-3 align-items-end mb-3">
+                                    
+                                        <!-- Filter Kelas -->
+                                        <div class="col-xxl-4 col-sm-6">
+                                            <label for="filterKelas" class="form-label">Kelas</label>
+                                            <select id="filterKelas" wire:model="selectedKelas" style="cursor: pointer" class="form-select"
+                                                data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Kelas">
                                                 <option value="">Semua Kelas</option>
                                                 @foreach ($select_kelas as $kelas)
-                                                    <option value="{{ $kelas->ms_kelas_id }}">{{ $kelas->nama_kelas }}</option>
+                                                <option value="{{ $kelas->ms_kelas_id }}">{{ $kelas->nama_kelas }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
-                                        <!-- Kotak Pencarian -->
+                                    
+                                        <!-- Pencarian Siswa -->
                                         <div class="col-xxl-8 col-sm-6">
+                                            <label for="searchSiswa" class="form-label">Pencarian Siswa</label>
                                             <div class="search-box">
-                                                <input type="text" class="form-control search" wire:model.debounce.300ms="searchSiswa" placeholder="Cari nama, deskripsi, atau lainnya...">
+                                                <input type="text" id="searchSiswa" class="form-control search" wire:model.debounce.300ms="searchSiswa"
+                                                    placeholder="Cari nama siswa...">
                                                 <i class="ri-search-line search-icon"></i>
                                             </div>
                                         </div>
+                                    
                                     </div>
                                     
                                     <!-- Tabel Data Siswa -->
@@ -116,7 +123,7 @@
                         <div class="col-xxl-8">
                             <div class="card">
                                 <div class="card-header align-items-center d-flex border-0">
-                                    <h4 class="card-title mb-0 flex-grow-1">Jenis Tagihan</h4>
+                                    <h4 class="card-title mb-0 flex-grow-1">Data Jenis Tagihan</h4>
                                     <div class="flex-shrink-0">
                                         <!-- Secondary Alert -->
                                         <div class="mb-0 alert alert-secondary alert-dismissible alert-label-icon rounded-label shadow fade show" role="alert">
@@ -126,21 +133,33 @@
                                     </div>
                                 </div><!-- end card header -->
                                 <div class="card-body">
-                                    <div class="row g-3 mb-3">
-                                        <div class="col-xxl-2 col-sm-6"> 
-                                            <select wire:model="selectedKategoriTagihan" style="cursor: pointer" class="form-select" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Kelas">
+                                    <div class="row g-3 align-items-end mb-3">
+                                    
+                                        <!-- Filter Kategori -->
+                                        <div class="col-xxl-2 col-sm-6">
+                                            <label for="filterKategoriTagihan" class="form-label">Kategori</label>
+                                            <select id="filterKategoriTagihan" wire:model="selectedKategoriTagihan" style="cursor: pointer"
+                                                class="form-select" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top"
+                                                title="Pilih Kategori">
                                                 <option value="">Semua Kategori</option>
                                                 @foreach ($select_kategori as $kategori)
-                                                    <option value="{{ $kategori->ms_kategori_tagihan_siswa_id }}">{{ $kategori->nama_kategori_tagihan_siswa }}</option>
+                                                <option value="{{ $kategori->ms_kategori_tagihan_siswa_id }}">
+                                                    {{ $kategori->nama_kategori_tagihan_siswa }}
+                                                </option>
                                                 @endforeach
                                             </select>
                                         </div>
+                                    
+                                        <!-- Pencarian Jenis Tagihan -->
                                         <div class="col-xxl-10 col-sm-6">
+                                            <label for="searchJenisTagihan" class="form-label">Pencarian</label>
                                             <div class="search-box">
-                                                <input type="text" class="form-control search" wire:model.debounce.300ms="searchJenisTagihan" placeholder="cari nama, deskripsi atau lainnya...">
+                                                <input type="text" id="searchJenisTagihan" class="form-control search"
+                                                    wire:model.debounce.300ms="searchJenisTagihan" placeholder="Cari nama jenis tagihan atau deskripsi...">
                                                 <i class="ri-search-line search-icon"></i>
                                             </div>
                                         </div>
+                                    
                                     </div>
                                     <div class="live-preview">
                                         <!-- Jika Jenjang atau Tahun Ajar belum dipilih -->
@@ -165,7 +184,7 @@
                                                         </th>
                                                         <th class="text-uppercase">Jenis Tagihan</th>
                                                         <th class="text-uppercase">Kategori</th>
-                                                        <th class="text-uppercase">Tagihan</th>
+                                                        <th class="text-uppercase">Nominal Tagihan</th>
                                                         <th class="text-uppercase">Jatuh Tempo</th>
                                                         <th class="text-uppercase">Cicilan</th>
                                                     </tr>

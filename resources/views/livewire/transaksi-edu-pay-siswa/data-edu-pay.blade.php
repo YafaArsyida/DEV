@@ -27,6 +27,32 @@
         </div>
     </div>
     <div class="card-body">
+        <div class="row g-3 align-items-end mb-3">
+            <!-- Jenis -->
+            <div class="col-xxl-3 col-sm-6">
+                <label class="form-label">Jenis Transaksi</label>
+                <select wire:model="selectedJenis" class="form-select">
+                    <option value="">Semua</option>
+                    <option value="topup tunai">Top-Up Tunai</option>
+                    <option value="topup online">Top-Up Online</option>
+                    <option value="pengembalian dana">Pengembalian Dana</option>
+                    <option value="penarikan">Penarikan</option>
+                    <option value="pembayaran">Pembayaran</option>
+                    <option value="kantin">Kantin</option>
+                </select>
+            </div>
+        
+            <!-- Search -->
+            <div class="col-xxl-9 col-sm-6">
+                <label class="form-label">Pencarian</label>
+                <div class="search-box">
+                    <input type="text" class="form-control search" wire:model.debounce.300ms="search"
+                        placeholder="Cari nama, deskripsi, atau lainnya...">
+                    <i class="ri-search-line search-icon"></i>
+                </div>
+            </div>
+        
+        </div>
         <div class="table-responsive">
             <table id="data" class="table table-borderless table-hover text-center table-nowrap align-middle mb-0">
                 <thead class="table-light">
@@ -114,7 +140,7 @@
                                 <ul class="list-inline hstack gap-2 mb-0">
                                     <li class="list-inline-item detail" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Edit Transaksi">
                                         @if ($item->jenis_transaksi === 'penarikan' || $item->jenis_transaksi === 'topup tunai')
-                                            <a href="#editTransaksiEduPay" 
+                                            <a href="#loadTransaksiEduPay" 
                                                 data-bs-toggle="modal" 
                                                 wire:click.prevent="$emit('loadTransaksiEduPay', {{ $item->ms_transaksi_edupay_id }})" 
                                                 class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1">
