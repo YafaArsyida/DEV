@@ -25,6 +25,17 @@ class Delete extends Component
 
     public function confirmDeleteEduPay($id)
     {
+        // 🔥 Lock transaksi
+        $transaksi = TransaksiEduPay::find($this->ms_transaksi_edupay_id);
+
+        if (!$transaksi) {
+            throw new \Exception('Transaksi tidak ditemukan!');
+        }
+
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Transaksi dimuat'
+        ]);
+        
         $this->ms_transaksi_edupay_id = $id;
     }
 
@@ -41,9 +52,7 @@ class Delete extends Component
         }
 
         if ($saldoSetelah < 0) {
-            $this->dispatchBrowserEvent('alertify-error', [
-                'message' => 'Saldo sudah digunakan'
-            ]);
+            throw new \Exception('Saldo sudah digunakan');
         }
     }
 
@@ -88,19 +97,23 @@ class Delete extends Component
         DB::beginTransaction();
 
         try {
-            $transaksi = TransaksiEduPay::find($this->ms_transaksi_edupay_id);
+            // 🔥 Lock transaksi
+            $transaksi = TransaksiEduPay::lockForUpdate()
+                ->find($this->ms_transaksi_edupay_id);
 
             if (!$transaksi) {
-                $this->dispatchBrowserEvent('alertify-error', [
-                    'message' => 'Transaksi tidak ditemukan!'
-                ]);
-                return;
+                throw new \Exception('Transaksi tidak ditemukan!');
             }
 
-            $saldo = SaldoEduPay::getSaldo(
-                $transaksi->user_id,
-                $transaksi->user_type
-            );
+            // 🔥 Lock saldo (WAJIB untuk uang)
+            $saldo = SaldoEduPay::where('user_id', $transaksi->user_id)
+                ->where('user_type', $transaksi->user_type)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$saldo) {
+                throw new \Exception('Data saldo tidak ditemukan!');
+            }
 
             $this->validateSaldoDelete($transaksi, $saldo);
 
@@ -109,10 +122,11 @@ class Delete extends Component
             DB::commit();
 
             $this->afterDeleteSuccess();
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
+
             $this->dispatchBrowserEvent('alertify-error', [
-                'message' => 'Terjadi kesalahan sistem'
+                'message' => $e->getMessage() ?? 'Terjadi kesalahan sistem'
             ]);
         }
     }

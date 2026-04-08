@@ -11,21 +11,17 @@ use App\Models\User;
 use App\Models\WhatsAppTagihanSiswa;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Livewire\WithPagination;
 
 class DataTagihan extends Component
 {
-    use WithPagination;
-
-    protected $paginationTheme = 'bootstrap'; // Menggunakan tema Bootstrap untuk paginasi
-
     public $ms_penempatan_siswa_id;
     public $ms_jenjang_id;
     public $ms_tahun_ajar_id;
     public $ms_siswa_id;
 
-    public $saldoTabunganSiswa;
-    public $saldoEduPaySiswa;
+    public $tagihans = [];
 
     public $totalEstimasi;
     public $totalDibayarkan;
@@ -35,112 +31,132 @@ class DataTagihan extends Component
 
     protected $listeners = [
         'siswaSelected', // Listener untuk parameter siswa yang dipilih
-        'tagihanUpdated'
+
+        'reloadTagihanSiswa' => 'loadTagihan',
+        
+        'refreshTagihanSiswa' => 'loadTagihan'
     ];
 
-    public function siswaSelected($ms_penempatan_siswa_id)
+    public function siswaSelected($id)
     {
-        $this->ms_penempatan_siswa_id = $ms_penempatan_siswa_id;
+        $penempatan = PenempatanSiswa::with('ms_siswa')->find($id);
+
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Tagihan dimuat'
+        ]);
+
         $this->siswaSelected = true;
+        $this->ms_penempatan_siswa_id = $id;
 
-        // Ambil data jenjang dan tahun ajar
-        $penempatanSiswa = PenempatanSiswa::find($ms_penempatan_siswa_id);
+        $this->ms_jenjang_id = $penempatan->ms_jenjang_id;
+        $this->ms_tahun_ajar_id = $penempatan->ms_tahun_ajar_id;
+        $this->ms_siswa_id = $penempatan->ms_siswa_id;
 
-        if ($penempatanSiswa) {
-            $this->ms_jenjang_id = $penempatanSiswa->ms_jenjang_id;
-            $this->ms_tahun_ajar_id = $penempatanSiswa->ms_tahun_ajar_id;
-            $this->ms_siswa_id = $penempatanSiswa->ms_siswa_id;
-            $this->saldoTabunganSiswa = $penempatanSiswa->ms_siswa->ms_saldo_tabungan->saldo_tabungan;
-            $this->saldoEduPaySiswa = $penempatanSiswa->ms_siswa->saldo_edupay_siswa();
-        } else {
-            $this->ms_jenjang_id = null;
-            $this->ms_tahun_ajar_id = null;
-            $this->ms_siswa_id = null;
-        }
+        $this->loadTagihan(); // 🔥 load sekali
     }
 
-    public function tagihanUpdated()
+    public function loadTagihan()
     {
-        $penempatanSiswa = PenempatanSiswa::find($this->ms_penempatan_siswa_id);
-
-        if ($penempatanSiswa) {
-            $this->saldoTabunganSiswa = $penempatanSiswa->ms_siswa->ms_saldo_tabungan->saldo_tabungan;
-            $this->saldoEduPaySiswa = $penempatanSiswa->ms_siswa->saldo_edupay_siswa();
-        }
-        $this->emitSelf('$refresh'); //ringan
-    }
-
-    public function aksiLunas($ms_tagihan_siswa_id)
-    {
-        if (!$this->ms_penempatan_siswa_id) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Siswa belum dipilih.']);
-            return;
-        }
-
-        // Ambil data tagihan berdasarkan ID
-        $tagihan = TagihanSiswa::where('ms_tagihan_siswa_id', $ms_tagihan_siswa_id)
+        $tagihans = TagihanSiswa::query()
+            ->with(['ms_jenis_tagihan_siswa.ms_kategori_tagihan_siswa'])
             ->where('ms_penempatan_siswa_id', $this->ms_penempatan_siswa_id)
-            ->first();
+            ->withSum('dt_transaksi_tagihan_siswa as total_bayar', 'jumlah_bayar')
+            ->orderBy('ms_jenis_tagihan_siswa_id')
+            ->get();
 
-        if (!$tagihan) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Tagihan tidak ditemukan.']);
-            return;
-        }
+        $keranjangIds = KeranjangTagihanSiswa::where('ms_penempatan_siswa_id', $this->ms_penempatan_siswa_id)
+            ->whereIn('ms_tagihan_siswa_id', $tagihans->pluck('ms_tagihan_siswa_id'))
+            ->pluck('ms_tagihan_siswa_id')
+            ->flip();
 
-        // Periksa apakah tagihan sudah ada di keranjang
-        $keranjangExist = KeranjangTagihanSiswa::where('ms_penempatan_siswa_id', $this->ms_penempatan_siswa_id)
-            ->where('ms_tagihan_siswa_id', $ms_tagihan_siswa_id)
-            ->first();
+        $this->tagihans = $tagihans->map(function ($item) use ($keranjangIds) {
+            $totalBayar = $item->total_bayar ?? 0;
 
-        if ($keranjangExist) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Tagihan ini sudah ada di keranjang.']);
-            return;
-        }
-
-        // Insert tagihan ke keranjang
-        $ms_pengguna_id = Auth::id();
-
-        KeranjangTagihanSiswa::create([
-            'ms_penempatan_siswa_id' => $this->ms_penempatan_siswa_id,
-            'ms_tagihan_siswa_id' => $ms_tagihan_siswa_id,
-            'ms_pengguna_id' => $ms_pengguna_id, // ID pengguna yang melakukan aksi
-            'jumlah_bayar' => $tagihan->jumlah_tagihan_siswa - $tagihan->jumlah_sudah_dibayar(),
-            'tanggal_dibayar' => now(),
-            'status' => 'Lunas',
-            'deskripsi' => 'Tagihan #' . $ms_tagihan_siswa_id . ' dimasukkan ke keranjang.',
-        ]);
-
-        // Update status tagihan menjadi 'Masuk Keranjang'
-        $tagihan->update([
-            'status' => 'Masuk Keranjang',
-            'deskripsi' => 'Tagihan masuk keranjang oleh user ' . $ms_pengguna_id
-        ]);
-
-        $this->emitSelf('$refresh');
-        $this->emit('keranjangUpdated'); // Emit event ke komponen Livewire terkait
-        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Tagihan berhasil dimasukkan ke keranjang.']);
+            return [
+                'ms_tagihan_siswa_id' => $item->ms_tagihan_siswa_id,
+                'nama_jenis' => $item->ms_jenis_tagihan_siswa->nama_jenis_tagihan_siswa,
+                'nama_kategori' => $item->ms_jenis_tagihan_siswa->ms_kategori_tagihan_siswa->nama_kategori_tagihan_siswa,
+                'jumlah_tagihan_siswa' => $item->jumlah_tagihan_siswa,
+                'total_bayar' => $totalBayar,
+                'kekurangan' => $item->jumlah_tagihan_siswa - $totalBayar,
+                'cicilan_status' => $item->ms_jenis_tagihan_siswa->cicilan_status,
+                'status' => $item->status,
+                'in_keranjang' => isset($keranjangIds[$item->ms_tagihan_siswa_id]),
+            ];
+        })->values()->toArray(); // 🔥 WAJIB
     }
 
-    // AKSI BAYAR
-    public function showBayar($ms_tagihan_siswa_id)
+    public function tambahKeranjang($tagihanId)
     {
-        // Periksa apakah tagihan ada di keranjang
-        $keranjang = KeranjangTagihanSiswa::where('ms_tagihan_siswa_id', $ms_tagihan_siswa_id)->first();
+        DB::beginTransaction();
+        
+        try {
+            if (!$this->ms_penempatan_siswa_id) {
+                throw new \Exception('Siswa belum dipilih.');
+            }
 
-        if ($keranjang) {
-            // Jika sudah ada di keranjang, berikan notifikasi dan hentikan proses
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Tagihan sudah ada di keranjang.']);
-            return;
+            $tagihan = TagihanSiswa::query()
+                ->where('ms_tagihan_siswa_id', $tagihanId)
+                ->where('ms_penempatan_siswa_id', $this->ms_penempatan_siswa_id)
+                ->withSum('dt_transaksi_tagihan_siswa as total_bayar', 'jumlah_bayar')
+                ->first();
+
+            if (!$tagihan) {
+                throw new \Exception('Tagihan tidak ditemukan');
+            }
+
+            $jumlahBayar = max(
+                0,
+                ($tagihan->jumlah_tagihan_siswa ?? 0) - ($tagihan->total_bayar ?? 0)
+            );
+
+            if ($jumlahBayar <= 0) {
+                throw new \Exception('Tagihan sudah lunas');
+            }
+
+            KeranjangTagihanSiswa::firstOrCreate(
+                [
+                    'ms_penempatan_siswa_id' => $this->ms_penempatan_siswa_id,
+                    'ms_tagihan_siswa_id' => $tagihanId,
+                ],
+                [
+                    'ms_pengguna_id' => auth()->id(),
+                    'jumlah_bayar' => $jumlahBayar,
+                    'tanggal_dibayar' => now(),
+                    'status' => 'Lunas',
+                    'deskripsi' => "Tagihan #{$tagihanId} dimasukkan ke keranjang",
+                ]
+            );
+
+            $tagihan->update([
+                'status' => 'Masuk Keranjang',
+                'deskripsi' => 'Masuk keranjang oleh petugas ' . auth()->id()
+            ]);
+
+            DB::commit();
+
+            // 🔥 update local state (INI KUNCI UTAMA)
+            foreach ($this->tagihans as $i => $item) {
+                if ($item['ms_tagihan_siswa_id'] == $tagihanId) {
+                    $this->tagihans[$i]['in_keranjang'] = true;
+                    $this->tagihans[$i]['status'] = 'Masuk Keranjang';
+                    break;
+                }
+            }
+
+            
+            $this->dispatchBrowserEvent('alertify-success', [
+                'message' => 'Berhasil masuk keranjang'
+            ]);
+            
+            $this->emit('keranjangUpdated');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => $e->getMessage() ?? 'Terjadi kesalahan sistem'
+            ]);
         }
-
-        // Emit event ke komponen lain untuk memuat data tagihan
-        $this->emit('loadTagihan', $ms_tagihan_siswa_id);
-    }
-
-    // cek di keranjang
-    public function isInKeranjang($ms_tagihan_siswa_id)
-    {
-        return KeranjangTagihanSiswa::where('ms_tagihan_siswa_id', $ms_tagihan_siswa_id)->exists();
     }
 
     public function kirimWhatsappTagihan($msPenempatanSiswaId)
@@ -282,26 +298,11 @@ class DataTagihan extends Component
 
     public function render()
     {
-        // Query Tagihan
-        $query = TagihanSiswa::select('ms_tagihan_siswa.*', 'ms_kategori_tagihan_siswa.ms_kategori_tagihan_siswa_id')
-            ->join('ms_jenis_tagihan_siswa', 'ms_jenis_tagihan_siswa.ms_jenis_tagihan_siswa_id', '=', 'ms_tagihan_siswa.ms_jenis_tagihan_siswa_id')
-            ->join('ms_kategori_tagihan_siswa', 'ms_kategori_tagihan_siswa.ms_kategori_tagihan_siswa_id', '=', 'ms_jenis_tagihan_siswa.ms_kategori_tagihan_siswa_id')
-            ->whereHas('ms_penempatan_siswa', function ($q) {
-                $q->where('ms_penempatan_siswa_id', $this->ms_penempatan_siswa_id);
-            });
-
-        $tagihans = $query
-            ->orderBy('ms_kategori_tagihan_siswa.ms_kategori_tagihan_siswa_id', 'ASC')
-            ->orderBy('ms_jenis_tagihan_siswa_id', 'ASC')->get();
-
-        $this->totalEstimasi = $tagihans->sum('jumlah_tagihan_siswa');
-        $this->totalDibayarkan = $tagihans->sum(function ($tagihan) {
-            return $tagihan->jumlah_sudah_dibayar();
-        });
-        $this->totalKekurangan = $this->totalEstimasi - $this->totalDibayarkan;
-
         return view('livewire.transaksi-tagihan-siswa.data-tagihan', [
-            'tagihans' => $tagihans,
+            'tagihans' => $this->tagihans,
+            'totalEstimasi' => collect($this->tagihans)->sum(fn($x) => $x['jumlah_tagihan_siswa'] ?? 0),
+            'totalDibayarkan' => collect($this->tagihans)->sum(fn($x) => $x['total_bayar'] ?? 0),
+            'totalKekurangan' => collect($this->tagihans)->sum(fn($x) => $x['kekurangan'] ?? 0),
         ]);
     }
 }

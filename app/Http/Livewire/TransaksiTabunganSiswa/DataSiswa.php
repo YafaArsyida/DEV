@@ -225,6 +225,8 @@ class DataSiswa extends Component
 
     public function simpanKredit()
     {
+        DB::beginTransaction();
+
         try {
             $this->validate([
                 'nominal_kredit' => 'required|numeric|min:1000',
@@ -237,19 +239,24 @@ class DataSiswa extends Component
             ]);
 
             if (!$this->ms_siswa_id) {
-                $this->dispatchBrowserEvent('alertify-error', [
-                    'message' => 'Siswa tidak ditemukan!'
-                ]);
-                return;
+                throw new \Exception('Siswa tidak ditemukan!');
             }
+            $saldo = SaldoTabungan::where('user_id', $this->ms_siswa_id)
+                ->lockForUpdate()
+                ->first();
 
-            DB::transaction(function () {
-                $saldo = SaldoTabungan::getSaldo($this->ms_siswa_id, 'siswa');
-                $this->processKredit($saldo);
-            });
+            if (!$saldo) {
+                throw new \Exception('Data saldo tidak ditemukan!');
+            }  
+            
+            $this->processKredit($saldo);
+
+            DB::commit();
 
             $this->afterSuccess();
         } catch (\Throwable $e) {
+            DB::rollBack();
+
             $this->dispatchBrowserEvent('alertify-error', [
                 'message' => $e->getMessage() ?? 'Terjadi kesalahan sistem'
             ]);
@@ -258,6 +265,8 @@ class DataSiswa extends Component
 
     public function simpanDebit()
     {
+        DB::beginTransaction();
+
         try {
             $this->validate([
                 'nominal_debit' => 'required|numeric|min:1000',
@@ -270,24 +279,29 @@ class DataSiswa extends Component
             ]);
 
             if (!$this->ms_siswa_id) {
-                $this->dispatchBrowserEvent('alertify-error', [
-                    'message' => 'Siswa tidak ditemukan!'
-                ]);
-                return;
+                throw new \Exception('Siswa tidak ditemukan!');
             }
 
-            DB::transaction(function () {
-                $saldo = SaldoTabungan::getSaldo($this->ms_siswa_id, 'siswa');
+            $saldo = SaldoTabungan::where('user_id', $this->ms_siswa_id)
+                ->lockForUpdate()
+                ->first();
 
-                if ($this->nominal_debit > $saldo->saldo_tabungan) {
-                    throw new \Exception('Saldo tidak cukup');
-                }
+            if (!$saldo) {
+                throw new \Exception('Data saldo tidak ditemukan!');
+            }
 
-                $this->processDebit($saldo);
-            });
+            if ($this->nominal_debit > $saldo->saldo_tabungan) {
+                throw new \Exception('Saldo tidak cukup');
+            }
+
+            $this->processDebit($saldo);
+
+            DB::commit();
 
             $this->afterSuccess();
         } catch (\Throwable $e) {
+            DB::rollBack();
+
             $this->dispatchBrowserEvent('alertify-error', [
                 'message' => $e->getMessage() ?? 'Terjadi kesalahan sistem'
             ]);

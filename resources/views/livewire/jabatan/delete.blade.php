@@ -1,6 +1,5 @@
 {{-- Nothing in the world is as soft and yielding as water. --}}
 <div>
-    <!-- Modal -->
     <div class="modal fade zoomIn" id="ModalDeleteJabatan" tabindex="-1" aria-labelledby="deleteRecordLabel" aria-hidden="true" wire:ignore.self>
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">

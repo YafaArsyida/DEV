@@ -23,15 +23,19 @@
                                 <div class="card">
                                     @livewire('siswa.edit')    
                                     @livewire('tagihan-siswa.detail')    
-                                    @livewire('tagihan-siswa.histori')    
-                                    @livewire('tagihan-siswa.edit')    
-                                    @livewire('transaksi-tagihan-siswa.aksi-bayar')   
+                                    @livewire('tagihan-siswa.edit')   
+                                    @livewire('tagihan-siswa.delete')   
+                                    
                                     @livewire('transaksi-tagihan-siswa.aksi-tambah')   
-                                    @livewire('transaksi-tagihan-siswa.aksi-edit')   
-                                    @livewire('transaksi-tagihan-siswa.aksi-delete')   
+                                    
                                     @livewire('transaksi-tagihan-siswa.data-siswa')   
                                     @livewire('transaksi-tagihan-siswa.data-tagihan')   
-                                    @livewire('transaksi-tagihan-siswa.delete-transaksi')   
+                                    
+                                    @livewire('transaksi-tagihan-siswa.cicilan')
+                                    
+                                    @livewire('transaksi-tagihan-siswa.edit')    
+                                    @livewire('transaksi-tagihan-siswa.delete')   
+                                    @livewire('transaksi-tagihan-siswa.histori')    
     
                                     @livewire('transaksi-tabungan-siswa.index')   
                                     @livewire('transaksi-tabungan-siswa.delete') 

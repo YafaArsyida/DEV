@@ -7,14 +7,12 @@
             </div>
         </div>
         <div class="table-responsive">
-            <table class="table table-borderless table-hover text-center table-nowrap align-middle mb-0">
+            <table class="table table-borderless table-hover table-nowrap align-middle mb-0">
                 <thead class="table-light">
                     <tr class="table-active">
-                        <th class="text-uppercase" scope="col" style="width: 50px;">batal</th>
+                        <th class="text-uppercase text-center" scope="col" style="width: 50px;">batal</th>
                         <th class="text-uppercase" scope="col" style="width: 350px;">tagihan</th>
-                        <th class="text-uppercase" scope="col">riwayat</th>
-                        <th class="text-uppercase" scope="col">bayar</th>
-                        <th class="text-uppercase text-end" scope="col">kekurangan</th>
+                        <th class="text-uppercase text-end" scope="col">bayar</th>
                     </tr>
                 </thead>
                 <tbody id="products-list">
@@ -22,30 +20,25 @@
                         @forelse($keranjangs as $item)
                             <tr>
                                 <th scope="row">
-                                    <a href="" class="btn btn-sm btn-soft-danger d-inline-flex align-items-center gap-1" wire:click.prevent="hapusKeranjang({{ $item->ms_keranjang_tagihan_siswa_id }})">
+                                    <a href="" class="btn btn-sm btn-soft-danger d-inline-flex align-items-center gap-1" 
+                                        wire:click.prevent="hapusKeranjang({{ $item->ms_keranjang_tagihan_siswa_id }})"
+                                        wire:loading.attr="disabled">
                                         <i class="ri-delete-bin-5-line align-bottom"></i>
                                     </a>
                                 </th>
                                 <td class="text-start">
-                                    <span class="fw-medium fs-14">
-                                        {{ $item->nama_jenis_tagihan_siswa() }}</span>
-                                    <p class="text-muted mb-0">RP{{ number_format($item->jumlah_tagihan_siswa(), 0, ',', '.') }}</p>
+                                    <span class="fw-medium fs-14">{{ $item->ms_tagihan_siswa->ms_jenis_tagihan_siswa->nama_jenis_tagihan_siswa ?? '-'  }}</span>
+                                    <p class="text-muted mb-0">
+                                        RP{{ number_format($item->ms_tagihan_siswa->jumlah_tagihan_siswa ?? 0, 0, ',', '.') }}
+                                    </p>
                                 </td>
+                        
+                                {{-- Dibayar Sekarang (di keranjang) --}}
                                 <td>
-                                    <span class="fw-medium fs-14">
-                                        RP{{ number_format($item->jumlah_sudah_dibayar(), 0, ',', '.') }}
-                                    </span>
-                                </td>
-                                <td><span class="fw-medium fs-14 text-success">
+                                    <span class="fw-medium fs-14 text-success">
                                         RP{{ number_format($item->jumlah_bayar, 0, ',', '.') }}
                                     </span>
                                 </td>
-                               <td class="text-end">
-                                    <span class="fw-medium fs-14 text-danger">
-                                        RP{{ number_format($item->jumlah_tagihan_siswa() - ($item->jumlah_sudah_dibayar() + $item->jumlah_bayar), 0, ',', '.') }}
-                                    </span>
-                                </td>
-
                             </tr>
                         @empty
                             <tr>

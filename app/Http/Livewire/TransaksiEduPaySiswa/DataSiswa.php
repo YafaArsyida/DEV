@@ -8,7 +8,6 @@ use App\Models\SaldoEduPay;
 use App\Models\TransaksiEduPay;
 use Exception;
 use Livewire\Component;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
@@ -237,9 +236,11 @@ class DataSiswa extends Component
             'message' => 'Transaksi berhasil disimpan.'
         ]);
     }
-    
+
     public function simpanTopUp()
     {
+        DB::beginTransaction();
+
         try {
             $this->validate([
                 'nominal_topup' => 'required|numeric|min:1000',
@@ -252,19 +253,27 @@ class DataSiswa extends Component
             ]);
 
             if (!$this->ms_siswa_id) {
-                $this->dispatchBrowserEvent('alertify-error', [
-                    'message' => 'Siswa tidak ditemukan!'
-                ]);
-                return;
+                throw new \Exception('Siswa tidak ditemukan!');
             }
 
-            DB::transaction(function () {
-                $saldo = SaldoEduPay::getSaldo($this->ms_siswa_id, 'siswa');
-                $this->processTopUp($saldo);
-            });
+            // 🔥 Ambil saldo + lock (penting untuk uang)
+            $saldo = SaldoEduPay::where('user_id', $this->ms_siswa_id)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$saldo) {
+                throw new \Exception('Data saldo tidak ditemukan!');
+            }
+
+            // 🔥 Proses utama
+            $this->processTopUp($saldo);
+
+            DB::commit();
 
             $this->afterSuccess();
         } catch (\Throwable $e) {
+            DB::rollBack();
+
             $this->dispatchBrowserEvent('alertify-error', [
                 'message' => $e->getMessage() ?? 'Terjadi kesalahan sistem'
             ]);
@@ -273,6 +282,8 @@ class DataSiswa extends Component
 
     public function simpanPenarikan()
     {
+        DB::beginTransaction();
+
         try {
             $this->validate([
                 'nominal_penarikan' => 'required|numeric|min:1000',
@@ -285,24 +296,30 @@ class DataSiswa extends Component
             ]);
 
             if (!$this->ms_siswa_id) {
-                $this->dispatchBrowserEvent('alertify-error', [
-                    'message' => 'Siswa tidak ditemukan!'
-                ]);
-                return;
+                throw new \Exception('Siswa tidak ditemukan!');
             }
 
-            DB::transaction(function () {
-                $saldo = SaldoEduPay::getSaldo($this->ms_siswa_id, 'siswa');
+            // 🔥 Ambil saldo + lock (penting untuk uang)
+            $saldo = SaldoEduPay::where('user_id', $this->ms_siswa_id)
+                ->lockForUpdate()
+                ->first();
 
-                if ($this->nominal_penarikan > $saldo->saldo_edupay) {
-                    throw new \Exception('Saldo tidak cukup');
-                }
+            if (!$saldo) {
+                throw new \Exception('Data saldo tidak ditemukan!');
+            }
 
-                $this->processPenarikan($saldo);
-            });
+            if ($this->nominal_penarikan > $saldo->saldo_edupay) {
+                throw new \Exception('Saldo tidak cukup');
+            }
+
+            $this->processPenarikan($saldo);
+
+            DB::commit();
 
             $this->afterSuccess();
         } catch (\Throwable $e) {
+            DB::rollBack();
+
             $this->dispatchBrowserEvent('alertify-error', [
                 'message' => $e->getMessage() ?? 'Terjadi kesalahan sistem'
             ]);

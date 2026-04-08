@@ -1,0 +1,118 @@
+<?php
+
+namespace App\Http\Livewire\TransaksiTagihanSiswa;
+
+use App\Models\KeranjangTagihanSiswa;
+use App\Models\TagihanSiswa;
+use Livewire\Component;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
+class Cicilan extends Component
+{
+    public $tagihan;
+    public $jumlah_bayar = 0;
+
+    protected $listeners = [
+        'loadCicilan' => 'loadCicilan',
+    ];
+
+    public function loadCicilan($ms_tagihan_siswa_id)
+    {
+        $this->tagihan = TagihanSiswa::withSum('dt_transaksi_tagihan_siswa as total_bayar', 'jumlah_bayar')
+            ->where('ms_tagihan_siswa_id', $ms_tagihan_siswa_id)
+            ->first();
+
+        if (!$this->tagihan) {
+            throw new \Exception('Tagihan tidak ditemukan!');
+        }
+
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Tagihan dimuat'
+        ]);
+
+        $this->jumlah_bayar = max(
+            0,
+            ($this->tagihan->jumlah_tagihan_siswa ?? 0) - ($this->tagihan->total_bayar ?? 0)
+        );
+    }
+
+    public function masukKeranjang($ms_tagihan_siswa_id)
+    {
+        DB::beginTransaction();
+
+        try {
+            // 🔒 Ambil ulang + lock
+            $tagihan = TagihanSiswa::lockForUpdate()
+                ->withSum('dt_transaksi_tagihan_siswa as total_bayar', 'jumlah_bayar')
+                ->find($ms_tagihan_siswa_id);
+
+            if (!$tagihan) {
+                throw new \Exception('Tagihan tidak ditemukan.');
+            }
+
+            if ($this->jumlah_bayar <= 0) {
+                throw new \Exception('Jumlah bayar harus lebih dari 0.');
+            }
+
+            $jumlah_bayar_sebelumnya = $tagihan->total_bayar ?? 0;
+            $sisa = $tagihan->jumlah_tagihan_siswa - $jumlah_bayar_sebelumnya;
+
+            if ($this->jumlah_bayar > $sisa) {
+                throw new \Exception('Jumlah bayar melebihi tagihan.');
+            }
+
+            // 🔥 Insert keranjang (anti duplicate)
+            KeranjangTagihanSiswa::updateOrCreate(
+                [
+                    'ms_penempatan_siswa_id' => $tagihan->ms_penempatan_siswa_id,
+                    'ms_tagihan_siswa_id' => $ms_tagihan_siswa_id,
+                ],
+                [
+                    'ms_pengguna_id' => Auth::id(),
+                    'jumlah_bayar' => $this->jumlah_bayar,
+                    'tanggal_dibayar' => now(),
+                    'status' => 'Masih Dicicil',
+                    'deskripsi' => 'Tagihan #' . $ms_tagihan_siswa_id . ' dibayar sebagian.',
+                ]
+            );
+
+            $sisa_tagihan = $tagihan->jumlah_tagihan_siswa - ($jumlah_bayar_sebelumnya + $this->jumlah_bayar);
+
+            $tagihan->update([
+                'status' => $sisa_tagihan > 0 ? 'Masih Dicicil' : 'Masuk Keranjang',
+                'deskripsi' => $sisa_tagihan > 0
+                    ? 'Sebagian tagihan dibayar, sisa: Rp' . number_format($sisa_tagihan, 0, ',', '.')
+                    : 'Tagihan telah Masuk Keranjang.',
+            ]);
+
+            DB::commit();
+
+            $this->reset(['tagihan', 'jumlah_bayar']);
+
+            $this->dispatchBrowserEvent('alertify-success', [
+                'message' => 'Berhasil masuk keranjang.'
+            ]);
+
+            $this->dispatchBrowserEvent('hide-modal', [
+                'modalId' => 'ModalAksiBayar'
+            ]);
+
+            $this->emit('keranjangUpdated');
+            $this->emit('reloadTagihanSiswa');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => $e->getMessage() ?? 'Terjadi kesalahan sistem'
+            ]);
+        }
+    }
+
+    public function render()
+    {
+        return view('livewire.transaksi-tagihan-siswa.cicilan', [
+            'tagihan' => $this->tagihan,
+        ]);
+    }
+}

@@ -3,92 +3,148 @@
 namespace App\Http\Livewire\TagihanSiswa;
 
 use App\Models\AkuntansiJurnalDetail;
-use App\Models\TransaksiTagihanSiswa;
-use Carbon\Carbon;
+use App\Models\KeranjangTagihanSiswa;
+use App\Models\TagihanSiswa;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class Edit extends Component
 {
-    public $ms_jenjang_id = null;
-    public $ms_tahun_ajar_id = null;
+    public $tagihan;
+    public $ms_tagihan_siswa_id;
+    public $ms_jenjang_id;
+    public $ms_tahun_ajar_id;
+    public $nama_siswa;
 
-    public $transaksi;
-    public $tanggalTransaksi; // Tanggal transaksi yang akan diedit
-    public $deskripsi;
+    public $nama_jenis_tagihan_siswa;
+    public $jumlah_tagihan_siswa;
 
-    protected $listeners = [
-        'loadHistoriTransaksi',
-    ];
+    public $jumlah_perubahan_tagihan = 0;
 
-    protected $rules = [
-        'tanggalTransaksi' => 'required|date',
-        'deskripsi' => 'nullable|string|max:255',
-    ];
+    public $nama_petugas;
 
-
-    public function loadHistoriTransaksi($ms_transaksi_tagihan_siswa_id)
+    public function mount()
     {
-        // Ambil data transaksi
-        $transaksi = TransaksiTagihanSiswa::find($ms_transaksi_tagihan_siswa_id);
-
-        if (!$transaksi) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Transaksi tidak ditemukan.']);
-            return;
-        }
-
-        // Ambil data penempatan siswa melalui relasi
-        $penempatanSiswa = $transaksi->ms_penempatan_siswa;
-
-        if (!$penempatanSiswa) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Penempatan siswa tidak ditemukan.']);
-            return;
-        }
-        // Set properti dari penempatan siswa
-        $this->ms_jenjang_id = $penempatanSiswa->ms_jenjang_id;
-        $this->ms_tahun_ajar_id = $penempatanSiswa->ms_tahun_ajar_id;
-
-        $this->transaksi = $transaksi;
-        $this->tanggalTransaksi = $transaksi->tanggal_transaksi;
+        $this->nama_petugas = auth()->user()->nama;
     }
 
-    public function updateTanggalTransaksi()
-    {
-        $this->validate();
+    protected $listeners = [
+        'loadTagihanEdit' => 'loadTagihanEdit',
+    ];
 
-        if (!$this->transaksi) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Tidak ada data transaksi untuk diperbarui.']);
+    public function loadTagihanEdit($ms_tagihan_siswa_id)
+    {
+        $keranjang = KeranjangTagihanSiswa::where('ms_tagihan_siswa_id', $ms_tagihan_siswa_id)->first();
+
+        if ($keranjang) {
+            // Jika sudah ada di keranjang, berikan notifikasi dan hentikan proses
+            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Tagihan sudah ada di keranjang.']);
             return;
         }
 
-        // Format tanggal transaksi
-        $newTanggalTransaksi = Carbon::parse($this->tanggalTransaksi)->format('Y-m-d H:i:s');
-        $this->transaksi->tanggal_transaksi = $newTanggalTransaksi;
+        // Ambil data tagihan
+        $tagihan = TagihanSiswa::findOrFail($ms_tagihan_siswa_id);
+        $this->ms_tagihan_siswa_id = $ms_tagihan_siswa_id;
+        $this->tagihan = TagihanSiswa::where('ms_tagihan_siswa_id', $ms_tagihan_siswa_id)
+            ->first();
 
-        // Perbarui deskripsi jika ada perubahan
-        if (!empty($this->deskripsi)) {
-            $this->transaksi->deskripsi = $this->deskripsi;
+        if (!$this->tagihan) {
+            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Tagihan tidak ditemukan.']);
+            return;
         }
 
-        $this->transaksi->save();
+        $penempatanSiswa = $tagihan->ms_penempatan_siswa;
+        $this->ms_jenjang_id = $penempatanSiswa->ms_jenjang_id ?? null;
+        $this->ms_tahun_ajar_id = $penempatanSiswa->ms_tahun_ajar_id ?? null;
+        $this->nama_siswa = $penempatanSiswa->ms_siswa->nama_siswa ?? null;
 
-        $this->deskripsi = '';
+        $this->nama_jenis_tagihan_siswa = $tagihan->ms_jenis_tagihan_siswa->nama_jenis_tagihan_siswa;
+        $this->jumlah_tagihan_siswa = $tagihan->jumlah_tagihan_siswa;
 
-        // Update jurnal terkait
-        $jurnalIds = [
-            $this->transaksi->akuntansi_jurnal_detail_debit_id,
-            $this->transaksi->akuntansi_jurnal_detail_kredit_id,
-        ];
+        // Reset jumlah bayar saat tagihan di-load
+        $this->jumlah_perubahan_tagihan = $this->tagihan->jumlah_tagihan_siswa;
+    }
 
-        AkuntansiJurnalDetail::whereIn('akuntansi_jurnal_detail_id', $jurnalIds)
-            ->update(['tanggal_transaksi' => $newTanggalTransaksi]);
+    public function aksiEdit()
+    {
+        DB::beginTransaction();
 
-        $this->emit('historiUpdated');
-        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Tanggal transaksi berhasil diperbarui.']);
-        $this->dispatchBrowserEvent('hide-create-modal', ['modalId' => 'editHistoriTagihan']);
+        try {
+            // Validasi input jumlah tagihan
+            $rules = ['jumlah_perubahan_tagihan' => 'numeric|min:0'];
+            $messages = [
+                'jumlah_perubahan_tagihan.numeric' => 'Jumlah tagihan harus berupa angka.',
+                'jumlah_perubahan_tagihan.min' => 'Jumlah tagihan tidak boleh kurang dari 0.',
+            ];
+            $this->validate($rules, $messages);
+
+            // Ambil data tagihan
+            $tagihan = TagihanSiswa::find($this->tagihan->ms_tagihan_siswa_id);
+            if (!$tagihan) {
+                throw new \Exception('Tagihan tidak ditemukan.');
+            }
+
+            // Ambil jumlah yang sudah dibayarkan
+            $jumlahSudahDibayar = $tagihan->jumlah_sudah_dibayar();
+
+            // Cek validasi jumlah tagihan
+            if ($this->jumlah_perubahan_tagihan < $jumlahSudahDibayar) {
+                throw new \Exception('Jumlah tagihan tidak boleh kurang dari jumlah yang sudah dibayarkan (' . number_format($jumlahSudahDibayar) . ').');
+            }
+
+            // Tentukan status berdasarkan jumlah tagihan dan jumlah yang sudah dibayarkan
+            $dataToUpdate['jumlah_tagihan_siswa'] = $this->jumlah_perubahan_tagihan;
+            if ($jumlahSudahDibayar == 0) {
+                $dataToUpdate['status'] = 'Belum Dibayar';
+            } elseif ($this->jumlah_perubahan_tagihan > $jumlahSudahDibayar) {
+                $dataToUpdate['status'] = 'Masih Dicicil';
+            } else {
+                $dataToUpdate['status'] = 'Lunas';
+            }
+
+            // Update jurnal detail
+            $debitJurnal = AkuntansiJurnalDetail::find($tagihan->akuntansi_jurnal_detail_debit_id);
+            $kreditJurnal = AkuntansiJurnalDetail::find($tagihan->akuntansi_jurnal_detail_kredit_id);
+
+            if ($debitJurnal && $kreditJurnal) {
+                $debitJurnal->update([
+                    'nominal' => $this->jumlah_perubahan_tagihan,
+                ]);
+
+                $kreditJurnal->update([
+                    'nominal' => $this->jumlah_perubahan_tagihan,
+                ]);
+            }
+
+            // Perbarui deskripsi
+            $dataToUpdate['deskripsi'] = "Tagihan diubah oleh {$this->nama_petugas} menjadi nominal Rp" . number_format($this->jumlah_perubahan_tagihan);
+
+            // Lakukan pembaruan data tagihan
+            $tagihan->update($dataToUpdate);
+
+            // Commit transaksi
+            DB::commit();
+
+            // Emit event untuk refresh data
+            $this->emit('tagihanUpdated');
+            $this->dispatchBrowserEvent('hide-create-modal', ['modalId' => 'ModalAksiEdit']);
+            $this->dispatchBrowserEvent('alertify-success', ['message' => 'Tagihan berhasil diperbarui.']);
+
+            // Reset jumlah perubahan tagihan
+            $this->jumlah_perubahan_tagihan = 0;
+        } catch (\Exception $e) {
+            // Rollback transaksi jika terjadi kesalahan
+            DB::rollBack();
+
+            // Berikan notifikasi error
+            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+        }
     }
 
     public function render()
     {
-        return view('livewire.tagihan-siswa.edit');
+        return view('livewire.tagihan-siswa.edit', [
+            'tagihan' => $this->tagihan,
+        ]);
     }
 }

@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Http\Livewire\TransaksiTabunganSiswa;
+namespace App\Http\Livewire\TransaksiTagihanSiswa;
 
 use App\Models\AkuntansiJurnalDetail;
-use App\Models\TransaksiTabungan;
-
+use App\Models\TransaksiTagihanSiswa;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
@@ -12,43 +11,37 @@ use Livewire\Component;
 class Edit extends Component
 {
     public $transaksi;
-    
-    public $tanggal;
+
+    public $tanggalTransaksi; // Tanggal transaksi yang akan diedit
     public $deskripsi;
 
     protected $listeners = [
-        'loadTransaksiTabungan',
+        'loadHistoriTransaksi',
     ];
 
-    public function loadTransaksiTabungan($id)
+    public function loadHistoriTransaksi($ms_transaksi_tagihan_siswa_id)
     {
-        $transaksi = TransaksiTabungan::find($id);
+        // Ambil data transaksi
+        $transaksi = TransaksiTagihanSiswa::find($ms_transaksi_tagihan_siswa_id);
 
         if (!$transaksi) {
             throw new \Exception('Transaksi tidak ditemukan!');
         }
-        
+
         $this->dispatchBrowserEvent('alertify-success', [
             'message' => 'Transaksi dimuat'
         ]);
 
-        // 🔥 INI WAJIB
-        $this->resetErrorBag();
-        $this->resetValidation();
-        
         $this->transaksi = $transaksi;
 
-        $this->tanggal = Carbon::parse($transaksi->tanggal)->format('Y-m-d');
+        $this->tanggalTransaksi = Carbon::parse($transaksi->tanggal_transaksi)->format('Y-m-d');
         $this->deskripsi = $transaksi->deskripsi;
     }
 
-    public function rules()
-    {
-        return [
-            'tanggal' => 'required|date',
-            'deskripsi' => 'nullable|string|max:255',
-        ];
-    }
+    protected $rules = [
+        'tanggalTransaksi' => 'required|date',
+        'deskripsi' => 'nullable|string|max:255',
+    ];
 
     protected $messages = [
         'tanggal.required' => 'Tanggal tidak boleh kosong',
@@ -63,46 +56,46 @@ class Edit extends Component
         $this->validateOnly($field);
     }
 
-    protected function processUpdateTransaksi()
-    {
-        $data = [
-            'deskripsi' => $this->deskripsi,
-        ];
-
-        if ($this->tanggal) {
-            $old = Carbon::parse($this->transaksi->tanggal);
-            $new = Carbon::parse($this->tanggal);
-
-            // gabungkan tanggal baru + jam lama
-            $newTanggal = $new->setTimeFrom($old);
-
-            if (!$newTanggal->equalTo($old)) {
-
-                $data['tanggal'] = $newTanggal->format('Y-m-d H:i:s');
-
-                AkuntansiJurnalDetail::whereIn('akuntansi_jurnal_detail_id', [
-                    $this->transaksi->akuntansi_jurnal_detail_debit_id,
-                    $this->transaksi->akuntansi_jurnal_detail_kredit_id,
-                ])->update([
-                    'tanggal_transaksi' => $data['tanggal']
-                ]);
-            }
-        }
-
-        $this->transaksi->update($data);
-    }
-
     protected function afterUpdateSuccess()
     {
-        $this->emit('successTransaksiTabungan');
+        $this->emit('refreshTagihanSiswa');
 
         $this->dispatchBrowserEvent('alertify-success', [
             'message' => 'Transaksi berhasil diperbarui.'
         ]);
 
         $this->dispatchBrowserEvent('hide-modal', [
-            'modalId' => 'loadTransaksiTabungan'
+            'modalId' => 'editHistoriTagihan'
         ]);
+    }
+
+    protected function processUpdateTransaksi()
+    {
+        $data = [
+            'deskripsi' => $this->deskripsi,
+        ];
+
+        if ($this->tanggalTransaksi) {
+            $old = Carbon::parse($this->transaksi->tanggal_transaksi);
+            $new = Carbon::parse($this->tanggalTransaksi);
+
+            // gabungkan tanggal baru + jam lama
+            $newTanggal = $new->setTimeFrom($old);
+
+            if (!$newTanggal->equalTo($old)) {
+
+                $data['tanggal_transaksi'] = $newTanggal->format('Y-m-d H:i:s');
+
+                AkuntansiJurnalDetail::whereIn('akuntansi_jurnal_detail_id', [
+                    $this->transaksi->akuntansi_jurnal_detail_debit_id,
+                    $this->transaksi->akuntansi_jurnal_detail_kredit_id,
+                ])->update([
+                    'tanggal_transaksi' => $data['tanggal_transaksi']
+                ]);
+            }
+        }
+
+        $this->transaksi->update($data);
     }
 
     public function updateTransaksi()
@@ -116,19 +109,19 @@ class Edit extends Component
                 throw new \Exception('Transaksi tidak ditemukan!');
             }
 
-            // 🔥 ambil ulang + lock (INI KUNCI)
-            $transaksi = TransaksiTabungan::lockForUpdate()
-                ->find($this->transaksi->ms_transaksi_tabungan_id);
+            // Ambil data transaksi
+            $transaksi = TransaksiTagihanSiswa::lockForUpdate()
+                ->find($this->transaksi->ms_transaksi_tagihan_siswa_id);
 
             if (!$transaksi) {
                 throw new \Exception('Transaksi tidak ditemukan!');
             }
-
+            
             $this->transaksi = $transaksi;
 
-            $this->processUpdateTransaksi();
-
             DB::commit();
+
+            $this->processUpdateTransaksi();
 
             $this->transaksi->refresh();
             $this->afterUpdateSuccess();
@@ -140,9 +133,8 @@ class Edit extends Component
             ]);
         }
     }
-    
     public function render()
     {
-        return view('livewire.transaksi-tabungan-siswa.edit');
+        return view('livewire.transaksi-tagihan-siswa.edit');
     }
 }

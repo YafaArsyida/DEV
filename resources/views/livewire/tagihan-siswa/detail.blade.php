@@ -85,24 +85,21 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    @php
-                                                        $no = ($tagihans->currentPage() - 1) * $tagihans->perPage();
-                                                    @endphp
                                                     @forelse ($tagihans as $item)
                                                     <tr style="white-space: nowrap;">
-                                                        <td>{{ ++$no }}.</td>
+                                                        <td style="width: 50px">{{ $loop->iteration }}.</td>
                                                         <td class="text-start">
                                                             <span class="fw-medium">
-                                                                {{ $item->nama_siswa() }}
+                                                                {{ $item->ms_penempatan_siswa->ms_siswa->nama_siswa }}
                                                             </span>
                                                         </td>
-                                                        <td>{{ $item->nama_kelas() }}</td>
+                                                        <td>{{ $item->ms_penempatan_siswa->ms_kelas->nama_kelas }}</td>
                                                         <td class="text-start">
                                                             <span class="fw-medium">
                                                                 {{ $item->ms_jenis_tagihan_siswa->nama_jenis_tagihan_siswa }}
                                                             </span>
                                                         </td>
-                                                        <td>{{ $item->nama_kategori_tagihan_siswa() }}</td>
+                                                        <td>{{ $item->ms_jenis_tagihan_siswa->ms_kategori_tagihan_siswa->nama_kategori_tagihan_siswa }}</td>
                                                         <td>{{ $item->ms_jenis_tagihan_siswa->cicilan_status }}</td>
                                                         <td class="text-center">
                                                             <span class="fs-14 fw-medium text-info">
@@ -116,8 +113,7 @@
                                                         </td>
                                                         <td class="text-center">
                                                             <span class="fs-14 fw-medium text-danger">
-                                                                RP{{ number_format($item->jumlah_tagihan_siswa - $item->jumlah_sudah_dibayar(), 0, ',', '.')
-                                                                }}
+                                                                RP{{ number_format($item->jumlah_tagihan_siswa - ($item->total_bayar ?? 0), 0, ',', '.') }}
                                                             </span>
                                                         </td>
                                                         <td>{{
@@ -167,7 +163,6 @@
                                                     </tr>
                                                 </tfoot>
                                             </table>
-                                            {{ $tagihans->links() }}
                                         </div>
                                         @endif
                                     </div>

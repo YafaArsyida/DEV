@@ -20,9 +20,9 @@
                 @livewire('tagihan-siswa.create')   
                 @livewire('tagihan-siswa.detail')   
                 @livewire('tagihan-siswa.edit')   
-                @livewire('tagihan-siswa.histori')   
                 @livewire('tagihan-siswa.manage')   
-                @livewire('transaksi-tagihan-siswa.delete-transaksi')   
+                @livewire('transaksi-tagihan-siswa.delete')   
+                @livewire('transaksi-tagihan-siswa.histori')   
             </div>  
         </div>
     </div>

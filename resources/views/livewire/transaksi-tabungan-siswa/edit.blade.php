@@ -42,7 +42,6 @@
                             <td>
                                 <div class="input-group input-group-sm">
                                     <input type="date" class="form-control" wire:model.defer="tanggal">
-                                    {{-- <input type="datetime-local" class="form-control" wire:model.defer="tanggal" aria-label="Tanggal Transaksi"> --}}
                                 </div>
                                 @error('tanggal') <span class="text-danger text-sm">{{ $message }}</span> @enderror
                             </td>

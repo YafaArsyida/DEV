@@ -25,11 +25,7 @@ class Edit extends Component
         $transaksi = TransaksiEduPay::find($id);
 
         if (!$transaksi) {
-            $this->dispatchBrowserEvent('alertify-error', [
-                'message' => 'Transaksi tidak ditemukan!'
-            ]);
-
-            return;
+            throw new \Exception('Transaksi tidak ditemukan!');
         }
 
         $this->dispatchBrowserEvent('alertify-success', [
@@ -116,11 +112,19 @@ class Edit extends Component
             $this->validate();
 
             if (!$this->transaksi) {
-                $this->dispatchBrowserEvent('alertify-error', [
-                    'message' => 'Transaksi tidak ditemukan!'
-                ]);
-                return;
+                throw new \Exception('Transaksi tidak ditemukan!');
             }
+
+            // 🔥 ambil ulang + lock (INI KUNCI)
+            $transaksi = TransaksiEduPay::lockForUpdate()
+                ->find($this->transaksi->ms_transaksi_edupay_id);
+
+            if (!$transaksi) {
+                throw new \Exception('Transaksi tidak ditemukan!');
+            }
+
+            // 🔥 inject ulang ke property biar konsisten
+            $this->transaksi = $transaksi;
 
             $this->processUpdateTransaksi();
 
@@ -128,10 +132,11 @@ class Edit extends Component
 
             $this->transaksi->refresh();
             $this->afterUpdateSuccess();
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
+
             $this->dispatchBrowserEvent('alertify-error', [
-                'message' => 'Terjadi kesalahan sistem'
+                'message' => $e->getMessage() ?? 'Terjadi kesalahan sistem'
             ]);
         }
     }

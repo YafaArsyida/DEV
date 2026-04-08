@@ -1,20 +1,16 @@
 <?php
 
-namespace App\Http\Livewire\TagihanSiswa;
+namespace App\Http\Livewire\TransaksiTagihanSiswa;
 
 use App\Http\Controllers\HelperController;
 use App\Models\KuitansiPembayaranTagihanSiswa;
 use App\Models\TransaksiTagihanSiswa;
 use App\Models\WhatsAppPembayaranTagihanSiswa;
-use Livewire\WithPagination;
+
 use Livewire\Component;
 
 class Histori extends Component
 {
-    use WithPagination;
-
-    protected $paginationTheme = 'bootstrap'; // Menggunakan tema Bootstrap untuk paginasi
-
     public $ms_penempatan_siswa_id;
 
     public $selectedJenjang = null;
@@ -27,23 +23,19 @@ class Histori extends Component
     // Listener untuk Livewire
     protected $listeners = [
         'showHistoriTagihan',
-        'historiUpdated'
+
+        'refreshTagihanSiswa' => '$refresh'
     ];
-
-    public function historiUpdated()
-    {
-        $this->emitSelf('$refresh'); //ringan
-
-        // $this->render(); // Memanggil render untuk memperbarui data keranjang
-    }
 
     public function showHistoriTagihan($params)
     {
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Transaksi dimuat'
+        ]);
+
         $this->selectedJenjang = $params['jenjang'];
         $this->selectedTahunAjar = $params['tahunAjar'];
         $this->ms_penempatan_siswa_id = $params['ms_penempatan_siswa_id'];
-        // $this->resetPage();
-        $this->emitSelf('$refresh'); //ringan
     }
 
     // whatsapp
@@ -143,8 +135,6 @@ class Histori extends Component
         // Emit URL untuk membuka tab baru
         $this->emit('openNewTab', $url);
     }
-
-
     public function render()
     {
         // Query Transaksi dengan relasi
@@ -152,9 +142,11 @@ class Histori extends Component
             'ms_pengguna',
             'ms_penempatan_siswa',
             'dt_transaksi_tagihan_siswa.ms_tagihan_siswa' // Include relasi detail dan tagihan jika dibutuhkan
-        ])->whereHas('ms_penempatan_siswa', function ($q) {
-            $q->where('ms_penempatan_siswa_id', $this->ms_penempatan_siswa_id);
-        });
+        ])
+            ->withSum('dt_transaksi_tagihan_siswa as total_jumlah_dibayarkan', 'jumlah_bayar') // 👈 ini dia
+            ->whereHas('ms_penempatan_siswa', function ($q) {
+                $q->where('ms_penempatan_siswa_id', $this->ms_penempatan_siswa_id);
+            });
 
         // Filter berdasarkan pencarian nama jenis tagihan
         if ($this->search) {
@@ -166,8 +158,8 @@ class Histori extends Component
         // Paginasi dan urutan berdasarkan kategori tagihan
         $historis = $query->orderBy('ms_transaksi_tagihan_siswa_id', 'ASC')->get();
 
-        return view('livewire.tagihan-siswa.histori', [
-            'historis' => $historis
-        ]);
+        return view('livewire.transaksi-tagihan-siswa.histori', compact(
+            'historis'
+        ));
     }
 }

@@ -48,9 +48,9 @@
                 @forelse ($tagihans as $item)
                 <tr class="align-middle">
                     <th class="text-center" scope="row">
-                        @if ($item->jumlah_sudah_dibayar() === 0)
+                        @if ($item['total_bayar'] === 0)
                             <a href="#ModalAksiDelete" data-bs-toggle="modal" class="btn btn-sm btn-soft-danger d-inline-flex align-items-center gap-1" 
-                            wire:click.prevent="$emit('loadTagihanDelete', {{ $item->ms_tagihan_siswa_id }})" data-bs-trigger="hover" data-bs-placement="top" title="Hapus Tagihan">
+                            wire:click.prevent="$emit('loadTagihanDelete', {{ $item['ms_tagihan_siswa_id'] }})" data-bs-trigger="hover" data-bs-placement="top" title="Hapus Tagihan">
                                 <i class="ri-delete-bin-5-line"></i>
                             </a>
                         @else
@@ -59,71 +59,69 @@
                             </span>
                         @endif
                     </th>
-                    <td class="text-start">{{ $item->ms_jenis_tagihan_siswa->nama_jenis_tagihan_siswa }}</td>
-                    <td class="text-start">{{ $item->nama_kategori_tagihan_siswa() }}</td>
+                    <td class="text-start">{{ $item['nama_jenis'] }}</td>
+                    <td class="text-start">{{ $item['nama_kategori'] }}</td>
                     <td class="text-center">
                         <span class="fw-medium fs-14 text-info">
-                            RP{{ number_format($item->jumlah_tagihan_siswa, 0, ',', '.') }}
+                            RP{{ number_format($item['jumlah_tagihan_siswa'], 0, ',', '.') }}
                         </span>
                     </td>
                     <td class="text-center">
                         <span class="fw-medium fs-14 text-success">
-                            RP{{ number_format($item->jumlah_sudah_dibayar(), 0, ',', '.') }}</td>
+                            RP{{ number_format($item['total_bayar'], 0, ',', '.') }}
                         </span>
                     </td>
                     <td class="text-center">
                         <span class="fw-medium fs-14 text-danger">
-                            RP{{ number_format($item->jumlah_tagihan_siswa - $item->jumlah_sudah_dibayar(), 0, ',', '.') }}
+                            RP{{ number_format($item['kekurangan'], 0, ',', '.') }}
                         </span>
                     </td>
-                    {{-- <td class="
-                        {{ $item->status === 'Belum Dibayar' ? 'text-warning' : '' }}
-                        {{ $item->status === 'Masih Dicicil' ? 'text-info' : '' }}
-                        {{ $item->status === 'Lunas' ? 'text-success' : '' }}">
-                        <i class="ri-{{ $item->status === 'Belum Dibayar' ? 'time-line' : ($item->status === 'Masih Dicicil' ? 'money-dollar-circle-line' : 'checkbox-circle-line') }} align-bottom"></i>
-                        {{ $item->status }}
-                    </td> --}}
-                    <td class="text-end">
-                        <ul class="list-inline hstack gap-2 mb-0">
-                        @if ($item->status === 'Lunas')
-                        <a class="text-success d-inline-block detail-item-btn">
-                            <i class="ri-checkbox-circle-line align-bottom"></i> Lunas
-                        </a>
+                    <td>
+                        @if ($item['status'] === 'Lunas')
+                            <span class="text-success d-inline-flex align-items-center gap-1">
+                                <i class="ri-checkbox-circle-line"></i> Lunas
+                            </span>
+                        @elseif ($item['in_keranjang'])
+                            <span class="text-info d-inline-flex align-items-center gap-1">
+                                <i class="ri-check-double-line"></i> Menunggu Bayar
+                            </span>
                         @else
-                            @if (!$this->isInKeranjang($item->ms_tagihan_siswa_id))
-                                <li class="list-inline-item detail" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Masuk Keranjang">
-                                    <a href="" class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1" 
-                                    wire:click.prevent="aksiLunas({{ $item->ms_tagihan_siswa_id }})">
-                                        <i class="ri-shopping-cart-line align-bottom"></i> Keranjang
-                                    </a>
+                            <ul class="list-inline mb-0 d-flex flex-wrap gap-2">
+                                {{-- Keranjang --}}
+                                <li class="list-inline-item" title="Masuk Keranjang">
+                                    <button type="button" class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1"
+                                        wire:click="tambahKeranjang({{ $item['ms_tagihan_siswa_id'] }})">
+                                        <i class="ri-shopping-cart-line"></i> Keranjang
+                                    </button>
                                 </li>
-                                @if ($item->ms_jenis_tagihan_siswa->cicilan_status === 'Aktif')
-                                    <li class="list-inline-item detail" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Cicil Tagihan">
-                                        <a href="#ModalAksiBayar" data-bs-toggle="modal" class="btn btn-sm btn-soft-secondary d-inline-flex align-items-center gap-1" 
-                                        wire:click.prevent="showBayar({{ $item->ms_tagihan_siswa_id }})">
-                                            <i class="ri-money-dollar-circle-line align-bottom"></i> Bayar Cicilan
-                                        </a>
-                                    </li>
+                            
+                                {{-- Cicilan --}}
+                                @if ($item['cicilan_status'] === 'Aktif')
+                                <li class="list-inline-item" title="Cicil Tagihan">
+                                    <button type="button" class="btn btn-sm btn-soft-secondary d-inline-flex align-items-center gap-1"
+                                        data-bs-toggle="modal" data-bs-target="#ModalAksiBayar"
+                                        wire:click="$emit('loadCicilan', {{ $item['ms_tagihan_siswa_id'] }})">
+                                        <i class="ri-money-dollar-circle-line"></i> Cicil
+                                    </button>
+                                </li>
                                 @else
-                                    <li class="list-inline-item detail">
-                                        <span class="text-muted d-inline-block" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Cicilan tidak aktif">
-                                            <i class="ri-money-dollar-circle-line align-bottom"></i> Cicilan Tidak Aktif
-                                        </span>
-                                    </li>
-                                @endif
-                                <li class="list-inline-item detail" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Edit Tagihan">
-                                    <a href="#ModalAksiEdit" data-bs-toggle="modal" class="text-warning d-inline-block detail-item-btn" 
-                                    wire:click.prevent="$emit('loadTagihanEdit', {{ $item->ms_tagihan_siswa_id }})">
-                                        <i class="ri-quill-pen-line align-bottom"></i> Edit
-                                    </a>
+                                <li class="list-inline-item">
+                                    <span class="text-muted d-inline-flex align-items-center gap-1" title="Cicilan tidak aktif">
+                                        <i class="ri-money-dollar-circle-line"></i> Non Cicil
+                                    </span>
                                 </li>
-                            @else
-                            <a class="text-info d-inline-block detail-item-btn">
-                                <i class="ri-check-double-line label-icon"></i> Menunggu Bayar
-                            </a>
-                            @endif
+                                @endif
+                                {{-- Edit --}}
+                                <li class="list-inline-item" title="Edit Tagihan">
+                                    <button type="button" class="btn btn-sm btn-soft-warning d-inline-flex align-items-center gap-1"
+                                        data-bs-toggle="modal" data-bs-target="#ModalAksiEdit"
+                                        wire:click="$emit('loadTagihanEdit', {{ $item['ms_tagihan_siswa_id'] }})">
+                                        <i class="ri-quill-pen-line"></i> Edit
+                                    </button>
+                                </li>
+                            
+                            </ul>
                         @endif
-                        </ul>
                     </td>
                 </tr>
                 @empty

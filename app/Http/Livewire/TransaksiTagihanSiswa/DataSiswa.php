@@ -28,9 +28,9 @@ class DataSiswa extends Component
 
         'siswaUpdated', //from update data
 
-        'successTransaksiTabungan',
-        
         'refreshTagihanSiswa',
+        
+        'successTransaksiTabungan',
 
         'successTransaksiEduPay',
     ];

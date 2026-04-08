@@ -19,6 +19,16 @@ class Delete extends Component
 
     public function confirmDeleteTabungan($id)
     {
+        $transaksi = TransaksiTabungan::find($this->ms_transaksi_tabungan_id);
+
+        if (!$transaksi) {
+            throw new \Exception('Transaksi tidak ditemukan!');
+        }
+
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Transaksi dimuat'
+        ]);
+
         $this->ms_transaksi_tabungan_id = $id;
     }
 
@@ -31,9 +41,7 @@ class Delete extends Component
             : $saldoValue + $transaksi->nominal;
 
         if ($saldoSetelahHapus < 0) {
-            $this->dispatchBrowserEvent('alertify-error', [
-                'message' => 'Saldo sudah digunakan'
-            ]);
+            throw new \Exception('Saldo sudah digunakan');
         }
     }
 
@@ -75,19 +83,21 @@ class Delete extends Component
 
         try {
             
-            $transaksi = TransaksiTabungan::find($this->ms_transaksi_tabungan_id);
+            $transaksi = TransaksiTabungan::lockForUpdate()
+                ->find($this->ms_transaksi_tabungan_id);
 
             if (!$transaksi) {
-                $this->dispatchBrowserEvent('alertify-error', [
-                    'message' => 'Transaksi tidak ditemukan!'
-                ]);
-                return;
+                throw new \Exception('Transaksi tidak ditemukan!');
             }
 
-            $saldo = SaldoTabungan::getSaldo(
-                $transaksi->user_id,
-                $transaksi->user_type
-            );
+            $saldo = SaldoTabungan::where('user_id', $transaksi->user_id)
+                ->where('user_type', $transaksi->user_type)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$saldo) {
+                throw new \Exception('Data saldo tidak ditemukan!');
+            }
 
             $this->validateSaldoDelete($transaksi, $saldo);
 
@@ -96,10 +106,11 @@ class Delete extends Component
             DB::commit();
 
             $this->afterDeleteSuccess();
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
+
             $this->dispatchBrowserEvent('alertify-error', [
-                'message' => 'Terjadi kesalahan sistem'
+                'message' => $e->getMessage() ?? 'Terjadi kesalahan sistem'
             ]);
         }
     }

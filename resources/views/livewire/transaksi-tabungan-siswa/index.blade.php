@@ -10,7 +10,7 @@
                 <div class="tab-content text-muted">
                     <div class="tab-pane active" id="tabSiswaKelas" role="tabpanel">
                         <div class="row">
-                            <div class="col-xxl-4">
+                            <div class="col-xxl-4 col-md-4">
                                 <div class="sticky-side-div">
                                     <div class="card">
                                         @livewire('transaksi-tabungan-siswa.data-siswa')
@@ -18,7 +18,7 @@
                                 </div>
                             </div>
                             <!--end col-->
-                            <div class="col-xxl-8">
+                            <div class="col-xxl-8 col-md-8">
                                 @livewire('transaksi-tabungan-siswa.data-tabungan')
                             </div>
                         </div>
