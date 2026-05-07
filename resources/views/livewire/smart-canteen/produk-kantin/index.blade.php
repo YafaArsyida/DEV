@@ -3,13 +3,13 @@
         <div class="row align-items-center gy-3">
             <div class="col-sm">
                 <h5 class="card-title mb-0">Administrasi Produk SmartCanteen</h5>
-                <p class="text-muted mb-0">SmartCanteen > Administrasi Produk</p>
+                <p class="text-muted mb-0">SmartCanteen > Administrasi Produk {{ $namaKantin }}</p>
             </div>
             <div class="col-sm-auto">
                 <div class="d-flex gap-1 flex-wrap">
                     <button type="button" class="btn btn-success add-btn" data-bs-toggle="modal" 
                         data-bs-target="#ModalTambahProduk"
-                        wire:click="$emit('showCreateProduk', {{ $selectedJenjang ?? 'null' }})">
+                        wire:click="$emit('showCreateProduk', {{ $selectedKantin ?? 'null' }})">
                         <i class="ri-add-line align-bottom me-1"></i> Tambah Produk
                     </button>
                     <button type="button" class="btn btn-info">
@@ -68,7 +68,7 @@
             <!-- Tombol Offcanvas di Kanan -->
             <li class="nav-item">
                 <button data-bs-toggle="modal" 
-                    data-bs-target="#ModalTambahKategori" wire:click="$emit('showCreateKategori', {{ $selectedJenjang ?? 'null' }})" class="btn btn-sm shadow-none nav-link py-3">
+                    data-bs-target="#ModalTambahKategori" wire:click="$emit('showCreateKategori', {{ $selectedKantin ?? 'null' }})" class="btn btn-sm shadow-none nav-link py-3">
                     <i class="ri-add-line me-1 align-bottom"></i> Tambah Kategori
                 </button>
             </li>

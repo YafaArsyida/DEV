@@ -15,7 +15,7 @@
                                 <input type="text" 
                                        wire:model.defer="nama_jenis_tagihan_siswa" 
                                        id="nama_jenis_tagihan_siswa"  
-                                       class="form-control" 
+                                       class="form-control @error('nama_jenis_tagihan_siswa') is-invalid @enderror" 
                                        placeholder="SPP / UANG MAKAN / TRANSPORT ......." />
                                 @error('nama_jenis_tagihan_siswa') 
                                     <div class="text-danger small mt-1">{{ $message }}</div>
@@ -26,7 +26,7 @@
                                 <label for="ms_kategori_tagihan_siswa_id" class="form-label">Kategori</label>
                                 <select id="ms_kategori_tagihan_siswa_id" 
                                         wire:model.defer="ms_kategori_tagihan_siswa_id" 
-                                        class="form-select">
+                                        class="form-select @error('ms_kategori_tagihan_siswa_id') is-invalid @enderror">
                                     <option value="">Pilih Kategori</option>
                                     @foreach ($select_kategori as $item)    
                                         <option value="{{ $item->ms_kategori_tagihan_siswa_id }}">
@@ -44,7 +44,7 @@
                                 <input type="date" 
                                     id="tanggal_jatuh_tempo" 
                                     wire:model.defer="tanggal_jatuh_tempo" 
-                                    class="form-control" />
+                                    class="form-control @error('tanggal_jatuh_tempo') is-invalid @enderror" />
                                 @error('tanggal_jatuh_tempo') 
                                     <div class="text-danger small mt-1">{{ $message }}</div>
                                 @enderror

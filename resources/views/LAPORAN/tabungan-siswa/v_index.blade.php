@@ -15,15 +15,15 @@
             <!--end col-->
         </div>
         <div class="row">
-            <div class="col-xxl-4 pe-1">
-                @livewire('laporan-tabungan-siswa.overview')   
-                @livewire('laporan-tabungan-siswa.saldo')   
-                @livewire('laporan-tabungan-siswa.export-saldo')   
+            <div class="col-xxl-4">
+                @livewire('laporan-tabungan-siswa.overview')  
+                <div class="sticky-side-div">
+                    @livewire('laporan-tabungan-siswa.saldo')   
+                </div> 
             </div>  
-            <div class="col-xxl-8 ps-0">
+            <div class="col-xxl-8">
                 @livewire('parameter.filter-tabungan')   
                 @livewire('laporan-tabungan-siswa.index')   
-                @livewire('laporan-tabungan-siswa.export')   
                 @livewire('laporan-tabungan-siswa.withdraw')   
             </div>  
         </div>

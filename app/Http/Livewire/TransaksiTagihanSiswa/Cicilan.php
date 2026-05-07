@@ -7,6 +7,7 @@ use App\Models\TagihanSiswa;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class Cicilan extends Component
 {
@@ -42,24 +43,34 @@ class Cicilan extends Component
         DB::beginTransaction();
 
         try {
+            // ✅ Validasi basic dulu
+            $this->validate([
+                'jumlah_bayar' => 'required|numeric|min:1',
+            ], [
+                'jumlah_bayar.required' => 'Jumlah bayar wajib diisi.',
+                'jumlah_bayar.numeric' => 'Jumlah bayar harus berupa angka.',
+                'jumlah_bayar.min' => 'Jumlah bayar harus lebih dari 0.',
+            ]);
+
             // 🔒 Ambil ulang + lock
             $tagihan = TagihanSiswa::lockForUpdate()
                 ->withSum('dt_transaksi_tagihan_siswa as total_bayar', 'jumlah_bayar')
                 ->find($ms_tagihan_siswa_id);
 
             if (!$tagihan) {
-                throw new \Exception('Tagihan tidak ditemukan.');
-            }
-
-            if ($this->jumlah_bayar <= 0) {
-                throw new \Exception('Jumlah bayar harus lebih dari 0.');
+                throw ValidationException::withMessages([
+                    'jumlah_bayar' => 'Tagihan tidak ditemukan.'
+                ]);
             }
 
             $jumlah_bayar_sebelumnya = $tagihan->total_bayar ?? 0;
             $sisa = $tagihan->jumlah_tagihan_siswa - $jumlah_bayar_sebelumnya;
 
+            // ✅ Validasi bisnis
             if ($this->jumlah_bayar > $sisa) {
-                throw new \Exception('Jumlah bayar melebihi tagihan.');
+                throw ValidationException::withMessages([
+                    'jumlah_bayar' => 'Jumlah bayar melebihi sisa tagihan (Rp' . number_format($sisa, 0, ',', '.') . ').'
+                ]);
             }
 
             // 🔥 Insert keranjang (anti duplicate)
@@ -100,6 +111,15 @@ class Cicilan extends Component
 
             $this->emit('keranjangUpdated');
             $this->emit('reloadTagihanSiswa');
+        } catch (ValidationException $e) {
+            DB::rollBack();
+
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Gagal validasi, cek input!'
+            ]);
+
+            throw $e; // 🔥 WAJIB biar tampil di blade
+
         } catch (\Throwable $e) {
             DB::rollBack();
 

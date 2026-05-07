@@ -95,6 +95,11 @@ class Siswa extends Model
     }
 
     // =============== EDUPAY ===============
+    public function ms_saldo_edupay()
+    {
+        return $this->hasOne(SaldoEduPay::class, 'user_id', 'ms_siswa_id')
+            ->where('user_type', 'siswa');
+    }
     public function ms_transaksi_edupay()
     {
         return $this->hasMany(TransaksiEduPay::class, 'user_id', 'ms_siswa_id')

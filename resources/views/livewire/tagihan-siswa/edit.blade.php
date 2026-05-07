@@ -42,9 +42,12 @@
                             <td>
                                 <div class="input-group input-group-sm">
                                     <span class="input-group-text">RP</span>
-                                    <input type="number" class="form-control"
+                                    <input type="number" class="form-control @error('jumlah_perubahan_tagihan') is-invalid @enderror"
                                         wire:model.defer="jumlah_perubahan_tagihan" min="0" step="0.01"
                                         aria-label="Amount">
+                                        @error('jumlah_perubahan_tagihan')
+                                        <footer class="text-danger mt-0">{{ $message }}</footer>
+                                        @enderror
                                 </div>
                             </td>
                         </tr>

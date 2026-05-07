@@ -5,13 +5,14 @@ namespace App\Http\Livewire\Parameter;
 use App\Models\AkuntansiJurnalDetail;
 use Livewire\Component;
 use App\Models\Jenjang;
+use App\Models\SmartCanteen\Kantin;
 use App\Models\SmartCanteen\TransaksiSmartCanteen;
 use App\Models\TahunAjar;
 use Illuminate\Support\Facades\Auth;
 
 class SmartCanteen extends Component
 {
-    public $selectedJenjang = null;
+    public $selectedKantin = null;
     public $selectedTahunAjar = null;
 
     public $saldoPendapatanKantin;
@@ -21,7 +22,7 @@ class SmartCanteen extends Component
         'refreshSaldo'
     ];
 
-    public function updatedSelectedJenjang()
+    public function updatedSelectedKantin()
     {
         $this->checkAndEmitParameters();
     }
@@ -33,31 +34,38 @@ class SmartCanteen extends Component
 
     public function mount()
     {
-        // Tetapkan nilai pertama dari data yang tersedia jika ada
-        $firstJenjang = Jenjang::whereIn('ms_jenjang_id', function ($query) {
-            $query->select('ms_jenjang_id')
-                ->from('ms_akses_jenjang')
-                ->where('ms_pengguna_id', Auth::id());
-        })->where('status', 'Aktif')->first();
+        $user = Auth::user();
+        // SUPERADMIN bisa semua kantin
+        if ($user->peran === 'SUPERADMIN') {
+            $firstKantin = Kantin::first();
+        } else {
+
+            // selain superadmin hanya kantin miliknya
+            $firstKantin = Kantin::whereIn('ms_kantin_id', function ($query) use ($user) {
+                $query->select('ms_kantin_id')
+                    ->from('ms_akses_kantin')
+                    ->where('ms_pengguna_id', $user->ms_pengguna_id);
+            })->first();
+        }
 
         $firstTahunAjar = TahunAjar::where('status', 'Aktif')
             ->orderBy('urutan', 'asc')->first();
 
-        $this->selectedJenjang = $firstJenjang->ms_jenjang_id ?? null;
+        $this->selectedKantin = $firstKantin->ms_kantin_id ?? null;
         $this->selectedTahunAjar = $firstTahunAjar->ms_tahun_ajar_id ?? null;
     }
 
     private function checkAndEmitParameters()
     {
-        if ($this->selectedJenjang !== null && $this->selectedTahunAjar !== null) {
-            $this->emit('parameterUpdated', $this->selectedJenjang, $this->selectedTahunAjar);
+        if ($this->selectedKantin !== null && $this->selectedTahunAjar !== null) {
+            $this->emit('parameterUpdated', $this->selectedKantin, $this->selectedTahunAjar);
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
         }
     }
 
     public function refreshParameters()
     {
-        $this->selectedJenjang = null;
+        $this->selectedKantin = null;
         $this->selectedTahunAjar = null;
         $this->emit('parameterUpdated', null, null);
     }
@@ -74,10 +82,10 @@ class SmartCanteen extends Component
             ->where('status_settlement', 'belum') // transaksi belum disettle
 
             // 🔥 Filter berdasarkan jenjang (siswa/pegawai)
-            ->when($this->selectedJenjang, function ($q) {
+            ->when($this->selectedKantin, function ($q) {
 
                 $q->where(function ($sub) {
-                    $jenjang = $this->selectedJenjang;
+                    $jenjang = $this->selectedKantin;
 
                     // Jika transaksi oleh siswa
                     $sub->orWhereHas('ms_penempatan_siswa', function ($q2) use ($jenjang) {
@@ -105,19 +113,30 @@ class SmartCanteen extends Component
 
     public function render()
     {
-        if ($this->selectedJenjang && $this->selectedTahunAjar) {
-            $this->emit('parameterUpdated', $this->selectedJenjang, $this->selectedTahunAjar);
+        $user = Auth::user();
+
+        // query kantin berdasarkan role
+        if ($user->peran === 'SUPERADMIN') {
+
+            $selectKantin = Kantin::get();
+        } else {
+
+            $selectKantin = Kantin::whereIn('ms_kantin_id', function ($query) use ($user) {
+                $query->select('ms_kantin_id')
+                    ->from('ms_akses_kantin')
+                    ->where('ms_pengguna_id', $user->ms_pengguna_id);
+            })->get();
         }
 
-        $this->refreshSaldo();
+        if ($this->selectedKantin && $this->selectedTahunAjar) {
+            $this->emit('parameterUpdated', $this->selectedKantin, $this->selectedTahunAjar);
+        }
+
+        // $this->refreshSaldo();
 
         return view('livewire.parameter.smart-canteen', [
-            'select_jenjang' => Jenjang::whereIn('ms_jenjang_id', function ($query) {
-                $query->select('ms_jenjang_id')
-                    ->from('ms_akses_jenjang')
-                    ->where('ms_pengguna_id', Auth::id());
-            })->where('status', 'Aktif')->get(),
-
+            'select_kantin' => $selectKantin,
+            
             'select_tahun_ajar' => TahunAjar::where('status', 'Aktif')
                 ->orderBy('urutan', 'asc')->get(),
         ]);

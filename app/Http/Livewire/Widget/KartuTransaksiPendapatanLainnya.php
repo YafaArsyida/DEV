@@ -5,21 +5,23 @@ namespace App\Http\Livewire\Widget;
 use App\Models\AkuntansiJurnalDetail;
 use App\Models\AkuntansiRekening;
 use App\Models\PendapatanLainnya;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class KartuTransaksiPendapatanLainnya extends Component
 {
     public $selectedJenjang = null;
     public $selectedTahunAjar = null;
-    public $selectedRekening = null;
-
+    
     public $nominal, $kode_rekening, $metode_pembayaran = 'tunai', $deskripsi;
+
+    public $select_transaksi = [];
+    public $totalPendapatanLainnya = 0;
 
     // public $totalPendapatanLainnya;
 
     protected $listeners = [
         'parameterUpdated',
-        'refreshTransaksiPendapatanLainnya'
     ];
 
     public function parameterUpdated($jenjang, $tahunAjar)
@@ -27,18 +29,33 @@ class KartuTransaksiPendapatanLainnya extends Component
         // Update nilai selectedJenjang dan selectedTahunAjar
         $this->selectedJenjang = $jenjang;
         $this->selectedTahunAjar = $tahunAjar;
+
+        $this->loadData();
     }
 
-    public function refreshTransaksiPendapatanLainnya()
+    public function mount()
     {
-        $this->emitSelf('$refresh'); //ringan
+        // SELECT OPTION (cache candidate)
+        $this->select_transaksi = AkuntansiRekening::where('akuntansi_kelompok_rekening_id', 4)
+            ->where('tipe_akun', 'Pendapatan Lainnya')
+            ->orderBy('kode_rekening', 'ASC')
+            ->get();
+    }
+
+    public function loadData()
+    {
+        $this->totalPendapatanLainnya = PendapatanLainnya::query()
+            ->where('ms_tahun_ajar_id', $this->selectedTahunAjar)
+            ->where('ms_jenjang_id', $this->selectedJenjang)
+            ->sum('nominal');
     }
 
     public function simpanTransaksi()
     {
+        DB::beginTransaction();
+
         try {
-            // Validasi input untuk topup
-            $validatedData = $this->validate([
+            $this->validate([
                 'kode_rekening' => 'required',
                 'nominal' => 'required|numeric|min:1000',
                 'deskripsi' => 'nullable|string|max:255',
@@ -52,25 +69,28 @@ class KartuTransaksiPendapatanLainnya extends Component
                 'metode_pembayaran.required' => 'Metode Pembayaran harus dipilih.',
             ]);
 
-            $kode_rekening_kas = 11001;
-            $kode_rekening_bank = 11002;
+            // ======================
+            // SET REKENING
+            // ======================
+            $kodeRekeningKas  = 11001;
+            $kodeRekeningBank = 11002;
 
-            if ($this->metode_pembayaran === 'bank') {
-                $kode_rekening_debit = $kode_rekening_bank;
-            } else {
-                $kode_rekening_debit = $kode_rekening_kas;
-            }
+            $kodeRekeningDebit = $this->metode_pembayaran === 'bank'
+                ? $kodeRekeningBank
+                : $kodeRekeningKas;
 
-            $nama_transaksi = AkuntansiRekening::where('kode_rekening', $this->kode_rekening)
-                ->pluck('nama_rekening')
-                ->first();
+            // ======================
+            // AMBIL NAMA TRANSAKSI
+            // ======================
+            $namaTransaksi = AkuntansiRekening::where('kode_rekening', $this->kode_rekening)
+                ->value('nama_rekening');
 
-            $deskripsi = "{$nama_transaksi} Rp {$this->nominal}, {$this->deskripsi}";
+            $deskripsi = trim("{$namaTransaksi} Rp {$this->nominal} {$this->deskripsi}");
 
-            // Data untuk jurnal debit
-            $jurnalDebit = [
-                'kode_rekening' => $kode_rekening_debit,
-                'posisi' => 'debit',
+            // ======================
+            // COMMON DATA
+            // ======================
+            $baseData = [
                 'nominal' => $this->nominal,
                 'tanggal_transaksi' => now(),
                 'ms_pengguna_id' => auth()->id(),
@@ -78,64 +98,65 @@ class KartuTransaksiPendapatanLainnya extends Component
                 'ms_jenjang_id' => $this->selectedJenjang,
                 'deskripsi' => $deskripsi,
             ];
-            $jurnalDebitId = AkuntansiJurnalDetail::create($jurnalDebit)->akuntansi_jurnal_detail_id;
 
-            // Data untuk jurnal kredit
-            $jurnalKredit = [
+            // ======================
+            // JURNAL DEBIT
+            // ======================
+            $jurnalDebit = AkuntansiJurnalDetail::create(array_merge($baseData, [
+                'kode_rekening' => $kodeRekeningDebit,
+                'posisi' => 'debit',
+            ]));
+
+            // ======================
+            // JURNAL KREDIT
+            // ======================
+            $jurnalKredit = AkuntansiJurnalDetail::create(array_merge($baseData, [
                 'kode_rekening' => $this->kode_rekening,
                 'posisi' => 'kredit',
-                'nominal' => $this->nominal,
-                'tanggal_transaksi' => now(),
-                'ms_pengguna_id' => auth()->id(),
-                'ms_tahun_ajaran_id' => $this->selectedTahunAjar,
-                'ms_jenjang_id' => $this->selectedJenjang,
-                'deskripsi' => $deskripsi,
-            ];
-            $jurnalKreditId = AkuntansiJurnalDetail::create($jurnalKredit)->akuntansi_jurnal_detail_id;
+            ]));
 
+            // ======================
+            // SIMPAN TRANSAKSI
+            // ======================
             PendapatanLainnya::create([
                 'ms_pengguna_id' => auth()->id(),
                 'ms_jenjang_id' => $this->selectedJenjang,
                 'ms_tahun_ajar_id' => $this->selectedTahunAjar,
-                'kode_rekening' => $this->kode_rekening, // Jenis transaksi untuk top-up
+                'kode_rekening' => $this->kode_rekening,
                 'nominal' => $this->nominal,
                 'metode_pembayaran' => $this->metode_pembayaran,
                 'tanggal' => now(),
                 'deskripsi' => $deskripsi,
-                'akuntansi_jurnal_detail_debit_id' => $jurnalDebitId,
-                'akuntansi_jurnal_detail_kredit_id' => $jurnalKreditId,
+                'akuntansi_jurnal_detail_debit_id' => $jurnalDebit->akuntansi_jurnal_detail_id,
+                'akuntansi_jurnal_detail_kredit_id' => $jurnalKredit->akuntansi_jurnal_detail_id,
             ]);
 
-            // Reset input
-            $this->reset(['nominal', 'deskripsi']);
-            $this->emitSelf('$refresh'); //ringan
-            $this->emit('refreshJurnalHariIni');
+            // ======================
+            // COMMIT
+            // ======================
+            DB::commit();
 
-            $this->dispatchBrowserEvent('alertify-success', ['message' => 'Transaksi berhasil disimpan.']);
-        } catch (\Exception $e) {
-            // Notifikasi error
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+            // ======================
+            // RESET & FEEDBACK
+            // ======================
+            $this->reset(['nominal', 'deskripsi']);
+            $this->loadData();
+
+            $this->emit('refreshJurnalHariIni');
+            $this->dispatchBrowserEvent('alertify-success', [
+                'message' => 'Transaksi berhasil disimpan.'
+            ]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => $e->getMessage() ?? 'Terjadi kesalahan sistem'
+            ]);
         }
     }
+
     public function render()
     {
-        $select_pendapatan = [];
-        $select_pendapatan = AkuntansiRekening::where('akuntansi_kelompok_rekening_id', 4)
-            ->where('tipe_akun', 'Pendapatan Lainnya')
-            ->orderBy('kode_rekening', 'ASC')
-            ->get();
-
-        $totalPendapatan = AkuntansiJurnalDetail::with('akuntansi_rekening')
-            ->where('ms_jenjang_id', $this->selectedJenjang)
-            ->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
-            ->where('posisi', 'kredit')
-            ->whereHas('akuntansi_rekening', function ($query) {
-                $query->where('kode_rekening', 'like', '4%');
-            })
-            ->sum('nominal');
-        return view('livewire.widget.kartu-transaksi-pendapatan-lainnya', [
-            'totalPendapatan' => $totalPendapatan,
-            'select_pendapatan' => $select_pendapatan,
-        ]);
+        return view('livewire.widget.kartu-transaksi-pendapatan-lainnya');
     }
 }

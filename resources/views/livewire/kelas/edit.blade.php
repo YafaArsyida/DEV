@@ -12,7 +12,7 @@
                     <div class="row g-3">
                         <div class="col-lg-8">
                             <label for="nama_kelas" class="form-label">Nama Kelas</label>
-                            <input type="text" wire:model.defer="nama_kelas" id="nama_kelas" class="form-control"
+                            <input type="text" wire:model.defer="nama_kelas" id="nama_kelas" class="form-control @error('nama_kelas') is-invalid @enderror"
                                 placeholder="7 A/ VII D Umar Bin Khatab..." />
                             @error('nama_kelas')
                             <footer class="text-danger mt-0">{{ $message }}</footer>
@@ -20,7 +20,7 @@
                         </div>
                         <div class="col-lg-4">
                             <label for="urutan" class="form-label">Urutan</label>
-                            <input type="number" wire:model.defer="urutan" class="form-control"
+                            <input type="number" wire:model.defer="urutan" class="form-control @error('urutan') is-invalid @enderror"
                                 placeholder="1, 2, 3, ..." />
                             @error('urutan')
                             <footer class="text-danger mt-0">{{ $message }}</footer>

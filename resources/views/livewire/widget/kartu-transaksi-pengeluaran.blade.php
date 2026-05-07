@@ -23,7 +23,7 @@
             <label for="kode_rekening" class="form-label">Jenis Pengeluaran Operasional</label>
             <select wire:model="kode_rekening" style="cursor: pointer" class="form-select" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Transaksi">
                 <option value="">Pilih Transaksi</option>
-                @foreach ($select_pengeluaran as $item)    
+                @foreach ($select_transaksi as $item)    
                 <option value="{{ $item->kode_rekening }}">{{ $item->nama_rekening }}</option>
                 @endforeach
             </select>
@@ -58,7 +58,7 @@
         <div class="hstack gap-2 justify-content-end d-print-none mt-4">
             <input type="text" id="deskripsi" class="form-control" wire:model.defer="deskripsi" placeholder="Deskripsi transaksi (opsional)">
             @error('deskripsi') <span class="text-danger">{{ $message }}</span> @enderror
-            <button wire:click="simpanPengeluaran" class="btn btn-danger">
+            <button wire:click="simpanTransaksi" class="btn btn-danger">
                 <i class="ri-save-line align-bottom me-1"></i> Simpan
             </button>
         </div>

@@ -15,12 +15,14 @@
             <!--end col-->
         </div>
         <div class="row">
-            <div class="col-xxl-4 pe-1">
+            <div class="col-xxl-4">
                 @livewire('laporan-edu-pay-pegawai.overview')   
-                @livewire('laporan-edu-pay-pegawai.saldo')   
+                <div class="sticky-side-div">
+                    @livewire('laporan-edu-pay-pegawai.saldo')   
+                </div>
                 @livewire('laporan-edu-pay-pegawai.withdraw')   
             </div>  
-            <div class="col-xxl-8 ps-0">
+            <div class="col-xxl-8">
                 @livewire('parameter.filter-laporan-edu-pay')   
                 @livewire('laporan-edu-pay-pegawai.index')   
             </div>  

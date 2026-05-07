@@ -3,14 +3,14 @@
 namespace App\Http\Livewire\Siswa;
 
 use App\Exports\ExportTeleponSiswa;
+use App\Http\Controllers\HelperController;
 use App\Imports\ImportTeleponSiswa;
-use App\Models\AktifitasPengguna;
 use App\Models\Kelas;
 
 use App\Models\PenempatanSiswa;
 use App\Models\Siswa;
 
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Maatwebsite\Excel\Facades\Excel;
@@ -105,44 +105,80 @@ class ImportTelepon extends Component
     public function saveChanges()
     {
         if (!is_array($this->newSiswaList) || empty($this->newSiswaList)) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Tidak ada data untuk diperbarui.']);
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Tidak ada data untuk diperbarui.'
+            ]);
             return;
         }
 
-        $updatedCount = 0;
-        $skippedCount = 0;
+        DB::beginTransaction();
 
-        foreach ($this->newSiswaList as $siswa) {
-            // Validasi data sebelum update
-            if (!isset($siswa['ms_siswa_id'], $siswa['telepon']) || empty($siswa['telepon'])) {
-                $skippedCount++;
-                continue;
-            }
+        try {
+            $updated = 0;
+            $skipped = 0;
 
-            try {
-                // Cari siswa berdasarkan ms_siswa_id dan update teleponnya
-                $siswaModel = Siswa::find($siswa['ms_siswa_id']);
-                if ($siswaModel) {
-                    $siswaModel->update(['telepon' => $siswa['telepon']]);
-                    $updatedCount++;
-                } else {
-                    $skippedCount++;
+            // 🔥 ambil semua ID sekaligus (lebih optimal)
+            $ids = collect($this->newSiswaList)
+                ->pluck('ms_siswa_id')
+                ->filter()
+                ->toArray();
+
+            $siswas = Siswa::whereIn('ms_siswa_id', $ids)->get()->keyBy('ms_siswa_id');
+
+            foreach ($this->newSiswaList as $item) {
+
+                // 🚫 validasi basic
+                if (
+                    empty($item['ms_siswa_id']) ||
+                    empty($item['telepon'])
+                ) {
+                    $skipped++;
+                    continue;
                 }
-            } catch (\Exception $e) {
-                $this->dispatchBrowserEvent('alertify-error', [
-                    'message' => "Gagal memperbarui telepon untuk siswa ID: {$siswa['ms_siswa_id']}."
+
+                $siswa = $siswas[$item['ms_siswa_id']] ?? null;
+
+                if (!$siswa) {
+                    $skipped++;
+                    continue;
+                }
+
+                // ✅ normalize nomor
+                $normalizedPhone = HelperController::normalizePhoneNumber($item['telepon']);
+
+                // 🚫 optional: validasi panjang / format
+                if (strlen($normalizedPhone) < 8) {
+                    $skipped++;
+                    continue;
+                }
+
+                // ✅ update
+                $siswa->update([
+                    'telepon' => $normalizedPhone
                 ]);
-                $skippedCount++;
-                continue;
+
+                $updated++;
             }
+
+            DB::commit();
+
+            // 🔥 FEEDBACK CLEAN (tidak spam)
+            $this->dispatchBrowserEvent('alertify-success', [
+                'message' => "Berhasil update {$updated} data" . ($skipped ? ", {$skipped} dilewati" : "")
+            ]);
+
+            // 🔥 reset state
+            $this->newSiswaList = [];
+            $this->file_import = null;
+
+            $this->emit('refreshSiswas');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => $e->getMessage() ?? 'Terjadi kesalahan saat update massal'
+            ]);
         }
-
-        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Data telepon siswa berhasil diperbarui.']);
-        // Reset data setelah sukses
-        $this->newSiswaList = [];
-        $this->file_import = null;
-
-        $this->emit('refreshSiswas');
     }
 
     public function render()

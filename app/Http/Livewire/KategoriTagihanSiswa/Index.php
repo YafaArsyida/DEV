@@ -66,10 +66,10 @@ class Index extends Component
         }
 
         // Ambil data kelas yang sudah difilter dan paginasi
-        $kategoris = $kategoris->paginate(1000);
+        $kategoris = $kategoris->paginate(20);
 
-        return view('livewire.kategori-tagihan-siswa.index', [
-            'kategoris' => $kategoris,
-        ]);
+        return view('livewire.kategori-tagihan-siswa.index', compact(
+            'kategoris'
+        ));
     }
 }

@@ -15,7 +15,7 @@ class ProdukSmartCanteen extends Model
     protected $table = 'ms_produk_kantin';
     protected $primaryKey = 'ms_produk_kantin_id';
     protected $fillable = [
-        'ms_jenjang_id',
+        'ms_kantin_id',
         'ms_pengguna_id',
         'ms_kategori_produk_kantin_id',
         'nama_produk_kantin',
@@ -29,13 +29,13 @@ class ProdukSmartCanteen extends Model
     ];
 
     /**
-     * Relasi ke model Jenjang.
+     * Relasi ke model Kantin.
      * 
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function ms_jenjang()
+    public function ms_kantin()
     {
-        return $this->belongsTo(Jenjang::class, 'ms_jenjang_id', 'ms_jenjang_id');
+        return $this->belongsTo(Kantin::class, 'ms_kantin_id', 'ms_kantin_id');
     }
 
     public function ms_kategori_produk_kantin()

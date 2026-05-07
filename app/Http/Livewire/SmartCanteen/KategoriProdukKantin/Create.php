@@ -8,14 +8,15 @@ use Illuminate\Support\Facades\DB;
 
 class Create extends Component
 {
-    public $ms_jenjang_id, $nama_kategori_produk_kantin, $icon, $deskripsi;
+    public $ms_kantin_id, $nama_kategori_produk_kantin, $icon, $deskripsi;
+
     protected $listeners = [
         'showCreateKategori',
     ];
 
-    public function showCreateKategori($jenjang)
+    public function showCreateKategori($kantin)
     {
-        $this->ms_jenjang_id = $jenjang;
+        $this->ms_kantin_id = $kantin;
         $this->emitSelf('render');
     }
 
@@ -23,14 +24,14 @@ class Create extends Component
     {
         return [
             'nama_kategori_produk_kantin' => 'required|string|max:50',
-            'ms_jenjang_id' => 'required',
+            'ms_kantin_id' => 'required',
             'deskripsi' => 'nullable|string',
         ];
     }
 
     protected $messages = [
         'nama_kategori_produk_kantin.required' => 'Nama kategori tidak boleh kosong',
-        'ms_jenjang_id.required' => 'Pilih jenjang',
+        'ms_kantin_id.required' => 'Pilih Kantin',
     ];
 
     public function updated($fields)
@@ -46,7 +47,7 @@ class Create extends Component
         try {
 
             KategoriProdukSmartCanteen::create([
-                'ms_jenjang_id' => $this->ms_jenjang_id,
+                'ms_kantin_id' => $this->ms_kantin_id,
                 'nama_kategori_produk_kantin' => $this->nama_kategori_produk_kantin,
                 'deskripsi'  => $this->deskripsi,
                 'icon'       => $this->icon,
@@ -55,15 +56,15 @@ class Create extends Component
             DB::commit();
 
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'Berhasil menambah kategori!']);
+            $this->resetInput();
+            $this->dispatchBrowserEvent('hide-modal', ['modalId' => 'ModalTambahKategori']);
+            $this->emit('refreshKategori');
+            $this->emit('refreshProduk');
         } catch (\Exception $e) {
             DB::rollBack();
 
             $this->dispatchBrowserEvent('alertify-error', ['message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
-        $this->resetInput();
-        $this->dispatchBrowserEvent('hide-modal', ['modalId' => 'ModalTambahKategori']);
-        $this->emit('refreshKategori');
-        $this->emit('refreshProduk');
     }
 
     public function resetInput()

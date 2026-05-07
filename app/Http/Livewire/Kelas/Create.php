@@ -2,16 +2,19 @@
 
 namespace App\Http\Livewire\Kelas;
 
-use App\Models\AktifitasPengguna;
-use App\Models\Jenjang as JenjangModel;
 use App\Models\Kelas as KelasModel;
-use App\Models\TahunAjar as TahunAjarModel;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
+
+use Illuminate\Validation\ValidationException;
 
 class Create extends Component
 {
-    public $nama_kelas, $ms_jenjang_id, $ms_tahun_ajar_id, $urutan, $deskripsi;
+    public $nama_kelas;
+    public $ms_jenjang_id;
+    public $ms_tahun_ajar_id;
+    public $urutan;
+    public $deskripsi;
 
     protected $listeners = [
         'showCreateKelas',
@@ -19,9 +22,11 @@ class Create extends Component
 
     public function showCreateKelas($jenjang, $tahunAjar)
     {
+        $this->resetValidation();
+        $this->resetInput();
+
         $this->ms_jenjang_id = $jenjang;
         $this->ms_tahun_ajar_id = $tahunAjar;
-        $this->emitSelf('render');
     }
 
     protected function rules()
@@ -52,18 +57,48 @@ class Create extends Component
 
     public function save()
     {
-        try {
-            $validatedData = $this->validate();
-            // Buat kelas baru
-            KelasModel::create($validatedData);
+        DB::beginTransaction();
 
-            $this->dispatchBrowserEvent('alertify-success', ['message' => 'Berhasil menambah kelas!']);
-        } catch (\Exception $e) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+        try {
+            $this->validate();
+
+            KelasModel::create([
+                'nama_kelas' => $this->nama_kelas,
+                'ms_jenjang_id' => $this->ms_jenjang_id,
+                'ms_tahun_ajar_id' => $this->ms_tahun_ajar_id,
+                'urutan' => $this->urutan,
+                'deskripsi' => $this->deskripsi,
+            ]);
+
+            DB::commit();
+
+            $this->dispatchBrowserEvent('alertify-success', [
+                'message' => 'Kelas berhasil ditambahkan'
+            ]);
+
+            // $this->dispatchBrowserEvent('hide-modal', [
+            //     'modalId' => 'ModalAddKelas'
+            // ]);
+
+            $this->resetInput();
+            $this->emit('refreshKelass');
+        } catch (ValidationException $e) {
+            DB::rollBack();
+
+            // 🔥 OPTIONAL notif
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Validasi gagal, cek input!'
+            ]);
+
+            throw $e; // 🔥 WAJIB agar @error tampil
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => $e->getMessage() ?? 'Terjadi kesalahan sistem'
+            ]);
         }
-        $this->resetInput();
-        $this->emit('refreshKelass');
-        $this->emit('refreshSiswas');
     }
 
     public function resetInput()

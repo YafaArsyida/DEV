@@ -8,7 +8,8 @@ use App\Imports\ImportEduCardSiswa;
 use App\Models\EduCard;
 use App\Models\Kelas;
 use App\Models\PenempatanSiswa;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Siswa;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Maatwebsite\Excel\Facades\Excel;
@@ -103,62 +104,107 @@ class ImportEduCard extends Component
     public function saveChanges()
     {
         if (!is_array($this->newSiswaList) || empty($this->newSiswaList)) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Tidak ada data untuk diperbarui.']);
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Tidak ada data untuk diperbarui.'
+            ]);
             return;
         }
 
-        $importedCount = 0;
-        $deletedCount = 0;
-        $skippedCount = 0;
+        DB::beginTransaction();
 
-        foreach ($this->newSiswaList as $siswa) {
-            // Validasi data sebelum proses
-            if (!isset($siswa['ms_siswa_id']) || empty($siswa['nama_siswa'])) {
-                $skippedCount++;
-                continue;
+        try {
+            $imported = 0;
+            $deleted = 0;
+            $skipped = 0;
+
+            // 🔥 ambil semua siswa sekaligus (hindari N+1)
+            $ids = collect($this->newSiswaList)
+                ->pluck('ms_siswa_id')
+                ->filter()
+                ->toArray();
+
+            $siswas = Siswa::whereIn('ms_siswa_id', $ids)
+                ->get()
+                ->keyBy('ms_siswa_id');
+
+            foreach ($this->newSiswaList as $item) {
+
+                // 🚫 validasi basic
+                if (
+                    empty($item['ms_siswa_id']) ||
+                    empty($item['nama_siswa'])
+                ) {
+                    $skipped++;
+                    continue;
+                }
+
+                $siswa = $siswas[$item['ms_siswa_id']] ?? null;
+
+                if (!$siswa) {
+                    $skipped++;
+                    continue;
+                }
+
+                try {
+                    if (!empty($item['educard'])) {
+
+                        // 🔥 optional: trimming
+                        $kodeKartu = trim($item['educard']);
+
+                        EduCard::updateOrCreate(
+                            ['ms_siswa_id' => $item['ms_siswa_id']],
+                            [
+                                'ms_pengguna_id' => auth()->id(),
+                                'kode_kartu' => $kodeKartu,
+                                'jenis_pemilik' => 'siswa',
+                                'status_kartu' => 'aktif',
+                                'deskripsi' => 'EduCard ' . $item['nama_siswa'],
+                            ]
+                        );
+
+                        $imported++;
+                    } else {
+                        // ✅ hapus jika kosong
+                        EduCard::where('ms_siswa_id', $item['ms_siswa_id'])->delete();
+                        $deleted++;
+                    }
+                } catch (\Illuminate\Database\QueryException $e) {
+
+                    // 🔥 HANDLE DUPLIKASI TANPA SPAM
+                    if ($e->getCode() == 23000) {
+                        // duplicate key → skip saja
+                        $skipped++;
+                        continue;
+                    }
+
+                    throw $e; // selain itu lempar ke global catch
+                }
             }
 
-            try {
-                // Update atau hapus EduCard berdasarkan data baru
-                if (!empty($siswa['educard'])) {
-                    EduCard::updateOrCreate(
-                        ['ms_siswa_id' => $siswa['ms_siswa_id']], // Kondisi untuk cek apakah data sudah ada
-                        [
-                            'ms_pengguna_id' => auth()->id(), // Asosiasi dengan pengguna saat ini
-                            'kode_kartu' => $siswa['educard'], // Kode kartu dari data impor
-                            'jenis_pemilik' => 'siswa', // Tetap 'siswa' untuk tipe pemilik
-                            'status_kartu' => 'aktif', // Status default kartu
-                            'deskripsi' => 'EduCard ' . $siswa['nama_siswa'], // Deskripsi kartu
-                        ]
-                    );
-                    $importedCount++;
-                } else {
-                    // Hapus data jika educard dikosongkan
-                    EduCard::where('ms_siswa_id', $siswa['ms_siswa_id'])->delete();
-                    $deletedCount++;
-                }
-            } catch (\Illuminate\Database\QueryException $e) {
-                // Tangani error duplicate entry
-                if ($e->getCode() == 23000) {
-                    $this->dispatchBrowserEvent('alertify-error', [
-                        'message' => "Duplikasi kode kartu: {$siswa['educard']} pada siswa {$siswa['nama_siswa']}."
-                    ]);
-                } else {
-                    $this->dispatchBrowserEvent('alertify-error', [
-                        'message' => "Terjadi kesalahan pada siswa {$siswa['nama_siswa']}."
-                    ]);
-                }
-                $skippedCount++;
-                continue;
+            DB::commit();
+
+            // 🔥 summary clean (UX bagus)
+            $message = "Import: {$imported}, Hapus: {$deleted}";
+            if ($skipped) {
+                $message .= ", Skip: {$skipped}";
             }
+
+            $this->dispatchBrowserEvent('alertify-success', [
+                'message' => $message
+            ]);
+
+            // 🔥 reset state
+            $this->newSiswaList = [];
+            $this->file_import = null;
+
+            $this->emit('refreshSiswas');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => $e->getMessage() ?? 'Terjadi kesalahan saat update EduCard'
+            ]);
         }
-
-        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Data EduCard berhasil diperbarui.']);
-        // Reset data setelah sukses
-        $this->newSiswaList = [];
-        $this->file_import = null;
-
-        $this->emit('refreshSiswas');
     }
 
     public function render()

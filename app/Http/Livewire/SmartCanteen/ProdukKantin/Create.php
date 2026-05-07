@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class Create extends Component
 {
-    public $ms_jenjang_id;
+    public $ms_kantin_id;
     public $ms_kategori_produk_kantin_id;
     public $nama_produk_kantin;
     public $harga;
@@ -23,10 +23,10 @@ class Create extends Component
 
     protected $listeners = ['showCreateProduk'];
 
-    public function showCreateProduk($jenjangId = null)
+    public function showCreateProduk($kantin = null)
     {
         $this->resetInput();
-        $this->ms_jenjang_id = $jenjangId;
+        $this->ms_kantin_id = $kantin;
     }
 
     public function resetInput()
@@ -44,7 +44,7 @@ class Create extends Component
     protected function rules()
     {
         return [
-            'ms_jenjang_id' => 'required|exists:ms_jenjang,ms_jenjang_id',
+            'ms_kantin_id' => 'required|exists:ms_kantin,ms_kantin_id',
             'ms_kategori_produk_kantin_id' => 'required|exists:ms_kategori_produk_kantin,ms_kategori_produk_kantin_id',
             'nama_produk_kantin' => 'required|string|max:255',
             'harga' => 'required|numeric|min:100',
@@ -58,8 +58,8 @@ class Create extends Component
     }
 
     protected $messages = [
-        'ms_jenjang_id.required' => 'Jenjang wajib dipilih.',
-        'ms_jenjang_id.exists' => 'Jenjang tidak valid.',
+        'ms_kantin_id.required' => 'Kantin wajib dipilih.',
+        'ms_kantin_id.exists' => 'Kantin tidak valid.',
 
         'ms_kategori_produk_kantin_id.required' => 'Kategori wajib dipilih.',
         'ms_kategori_produk_kantin_id.exists' => 'Kategori tidak valid.',
@@ -104,7 +104,7 @@ class Create extends Component
 
         try {
             ProdukSmartCanteen::create([
-                'ms_jenjang_id' => $this->ms_jenjang_id,
+                'ms_kantin_id' => $this->ms_kantin_id,
                 'ms_kategori_produk_kantin_id' => $this->ms_kategori_produk_kantin_id,
                 'nama_produk_kantin' => $this->nama_produk_kantin,
                 'harga' => $this->harga,
@@ -134,7 +134,7 @@ class Create extends Component
     public function render()
     {
         return view('livewire.smart-canteen.produk-kantin.create', [
-            'kategoriList' => KategoriProdukSmartCanteen::all(),
+            'kategoriList' => KategoriProdukSmartCanteen::where('ms_kantin_id', $this->ms_kantin_id)->get(),
         ]);
     }
 }

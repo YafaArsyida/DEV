@@ -3,9 +3,10 @@
 namespace App\Http\Livewire\Siswa;
 
 use Livewire\Component;
-use App\Models\Siswa as SiswaModel;
 use App\Models\Kelas as KelasModel;
 use App\Models\PenempatanSiswa as PenempatanSiswaModel;
+
+use Illuminate\Validation\ValidationException;
 
 use App\Http\Controllers\HelperController;
 use App\Models\EduCard;
@@ -118,7 +119,7 @@ class Edit extends Component
         'form.telepon.max' => 'Telepon maksimal 20 karakter',
 
         'form.ms_kelas_id.required' => 'Kelas tidak boleh kosong',
-        'ms_kelas_id.exists' => 'Kelas tidak valid',
+        'forn.ms_kelas_id.exists' => 'Kelas tidak valid',
 
         'form.ms_jenjang_id.required' => 'Jenjang tidak boleh kosong',
         'form.ms_jenjang_id.exists' => 'Jenjang tidak valid',
@@ -189,7 +190,7 @@ class Edit extends Component
         ]);
 
         // 🔥 jangan reload semua
-        $this->emit('siswaUpdated');
+        $this->emit('refreshSiswas');
     }
 
     public function updateSiswa()
@@ -207,10 +208,19 @@ class Edit extends Component
 
             $this->siswa->refresh();
             $this->afterUpdateSuccess();
-        } catch (\Exception $e) {
+        } catch (ValidationException $e) {
+            DB::rollBack();
+
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Validasi gagal, cek input'
+            ]);
+
+            throw $e; // 🔥 INI KUNCI
+
+        }catch (\Throwable $e) {
             DB::rollBack();
             $this->dispatchBrowserEvent('alertify-error', [
-                'message' => 'Gagal diperbarui'
+                'message' => $e->getMessage() ?? 'Terjadi kesalahan sistem'
             ]);
         }
     }

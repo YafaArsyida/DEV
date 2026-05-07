@@ -52,7 +52,6 @@
                             <tr>
                                 <th class="text-uppercase" style="width: 50px;">NO</th>
                                 <th class="text-uppercase">Pegawai</th>
-                                <th class="text-uppercase">EduCard</th>
                                 <th class="text-uppercase text-center">Saldo Tabungan</th>
                             </tr>
                         </thead>
@@ -64,25 +63,17 @@
                                         {{ ucfirst($item->nama_pegawai) }}
                                         <p class="fs-12 mb-0 text-muted">{{ $item->ms_jabatan->nama_jabatan ?? '' }}</p>
                                     </td>
-                                    <td style="white-space: nowrap;">
-                                        @if($item->ms_educard)
-                                            <span class="fs-14 text-warning">
-                                                {{ $item->ms_educard->kode_kartu }}
-                                            </span>
-                                        @else
-                                            <em>Belum memiliki kartu</em>
-                                        @endif
-                                    </td>
                                     <td class="text-center">
-                                        <span class="fs-14 text-info">
-                                            RP{{ number_format($item->saldo_tabungan_pegawai() ?? 0, 0, ',', '.') }}
+                                        <span class="fs-14 fw-semibold text-info">
+                                            RP{{ number_format($item->ms_saldo_tabungan->saldo_tabungan ?? 0, 0, ',',
+                                            '.') }}
                                         </span>
                                     </td>
 
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4">
+                                    <td colspan="3">
                                         <div class="noresult text-center py-3">
                                             <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop"
                                                 colors="primary:#405189,secondary:#08a88a"
@@ -98,10 +89,9 @@
                         <tfoot>
                             <tr class="">
                                 <td></td>
-                                <td></td>
                                 <td class="text-uppercase text-start">TOTAL</td>
                                 <td class="text-center">
-                                    <span class="fs-14 text-info">
+                                    <span class="fs-14 fw-semibold text-info">
                                         RP{{ number_format($totalSaldo, 0, ',', '.') }}</span>
                                 </td>
                             </tr>

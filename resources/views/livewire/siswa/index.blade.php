@@ -6,7 +6,7 @@
             <div class="flex-shrink-0">
                 <div class="d-flex gap-2 flex-wrap">
                     @if ($siswaSelected)
-                        <button href="#ModalDeleteSiswa" data-bs-toggle="modal" class="btn btn-soft-danger d-inline-flex align-items-center gap-1" wire:click.prevent="$emit('confirmBulkDelete', {{ json_encode($siswaSelected) }})">
+                        <button href="#ModalBulkDeleteSiswa" data-bs-toggle="modal" class="btn btn-soft-danger d-inline-flex align-items-center gap-1" wire:click.prevent="$emit('confirmBulkDelete', {{ json_encode($siswaSelected) }})">
                             <i class="ri-delete-bin-2-line me-1 align-bottom"></i> Hapus {{ count($siswaSelected) }}
                         </button>
                     @endif
@@ -64,27 +64,22 @@
                 </div>
             @else
             <div class="table-responsive">
-            {{-- <div data-simplebar data-simplebar-auto-hide="false" style="max-height: 100vh" class="table-responsive"> --}}
                 <table class="table table-hover nowrap align-middle" style="width:100%">
-                    {{-- <div class="text-center my-3">
-                        <h4 class="mb-0">Data Siswa Jenjang {{ $namaJenjang }}</h4>
-                        <div>{{ $namaKelas }} Tahun Ajaran {{ $namaTahunAjar }}</div>
-                    </div> --}}
                     <thead class="table-light">
                         <tr>
-                            <th class="text-uppercase" width="50px">no</th>
                             <th scope="col" style="width: 50px;">
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" id="checkAll" wire:model="selectAll">
                                 </div>
                             </th>
+                            <th class="text-uppercase" width="50px">no</th>
+                            <th class="text-uppercase" style="width: 50px;">Hapus</th>
                             <th class="text-uppercase">siswa</th>
                             {{-- <th class="text-uppercase">L/P</th> --}}
                             <th class="text-uppercase">kelas</th>
                             {{-- <th class="text-uppercase">ekstrakurikuler</th> --}}
                             <th class="text-uppercase">whatsapp</th>
                             <th class="text-uppercase">EduCard</th>
-                            <th class="text-uppercase">EduPay</th>
                             <th class="text-uppercase">aksi</th>
                         </tr>
                     </thead>
@@ -92,13 +87,20 @@
                         {{-- @forelse ($siswas as $item) --}}
                         @forelse ($siswas as $key => $item)
                         <tr>
-                            <td>{{ $siswas->firstItem() + $key }}.</td> 
-                            {{-- <td>{{ $loop->iteration }}</td> --}}
                             <td scope="row">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" wire:key="{{ $item->ms_penempatan_siswa_id }}" wire:model.live="siswaSelected" value="{{ $item->ms_penempatan_siswa_id }}">
+                                    <input class="form-check-input" type="checkbox" wire:key="{{ $item->ms_penempatan_siswa_id }}"
+                                        wire:model.live="siswaSelected" value="{{ $item->ms_penempatan_siswa_id }}">
                                 </div>
                             </td>
+                            <td>{{ $siswas->firstItem() + $key }}.</td> 
+                            <th class="text-center">
+                                <a href="#ModalDeleteSiswa" data-bs-toggle="modal"
+                                    class="btn btn-sm btn-soft-danger d-inline-flex align-items-center gap-1" data-bs-target="#ModalDeleteSiswa"
+                                    title="Hapus Siswa" wire:click.prevent="$emit('confirmDeleteSiswa', {{ $item->ms_penempatan_siswa_id }})">
+                                    <i class="ri-delete-bin-5-line"></i>
+                                </a>
+                            </th>
                             <td>
                                 <span class="fw-medium">
                                     {{ $item->ms_siswa->nama_siswa }}
@@ -127,39 +129,23 @@
                                     <em>Belum memiliki kartu</em>
                                 @endif
                             </td>
-                            <td> <!-- Menampilkan saldo tabungan -->
-                                <span class="fs-14 text-info">
-                                    RP{{ number_format($item->ms_siswa->saldo_edupay_siswa(), 0, ',', '.') }}
-                                </span>
-                            </td>
                             <td>
                                 <div class="hstack gap-2">
                                     {{-- Tombol Detail Siswa --}}
-                                    <button class="btn btn-sm btn-primary d-inline-flex align-items-center"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#ModalDetailSiswa"
-                                            title="Detail Siswa"
-                                            wire:click.prevent="$emit('showDetailSiswa', {{ $item->ms_penempatan_siswa_id }})">
-                                        <i class="ri-eye-line align-bottom me-1"></i> Detail
-                                    </button>
+
+                                    <a href="#ModalDetailSiswa" data-bs-toggle="modal" class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1" title="Detail Siswa"
+                                        wire:click="$emit('showDetailSiswa', {{ $item->ms_penempatan_siswa_id }})">
+                                        <i class="ri-eye-line align-bottom"></i> Detail
+                                    </a>
                             
-                                    {{-- Tombol Edit Siswa --}}
-                                    <button class="btn btn-sm btn-info d-inline-flex align-items-center"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#ModalEditSiswa"
-                                            title="Edit Siswa"
-                                            wire:click.prevent="$emit('loadDataSiswa', {{ $item->ms_penempatan_siswa_id }})">
-                                        <i class="ri-quill-pen-line align-bottom me-1"></i> Edit
-                                    </button>
-                            
-                                    {{-- Tombol Hapus Siswa --}}
-                                    <button class="btn btn-sm btn-soft-danger d-inline-flex align-items-center"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#ModalDeleteSiswa"
-                                            title="Hapus Siswa"
-                                            wire:click.prevent="$emit('confirmDeleteSiswa', {{ $item->ms_penempatan_siswa_id }})">
-                                        <i class="ri-delete-bin-5-line align-bottom me-1"></i>
-                                    </button>
+                                    {{-- DIVIDER --}}
+                                    <div class="vr mx-1"></div>
+                                    
+                                    {{-- EDIT --}}  
+                                    <a href="#ModalEditSiswa" data-bs-toggle="modal" class="text-primary d-inline-block" title="Edit Siswa"
+                                        wire:click="$emit('loadDataSiswa', {{ $item->ms_penempatan_siswa_id }})">
+                                        <i class="ri-quill-pen-line fs-17 align-middle"></i> Edit
+                                    </a>
                                 </div>
                             </td>                            
                         </tr>

@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class Edit extends Component
 {
-    public $ms_kategori_produk_kantin_id, $ms_jenjang_id, $nama_kategori_produk_kantin, $icon, $deskripsi;
+    public $ms_kategori_produk_kantin_id, $ms_kantin_id, $nama_kategori_produk_kantin, $icon, $deskripsi;
 
     protected $listeners = [
         'loadDataKategori',
@@ -18,7 +18,7 @@ class Edit extends Component
     {
         $kategori = KategoriProdukSmartCanteen::findOrFail($id);
         $this->ms_kategori_produk_kantin_id = $kategori->ms_kategori_produk_kantin_id;
-        $this->ms_jenjang_id = $kategori->ms_jenjang_id;
+        $this->ms_kantin_id = $kategori->ms_kantin_id;
         $this->nama_kategori_produk_kantin = $kategori->nama_kategori_produk_kantin;
         $this->icon = $kategori->icon;
         $this->deskripsi = $kategori->deskripsi;
@@ -28,7 +28,7 @@ class Edit extends Component
     {
         return [
             'nama_kategori_produk_kantin' => 'required|string|max:50',
-            'ms_jenjang_id' => 'required',
+            'ms_kantin_id' => 'required',
             'deskripsi' => 'nullable|string',
             'icon' => 'nullable|string',
         ];
@@ -36,7 +36,7 @@ class Edit extends Component
 
     protected $messages = [
         'nama_kategori_produk_kantin.required' => 'Nama kategori tidak boleh kosong',
-        'ms_jenjang_id.required' => 'Pilih jenjang',
+        'ms_kantin_id.required' => 'Pilih Kantin',
     ];
 
     public function update()
@@ -48,7 +48,7 @@ class Edit extends Component
 
             $kategori = KategoriProdukSmartCanteen::findOrFail($this->ms_kategori_produk_kantin_id);
             $kategori->update([
-                'ms_jenjang_id' => $this->ms_jenjang_id,
+                'ms_kantin_id' => $this->ms_kantin_id,
                 'nama_kategori_produk_kantin' => $this->nama_kategori_produk_kantin,
                 'deskripsi' => $this->deskripsi,
                 'icon' => $this->icon,

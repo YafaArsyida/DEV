@@ -1,24 +1,28 @@
 <div class="mt-3 mt-lg-0">
     <div class="row g-3 mb-0 align-items-center">
-        <div class="col-auto">
+        {{-- <div class="col-auto">
             <span class="fs-14 text-info">
                 Saldo Tersedia : Rp{{ number_format($saldoPendapatanKantin, 0, ',', '.') }}
             </span>
-        </div>
+        </div> --}}
+        <!--end col-->
         <div class="col-sm-auto">
             <div class="input-group">
-                <select wire:model="selectedJenjang" style="cursor: pointer" class="form-select border-0 dash-filter-picker shadow" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Jenjang">
-                    {{-- <option value="" selected disabled>Pilih Jenjang</option> --}}
-                    @foreach ($select_jenjang as $item)
-                        <option value="{{ $item->ms_jenjang_id }}">{{ $item->nama_jenjang }}</option>
+                <select wire:model="selectedKantin" class="form-select border-0 dash-filter-picker shadow" title="Pilih Kantin">
+        
+                    @foreach ($select_kantin as $item)
+                    <option value="{{ $item->ms_kantin_id }}">
+                        {{ $item->nama_kantin }}
+                    </option>
                     @endforeach
                 </select>
-                <div class="input-group-text bg-primary border-primary text-white">
-                    <i class=" ri-government-line"></i>
+        
+                <div class="input-group-text bg-primary text-white">
+                    <i class="ri-store-2-line"></i>
                 </div>
             </div>
         </div>
-        <!--end col-->
+
         <div class="col-sm-auto">
             <div class="input-group">
                 <select wire:model="selectedTahunAjar" style="cursor: pointer" class="form-select border-0 dash-filter-picker shadow" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Tahun Ajar">
@@ -35,7 +39,7 @@
     </div>
     <script>
         document.addEventListener('livewire:load', function () {
-            Livewire.emit('parameterUpdated', @json($selectedJenjang), @json($selectedTahunAjar));
+            Livewire.emit('parameterUpdated', @json($selectedKantin), @json($selectedTahunAjar));
         });
     </script>
 </div>

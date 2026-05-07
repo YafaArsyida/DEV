@@ -14,12 +14,16 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-lg-12">
-                <div class="tab-content text-muted">
-                    @livewire('transaksi-pendapatan-lainnya.index')   
-                    @livewire('transaksi-pendapatan-lainnya.delete')   
-                    @livewire('transaksi-pendapatan-lainnya.edit')   
-                </div>
+            <div class="col-xxl-4">
+                <div class="sticky-side-div">
+                    @livewire('transaksi-pendapatan-lainnya.input-transaksi')
+                </div><!-- end card -->
+            </div>
+            <!--end col-->
+            <div class="col-xxl-8">
+                @livewire('transaksi-pendapatan-lainnya.data-transaksi')
+                @livewire('transaksi-pendapatan-lainnya.delete')
+                @livewire('transaksi-pendapatan-lainnya.edit')
             </div>
         </div>
     </div>

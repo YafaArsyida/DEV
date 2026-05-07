@@ -34,28 +34,15 @@
                             <i class="ri-search-line search-icon"></i>
                         </div>
                     </div> --}}
-                    <div class="col-xxl-12 col-sm-12"> 
-                        <div class="row g-2 align-items-center">
-                            <!-- Label di sisi kiri -->
-                            <div class="col-auto">
-                                <label for="startDate" class="form-label text-muted text-uppercase fs-12 fw-medium mb-0">Periode </label>
-                            </div>
-                            <!-- Input tanggal di sisi kanan -->
-                            <div class="col">
-                                <div class="row g-2 align-items-center">
-                                    <div class="col-lg">
-                                        <input type="date" id="startDate" class="form-control" wire:model="startDate" placeholder="0">
-                                    </div>
-                                    <div class="col-lg">
-                                        <input type="date" id="endDate" class="form-control" wire:model="endDate" placeholder="0">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-auto">
-                                <button type="button" class="btn btn-soft-secondary btn-icon rounded-circle" wire:click="resetTanggal" title="Reset Tanggal">
-                                    <i class="ri-refresh-line fs-16"></i>
-                                </button>                                
-                            </div>
+                    <div class="col-xxl-12">
+                        <label class="form-label fw-semibold">Periode</label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="date" class="form-control" wire:model="startDate">
+                            <span class="text-muted">–</span>
+                            <input type="date" class="form-control" wire:model="endDate">
+                            <button type="button" class="btn btn-soft-secondary" wire:click="resetTanggal" title="Reset Tanggal">
+                                <i class="ri-refresh-line"></i>
+                            </button>
                         </div>
                     </div>
                 </div>

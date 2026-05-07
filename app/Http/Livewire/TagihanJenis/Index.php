@@ -84,9 +84,20 @@ class Index extends Component
         $this->totalKekurangan = 0;
 
         if ($this->selectedJenjang && $this->selectedTahunAjar) {
-            $query = JenisTagihanSiswa::with('ms_tagihan_siswa')
+            $query = JenisTagihanSiswa::query()
+                ->with('ms_kategori_tagihan_siswa')
+
                 ->where('ms_jenjang_id', $this->selectedJenjang)
-                ->where('ms_tahun_ajar_id', $this->selectedTahunAjar);
+                ->where('ms_tahun_ajar_id', $this->selectedTahunAjar)
+
+                // 🔥 COUNT
+                ->withCount(['ms_tagihan_siswa as jumlah_item'])
+
+                // 🔥 SUM TAGIHAN
+                ->withSum(['ms_tagihan_siswa as total_tagihan'], 'jumlah_tagihan_siswa')
+
+                // 🔥 SUM BAYAR (pakai hasManyThrough)
+                ->withSum(['dt_transaksi_tagihan_siswa as total_bayar'], 'jumlah_bayar');
 
             if ($this->selectedKategoriTagihan) {
                 $query->where('ms_kategori_tagihan_siswa_id', $this->selectedKategoriTagihan);
@@ -98,18 +109,19 @@ class Index extends Component
 
             $jenis_tagihans = $query
                 ->orderBy('ms_kategori_tagihan_siswa_id')
-                // ->orderBy('nama_jenis_tagihan_siswa')
-                ->get(); // pakai get agar perhitungan total tidak terpotong
-        }
-        // Perhitungan total
-        $this->totalSiswa = $jenis_tagihans->sum(fn($item) => $item->jumlah_tagihan_siswa());
-        $this->totalEstimasi = $jenis_tagihans->sum(fn($item) => $item->total_tagihan_siswa());
-        $this->totalDibayarkan = $jenis_tagihans->sum(fn($item) => $item->total_tagihan_siswa_dibayarkan());
-        $this->totalKekurangan = $this->totalEstimasi - $this->totalDibayarkan;
+                ->paginate(100);
 
-        $this->totalPersen = $this->totalEstimasi > 0
-            ? round(($this->totalDibayarkan / $this->totalEstimasi) * 100, 2)
-            : 0;
+
+            // Perhitungan total
+            $this->totalSiswa = $jenis_tagihans->sum('jumlah_item');
+            $this->totalEstimasi = $jenis_tagihans->sum('total_tagihan');
+            $this->totalDibayarkan = $jenis_tagihans->sum('total_bayar');
+            $this->totalKekurangan = $this->totalEstimasi - $this->totalDibayarkan;
+
+            $this->totalPersen = $this->totalEstimasi > 0
+                ? round(($this->totalDibayarkan / $this->totalEstimasi) * 100, 2)
+                : 0;
+        }
 
         return view('livewire.tagihan-jenis.index', [
             'select_kategori' => $select_kategori,

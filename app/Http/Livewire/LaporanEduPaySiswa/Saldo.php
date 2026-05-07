@@ -4,6 +4,7 @@ namespace App\Http\Livewire\LaporanEduPaySiswa;
 
 use App\Models\Kelas;
 use App\Models\PenempatanSiswa;
+use App\Models\SaldoEduPay;
 use App\Models\Siswa;
 
 use Illuminate\Database\Eloquent\Builder;
@@ -51,51 +52,6 @@ class Saldo extends Component
         $this->resetPage(); // Reset pagination ketika kelas berubah
     }
 
-    public function ExportSaldoEduPaySiswa()
-    {
-        $siswas = collect();
-        $query = PenempatanSiswa::with(['ms_siswa.ms_educard', 'ms_kelas', 'ms_tahun_ajar', 'ms_jenjang'])
-            ->join('ms_siswa', 'ms_penempatan_siswa.ms_siswa_id', '=', 'ms_siswa.ms_siswa_id')
-            ->where('ms_jenjang_id', $this->selectedJenjang)
-            ->where('ms_tahun_ajar_id', $this->selectedTahunAjar);
-
-        // Filter berdasarkan kelas (jika dipilih)
-        if ($this->selectedKelas) {
-            $query->where('ms_kelas_id', $this->selectedKelas);
-        }
-
-        if ($this->search) {
-            $query->where(function ($query) {
-                $query->whereHas('ms_siswa', function ($query) {
-                    $query->where('nama_siswa', 'like', '%' . $this->search . '%');
-                })->orWhereHas('ms_siswa.ms_educard', function ($query) {
-                    $query->where('kode_kartu', 'like', '%' . $this->search . '%');
-                });
-            });
-        }
-
-        $query->whereHas('ms_siswa.ms_transaksi_edupay', function (Builder $query) {
-            $query->whereNotNull('ms_penempatan_siswa_id');
-        });
-
-
-        $siswas = $query->orderBy('ms_penempatan_siswa.ms_kelas_id')
-            ->orderBy('ms_siswa.nama_siswa')->get();
-
-        $siswas = $siswas->map(function ($item) {
-            $item['saldo_edupay_siswa'] = $item->ms_siswa->saldo_edupay_siswa();
-            return $item;
-        });
-
-        // Hitung total saldo
-        $this->totalSaldo = $query->get()->sum(function ($item) {
-            return $item->ms_siswa->saldo_edupay_siswa() ?? 0;
-        });
-
-        // Emit data untuk frontend atau export
-        $this->emit('prepareExportSaldoEduPaySiswa', $siswas->toArray(), $this->totalSaldo);
-    }
-
     public function render()
     {
         // Data untuk dropdown Kelas (hanya jika Jenjang dan Tahun Ajar dipilih)
@@ -105,44 +61,63 @@ class Saldo extends Component
                 ->where('ms_tahun_ajar_id', $this->selectedTahunAjar)
                 ->get();
         }
-        $siswas = collect();
-        $siswas = PenempatanSiswa::with(['ms_siswa.ms_educard', 'ms_kelas', 'ms_tahun_ajar', 'ms_jenjang'])
-            ->join('ms_siswa', 'ms_penempatan_siswa.ms_siswa_id', '=', 'ms_siswa.ms_siswa_id')
+
+        // =========================
+        // QUERY UTAMA
+        // =========================
+        $query = PenempatanSiswa::with([
+            'ms_siswa.ms_educard',
+            'ms_siswa.ms_saldo_edupay',
+            'ms_kelas'
+        ])
             ->where('ms_jenjang_id', $this->selectedJenjang)
-            ->where('ms_tahun_ajar_id', $this->selectedTahunAjar)
-            ->when($this->selectedKelas, fn($q) => $q->where('ms_kelas_id', $this->selectedKelas))
-            ->whereHas(
-                'ms_siswa.ms_transaksi_edupay',
-                fn($q) =>
-                $q->whereNotNull('ms_penempatan_siswa_id')
-            )
-            ->when($this->search, function ($query) {
-                $query->where(function ($query) {
-                    $query->whereHas(
-                        'ms_siswa',
-                        fn($q) =>
-                        $q->where('nama_siswa', 'like', '%' . $this->search . '%')
-                    )->orWhereHas(
-                        'ms_siswa.ms_educard',
-                        fn($q) =>
-                        $q->where('kode_kartu', 'like', '%' . $this->search . '%')
-                    );
-                });
-            })
-            ->get()
-            ->filter(fn($item) => $item->ms_siswa->saldo_edupay_siswa() !== 0)
-            ->sortByDesc(fn($item) => $item->ms_siswa->saldo_edupay_siswa())
-            ->values(); // reset urutan index
+            ->where('ms_tahun_ajar_id', $this->selectedTahunAjar);
 
-        $this->totalSaldo = $siswas->sum(fn($item) => $item->ms_siswa->saldo_edupay_siswa() ?? 0);
+        // Filter kelas
+        if ($this->selectedKelas) {
+            $query->where('ms_kelas_id', $this->selectedKelas);
+        }
 
-        // Cek apakah koleksi siswa kosong.
-        if (!$siswas || $siswas->isEmpty()) {
+        // Search
+        if ($this->search) {
+            $query->whereHas('ms_siswa', function ($q) {
+                $q->where('nama_siswa', 'like', '%' . trim($this->search) . '%')
+                    ->orWhereHas('ms_educard', function ($q2) {
+                        $q2->where('kode_kartu', 'like', '%' . trim($this->search) . '%');
+                    });
+            });
+        }
+
+        // 🔥 HANYA siswa yang punya saldo ≠ 0
+        $query->whereHas('ms_siswa.ms_saldo_edupay', function ($q) {
+            $q->where('saldo_edupay', '!=', 0);
+        });
+
+        // 🔥 SORT by saldo (pakai subquery, bukan join manual)
+        $query->orderByDesc(
+            SaldoEduPay::select('saldo_edupay')
+                ->whereColumn('user_id', 'ms_penempatan_siswa.ms_siswa_id')
+                ->where('user_type', 'siswa')
+                ->limit(1)
+        );
+
+        $siswas = $query->get();
+
+        // =========================
+        // TOTAL SALDO
+        // =========================
+        $this->totalSaldo = $siswas->sum(function ($item) {
+            return $item->ms_siswa->ms_saldo_edupay->saldo_edupay ?? 0;
+        });
+
+        // =========================
+        // NOTIF
+        // =========================
+        if ($siswas->isEmpty()) {
             $this->dispatchBrowserEvent('alertify-error', ['message' => 'Data siswa tidak ditemukan.']);
         } else {
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui..']);
         }
-
         return view('livewire.laporan-edu-pay-siswa.saldo', [
             'select_kelas' => $select_kelas,
             'siswas' => $siswas,

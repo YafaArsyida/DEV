@@ -1,5 +1,5 @@
 @forelse ($listProduk as $item)
-    <div class="col-xxl-2 col-md-3 col-lg-3">
+    <div class="col-xxl-2 col-lg-3 col-md-3">
         <div class="card card-animate text-center shadow-sm rounded-3 h-100 border">
             <div class="card-body p-3 d-flex flex-column justify-content-between">
 

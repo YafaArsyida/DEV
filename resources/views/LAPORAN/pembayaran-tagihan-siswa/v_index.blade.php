@@ -15,18 +15,14 @@
             <!--end col-->
         </div>
         <div class="row">
-            <div class="col-xxl-4 pe-1">
-                @livewire('laporan-pembayaran-tagihan-siswa.overview')   
-                @livewire('laporan-pembayaran-tagihan-siswa.export-overview')   
-                {{-- @livewire('laporan-pembayaran.kategori')    --}}
-                {{-- @livewire('laporan-pembayaran.jenis')    --}}
+            <div class="col-xxl-4">
+                <div class="sticky-side-div">
+                    @livewire('laporan-pembayaran-tagihan-siswa.overview')   
+                </div>
             </div>  
-            <div class="col-xxl-8 ps-0">
+            <div class="col-xxl-8">
                 @livewire('parameter.filter-laporan-pembayaran')   
                 @livewire('laporan-pembayaran-tagihan-siswa.index')   
-                @livewire('laporan-pembayaran-tagihan-siswa.export')   
-                @livewire('laporan-pembayaran-tagihan-siswa.export-kategori')   
-                @livewire('laporan-pembayaran-tagihan-siswa.export-jenis')   
             </div>  
         </div>
     </div>

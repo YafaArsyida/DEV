@@ -33,7 +33,7 @@
                                         
                                         <div class="mb-3">
                                             <label class="form-label small text-muted">Kelas</label>
-                                            <select wire:model.defer="form.ms_kelas_id" class="form-select">
+                                            <select wire:model.defer="form.ms_kelas_id" class="form-select @error('form.ms_kelas_id') is-invalid @enderror">
                                                 <option value="">Pilih Kelas</option>
                                         
                                                 @foreach ($selectKelas as $item)
@@ -49,7 +49,7 @@
                                         
                                         <div class="mb-3">
                                             <label class="form-label small text-muted">Telepon</label>
-                                            <input type="text" wire:model.defer="form.telepon" class="form-control" placeholder="08xxxxxxxxxx">
+                                            <input type="text" wire:model.defer="form.telepon" class="form-control @error('form.telepon') is-invalid @enderror" placeholder="08xxxxxxxxxx">
                                             @error('form.telepon')
                                             <div class="text-danger small">{{ $message }}</div>
                                             @enderror
@@ -137,7 +137,7 @@
             
                                         <div class="col-lg-6">
                                             <label class="form-label">Nama Siswa</label>
-                                            <input type="text" wire:model.defer="form.nama_siswa" class="form-control">
+                                            <input type="text" wire:model.defer="form.nama_siswa" class="form-control @error('form.nama_siswa') is-invalid @enderror">
                                             @error('form.nama_siswa')
                                             <div class="text-danger small">{{ $message }}</div>
                                             @enderror
@@ -193,9 +193,8 @@
             
                 <!-- FOOTER -->
                 <div class="modal-footer border-top">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">
-                        Tutup
-                    </button>
+                    <a href="javascript:void(0);" class="btn btn-link link-success shadow-none fw-medium" data-bs-dismiss="modal"><i
+                        class="ri-close-line me-1 align-middle"></i> Tutup</a>
                     <button type="submit" class="btn btn-primary">
                         Simpan Perubahan
                     </button>

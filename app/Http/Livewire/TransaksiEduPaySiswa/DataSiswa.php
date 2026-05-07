@@ -216,7 +216,6 @@ class DataSiswa extends Component
         $saldo->decrement('saldo_edupay', $this->nominal_penarikan);
     }
 
-
     protected function afterSuccess()
     {
         $this->reset([

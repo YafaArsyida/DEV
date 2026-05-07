@@ -15,11 +15,13 @@
             <!--end col-->
         </div>
         <div class="row">
-            <div class="col-xxl-4 pe-1">
-                @livewire('laporan-tabungan-pegawai.overview')   
-                @livewire('laporan-tabungan-pegawai.saldo')   
+            <div class="col-xxl-4">
+                @livewire('laporan-tabungan-pegawai.overview') 
+                <div class="sticky-side-div">
+                    @livewire('laporan-tabungan-pegawai.saldo')   
+                </div>  
             </div>  
-            <div class="col-xxl-8 ps-0">
+            <div class="col-xxl-8">
                 @livewire('parameter.filter-tabungan')   
                 @livewire('laporan-tabungan-pegawai.index')   
                 @livewire('laporan-tabungan-siswa.withdraw')   

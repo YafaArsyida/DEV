@@ -43,7 +43,9 @@ class Manage extends Component
     }
 
     protected $listeners = [
-        'showTagihan'
+        'manageTagihan',
+
+        'refreshTagihanSiswa' => '$refresh',
     ];
 
     public function updatingSearch()
@@ -56,18 +58,21 @@ class Manage extends Component
         $this->emitSelf('$refresh');
     }
 
-    public function showTagihan($params)
+    public function manageTagihan($id)
     {
-        $this->ms_jenjang_id = $params['jenjang'];
-        $this->ms_tahun_ajar_id = $params['tahunAjar'];
-        $this->ms_penempatan_siswa_id = $params['ms_penempatan_siswa_id'];
+        $penempatan = PenempatanSiswa::with('ms_siswa')->find($id);
 
-        $penempatan = PenempatanSiswa::with('ms_siswa')->find($this->ms_penempatan_siswa_id);
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Tagihan dimuat'
+        ]);
+
+        $this->ms_penempatan_siswa_id = $id;
+        $this->ms_jenjang_id = $penempatan->ms_jenjang_id;
+        $this->ms_tahun_ajar_id = $penempatan->ms_tahun_ajar_id;
         $this->nama_siswa = $penempatan->ms_siswa->nama_siswa ?? 'Tidak Diketahui';
 
         $this->TagihanSelectAll = false;
         $this->TagihanSelected = [];
-        $this->emitSelf('$refresh');
     }
 
     public function updatedTagihanSelectAll($value)
@@ -152,6 +157,10 @@ class Manage extends Component
         DB::beginTransaction();
 
         try {
+            if (empty($this->TagihanSelected)) {
+                throw new \Exception('Tidak ada data yang dipilih');
+            }
+
             // Validasi fleksibel berdasarkan input yang diberikan
             $rules = [];
             $messages = [];
@@ -233,7 +242,7 @@ class Manage extends Component
 
             // Berikan notifikasi sukses
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'Tagihan berhasil diperbarui.']);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // Rollback transaksi jika terjadi kesalahan
             DB::rollBack();
 
@@ -241,7 +250,6 @@ class Manage extends Component
             $this->dispatchBrowserEvent('alertify-error', ['message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
     }
-
 
     public function render()
     {
@@ -252,32 +260,42 @@ class Manage extends Component
                 ->get();
         }
         // Query Tagihan
-        $query = TagihanSiswa::select('ms_tagihan_siswa.*', 'ms_kategori_tagihan_siswa.ms_kategori_tagihan_siswa_id')
-            ->join('ms_jenis_tagihan_siswa', 'ms_jenis_tagihan_siswa.ms_jenis_tagihan_siswa_id', '=', 'ms_tagihan_siswa.ms_jenis_tagihan_siswa_id')
-            ->join('ms_kategori_tagihan_siswa', 'ms_kategori_tagihan_siswa.ms_kategori_tagihan_siswa_id', '=', 'ms_jenis_tagihan_siswa.ms_kategori_tagihan_siswa_id')
-            ->whereHas('ms_penempatan_siswa', function ($q) {
-                $q->where('ms_penempatan_siswa_id', $this->ms_penempatan_siswa_id);
-            });
+        $query = TagihanSiswa::query()
+            ->with([
+                'ms_jenis_tagihan_siswa.ms_kategori_tagihan_siswa',
+                'ms_penempatan_siswa.ms_siswa',
+                'ms_penempatan_siswa.ms_kelas'
+            ])
+            ->where('ms_penempatan_siswa_id', $this->ms_penempatan_siswa_id)
+            ->withSum('dt_transaksi_tagihan_siswa as total_bayar', 'jumlah_bayar');
 
-        // Filter berdasarkan kategori tagihan jika dipilih
+        // FILTER KATEGORI
         if ($this->selectedKategori) {
-            $query->where('ms_kategori_tagihan_siswa.ms_kategori_tagihan_siswa_id', $this->selectedKategori);
+            $query->whereRelation(
+                'ms_jenis_tagihan_siswa.ms_kategori_tagihan_siswa',
+                'ms_kategori_tagihan_siswa_id',
+                $this->selectedKategori
+            );
         }
 
-        // Filter berdasarkan pencarian nama jenis tagihan
+        // SEARCH
         if ($this->search) {
-            $query->where('ms_jenis_tagihan_siswa.nama_jenis_tagihan_siswa', 'like', '%' . $this->search . '%');
+            $query->whereRelation(
+                'ms_jenis_tagihan_siswa',
+                'nama_jenis_tagihan_siswa',
+                'like',
+                '%' . $this->search . '%'
+            );
         }
 
-        // Paginasi dan urutan berdasarkan kategori tagihan
         $tagihans = $query
-            ->orderBy('ms_kategori_tagihan_siswa.ms_kategori_tagihan_siswa_id', 'ASC')
-            ->orderBy('ms_jenis_tagihan_siswa_id', 'ASC')->get();
+            ->orderBy('ms_jenis_tagihan_siswa_id')
+            ->get();
 
         // Simpan data tagihan dari halaman aktif
         $this->tagihanOnPage = $tagihans;
         $totalEstimasi = $tagihans->sum('jumlah_tagihan_siswa');
-        $totalDibayarkan = $tagihans->sum(fn($item) => $item->jumlah_sudah_dibayar());
+        $totalDibayarkan = $tagihans->sum(fn($t) => $t->total_bayar ?? 0);
         $totalKekurangan = $totalEstimasi - $totalDibayarkan;
 
         return view('livewire.tagihan-siswa.manage', [

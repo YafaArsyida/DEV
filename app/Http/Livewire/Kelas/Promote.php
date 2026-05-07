@@ -2,23 +2,16 @@
 
 namespace App\Http\Livewire\Kelas;
 
-use App\Models\AktifitasPengguna;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
-use Livewire\WithPagination;
-
+use Illuminate\Support\Facades\DB;
 use App\Models\Kelas;
 use App\Models\PenempatanSiswa;
-use App\Models\Tagihan;
 use App\Models\TagihanSiswa;
 use App\Models\TahunAjar;
 
 class Promote extends Component
 {
-    use WithPagination;
-
-    protected $paginationTheme = 'bootstrap';
-
     public $selectedJenjang; // Jenjang saat ini
     public $selectedTahunAjar; // Tahun ajar saat ini
     public $selectedKelas; // Kelas saat ini
@@ -35,7 +28,9 @@ class Promote extends Component
 
     public function updatingSearch()
     {
-        $this->resetPage();
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'memperbarui'
+        ]);
     }
 
     public function loadKelas($params)
@@ -43,6 +38,8 @@ class Promote extends Component
         $this->selectedJenjang = $params['jenjang'];
         $this->selectedTahunAjar = $params['tahunAjar'];
         $this->selectedKelas = $params['kelasId'];
+
+        $this->reset(['searchSiswa', 'siswaSelected', 'selectAll']);
 
         // Cari tahun ajar berikutnya berdasarkan urutan ID
         $this->tahunAjarBerikut = TahunAjar::where('ms_tahun_ajar_id', '>', $this->selectedTahunAjar)
@@ -53,7 +50,6 @@ class Promote extends Component
     public function updatedSelectAll($value)
     {
         if ($value) {
-            // Pilih semua siswa dalam halaman saat ini
             $this->siswaSelected = PenempatanSiswa::where('ms_kelas_id', $this->selectedKelas)
                 ->pluck('ms_penempatan_siswa_id')
                 ->toArray();
@@ -65,98 +61,153 @@ class Promote extends Component
     public function naikKelasSiswa()
     {
         if (!$this->tahunAjarBerikut) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Tahun ajar berikutnya tidak ditemukan.']);
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Tahun ajar berikut tidak ditemukan'
+            ]);
             return;
         }
 
         if (!$this->kelasTujuan) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Pilih kelas tujuan terlebih dahulu.']);
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Pilih kelas tujuan'
+            ]);
             return;
         }
 
         if (empty($this->siswaSelected)) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Pilih siswa yang ingin dinaikkan.']);
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Pilih siswa terlebih dahulu'
+            ]);
             return;
         }
 
-        $ms_pengguna_id = Auth::id();
-        $siswaSudahAda = []; // Untuk menyimpan siswa yang sudah dinaikkan sebelumnya
+        DB::beginTransaction();
 
-        // Query untuk mendapatkan nama tahun ajaran berdasarkan ID
-        $tahunAjarNama = $this->tahunAjarBerikut->nama_tahun_ajar ?? 'Tidak Diketahui';
+        try {
+            $tahunAjarId = $this->tahunAjarBerikut->ms_tahun_ajar_id;
 
-        $kelasTujuan = Kelas::find($this->kelasTujuan);
-        $namaKelasTujuan = $kelasTujuan ? $kelasTujuan->nama_kelas : 'Tidak Diketahui';
+            // 🔥 ambil semua penempatan sekaligus (NO N+1)
+            $penempatans = PenempatanSiswa::with('ms_siswa:ms_siswa_id,ms_siswa_id,nama_siswa')
+                ->whereIn('ms_penempatan_siswa_id', $this->siswaSelected)
+                ->get();
 
-        foreach ($this->siswaSelected as $siswaId) {
-            $siswa = PenempatanSiswa::with('ms_siswa')->find($siswaId);
+            $siswaIds = $penempatans->pluck('ms_siswa_id')->toArray();
 
-            if ($siswa) {
-                // Cek apakah siswa sudah ada di tahun ajar berikutnya
-                $existingPenempatan = PenempatanSiswa::where('ms_siswa_id', $siswa->ms_siswa_id)
-                    ->where('ms_tahun_ajar_id', $this->tahunAjarBerikut->ms_tahun_ajar_id)
-                    ->exists();
+            // 🔥 cek yang sudah ada (1 query)
+            $existing = PenempatanSiswa::whereIn('ms_siswa_id', $siswaIds)
+                ->where('ms_tahun_ajar_id', $tahunAjarId)
+                ->pluck('ms_siswa_id')
+                ->toArray();
 
-                if ($existingPenempatan) {
-                    $siswaSudahAda[] = $siswa->siswa->nama_siswa ?? 'Tidak Diketahui'; // Simpan nama siswa untuk laporan
-                    continue; // Lewati siswa yang sudah ada
+            $insertData = [];
+            $sudahAda = [];
+
+            foreach ($penempatans as $p) {
+                if (in_array($p->ms_siswa_id, $existing)) {
+                    $sudahAda[] = $p->ms_siswa->nama_siswa ?? '-';
+                    continue;
                 }
 
-                // Buat penempatan baru
-                PenempatanSiswa::create([
-                    'ms_siswa_id' => $siswa->ms_siswa_id,
+                $insertData[] = [
+                    'ms_siswa_id' => $p->ms_siswa_id,
                     'ms_kelas_id' => $this->kelasTujuan,
-                    'ms_tahun_ajar_id' => $this->tahunAjarBerikut->ms_tahun_ajar_id,
-                    'ms_jenjang_id' => $siswa->ms_jenjang_id,
-                    'ms_pengguna_id' => $ms_pengguna_id, // ID pengguna yang login
+                    'ms_tahun_ajar_id' => $tahunAjarId,
+                    'ms_jenjang_id' => $p->ms_jenjang_id,
+                    'ms_pengguna_id' => auth()->id(),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+
+            // 🔥 BULK INSERT
+            if (!empty($insertData)) {
+                DB::table('ms_penempatan_siswa')->insert($insertData);
+            }
+
+            DB::commit();
+
+            // RESET
+            $this->reset(['siswaSelected', 'selectAll']);
+
+            // UX FEEDBACK
+            if (!empty($sudahAda)) {
+                $this->dispatchBrowserEvent('alertify-success', [
+                    'message' => 'Sebagian siswa sudah ada: ' . implode(', ', array_slice($sudahAda, 0, 5))
+                ]);
+            } else {
+                $this->dispatchBrowserEvent('alertify-success', [
+                    'message' => 'Semua siswa berhasil dinaikkan'
                 ]);
             }
-        }
 
-        $this->siswaSelected = [];
-        $this->selectAll = false;
+            $this->emit('refreshKelass');
+        } catch (\Throwable $e) {
+            DB::rollBack();
 
-        if (!empty($siswaSudahAda)) {
-            $message = 'Siswa berikut sudah dinaikkan sebelumnya: ' . implode(', ', $siswaSudahAda);
-            $this->dispatchBrowserEvent('alertify-error', ['message' => $message]);
-        } else {
-            $this->dispatchBrowserEvent('alertify-success', ['message' => 'Siswa berhasil dinaikkan ke kelas tujuan.']);
+            // report($e);
+
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => $e->getMessage() ?? 'Terjadi kesalahan sistem'
+            ]);
         }
     }
 
     public function batalNaikKelasSiswa($siswaId)
     {
         if (!$this->tahunAjarBerikut) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Tahun ajar berikutnya tidak ditemukan.']);
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Tahun ajar berikut tidak ditemukan'
+            ]);
             return;
         }
 
-        // Cari penempatan siswa di tahun ajar berikutnya
-        $penempatanBerikut = PenempatanSiswa::where('ms_siswa_id', $siswaId)
-            ->where('ms_tahun_ajar_id', $this->tahunAjarBerikut->ms_tahun_ajar_id)
-            ->first();
+        DB::beginTransaction();
 
-        if (!$penempatanBerikut) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Penempatan siswa tidak ditemukan.']);
-            return;
+        try {
+            $penempatan = PenempatanSiswa::where('ms_siswa_id', $siswaId)
+                ->where('ms_tahun_ajar_id', $this->tahunAjarBerikut->ms_tahun_ajar_id)
+                ->first();
+
+            if (!$penempatan) {
+                DB::rollBack();
+
+                $this->dispatchBrowserEvent('alertify-error', [
+                    'message' => 'Penempatan tidak ditemukan'
+                ]);
+                return;
+            }
+
+            // 🔥 cek tagihan (1 query)
+            $hasTagihan = TagihanSiswa::where('ms_penempatan_siswa_id', $penempatan->ms_penempatan_siswa_id)
+                ->exists();
+
+            if ($hasTagihan) {
+                DB::rollBack();
+
+                $this->dispatchBrowserEvent('alertify-error', [
+                    'message' => 'Tidak bisa dibatalkan karena ada tagihan'
+                ]);
+                return;
+            }
+
+            $penempatan->delete();
+
+            DB::commit();
+
+            $this->dispatchBrowserEvent('alertify-success', [
+                'message' => 'Berhasil dibatalkan'
+            ]);
+
+            $this->emit('refreshKelass');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            // report($e);
+
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => $e->getMessage() ?? 'Terjadi kesalahan sistem'
+            ]);
         }
-
-        // Cek apakah ada tagihan terkait dengan penempatan ini
-        $tagihanExist = TagihanSiswa::where('ms_penempatan_siswa_id', $penempatanBerikut->ms_penempatan_siswa_id)->exists();
-
-        if ($tagihanExist) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Pembatalan tidak diperbolehkan karena terdapat tagihan']);
-            return;
-        }
-
-        // Ambil data siswa, kelas, dan tahun ajar untuk log aktivitas
-        $nama_siswa = $penempatanBerikut->ms_siswa->nama_siswa ?? 'Tidak Diketahui';
-        $nama_kelas = $penempatanBerikut->ms_kelas->nama_kelas ?? 'Tidak Diketahui';
-
-        $tahunAjarNama = $this->tahunAjarBerikut->nama_tahun_ajar ?? 'Tidak Diketahui';
-
-        $penempatanBerikut->delete();
-        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Penempatan siswa berhasil dibatalkan.']);
     }
 
     public function render()
@@ -180,7 +231,7 @@ class Promote extends Component
                 });
             }
 
-            $siswas = $query->orderBy('ms_siswa.nama_siswa')->paginate(100);
+            $siswas = $query->orderBy('ms_siswa.nama_siswa')->get();
         }
 
         return view('livewire.kelas.promote', [

@@ -82,7 +82,12 @@ class Index extends Component
         $query = PenempatanSiswa::with([
             'ms_siswa.ms_educard',
             'ms_kelas',
-            'ms_tagihan_siswa.ms_jenis_tagihan_siswa'
+            'ms_tagihan_siswa' => function ($q) {
+                $q->with([
+                    'ms_jenis_tagihan_siswa'
+                ])
+                    ->withSum('dt_transaksi_tagihan_siswa as jumlah_sudah_dibayar', 'jumlah_bayar');
+            }
         ])
             ->where('ms_jenjang_id', $this->selectedJenjang)
             ->where('ms_tahun_ajar_id', $this->selectedTahunAjar);
@@ -129,24 +134,29 @@ class Index extends Component
             $sum = 0;
 
             foreach ($siswas as $siswa) {
+
                 $tagihan = $siswa->ms_tagihan_siswa
                     ->firstWhere('ms_jenis_tagihan_siswa_id', $jenisId);
 
                 if (!$tagihan) continue;
 
+                $dibayar = $tagihan->jumlah_sudah_dibayar ?? 0;
+                $tagihanNominal = $tagihan->jumlah_tagihan_siswa;
+                $kekurangan = $tagihanNominal - $dibayar;
+
                 if ($this->jenisRekapitulasi === 'tagihan') {
-                    $sum += $tagihan->jumlah_tagihan_siswa;
+                    $sum += $tagihanNominal;
                 } elseif ($this->jenisRekapitulasi === 'pembayaran') {
-                    $sum += $tagihan->jumlah_sudah_dibayar();
-                } elseif ($this->jenisRekapitulasi === 'kekurangan') {
-                    $sum += $tagihan->jumlah_kekurangan();
+                    $sum += $dibayar;
+                } else {
+                    $sum += $kekurangan;
                 }
             }
 
             $this->total[$jenisId] = $sum;
             $this->grandTotal += $sum;
         }
-
+        
         return view('livewire.laporan-rekapitulasi-keuangan.index', [
             // 'select_kelas' => $select_kelas,
             'siswas' => $siswas,

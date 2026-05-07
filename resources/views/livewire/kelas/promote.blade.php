@@ -8,7 +8,7 @@
                 </div> --}}
                 <div class="modal-header bg-light p-3">
                     <h5 class="modal-title">
-                        Naik Kelas Siswa
+                        Naikan Siswa
                         @if ($tahunAjarBerikut)
                             <small class="text-muted">ke Tahun Ajar: {{ $tahunAjarBerikut->nama_tahun_ajar }}</small>
                         @else
@@ -117,8 +117,6 @@
                                                 @endforelse
                                             </tbody>
                                         </table>
-                                        <!-- Pagination -->
-                                        {{ $siswas->links() }}
                                     </div>
                                 @endif
                             </div>

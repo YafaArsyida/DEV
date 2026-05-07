@@ -43,7 +43,7 @@ class LoginController extends Controller
             $request->session()->regenerate();
 
             // Redirect sesuai peran
-            if ($user->peran === 'kantin') {
+            if ($user->peran === 'KANTIN') {
                 return redirect()->route('smartCanteen.dashboard');
             }
 

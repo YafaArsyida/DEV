@@ -19,7 +19,7 @@ class Delete extends Component
 
     public function confirmDeleteTabungan($id)
     {
-        $transaksi = TransaksiTabungan::find($this->ms_transaksi_tabungan_id);
+        $transaksi = TransaksiTabungan::find($id);
 
         if (!$transaksi) {
             throw new \Exception('Transaksi tidak ditemukan!');

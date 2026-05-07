@@ -133,16 +133,20 @@ class Import extends Component
                 'message' => "Proses selesai. Berhasil: {$importedCount}, Gagal: {$skippedCount}",
             ]);
 
+            $this->dispatchBrowserEvent('hide-modal', [
+                'modalId' => 'ModalImportTagihan'
+            ]);
+
+
             // Reset data setelah sukses
             $this->newJenisTagihan = [];
             $this->selectedKategoriTagihan = null;
             $this->emit('refreshJenisTagihans');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
 
-            // Informasikan error kepada pengguna
             $this->dispatchBrowserEvent('alertify-error', [
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+                'message' => $e->getMessage() ?? 'Terjadi kesalahan saat import'
             ]);
         }
     }

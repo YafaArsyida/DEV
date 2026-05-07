@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\SmartCanteen\ProdukKantin;
 
 use App\Models\Jenjang;
+use App\Models\SmartCanteen\Kantin;
 use App\Models\SmartCanteen\KategoriProdukSmartCanteen;
 use App\Models\SmartCanteen\ProdukSmartCanteen;
 use Livewire\Component;
@@ -10,8 +11,8 @@ use Livewire\Component;
 class Index extends Component
 {
     public $search = '';
-    public $selectedJenjang = null;
-    public $namaJenjang = '';
+    public $selectedKantin = null;
+    public $namaKantin = '';
     public $selectedKategori = null;
 
     public $activeTab = 'semua'; // default tab
@@ -24,6 +25,7 @@ class Index extends Component
     protected $listeners = [
         'refreshProduk' => '$refresh',
         'parameterUpdated' => 'updateParameters',
+
         'filterKategori' => 'setKategori',
     ];
 
@@ -32,20 +34,20 @@ class Index extends Component
         $this->selectedKategori = $kategoriId;
     }
 
-    public function updateParameters($jenjang)
+    public function updateParameters($kantin, $tahunAjar)
     {
-        $this->selectedJenjang = $jenjang;
+        $this->selectedKantin = $kantin;
 
-        $j = Jenjang::find($jenjang);
-        $this->namaJenjang = $j ? $j->nama_jenjang : 'Tidak Diketahui';
+        $j = Kantin::find($kantin);
+        $this->namaKantin = $j ? $j->nama_kantin : 'Tidak Diketahui';
     }
 
     public function render()
     {
         $query = ProdukSmartCanteen::query();
 
-        if ($this->selectedJenjang) {
-            $query->where('ms_jenjang_id', $this->selectedJenjang);
+        if ($this->selectedKantin) {
+            $query->where('ms_kantin_id', $this->selectedKantin);
         }
 
         if ($this->search) {
@@ -61,12 +63,10 @@ class Index extends Component
             // superadmin → tidak difilter (lihat semua)
         }
 
-        // ini ambil SEMUA produk sesuai jenjang + search
         $allProduk = $query->get();
-        // dd($allProduk->toArray());
 
         // ambil kategori
-        $kategori = KategoriProdukSmartCanteen::where('ms_jenjang_id', $this->selectedJenjang)->get();
+        $kategori = KategoriProdukSmartCanteen::where('ms_kantin_id', $this->selectedKantin)->get();
 
         return view('livewire.smart-canteen.produk-kantin.index', [
             'allProduk' => $allProduk,

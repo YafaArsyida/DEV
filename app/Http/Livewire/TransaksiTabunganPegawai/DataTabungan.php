@@ -20,30 +20,17 @@ class DataTabungan extends Component
     public $selectedJenjang = null;
 
     protected $listeners = [
-        'refreshTabungans',
+        'successTransaksiTabungan' => '$refresh',
         'pegawaiSelected'
     ];
-
-    public function refreshTabungans()
-    {
-        $this->emitSelf('$refresh');
-    }
 
     public function pegawaiSelected($ms_pegawai_id)
     {
         $pegawai = Pegawai::with('ms_jabatan', 'ms_educard', 'ms_transaksi_tabungan')
             ->findOrFail($ms_pegawai_id);
 
-        if (!$pegawai) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Pegawai tidak ditemukan.']);
-            return;
-        }
-
         $this->ms_pegawai_id = $pegawai->ms_pegawai_id;
         $this->selectedJenjang = $pegawai->ms_jenjang_id;
-
-        // Emit refresh agar data di render diperbaruip
-        $this->emitSelf('$refresh');
     }
 
     public function mount()
@@ -52,11 +39,26 @@ class DataTabungan extends Component
         $this->endDate   = now()->format('Y-m-d');
     }
 
+    public function updatedStartDate()
+    {
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Periode mulai diperbarui'
+        ]);
+    }
+
+    public function updatedEndDate()
+    {
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Periode selesai diperbarui'
+        ]);
+    }
+
     public function resetTanggal()
     {
         // $this->startDate = now()->format('Y-m-d');
         $this->startDate = now()->startOfMonth()->format('Y-m-d');
         $this->endDate   = now()->format('Y-m-d');
+
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
     }
 
@@ -170,74 +172,68 @@ class DataTabungan extends Component
         $this->emit('openNewTab', $url);
     }
 
-    private function baseQuery()
-    {
-        return TransaksiTabungan::query()
-            ->with('ms_pengguna')
-            ->where('user_id', $this->ms_pegawai_id);
-    }
-
     public function render()
     {
-        $saldoAwal = 0;
-        $totalSetoranSebelum = 0;
-        $totalPenarikanSebelum = 0;
+        $baseQuery = TransaksiTabungan::query()
+            ->where('user_id', $this->ms_pegawai_id)
+            ->where('user_type', 'pegawai');
 
-        if ($this->ms_pegawai_id && $this->startDate) {
+        // 🔥 WAJIB: default state
+        $summary = [
+            'saldoAwal' => 0,
+            'totalSetoranSebelum' => 0,
+            'totalPenarikanSebelum' => 0,
+        ];
 
-            $baseSebelum = $this->baseQuery();
+        if ($this->startDate && $this->ms_pegawai_id) {
+            $result = (clone $baseQuery)
+                ->where('tanggal', '<', $this->startDate)
+                ->selectRaw("
+                SUM(CASE WHEN jenis_transaksi = 'setoran' THEN nominal ELSE 0 END) as total_setoran,
+                SUM(CASE WHEN jenis_transaksi = 'penarikan' THEN nominal ELSE 0 END) as total_penarikan
+            ")
+                ->first();
 
-            $totalSetoranSebelum = (clone $baseSebelum)
-                ->whereDate('tanggal', '<', $this->startDate)
-                ->where('jenis_transaksi', 'setoran')
-                ->sum('nominal');
+            $setoran = $result->total_setoran ?? 0;
+            $penarikan = $result->total_penarikan ?? 0;
 
-            $totalPenarikanSebelum = (clone $baseSebelum)
-                ->whereDate('tanggal', '<', $this->startDate)
-                ->where('jenis_transaksi', 'penarikan')
-                ->sum('nominal');
-
-            $saldoAwal = $totalSetoranSebelum - $totalPenarikanSebelum;
+            $summary = [
+                'saldoAwal' => $setoran - $penarikan,
+                'totalSetoranSebelum' => $setoran,
+                'totalPenarikanSebelum' => $penarikan,
+            ];
         }
 
-        $saldo = $saldoAwal;
+        // 🔥 TRANSAKSI
+        $transaksiTabungan = collect();
 
-        $transaksiTabungan = $this->ms_pegawai_id
-            ? $this->baseQuery()
+        if ($this->ms_pegawai_id) {
+            $transaksiTabungan = (clone $baseQuery)
+                ->when($this->startDate && $this->endDate, fn($q) => $q->whereBetween('tanggal', [
+                    $this->startDate . ' 00:00:00',
+                    $this->endDate . ' 23:59:59'
+                ]))
+                ->orderBy('tanggal')    
+                ->orderBy('ms_transaksi_tabungan_id')
+                ->get();
 
-            ->when($this->startDate && $this->endDate, function ($q) {
+            // saldo berjalan
+            $saldo = $summary['saldoAwal'];
 
-                $startDate = Carbon::parse($this->startDate)->startOfDay();
-                $endDate   = Carbon::parse($this->endDate)->endOfDay();
-
-                $q->whereBetween('tanggal', [$startDate, $endDate]);
-            })
-
-            ->orderBy('tanggal', 'ASC')
-            ->orderBy('ms_transaksi_tabungan_id', 'ASC')
-
-            ->get()
-
-            ->map(function ($item) use (&$saldo) {
-
-                if ($item->jenis_transaksi === 'setoran') {
-                    $saldo += $item->nominal;
-                } else {
-                    $saldo -= $item->nominal;
-                }
+            $transaksiTabungan = $transaksiTabungan->map(function ($item) use (&$saldo) {
+                $saldo += $item->jenis_transaksi === 'setoran'
+                    ? $item->nominal
+                    : -$item->nominal;
 
                 $item->saldo = $saldo;
 
                 return $item;
-            })
-
-            : collect();
+            });
+        }
 
         return view('livewire.transaksi-tabungan-pegawai.data-tabungan', [
             'transaksiTabungan' => $transaksiTabungan,
-            'saldoAwal' => $saldoAwal,
-            'totalSetoranSebelum' => $totalSetoranSebelum,
-            'totalPenarikanSebelum' => $totalPenarikanSebelum,
+            ...$summary
         ]);
     }
 }

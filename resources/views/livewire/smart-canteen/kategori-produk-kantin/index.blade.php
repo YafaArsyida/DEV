@@ -13,7 +13,7 @@
                 class="btn btn-primary w-100"
                 data-bs-toggle="modal" 
                 data-bs-target="#ModalTambahKategori"
-                 wire:click="$emit('showCreateKategori', {{ $selectedJenjang ?? 'null' }})">
+                 wire:click="$emit('showCreateKategori', {{ $selectedKantin ?? 'null' }})">
             <i class="ri-add-fill me-1 align-bottom"></i> Kategori
         </button>
     </div>

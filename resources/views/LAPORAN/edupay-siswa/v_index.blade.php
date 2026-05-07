@@ -15,16 +15,16 @@
             <!--end col-->
         </div>
         <div class="row">
-            <div class="col-xxl-4 pe-1">
+            <div class="col-xxl-4">
                 @livewire('laporan-edu-pay-siswa.overview')   
-                @livewire('laporan-edu-pay-siswa.saldo')   
-                @livewire('laporan-edu-pay-siswa.export-saldo')   
+                <div class="sticky-side-div">
+                    @livewire('laporan-edu-pay-siswa.saldo')   
+                </div>
                 @livewire('laporan-edu-pay-siswa.withdraw')   
             </div>  
-            <div class="col-xxl-8 ps-0">
+            <div class="col-xxl-8">
                 @livewire('parameter.filter-laporan-edu-pay')   
                 @livewire('laporan-edu-pay-siswa.index')   
-                @livewire('laporan-edu-pay-siswa.export')   
             </div>  
         </div>
     </div>

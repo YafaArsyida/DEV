@@ -80,52 +80,58 @@
                             <td>{{ $loop->iteration }}.</td>
                             <td class="text-start">
                                 <span class="fw-medium">
-                                {{ $item->nama_jenis_tagihan_siswa }}
+                                    {{ $item->nama_jenis_tagihan_siswa }}
                                 </span>
                                 <p class="text-muted mb-0">{{ $item->deskripsi }}</p>
                             </td>
-                            <td>{{ $item->nama_kategori_tagihan_siswa() }}</td>
-                            {{-- <td class="{{ $item->cicilan_status == 'Aktif' ? 'text-success' : 'text-danger' }}"><i class="ri-{{ $item->cicilan_status == 'Aktif' ? 'checkbox' : 'close' }}-circle-line fs-17 align-middle"></i> {{ $item->cicilan_status }}</td> --}}
-                            <td>{{ $item->jumlah_tagihan_siswa() }} item</td>
+                            
                             <td>
-                                <span class="fs-14 fw-medium text-info">
-                                    RP{{ number_format($item->total_tagihan_siswa(), 0, ',', '.') }}
-                                </span>
-                            </td>
-                            <td>
-                                <span class="fs-14 fw-medium text-success">
-                                    RP{{ number_format($item->total_tagihan_siswa_dibayarkan(), 0, ',', '.') }}
-                                </span>
-                            </td>
-                            <td>
-                                <span class="fs-14 fw-medium text-danger">
-                                    RP{{ number_format($item->total_tagihan_siswa() - $item->total_tagihan_siswa_dibayarkan(), 0, ',', '.') }}
-                                </span>
-                            </td>
-                            <td class="fs-14 fw-medium text-start">
-                                @php
-                                    $estimasi = $item->total_tagihan_siswa();
-                                    $dibayarkan = $item->total_tagihan_siswa_dibayarkan();
-                                @endphp
-                                <span class="mb-0">
-                                    @if ($estimasi > 0)
-                                    {{ number_format(($dibayarkan / $estimasi) * 100, 2) }}% <i class="ri-bar-chart-fill text-success fs-16 align-middle ms-2"></i>
-                                @else
-                                    -
-                                @endif</span>
+                                {{ $item->ms_kategori_tagihan_siswa->nama_kategori_tagihan_siswa ?? '-' }}
                             </td>
                             
+                            <td>
+                                {{ $item->jumlah_item ?? 0 }} item
+                            </td>
+                            
+                            <td>
+                                <span class="fs-14 fw-medium text-info">
+                                    RP{{ number_format($item->total_tagihan ?? 0, 0, ',', '.') }}
+                                </span>
+                            </td>
+                            
+                            <td>
+                                <span class="fs-14 fw-medium text-success">
+                                    RP{{ number_format($item->total_bayar ?? 0, 0, ',', '.') }}
+                                </span>
+                            </td>
+                            
+                            <td>
+                                <span class="fs-14 fw-medium text-danger">
+                                    RP{{ number_format(($item->total_tagihan ?? 0) - ($item->total_bayar ?? 0), 0, ',', '.') }}
+                                </span>
+                            </td>
+                            
+                            <td class="fs-14 fw-medium text-start">
+                                @php
+                                $estimasi = $item->total_tagihan ?? 0;
+                                $dibayarkan = $item->total_bayar ?? 0;
+                                @endphp
+                            
+                                @if ($estimasi > 0)
+                                {{ number_format(($dibayarkan / $estimasi) * 100, 2) }}%
+                                <i class="ri-bar-chart-fill text-success fs-16 align-middle ms-2"></i>
+                                @else
+                                -
+                                @endif
+                            </td>
                             <td>
                                 <div class="hstack gap-2">
                                     {{-- Kelola Tagihan --}}
                                     <button class="btn btn-sm btn-primary d-inline-flex align-items-center" 
-                                            data-bs-toggle="modal" 
-                                            data-bs-target="#ModalKelolaTagihan"
-                                            wire:click.prevent="$emit('showTagihan', {
-                                                ms_jenis_tagihan_siswa_id: {{ $item->ms_jenis_tagihan_siswa_id }},
-                                                jenjang: {{ $item->ms_jenjang_id }},
-                                                tahunAjar: {{ $item->ms_tahun_ajar_id }}
-                                            })">
+                                            data-bs-toggle="offcanvas" data-bs-target="#offcanvasManage"
+                                            aria-controls="offcanvasManage"
+                                            title="Kelola Tagihan"
+                                            wire:click.prevent="$emit('manageTagihan', {{ $item->ms_jenis_tagihan_siswa_id }})">
                                         <i class="ri-settings-3-line align-bottom me-1"></i> Kelola
                                     </button>
                             
@@ -187,7 +193,7 @@
                         </tr>
                     </tfoot>
                 </table>
-                {{-- {{ $tagihans->links() }} --}}
+                {{ $tagihans->links() }}
             </div>
 
             @endif

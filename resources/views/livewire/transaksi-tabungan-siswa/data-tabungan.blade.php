@@ -3,7 +3,7 @@
     <div class="card-header border-0 pb-0">
         <div class="d-flex align-items-center flex-wrap gap-3">
             {{-- Judul --}}
-            <h4 class="card-title mb-0 flex-grow-1 fw-bold">Riwayat Transaksi Tabungan</h4>
+            <h5 class="card-title mb-0 flex-grow-1">Riwayat Transaksi Tabungan</h5>
     
             {{-- Tombol Export & Cetak --}}
             <div class="d-flex gap-2 flex-wrap">
@@ -42,7 +42,7 @@
                         <th class="text-start text-uppercase">aksi</th>
                     </tr>
                 </thead>
-                <tbody id="products-list">
+                <tbody>
                     <tr class="table-secondary fw-semibold">
                         <td colspan="5">
                             <i class="ri-wallet-3-line me-1"></i>

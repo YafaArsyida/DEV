@@ -2,27 +2,49 @@
 
 namespace App\Http\Livewire\Kelas;
 
-use App\Models\AktifitasPengguna;
-use App\Models\Jenjang as JenjangModel;
 use App\Models\Kelas as KelasModel;
-use App\Models\TahunAjar as TahunAjarModel;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
 use Livewire\Component;
+use Illuminate\Validation\ValidationException;
 
 class Edit extends Component
 {
-    public $nama_kelas, $ms_kelas_id, $ms_jenjang_id, $ms_tahun_ajar_id, $urutan, $deskripsi;
+    public $kelas;
 
-    protected $listeners = ['loadDataKelas'];
+    public $nama_kelas;
+    public $ms_kelas_id;
+    public $ms_jenjang_id;
+    public $ms_tahun_ajar_id;
+    public $urutan;
+    public $deskripsi;
+
+    protected $listeners = [
+        'loadDataKelas'
+    ];
 
     public function loadDataKelas($ms_kelas_id)
     {
-        $kelas = KelasModel::findOrFail($ms_kelas_id);
+        $this->resetValidation();
 
-        $this->ms_kelas_id = $kelas->ms_kelas_id;
-        $this->nama_kelas = $kelas->nama_kelas;
-        $this->urutan = $kelas->urutan;
-        $this->deskripsi = $kelas->deskripsi;
+        $this->kelas = KelasModel::findOrFail($ms_kelas_id);
+
+        if (!$this->kelas) {
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Data tidak ditemukan!'
+            ]);
+
+            return;
+        }
+
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Data dimuat'
+        ]);
+
+        $this->ms_kelas_id = $this->kelas->ms_kelas_id;
+        $this->nama_kelas = $this->kelas->nama_kelas;
+        $this->urutan = $this->kelas->urutan;
+        $this->deskripsi = $this->kelas->deskripsi;
     }
 
     public function rules()
@@ -48,18 +70,44 @@ class Edit extends Component
 
     public function updateKelas()
     {
-        $validatedData = $this->validate();
-        $kelas = KelasModel::where('ms_kelas_id', $this->ms_kelas_id)->firstOrFail();
+        DB::beginTransaction();
 
-        // Simpan data kelas sebelum diupdate untuk log aktivitas
-        $oldNamaKelas = $kelas->nama_kelas;
+        try {
+            $validatedData = $this->validate();
 
-        $kelas->update($validatedData);
+            $oldNamaKelas = $this->kelas->nama_kelas;
 
-        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Berhasil mengubah kelas!']);
-        $this->dispatchBrowserEvent('hide-edit-modal', ['modalId' => 'ModalEditKelas']);
-        $this->emit('refreshKelass');
-        $this->emit('refreshSiswas');
+            $this->kelas->update($validatedData);
+
+            DB::commit();
+
+            $this->dispatchBrowserEvent('alertify-success', [
+                'message' => "Berhasil mengubah kelas {$oldNamaKelas}"
+            ]);
+
+            $this->dispatchBrowserEvent('hide-modal', [
+                'modalId' => 'ModalEditKelas'
+            ]);
+
+            $this->emit('refreshKelass');
+        } catch (ValidationException $e) {
+            DB::rollBack();
+
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Gagal validasi, cek input!'
+            ]);
+
+            throw $e; // 🔥 WAJIB agar @error tampil
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            // report($e);
+
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => $e->getMessage() ?? 'Terjadi kesalahan sistem'
+            ]);
+        }
     }
 
     public function render()

@@ -57,7 +57,7 @@ class Pegawai extends Model
     }
 
 
-    public function saldo_tabungan()
+    public function ms_saldo_tabungan()
     {
         return $this->hasOne(SaldoTabungan::class, 'user_id', 'ms_pegawai_id')
             ->where('user_type', 'pegawai');
@@ -68,30 +68,30 @@ class Pegawai extends Model
         return $this->hasMany(TransaksiTabungan::class, 'user_id', 'ms_pegawai_id')
         ->where('user_type', 'pegawai');
     }
-    // public function total_kredit_tabungan()
-    // {
-    //     // Menghitung total nominal kredit (Setoran)
-    //     return $this->ms_transaksi_tabungan()
-    //         ->where('jenis_transaksi', 'setoran')
-    //         ->sum('nominal');
-    // }
+    public function total_kredit_tabungan()
+    {
+        // Menghitung total nominal kredit (Setoran)
+        return $this->ms_transaksi_tabungan()
+            ->where('jenis_transaksi', 'setoran')
+            ->sum('nominal');
+    }
 
-    // public function total_debit_tabungan()
-    // {
-    //     // Menghitung total nominal debit (Penarikan)
-    //     return $this->ms_transaksi_tabungan()
-    //         ->where('jenis_transaksi', 'penarikan')
-    //         ->sum('nominal');
-    // }
+    public function total_debit_tabungan()
+    {
+        // Menghitung total nominal debit (Penarikan)
+        return $this->ms_transaksi_tabungan()
+            ->where('jenis_transaksi', 'penarikan')
+            ->sum('nominal');
+    }
 
     /**
      * Total saldo terakhir untuk siswa ini
      */
-    // public function saldo_tabungan_pegawai()
-    // {
-    //     // Menghitung saldo berdasarkan total kredit dikurangi total debit
-    //     return $this->total_kredit_tabungan() - $this->total_debit_tabungan();
-    // }
+    public function saldo_tabungan_pegawai()
+    {
+        // Menghitung saldo berdasarkan total kredit dikurangi total debit
+        return $this->total_kredit_tabungan() - $this->total_debit_tabungan();
+    }
 
     /**
      * Relasi ke model EduCard
@@ -105,6 +105,11 @@ class Pegawai extends Model
     }
 
     // =============== EDUPAY ===============
+    public function ms_saldo_edupay()
+    {
+        return $this->hasOne(SaldoEduPay::class, 'user_id', 'ms_pegawai_id')
+            ->where('user_type', 'pegawai');
+    }
     public function ms_transaksi_edupay()
     {
         return $this->hasMany(TransaksiEduPay::class, 'user_id', 'ms_pegawai_id')

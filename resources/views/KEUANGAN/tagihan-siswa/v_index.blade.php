@@ -21,6 +21,8 @@
                 @livewire('tagihan-siswa.detail')   
                 @livewire('tagihan-siswa.edit')   
                 @livewire('tagihan-siswa.manage')   
+                @livewire('tagihan-siswa.delete')   
+                @livewire('transaksi-tagihan-siswa.edit')   
                 @livewire('transaksi-tagihan-siswa.delete')   
                 @livewire('transaksi-tagihan-siswa.histori')   
             </div>  

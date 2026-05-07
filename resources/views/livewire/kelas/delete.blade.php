@@ -1,6 +1,5 @@
 <div>
     {{-- Knowing others is intelligence; knowing yourself is true wisdom. --}}
-    <!-- Modal -->
     <div class="modal fade zoomIn" id="ModalDeleteKelas" tabindex="-1" aria-labelledby="deleteRecordLabel" aria-hidden="true" wire:ignore.self>
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">

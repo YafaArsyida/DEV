@@ -10,7 +10,7 @@
                     </div>
                     <div class="flex-grow-1">
                         <p class="text-muted mb-1">Total Pendapatan :</p>
-                        <h5 class="mb-0">RP{{ number_format($totalPendapatan, 0, ',', '.') }}</h5>
+                        <h5 class="mb-0">RP{{ number_format($totalPendapatanLainnya, 0, ',', '.') }}</h5>
                     </div>
                 </div>
             </div>
@@ -23,7 +23,7 @@
             <label for="kode_rekening" class="form-label">Jenis Transaksi Pendapatan</label>
             <select wire:model="kode_rekening" style="cursor: pointer" class="form-select" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Transaksi">
                 <option value="">Pilih Transaksi</option>
-                @foreach ($select_pendapatan as $item)    
+                @foreach ($select_transaksi as $item)    
                 <option value="{{ $item->kode_rekening }}">{{ $item->nama_rekening }}</option>
                 @endforeach
             </select>

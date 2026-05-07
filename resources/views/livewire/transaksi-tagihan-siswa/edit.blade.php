@@ -1,5 +1,5 @@
 {{-- The whole world belongs to you. --}}
-<div wire:ignore.self class="modal fade" id="editHistoriTagihan" tabindex="-1" aria-labelledby="editHistoriTagihanLabel"
+<div wire:ignore.self class="modal fade" id="loadHistoriTransaksi" tabindex="-1" aria-labelledby="editHistoriTagihanLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">

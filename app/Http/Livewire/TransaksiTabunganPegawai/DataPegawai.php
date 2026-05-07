@@ -4,6 +4,7 @@ namespace App\Http\Livewire\TransaksiTabunganPegawai;
 
 use App\Models\AkuntansiJurnalDetail;
 use App\Models\Pegawai;
+use App\Models\SaldoTabungan;
 use App\Models\TransaksiTabungan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -21,9 +22,7 @@ class DataPegawai extends Component
     public $telepon_pegawai = null;
     public $alamat_pegawai = null;
 
-    public $saldo_tabungan_pegawai;
-    public $total_kredit_tabungan;
-    public $total_debit_tabungan;
+    public $saldoTabunganPegawai;
 
     // save kredit
     public $nominal_kredit;
@@ -35,7 +34,9 @@ class DataPegawai extends Component
 
     protected $listeners = [
         'parameterUpdated' => 'updateParameters',
+
         'pegawaiSelected',
+        
         'refreshTabungans'
     ];
 
@@ -45,11 +46,28 @@ class DataPegawai extends Component
         $this->ms_tahun_ajar_id = $tahunAjar;
     }
 
+    protected function fillPegawaiData($pegawai): void
+    {
+        $this->ms_pegawai_id = $pegawai->ms_pegawai_id;
+        $this->nama_pegawai = $pegawai->nama_pegawai;
+        $this->educard_pegawai = $pegawai->ms_educard->kode_kartu ?? null;
+        $this->jabatan = $pegawai->ms_jabatan->nama_jabatan ?? null;
+        $this->telepon_pegawai = $pegawai->telepon ?? null;
+        $this->alamat_pegawai = $pegawai->alamat ?? null;
+    }
+
     public function refreshTabungans()
     {
         if ($this->ms_pegawai_id) {
-            $this->pegawaiSelected($this->ms_pegawai_id);
+            $this->updateSaldoTabungan();
         }
+    }
+
+    protected function updateSaldoTabungan()
+    {
+        $saldo = SaldoTabungan::getSaldo($this->ms_pegawai_id, 'pegawai');
+
+        $this->saldoTabunganPegawai = $saldo->saldo_tabungan;
     }
 
     public function pegawaiSelected($ms_pegawai_id)
@@ -62,17 +80,131 @@ class DataPegawai extends Component
             return;
         }
 
-        $this->ms_pegawai_id = $pegawai->ms_pegawai_id;
-        $this->nama_pegawai = $pegawai->nama_pegawai;
-        $this->educard_pegawai = $pegawai->ms_educard->kode_kartu ?? null;
-        $this->jabatan = $pegawai->ms_jabatan->nama_jabatan ?? null;
-        $this->telepon_pegawai = $pegawai->telepon;
-        $this->alamat_pegawai = $pegawai->alamat;
+        $this->fillPegawaiData($pegawai);
 
-        // Hitung saldo dan transaksi edupay pegawai
-        $this->saldo_tabungan_pegawai     = $pegawai->saldo_tabungan_pegawai();
-        $this->total_kredit_tabungan  = $pegawai->total_kredit_tabungan();
-        $this->total_debit_tabungan = $pegawai->total_debit_tabungan();
+        // 🔥 ambil saldo sekali
+        $this->updateSaldoTabungan();
+    }
+
+    protected function processKredit($saldo)
+    {
+        $ms_pengguna_id = Auth::id();
+
+        $kode_rekening_kas = 11001;
+        $rekening_tabungan_pegawai = 22004;
+
+        $deskripsiJurnal = "Setoran Tunai Tabungan Rp {$this->nominal_kredit} pegawai {$this->nama_pegawai}";
+
+        // Debit (Kas)
+        $jurnalDebitId = AkuntansiJurnalDetail::create([
+            'kode_rekening' => $kode_rekening_kas,
+            'posisi' => 'debit',
+            'nominal' => $this->nominal_kredit,
+            'tanggal_transaksi' => now(),
+            'ms_pengguna_id' => $ms_pengguna_id,
+            'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
+            'ms_jenjang_id' => $this->ms_jenjang_id,
+            'is_canceled' => 'active',
+            'deskripsi' => $deskripsiJurnal
+        ])->akuntansi_jurnal_detail_id;
+
+        // Kredit (Tabungan)
+        $jurnalKreditId = AkuntansiJurnalDetail::create([
+            'kode_rekening' => $rekening_tabungan_pegawai,
+            'posisi' => 'kredit',
+            'nominal' => $this->nominal_kredit,
+            'tanggal_transaksi' => now(),
+            'ms_pengguna_id' => $ms_pengguna_id,
+            'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
+            'ms_jenjang_id' => $this->ms_jenjang_id,
+            'is_canceled' => 'active',
+            'deskripsi' => $deskripsiJurnal
+        ])->akuntansi_jurnal_detail_id;
+
+        // Simpan transaksi
+        TransaksiTabungan::create([
+            'user_type' => 'pegawai',
+            'user_id' => $this->ms_pegawai_id,
+            'ms_pengguna_id' => $ms_pengguna_id,
+            'jenis_transaksi' => 'setoran',
+            'nominal' => $this->nominal_kredit,
+            'tanggal' => now(),
+            'deskripsi' => $this->deskripsi_kredit,
+            'akuntansi_jurnal_detail_debit_id' => $jurnalDebitId,
+            'akuntansi_jurnal_detail_kredit_id' => $jurnalKreditId,
+        ]);
+
+        // 🔥 update saldo (pakai object yg sama)
+        $saldo->increment('saldo_tabungan', $this->nominal_kredit);
+    }
+
+    protected function processDebit($saldo)
+    {
+        $ms_pengguna_id = Auth::id();
+
+        $kode_rekening_kas = 11001;
+        $rekening_tabungan_pegawai = 22004;
+
+        $deskripsiJurnal = "Penarikan Tunai Tabungan Rp {$this->nominal_debit} pegawai {$this->nama_pegawai}";
+
+        $jurnalDebitId = AkuntansiJurnalDetail::create([
+            'kode_rekening' => $rekening_tabungan_pegawai,
+            'posisi' => 'debit',
+            'nominal' => $this->nominal_debit,
+            'tanggal_transaksi' => now(),
+            'ms_pengguna_id' => $ms_pengguna_id,
+            'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
+            'ms_jenjang_id' => $this->ms_jenjang_id,
+            'is_canceled' => 'active',
+            'deskripsi' => $deskripsiJurnal,
+        ])->akuntansi_jurnal_detail_id;
+
+        $jurnalKreditId = AkuntansiJurnalDetail::create([
+            'kode_rekening' => $kode_rekening_kas,
+            'posisi' => 'kredit',
+            'nominal' => $this->nominal_debit,
+            'tanggal_transaksi' => now(),
+            'ms_pengguna_id' => $ms_pengguna_id,
+            'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
+            'ms_jenjang_id' => $this->ms_jenjang_id,
+            'is_canceled' => 'active',
+            'deskripsi' => $deskripsiJurnal,
+        ])->akuntansi_jurnal_detail_id;
+
+        TransaksiTabungan::create([
+            'user_type' => 'pegawai',
+            'user_id' => $this->ms_pegawai_id,
+            'ms_pengguna_id' => $ms_pengguna_id,
+            'jenis_transaksi' => 'penarikan',
+            'nominal' => $this->nominal_debit,
+            'tanggal' => now(),
+            'deskripsi' => $this->deskripsi_debit,
+            'akuntansi_jurnal_detail_debit_id' => $jurnalDebitId,
+            'akuntansi_jurnal_detail_kredit_id' => $jurnalKreditId,
+        ]);
+
+        // 🔥 penting: pakai object yang sama (anti race condition ringan)
+        $saldo->decrement('saldo_tabungan', $this->nominal_debit);
+    }
+
+    protected function afterSuccess()
+    {
+        $this->reset([
+            'nominal_kredit',
+            'deskripsi_kredit',
+            'nominal_debit',
+            'deskripsi_debit'
+        ]);
+
+        // cukup update saldo saja
+        $this->updateSaldoTabungan();
+
+        // kalau ada table transaksi → emit khusus
+        $this->emit('successTransaksiTabungan');
+
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Transaksi berhasil disimpan.'
+        ]);
     }
 
     public function simpanKredit()
@@ -80,90 +212,38 @@ class DataPegawai extends Component
         DB::beginTransaction();
 
         try {
-            // Pastikan pegawai dipilih
-            if (!$this->ms_pegawai_id) {
-                $this->dispatchBrowserEvent('alertify-error', ['message' => 'Silakan pilih pegawai terlebih dahulu.']);
-                return;
-            }
-
-            // Validasi input untuk kredit
-            $validatedData = $this->validate([
+            $this->validate([
                 'nominal_kredit' => 'required|numeric|min:1000',
                 'deskripsi_kredit' => 'nullable|string|max:255',
             ], [
                 'nominal_kredit.required' => 'Nominal kredit harus diisi.',
                 'nominal_kredit.numeric' => 'Nominal kredit harus berupa angka.',
-                'nominal_kredit.min' => 'Nominal kredit harus minimal 1.',
+                'nominal_kredit.min' => 'Nominal kredit minimal 1000.',
                 'deskripsi_kredit.max' => 'Deskripsi tidak boleh lebih dari 255 karakter.',
             ]);
 
-            $ms_pengguna_id = Auth::id();
+            if (!$this->ms_pegawai_id) {
+                throw new \Exception('Pegawai tidak ditemukan!');
+            }
+            $saldo = SaldoTabungan::where('user_id', $this->ms_pegawai_id)
+                ->lockForUpdate()
+                ->first();
 
-            // simpan jurnal
-            $kode_rekening_kas = 11001;
-            $kode_rekening_tabungan = 22004;
+            if (!$saldo) {
+                throw new \Exception('Data saldo tidak ditemukan!');
+            }
 
-            $deskripsiJurnal = "Setoran Tunai Tabungan Rp {$this->nominal_kredit} pegawai {$this->nama_pegawai}";
-
-            // Data untuk jurnal debit
-            $jurnalDebit = [
-                'kode_rekening' => $kode_rekening_kas,
-                'posisi' => 'debit',
-                'nominal' => $this->nominal_kredit,
-                'tanggal_transaksi' => now(),
-                'ms_pengguna_id' => auth()->id(),
-                'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
-                'ms_jenjang_id' => $this->ms_jenjang_id,
-                'is_canceled' => 'active',
-                'deskripsi' => $deskripsiJurnal
-            ];
-            $jurnalDebitId = AkuntansiJurnalDetail::create($jurnalDebit)->akuntansi_jurnal_detail_id;
-
-            // Data untuk jurnal kredit
-            $jurnalKredit = [
-                'kode_rekening' => $kode_rekening_tabungan,
-                'posisi' => 'kredit',
-                'nominal' => $this->nominal_kredit,
-                'tanggal_transaksi' => now(),
-                'ms_pengguna_id' => auth()->id(),
-                'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
-                'ms_jenjang_id' => $this->ms_jenjang_id,
-                'is_canceled' => 'active',
-                'deskripsi' => $deskripsiJurnal
-            ];
-            $jurnalKreditId = AkuntansiJurnalDetail::create($jurnalKredit)->akuntansi_jurnal_detail_id;
-
-            // Simpan transaksi kredit
-            TransaksiTabungan::create([
-                'user_type' => 'pegawai',
-                'user_id' => $this->ms_pegawai_id,
-                'ms_pengguna_id' => $ms_pengguna_id,
-                'jenis_transaksi' => 'setoran', // Jenis transaksi untuk kredit
-                'nominal' => $this->nominal_kredit,
-                'tanggal' => now(),
-                'deskripsi' => $this->deskripsi_kredit,
-                'akuntansi_jurnal_detail_debit_id' => $jurnalDebitId,
-                'akuntansi_jurnal_detail_kredit_id' => $jurnalKreditId,
-            ]);
+            $this->processKredit($saldo);
 
             DB::commit();
-            // Reset input
-            $this->reset(['nominal_kredit', 'deskripsi_kredit']);
 
-            // Refresh saldo 
-            $pegawai = Pegawai::find($this->ms_pegawai_id);
-            $this->saldo_tabungan_pegawai     = $pegawai->saldo_tabungan_pegawai();
-            $this->total_kredit_tabungan  = $pegawai->total_kredit_tabungan();
-            $this->total_debit_tabungan = $pegawai->total_debit_tabungan();
-
-            // Notifikasi sukses
-            $this->emit('refreshTabungans');
-            $this->emit('refreshSaldo');
-            $this->dispatchBrowserEvent('alertify-success', ['message' => 'Transaksi kredit berhasil disimpan.']);
-        } catch (\Exception $e) {
+            $this->afterSuccess();
+        } catch (\Throwable $e) {
             DB::rollBack();
-            // Notifikasi error
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => $e->getMessage() ?? 'Terjadi kesalahan sistem'
+            ]);
         }
     }
 
@@ -172,102 +252,45 @@ class DataPegawai extends Component
         DB::beginTransaction();
 
         try {
-            // Pastikan pegawai dipilih
-            if (!$this->ms_pegawai_id) {
-                $this->dispatchBrowserEvent('alertify-error', ['message' => 'Silakan pilih pegawai terlebih dahulu.']);
-                return;
-            }
-
-            // Validasi input untuk debit
-            $validatedData = $this->validate([
+            $this->validate([
                 'nominal_debit' => 'required|numeric|min:1000',
                 'deskripsi_debit' => 'nullable|string|max:255',
             ], [
                 'nominal_debit.required' => 'Nominal debit harus diisi.',
                 'nominal_debit.numeric' => 'Nominal debit harus berupa angka.',
-                'nominal_debit.min' => 'Nominal debit harus minimal 1000.',
+                'nominal_debit.min' => 'Nominal debit minimal 1000.',
                 'deskripsi_debit.max' => 'Deskripsi tidak boleh lebih dari 255 karakter.',
             ]);
 
-            // Periksa saldo pegawai saat ini
-            $pegawai = Pegawai::find($this->ms_pegawai_id);
-            $saldo_sekarang = $pegawai->saldo_tabungan_pegawai(); // Saldo dihitung secara dinamis
-
-            // Periksa apakah saldo cukup
-            if ($this->nominal_debit > $saldo_sekarang) {
-                $this->dispatchBrowserEvent('alertify-error', ['message' => 'Saldo tidak mencukupi untuk transaksi ini.']);
-                return;
+            if (!$this->ms_pegawai_id) {
+                throw new \Exception('Pegawai tidak ditemukan!');
             }
 
-            $ms_pengguna_id = Auth::id();
+            $saldo = SaldoTabungan::where('user_id', $this->ms_pegawai_id)
+                ->lockForUpdate()
+                ->first();
 
-            // simpan jurnal
-            $kode_rekening_kas = 11001;
-            $kode_rekening_tabungan = 22004;
-            $deskripsiJurnal = "Penarikan Tunai Tabungan Rp {$this->nominal_debit} pegawai {$this->nama_pegawai}";
+            if (!$saldo) {
+                throw new \Exception('Data saldo tidak ditemukan!');
+            }
 
-            // Data untuk jurnal debit
-            $jurnalDebit = [
-                'kode_rekening' => $kode_rekening_tabungan,
-                'posisi' => 'debit',
-                'nominal' => $this->nominal_debit,
-                'tanggal_transaksi' => now(),
-                'ms_pengguna_id' => $ms_pengguna_id,
-                'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
-                'ms_jenjang_id' => $this->ms_jenjang_id,
-                'is_canceled' => 'active',
-                'deskripsi' => $deskripsiJurnal,
-            ];
-            $jurnalDebitId = AkuntansiJurnalDetail::create($jurnalDebit)->akuntansi_jurnal_detail_id;
+            if ($this->nominal_debit > $saldo->saldo_tabungan) {
+                throw new \Exception('Saldo tidak cukup');
+            }
 
-            // Data jurnal kredit
-            $jurnalKredit = [
-                'kode_rekening' => $kode_rekening_kas,
-                'posisi' => 'kredit',
-                'nominal' => $this->nominal_debit,
-                'tanggal_transaksi' => now(),
-                'ms_pengguna_id' => $ms_pengguna_id,
-                'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
-                'ms_jenjang_id' => $this->ms_jenjang_id,
-                'is_canceled' => 'active',
-                'deskripsi' => $deskripsiJurnal,
-            ];
-            $jurnalKreditId = AkuntansiJurnalDetail::create($jurnalKredit)->akuntansi_jurnal_detail_id;
-
-            // Simpan transaksi debit
-            TransaksiTabungan::create([
-                'user_type' => 'pegawai',
-                'user_id' => $this->ms_pegawai_id,
-                'ms_pengguna_id' => $ms_pengguna_id,
-                'jenis_transaksi' => 'penarikan', // Jenis transaksi untuk debit
-                'nominal' => $this->nominal_debit,
-                'tanggal' => now(),
-                'deskripsi' => $this->deskripsi_debit,
-                'akuntansi_jurnal_detail_debit_id' => $jurnalDebitId,
-                'akuntansi_jurnal_detail_kredit_id' => $jurnalKreditId,
-            ]);
+            $this->processDebit($saldo);
 
             DB::commit();
 
-            // Reset input
-            $this->reset(['nominal_debit', 'deskripsi_debit']);
-
-            // Refresh saldo 
-            $this->saldo_tabungan_pegawai     = $pegawai->saldo_tabungan_pegawai();
-            $this->total_kredit_tabungan  = $pegawai->total_kredit_tabungan();
-            $this->total_debit_tabungan = $pegawai->total_debit_tabungan();
-
-            // Notifikasi sukses
-            $this->emit('refreshTabungans');
-            $this->emit('refreshSaldo');
-            $this->dispatchBrowserEvent('alertify-success', ['message' => 'Transaksi debit berhasil disimpan.']);
-        } catch (\Exception $e) {
+            $this->afterSuccess();
+        } catch (\Throwable $e) {
             DB::rollBack();
-            // Notifikasi error
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => $e->getMessage() ?? 'Terjadi kesalahan sistem'
+            ]);
         }
     }
-
     public function render()
     {
         return view('livewire.transaksi-tabungan-pegawai.data-pegawai');

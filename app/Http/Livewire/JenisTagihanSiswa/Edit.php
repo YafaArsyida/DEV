@@ -6,10 +6,20 @@ use App\Models\JenisTagihanSiswa;
 use App\Models\KategoriTagihanSiswa;
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class Edit extends Component
 {
-    public $ms_tahun_ajar_id, $ms_jenjang_id, $ms_jenis_tagihan_siswa_id, $ms_kategori_tagihan_siswa_id, $nama_jenis_tagihan_siswa, $tanggal_jatuh_tempo, $deskripsi;
+    // Relasi
+    public $ms_tahun_ajar_id;
+    public $ms_jenjang_id;
+    public $ms_kategori_tagihan_siswa_id;
+    public $ms_jenis_tagihan_siswa_id;
+
+    // Form input
+    public $nama_jenis_tagihan_siswa;
+    public $tanggal_jatuh_tempo;
+    public $deskripsi;
 
     protected $listeners = [
         'loadDataJenisTagihan',
@@ -17,7 +27,13 @@ class Edit extends Component
 
     public function loadDataJenisTagihan($ms_jenis_tagihan_siswa_id)
     {
+        $this->resetValidation();
+
         $jenis = JenisTagihanSiswa::findOrFail($ms_jenis_tagihan_siswa_id);
+
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Data dimuat'
+        ]);
 
         $this->ms_tahun_ajar_id = $jenis->ms_tahun_ajar_id; // Update ms_tahun_ajar_id
         $this->ms_jenjang_id = $jenis->ms_jenjang_id; // Update ms_jenjang_id
@@ -51,29 +67,49 @@ class Edit extends Component
 
     public function updateJenis()
     {
-        $validatedData = $this->validate();
+        DB::beginTransaction();
 
         try {
-            // Ambil data jenis tagihan berdasarkan ID dan update
+            $validatedData = $this->validate();
+
             $jenisTagihan = JenisTagihanSiswa::findOrFail($this->ms_jenis_tagihan_siswa_id);
+
             $jenisTagihan->update([
-                'ms_kategori_tagihan_siswa_id' => $this->ms_kategori_tagihan_siswa_id,
-                'nama_jenis_tagihan_siswa' => $this->nama_jenis_tagihan_siswa,
-                'tanggal_jatuh_tempo' => $this->tanggal_jatuh_tempo,
-                'deskripsi' => $this->deskripsi
+                'ms_kategori_tagihan_siswa_id' => $validatedData['ms_kategori_tagihan_siswa_id'],
+                'nama_jenis_tagihan_siswa' => $validatedData['nama_jenis_tagihan_siswa'],
+                'tanggal_jatuh_tempo' => $validatedData['tanggal_jatuh_tempo'],
+                'deskripsi' => $validatedData['deskripsi']
             ]);
 
             DB::commit();
 
-            $this->dispatchBrowserEvent('alertify-success', ['message' => 'Berhasil mengubah jenis tagihan!']);
-            $this->dispatchBrowserEvent('hide-edit-modal', ['modalId' => 'ModalEditJenisTagihan']);
+            $this->dispatchBrowserEvent('alertify-success', [
+                'message' => 'Berhasil mengubah jenis tagihan!'
+            ]);
+
+            $this->dispatchBrowserEvent('hide-edit-modal', [
+                'modalId' => 'ModalEditJenisTagihan'
+            ]);
+
             $this->emit('refreshJenisTagihans');
-        } catch (\Exception $e) {
+        } catch (ValidationException $e) {
             DB::rollBack();
 
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Gagal validasi, cek input!'
+            ]);
+
+            throw $e; // 🔥 WAJIB agar @error tampil
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => $e->getMessage() ?? 'Terjadi kesalahan sistem'
+            ]);
         }
     }
+
     public function render()
     {
         // Data untuk dropdown Kelas (hanya jika Jenjang dan Tahun Ajar dipilih)

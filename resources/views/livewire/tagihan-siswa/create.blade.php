@@ -70,8 +70,7 @@
                                                                 </div>
                                                             </th>
                                                             <th class="text-uppercase">Siswa</th>
-                                                            <th class="text-uppercase">Tagihan</th>
-                                                            <th class="text-uppercase text-center">Nominal</th>
+                                                            <th class="text-uppercase">Kelas</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -82,17 +81,11 @@
                                                                         <input class="form-check-input" type="checkbox" wire:key="siswa-{{ $item->ms_penempatan_siswa_id }}" wire:model.defer="siswaSelected" value="{{ $item->ms_penempatan_siswa_id }}">
                                                                     </div>
                                                                 </th>
-                                                                <td class="text-start">
-                                                                    <span class="fw-medium">
-                                                                        {{ $item->ms_siswa->nama_siswa }}
-                                                                    </span>
-                                                                    <p class="text-muted mb-0">{{ $item->ms_kelas->nama_kelas }}</p>
+                                                                <td>
+                                                                    {{ $item->ms_siswa->nama_siswa }}
                                                                 </td>
-                                                                <td>{{ $item->jumlah_jenis_tagihan_siswa() }} item</td>
-                                                                <td class="text-center">
-                                                                    <span class="fw-medium text-success">
-                                                                        RP{{ number_format($item->total_tagihan_siswa(), 0, ',', '.') }}
-                                                                    </span>
+                                                                <td>
+                                                                    {{ $item->ms_kelas->nama_kelas }}
                                                                 </td>
                                                             </tr>
                                                         @empty
@@ -112,7 +105,7 @@
                                                     </tbody>
                                                 </table>
                                                 <!-- Pagination -->
-                                                {{ $siswas->links() }}
+                                                {{-- {{ $siswas->links() }} --}}
                                             </div>
                                         @endif
                                     </div>
@@ -198,7 +191,7 @@
                                                             </div>
                                                         </th>
                                                         <td>{{ $item->nama_jenis_tagihan_siswa }}</td>
-                                                        <td>{{ $item->nama_kategori_tagihan_siswa() }}</td>
+                                                        <td>{{ $item->ms_kategori_tagihan_siswa->nama_kategori_tagihan_siswa }}</td>
                                                         <td>
                                                             <div class="input-group input-group-sm">
                                                                 <span class="input-group-text">RP</span>
@@ -224,7 +217,7 @@
                                                     @endforelse
                                                 </tbody>
                                             </table>
-                                            {{ $jenis_tagihans->links() }}
+                                            {{-- {{ $jenis_tagihans->links() }} --}}
                                         </div>
                                         @endif
                                     </div>

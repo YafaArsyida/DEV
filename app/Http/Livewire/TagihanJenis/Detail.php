@@ -6,6 +6,8 @@ use Livewire\Component;
 use Livewire\WithPagination;
 
 use App\Models\Kelas;
+use App\Models\PenempatanSiswa;
+use App\Models\Siswa;
 use App\Models\TagihanSiswa;
 
 class Detail extends Component
@@ -55,40 +57,48 @@ class Detail extends Component
                 ->get();
         }
 
-        // Query untuk mendapatkan tagihan berdasarkan jenis tagihan dengan JOIN
-        $query = TagihanSiswa::select('ms_tagihan_siswa.*', 'ms_siswa.nama_siswa', 'ms_kelas.nama_kelas', 'ms_jenis_tagihan_siswa.nama_jenis_tagihan_siswa', 'ms_kategori_tagihan_siswa.nama_kategori_tagihan_siswa')
-            ->join('ms_penempatan_siswa', 'ms_tagihan_siswa.ms_penempatan_siswa_id', '=', 'ms_penempatan_siswa.ms_penempatan_siswa_id')
-            ->join('ms_siswa', 'ms_penempatan_siswa.ms_siswa_id', '=', 'ms_siswa.ms_siswa_id')
-            ->join('ms_kelas', 'ms_penempatan_siswa.ms_kelas_id', '=', 'ms_kelas.ms_kelas_id')
-            ->join('ms_jenis_tagihan_siswa', 'ms_tagihan_siswa.ms_jenis_tagihan_siswa_id', '=', 'ms_jenis_tagihan_siswa.ms_jenis_tagihan_siswa_id')
-            ->join('ms_kategori_tagihan_siswa', 'ms_jenis_tagihan_siswa.ms_kategori_tagihan_siswa_id', '=', 'ms_kategori_tagihan_siswa.ms_kategori_tagihan_siswa_id')
-            ->where('ms_tagihan_siswa.ms_jenis_tagihan_siswa_id', $this->ms_jenis_tagihan_siswa_id);
+        // QUERY UTAMA
+        $query = TagihanSiswa::query()
+            ->with([
+                'ms_jenis_tagihan_siswa.ms_kategori_tagihan_siswa',
+                'ms_penempatan_siswa.ms_siswa',
+                'ms_penempatan_siswa.ms_kelas'
+            ])
+            ->select('ms_tagihan_siswa.*') // 🔥 penting biar tidak bentrok
+            ->join('ms_penempatan_siswa', 'ms_penempatan_siswa.ms_penempatan_siswa_id', '=', 'ms_tagihan_siswa.ms_penempatan_siswa_id')
+            ->join('ms_siswa', 'ms_siswa.ms_siswa_id', '=', 'ms_penempatan_siswa.ms_siswa_id')
+            ->join('ms_kelas', 'ms_kelas.ms_kelas_id', '=', 'ms_penempatan_siswa.ms_kelas_id')
+            ->where('ms_tagihan_siswa.ms_jenis_tagihan_siswa_id', $this->ms_jenis_tagihan_siswa_id)
+            ->withSum('dt_transaksi_tagihan_siswa as total_bayar', 'jumlah_bayar');
 
-        // Filter kelas jika dipilih
+        // FILTER tetap pakai relation (clean)
         if ($this->selectedKelas) {
             $query->where('ms_kelas.ms_kelas_id', $this->selectedKelas);
         }
 
-        // Filter pencarian siswa
         if ($this->search) {
             $query->where('ms_siswa.nama_siswa', 'like', '%' . $this->search . '%');
         }
 
-        // Mengambil tagihan yang sudah difilter
-        $tagihans = $query->orderBy('ms_kelas.ms_kelas_id', 'ASC')
-            ->orderBy('ms_siswa.nama_siswa', 'ASC')
-            ->paginate(1000);
+        // ORDER BY jadi simple & cepat
+        $tagihans = $query
+            ->orderBy('ms_kelas.nama_kelas')
+            ->orderBy('ms_siswa.nama_siswa')
+            // ->paginate(100);
+            ->get();
 
+        // TOTAL
         $totalEstimasi = $tagihans->sum('jumlah_tagihan_siswa');
-        $totalDibayarkan = $tagihans->sum(fn($item) => $item->jumlah_sudah_dibayar());
+        $totalDibayarkan = $tagihans->sum(fn($t) => $t->total_bayar ?? 0);
         $totalKekurangan = $totalEstimasi - $totalDibayarkan;
 
-        return view('livewire.tagihan-jenis.detail', [
-            'select_kelas' => $select_kelas,
-            'tagihans' => $tagihans,
-            'totalEstimasi' => $totalEstimasi,
-            'totalDibayarkan' => $totalDibayarkan,
-            'totalKekurangan' => $totalKekurangan,
-        ]);
+        // RETURN
+        return view('livewire.tagihan-jenis.detail', compact(
+            'select_kelas',
+            'tagihans',
+            'totalEstimasi',
+            'totalDibayarkan',
+            'totalKekurangan'
+        ));
     }
 }

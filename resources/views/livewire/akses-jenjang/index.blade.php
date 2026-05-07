@@ -4,13 +4,8 @@
             <h5 class="card-title mb-0 flex-grow-1">Petugas Administrasi</h5>
             <div class="flex-shrink-0">
                 <div class="d-flex gap-2 flex-wrap">
-                    <button 
-                        class="btn btn-primary"
-                        data-bs-toggle="modal" 
-                        data-bs-target="#ModalAddPengguna" 
-                        data-bs-trigger="hover" 
-                        data-bs-placement="top" 
-                        title="Petugas Baru">
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ModalAddPengguna" data-bs-trigger="hover"
+                        data-bs-placement="top" title="Petugas Baru">
                         <i class="ri-group-line"></i> Petugas Baru
                     </button>
                 </div>

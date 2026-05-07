@@ -1,5 +1,5 @@
 {{-- The best athlete wants his opponent at his best. --}}
-<div class="card mb-1">
+<div class="card">
     <div class="card-header border-0 align-items-center d-flex">
         <h5 class="card-title mb-0 flex-grow-1">Overview</h5>
         <div>

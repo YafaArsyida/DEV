@@ -7,7 +7,6 @@ use App\Models\KuitansiTransaksiTabungan;
 use App\Models\PenempatanSiswa;
 use App\Models\TransaksiTabungan;
 use App\Models\WhatsAppTransaksiTabungan;
-use Carbon\Carbon;
 use Livewire\Component;
 
 class DataTabungan extends Component
@@ -180,7 +179,8 @@ class DataTabungan extends Component
     {
         $baseQuery = TransaksiTabungan::query()
             ->with('ms_pengguna')
-            ->where('user_id', $this->ms_siswa_id);
+            ->where('user_id', $this->ms_siswa_id)
+            ->where('user_type', 'siswa');
 
         // 🔥 WAJIB: default state
         $summary = [
@@ -213,11 +213,10 @@ class DataTabungan extends Component
 
         if ($this->ms_siswa_id) {
             $transaksiTabungan = (clone $baseQuery)
-                ->when(
-                    $this->startDate && $this->endDate,
-                    fn($q) =>
-                    $q->whereBetween('tanggal', [$this->startDate, $this->endDate])
-                )
+                ->when($this->startDate && $this->endDate, fn($q) => $q->whereBetween('tanggal', [
+                    $this->startDate . ' 00:00:00',
+                    $this->endDate . ' 23:59:59'
+                ]))
                 ->orderBy('tanggal')
                 ->orderBy('ms_transaksi_tabungan_id')
                 ->get();

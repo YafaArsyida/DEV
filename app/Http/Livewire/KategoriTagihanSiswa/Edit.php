@@ -3,14 +3,19 @@
 namespace App\Http\Livewire\KategoriTagihanSiswa;
 
 use App\Models\KategoriTagihanSiswa;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
+use Illuminate\Validation\ValidationException;
 
 class Edit extends Component
 {
-    public $selectedJenjang = null;
-    public $selectedTahunAjar = null;
+    // Relasi
+    public $ms_kategori_tagihan_siswa_id;
 
-    public $ms_tahun_ajar_id, $ms_jenjang_id, $ms_kategori_tagihan_siswa_id, $nama_kategori_tagihan_siswa, $urutan, $deskripsi;
+    // Form input
+    public $nama_kategori_tagihan_siswa;
+    public $urutan;
+    public $deskripsi;    
 
     protected $listeners = [
         'loadDataKategoriTagihan',
@@ -18,8 +23,14 @@ class Edit extends Component
 
     public function loadDataKategoriTagihan($ms_kategori_tagihan_siswa_id)
     {
+        $this->resetValidation();
+
         $kategori = KategoriTagihanSiswa::findOrFail($ms_kategori_tagihan_siswa_id);
 
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Data dimuat'
+        ]);
+        
         $this->ms_kategori_tagihan_siswa_id = $kategori->ms_kategori_tagihan_siswa_id;
         $this->nama_kategori_tagihan_siswa = $kategori->nama_kategori_tagihan_siswa;
         $this->urutan = $kategori->urutan;
@@ -36,10 +47,10 @@ class Edit extends Component
     }
 
     protected $messages = [
-        'nama_kategori_tagihan_siswa.required' => 'Nama kelas tidak boleh kosong',
+        'nama_kategori_tagihan_siswa.required' => 'Nama kategori tidak boleh kosong',
         'urutan.required' => 'Urutan tidak boleh kosong',
         'urutan.integer' => 'Urutan harus berupa angka',
-        'urutan.min' => 'Urutan harus minimal 1',
+        'urutan.min' => 'Urutan minimal 1',
     ];
 
     public function updated($fields)
@@ -49,16 +60,49 @@ class Edit extends Component
 
     public function updateKategori()
     {
-        $validatedData = $this->validate();
+        DB::beginTransaction();
 
-        $kategori = KategoriTagihanSiswa::where('ms_kategori_tagihan_siswa_id', $this->ms_kategori_tagihan_siswa_id)->firstOrFail();
-        $kategori->update($validatedData);
+        try {
+            $validatedData = $this->validate();
 
-        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Berhasil mengubah kategori!']);
-        $this->dispatchBrowserEvent('hide-edit-modal', ['modalId' => 'ModalEditKategoriTagihan']);
-        $this->emit('refreshKategoriTagihans');
-        $this->emit('refreshJenisTagihans');
+            $kategori = KategoriTagihanSiswa::findOrFail($this->ms_kategori_tagihan_siswa_id);
+
+            $kategori->update([
+                'nama_kategori_tagihan_siswa' => $validatedData['nama_kategori_tagihan_siswa'],
+                'urutan' => $validatedData['urutan'],
+                'deskripsi' => $validatedData['deskripsi'],
+            ]);
+
+            DB::commit();
+
+            $this->dispatchBrowserEvent('alertify-success', [
+                'message' => 'Berhasil mengubah kategori!'
+            ]);
+
+            $this->dispatchBrowserEvent('hide-modal', [
+                'modalId' => 'ModalEditKategoriTagihan'
+            ]);
+
+            $this->emit('refreshKategoriTagihans');
+            $this->emit('refreshJenisTagihans');
+        } catch (ValidationException $e) {
+            DB::rollBack();
+
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Gagal validasi, cek input!'
+            ]);
+
+            throw $e; // 🔥 penting untuk tampilkan error di blade
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => $e->getMessage() ?? 'Terjadi kesalahan sistem'
+            ]);
+        }
     }
+
     public function render()
     {
         return view('livewire.kategori-tagihan-siswa.edit');

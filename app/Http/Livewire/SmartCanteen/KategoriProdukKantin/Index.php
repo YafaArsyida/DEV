@@ -2,27 +2,28 @@
 
 namespace App\Http\Livewire\SmartCanteen\KategoriProdukKantin;
 
-use App\Models\Jenjang;
+use App\Models\SmartCanteen\Kantin;
 use App\Models\SmartCanteen\KategoriProdukSmartCanteen;
 use Livewire\Component;
 
 class Index extends Component
 {
     public $search = '';
-    public $selectedJenjang = null;
-    public $namaJenjang = '';
+    public $selectedKantin = null;
+    public $selectedTahunAjar = null;
+    public $namaKantin = '';
 
     protected $listeners = [
         'refreshKategori' => '$refresh',
         'parameterUpdated' => 'updateParameters'
     ];
 
-    public function updateParameters($jenjang)
+    public function updateParameters($kantin, $tahunAjar)
     {
-        $this->selectedJenjang = $jenjang;
+        $this->selectedKantin = $kantin;
 
-        $j = Jenjang::find($jenjang);
-        $this->namaJenjang = $j ? $j->nama_jenjang : 'Tidak Diketahui';
+        $j = Kantin::find($kantin);
+        $this->namaKantin = $j ? $j->nama_kantin : 'Tidak Diketahui';
     }
 
     public function render()
@@ -30,8 +31,8 @@ class Index extends Component
         $kategori = KategoriProdukSmartCanteen::query();
 
         // filter jenjang
-        if ($this->selectedJenjang) {
-            $kategori->where('ms_jenjang_id', $this->selectedJenjang);
+        if ($this->selectedKantin) {
+            $kategori->where('ms_kantin_id', $this->selectedKantin);
         }
 
         // filter pencarian

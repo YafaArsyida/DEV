@@ -25,7 +25,7 @@ class TransaksiSmartCanteen extends Model
         'user_id',
         'ms_penempatan_siswa_id',
         'ms_pengguna_id',
-        'ms_jenjang_id',
+        'ms_kantin_id',
         'tanggal_transaksi',
         'total_transaksi',
         'metode_pembayaran',

@@ -116,7 +116,7 @@
                             <td></td>
                             <td class="text-start"><strong>TOTAL</strong></td>
                             <td class="text-end">
-                                <span class="fs-14 fw-medium text-success">Rp {{ number_format($totalPembayaran, 0, ',', '.') }}</span>
+                                <span class="fs-14 fw-bold text-success">Rp {{ number_format($totalPembayaran, 0, ',', '.') }}</span>
                             </td>
                         </tr>
                     </tfoot>

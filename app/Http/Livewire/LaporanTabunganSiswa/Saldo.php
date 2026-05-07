@@ -4,7 +4,7 @@ namespace App\Http\Livewire\LaporanTabunganSiswa;
 
 use App\Models\Kelas;
 use App\Models\PenempatanSiswa;
-
+use App\Models\SaldoTabungan;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -50,44 +50,9 @@ class Saldo extends Component
         $this->resetPage(); // Reset pagination ketika kelas berubah
     }
 
-    public function ExportSaldoTabunganSiswa()
-    {
-        $siswas = collect([]);
-        $query = PenempatanSiswa::with(['ms_siswa.ms_educard', 'ms_kelas', 'ms_tahun_ajar', 'ms_jenjang'])
-            ->join('ms_siswa', 'ms_penempatan_siswa.ms_siswa_id', '=', 'ms_siswa.ms_siswa_id')
-            ->where('ms_jenjang_id', $this->selectedJenjang)
-            ->where('ms_tahun_ajar_id', $this->selectedTahunAjar);
-
-        // Filter berdasarkan kelas (jika dipilih)
-        if ($this->selectedKelas) {
-            $query->where('ms_kelas_id', $this->selectedKelas);
-        }
-
-        $query->whereHas('ms_siswa.ms_transaksi_tabungan', function (Builder $query) {
-            $query->whereNotNull('ms_penempatan_siswa_id');
-        });
-
-
-        $siswas = $query->orderBy('ms_penempatan_siswa.ms_kelas_id')
-            ->orderBy('ms_siswa.nama_siswa')->get();
-
-        $siswas = $siswas->map(function ($item) {
-            $item['saldo_tabungan_siswa'] = $item->ms_siswa->saldo_tabungan_siswa();
-            return $item;
-        });
-
-        // Hitung total saldo
-        $this->totalSaldo = $query->get()->sum(function ($item) {
-            return $item->ms_siswa->saldo_tabungan_siswa() ?? 0;
-        });
-
-        // Emit data untuk frontend atau export
-        $this->emit('prepareExportSaldo', $siswas->toArray(), $this->totalSaldo);
-    }
-
     public function render()
     {
-        // Data untuk dropdown Kelas (hanya jika Jenjang dan Tahun Ajar dipilih)
+        // Dropdown kelas
         $select_kelas = [];
         if ($this->selectedJenjang && $this->selectedTahunAjar) {
             $select_kelas = Kelas::where('ms_jenjang_id', $this->selectedJenjang)
@@ -95,62 +60,58 @@ class Saldo extends Component
                 ->get();
         }
 
-        $siswas = collect();
-        $siswas = PenempatanSiswa::query()
-            ->with([
-                'ms_siswa.ms_educard',
-                'ms_siswa.ms_saldo_tabungan',
-                'ms_kelas',
-                'ms_tahun_ajar',
-                'ms_jenjang'
-            ])
+        // =========================
+        // QUERY UTAMA
+        // =========================
+        $query = PenempatanSiswa::with([
+            'ms_siswa.ms_educard',
+            'ms_siswa.ms_saldo_tabungan',
+            'ms_kelas'
+        ])
+            ->where('ms_jenjang_id', $this->selectedJenjang)
+            ->where('ms_tahun_ajar_id', $this->selectedTahunAjar);
 
-            ->join('ms_siswa', 'ms_penempatan_siswa.ms_siswa_id', '=', 'ms_siswa.ms_siswa_id')
+        // Filter kelas
+        if ($this->selectedKelas) {
+            $query->where('ms_kelas_id', $this->selectedKelas);
+        }
 
-            // 🔥 JOIN SALDO
-            ->leftJoin('ms_saldo_tabungan', function ($join) {
-                $join->on('ms_saldo_tabungan.user_id', '=', 'ms_siswa.ms_siswa_id')
-                    ->where('ms_saldo_tabungan.user_type', 'siswa');
-            })
+        // Search
+        if ($this->search) {
+            $query->whereHas('ms_siswa', function ($q) {
+                $q->where('nama_siswa', 'like', '%' . trim($this->search) . '%')
+                    ->orWhereHas('ms_educard', function ($q2) {
+                        $q2->where('kode_kartu', 'like', '%' . trim($this->search) . '%');
+                    });
+            });
+        }
 
-            ->where('ms_penempatan_siswa.ms_jenjang_id', $this->selectedJenjang)
-            ->where('ms_penempatan_siswa.ms_tahun_ajar_id', $this->selectedTahunAjar)
+        // 🔥 HANYA siswa yang punya saldo ≠ 0
+        $query->whereHas('ms_siswa.ms_saldo_tabungan', function ($q) {
+            $q->where('saldo_tabungan', '!=', 0);
+        });
 
-            ->when(
-                $this->selectedKelas,
-                fn($q) =>
-                $q->where('ms_penempatan_siswa.ms_kelas_id', $this->selectedKelas)
-            )
-
-            // 🔍 SEARCH
-            ->when($this->search, function ($query) {
-                $query->where(function ($query) {
-                    $query->where('ms_siswa.nama_siswa', 'like', '%' . $this->search . '%')
-                        ->orWhereHas(
-                            'ms_siswa.ms_educard',
-                            fn($q) => $q->where('kode_kartu', 'like', '%' . $this->search . '%')
-                        );
-                });
-            })
-
-            // 🔥 FILTER SALDO ≠ 0
-            ->whereRaw('COALESCE(ms_saldo_tabungan.saldo_tabungan, 0) != 0')
-
-            // 🔥 SORT BY SALDO
-            ->orderByDesc('ms_saldo_tabungan.saldo_tabungan')
-
-            ->select('ms_penempatan_siswa.*') // penting biar model tetap normal
-
-            ->get();
-
-        // 🔥 TOTAL SALDO (dari DB, bukan PHP loop berat)
-        $this->totalSaldo = $siswas->sum(
-            fn($item) =>
-            $item->ms_siswa->ms_saldo_tabungan->saldo_tabungan ?? 0
+        // 🔥 SORT by saldo (pakai subquery, bukan join manual)
+        $query->orderByDesc(
+            SaldoTabungan::select('saldo_tabungan')
+                ->whereColumn('user_id', 'ms_penempatan_siswa.ms_siswa_id')
+                ->where('user_type', 'siswa')
+                ->limit(1)
         );
 
-        // Cek apakah koleksi siswa kosong.
-        if (!$siswas || $siswas->isEmpty()) {
+        $siswas = $query->get();
+
+        // =========================
+        // TOTAL SALDO
+        // =========================
+        $this->totalSaldo = $siswas->sum(function ($item) {
+            return $item->ms_siswa->ms_saldo_tabungan->saldo_tabungan ?? 0;
+        });
+
+        // =========================
+        // NOTIF
+        // =========================
+        if ($siswas->isEmpty()) {
             $this->dispatchBrowserEvent('alertify-error', ['message' => 'Data siswa tidak ditemukan.']);
         } else {
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui..']);

@@ -14,29 +14,16 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-lg-12">
-                <!-- Tab panes -->
-                <div class="tab-content text-muted">
-                    <div class="tab-pane active" id="tabSiswaKelas" role="tabpanel">
-                        <div class="row">
-                            <div class="col-xxl-4">
-                                <div class="sticky-side-div">
-                                    <div class="card">
-                                        @livewire('transaksi-edu-pay-siswa.data-siswa')
-                                    </div>
-                                </div><!-- end card -->
-                                @livewire('transaksi-edu-pay-siswa.edit')
-                                @livewire('transaksi-edu-pay-siswa.delete')
-                            </div>
-                            <!--end col-->
-                            <div class="col-xxl-8">
-                                @livewire('transaksi-edu-pay-siswa.data-edu-pay')
-                            </div>
-                        </div>
-                        <!--end row-->
-                    </div>
-                </div>
-                <!--end tab-content-->
+            <div class="col-xxl-4">
+                <div class="sticky-side-div">
+                    @livewire('transaksi-edu-pay-siswa.data-siswa')
+                </div><!-- end card -->
+            </div>
+            <!--end col-->
+            <div class="col-xxl-8">
+                @livewire('transaksi-edu-pay-siswa.data-edu-pay')
+                @livewire('transaksi-edu-pay-siswa.edit')
+                @livewire('transaksi-edu-pay-siswa.delete')
             </div>
         </div>
     </div><!-- container-fluid -->

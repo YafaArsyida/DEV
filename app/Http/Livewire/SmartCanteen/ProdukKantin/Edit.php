@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class Edit extends Component
 {
-    public $ms_jenjang_id;
+    public $ms_kantin_id;
     public $ms_kategori_produk_kantin_id;
     public $nama_produk_kantin;
     public $harga;
@@ -32,7 +32,8 @@ class Edit extends Component
         $produk = ProdukSmartCanteen::findOrFail($ms_produk_kantin_id);
         $this->ms_produk_kantin_id = $produk->ms_produk_kantin_id;
 
-        $this->ms_jenjang_id = $produk->ms_jenjang_id;
+        $this->ms_kantin_id = $produk->ms_kantin_id;
+
         $this->ms_kategori_produk_kantin_id = $produk->ms_kategori_produk_kantin_id;
         $this->nama_produk_kantin = $produk->nama_produk_kantin;
         $this->harga = $produk->harga;
@@ -46,7 +47,7 @@ class Edit extends Component
     protected function rules()
     {
         return [
-            'ms_jenjang_id' => 'required|exists:ms_jenjang,ms_jenjang_id',
+            'ms_kantin_id' => 'required|exists:ms_kantin,ms_kantin_id',
             'ms_kategori_produk_kantin_id' => 'required|exists:ms_kategori_produk_kantin,ms_kategori_produk_kantin_id',
             'nama_produk_kantin' => 'required|string|max:255',
             'harga' => 'required|numeric|min:100',
@@ -60,8 +61,8 @@ class Edit extends Component
     }
 
     protected $messages = [
-        'ms_jenjang_id.required' => 'Jenjang wajib dipilih.',
-        'ms_jenjang_id.exists' => 'Jenjang tidak valid.',
+        'ms_kantin_id.required' => 'Kantin wajib dipilih.',
+        'ms_kantin_id.exists' => 'Kantin tidak valid.',
 
         'ms_kategori_produk_kantin_id.required' => 'Kategori wajib dipilih.',
         'ms_kategori_produk_kantin_id.exists' => 'Kategori tidak valid.',
@@ -102,7 +103,7 @@ class Edit extends Component
 
             $produk = ProdukSmartCanteen::findOrFail($this->ms_produk_kantin_id);
             $produk->update([
-                'ms_jenjang_id' => $this->ms_jenjang_id,
+                'ms_kantin_id' => $this->ms_kantin_id,
                 'ms_kategori_produk_kantin_id' => $this->ms_kategori_produk_kantin_id,
                 'nama_produk_kantin' => $this->nama_produk_kantin,
                 'harga' => $this->harga,

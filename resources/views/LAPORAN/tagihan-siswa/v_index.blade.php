@@ -15,16 +15,9 @@
             <!--end col-->
         </div>
         <div class="row">
-            {{-- <div class="col-xxl-12">
-                @livewire('laporan-pembayaran-tagihan-siswa.kategori')   
-                @livewire('laporan-pembayaran-tagihan-siswa.jenis')   
-                @livewire('laporan-pembayaran-tagihan-siswa.export-kategori')   
-                @livewire('laporan-pembayaran-tagihan-siswa.export-jenis')   
-            </div>   --}}
             <div class="col-xxl-12">
                 @livewire('parameter.filter-tagihan')   
                 @livewire('laporan-tagihan-siswa.index')   
-                @livewire('laporan-tagihan-siswa.export')   
 
                 @livewire('whats-app-tagihan-siswa.create')
                 @livewire('whats-app-tagihan-siswa.edit')

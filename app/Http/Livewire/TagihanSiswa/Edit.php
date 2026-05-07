@@ -6,6 +6,7 @@ use App\Models\AkuntansiJurnalDetail;
 use App\Models\KeranjangTagihanSiswa;
 use App\Models\TagihanSiswa;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 
 class Edit extends Component
@@ -53,6 +54,10 @@ class Edit extends Component
             return;
         }
 
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Data dimuat'
+        ]);
+
         $penempatanSiswa = $tagihan->ms_penempatan_siswa;
         $this->ms_jenjang_id = $penempatanSiswa->ms_jenjang_id ?? null;
         $this->ms_tahun_ajar_id = $penempatanSiswa->ms_tahun_ajar_id ?? null;
@@ -76,6 +81,7 @@ class Edit extends Component
                 'jumlah_perubahan_tagihan.numeric' => 'Jumlah tagihan harus berupa angka.',
                 'jumlah_perubahan_tagihan.min' => 'Jumlah tagihan tidak boleh kurang dari 0.',
             ];
+            
             $this->validate($rules, $messages);
 
             // Ambil data tagihan
@@ -89,9 +95,10 @@ class Edit extends Component
 
             // Cek validasi jumlah tagihan
             if ($this->jumlah_perubahan_tagihan < $jumlahSudahDibayar) {
-                throw new \Exception('Jumlah tagihan tidak boleh kurang dari jumlah yang sudah dibayarkan (' . number_format($jumlahSudahDibayar) . ').');
+                throw ValidationException::withMessages([
+                    'jumlah_perubahan_tagihan' => 'Jumlah tagihan tidak boleh kurang dari yang sudah dibayarkan (' . number_format($jumlahSudahDibayar) . ').'
+                ]);
             }
-
             // Tentukan status berdasarkan jumlah tagihan dan jumlah yang sudah dibayarkan
             $dataToUpdate['jumlah_tagihan_siswa'] = $this->jumlah_perubahan_tagihan;
             if ($jumlahSudahDibayar == 0) {
@@ -126,18 +133,27 @@ class Edit extends Component
             DB::commit();
 
             // Emit event untuk refresh data
-            $this->emit('tagihanUpdated');
+            $this->emit('refreshTagihanSiswa');
             $this->dispatchBrowserEvent('hide-create-modal', ['modalId' => 'ModalAksiEdit']);
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'Tagihan berhasil diperbarui.']);
 
             // Reset jumlah perubahan tagihan
             $this->jumlah_perubahan_tagihan = 0;
-        } catch (\Exception $e) {
-            // Rollback transaksi jika terjadi kesalahan
+        } catch (ValidationException $e) {
             DB::rollBack();
 
-            // Berikan notifikasi error
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Gagal validasi, cek input!'
+            ]);
+
+            throw $e; // 🔥 penting untuk tampilkan error di blade
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => $e->getMessage() ?? 'Terjadi kesalahan sistem'
+            ]);
         }
     }
 

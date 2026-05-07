@@ -64,11 +64,11 @@
                                                         <th class="text-uppercase">Kategori</th>
                                                         <th class="text-uppercase">tagihan</th>
                                                         <th class="text-uppercase">Jatuh Tempo</th>
-                                                        <th class="text-uppercase">Status</th>
+                                                        <th class="text-uppercase">Cicilan</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    @forelse ($jenis_tagihans as $item)
+                                                    @forelse ($tagihans as $item)
                                                     <tr>
                                                         <th scope="col" style="width: 50px;">
                                                             <div class="form-check">
@@ -76,7 +76,9 @@
                                                             </div>
                                                         </th>
                                                         <td>{{ $item->nama_jenis_tagihan_siswa }}</td>
-                                                        <td>{{ $item->nama_kategori_tagihan_siswa() }}</td>
+                                                        <td>
+                                                            {{ $item->ms_kategori_tagihan_siswa->nama_kategori_tagihan_siswa ?? '-' }}
+                                                        </td>
                                                         <td>
                                                             <div class="input-group input-group-sm">
                                                                 <span class="input-group-text">Rp</span>
@@ -102,7 +104,6 @@
                                                     @endforelse
                                                 </tbody>
                                             </table>
-                                            {{ $jenis_tagihans->links() }}
                                         </div>
                                         @endif
                                     </div>

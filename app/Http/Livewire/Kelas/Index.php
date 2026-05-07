@@ -48,26 +48,19 @@ class Index extends Component
 
     public function render()
     {
-        // Query kelas hanya jika jenjang dan tahun ajar dipilih
-        $kelass = KelasModel::query();
-
-        // Filter berdasarkan Jenjang
-        if ($this->selectedJenjang) {
-            $kelass->where('ms_jenjang_id', $this->selectedJenjang);
-        }
-
-        // Filter berdasarkan Tahun Ajar
-        if ($this->selectedTahunAjar) {
-            $kelass->where('ms_tahun_ajar_id', $this->selectedTahunAjar);
-        }
-
-        // Filter berdasarkan Pencarian (jika ada input pencarian)
-        if ($this->search) {
-            $kelass->where('nama_kelas', 'like', '%' . $this->search . '%');
-        }
-
-        // Ambil data kelas yang sudah difilter dan paginasi
-        $kelass = $kelass->paginate(100); // Memanggil paginate() langsung pada query builder
+        $kelass = KelasModel::query()
+        ->when($this->selectedJenjang, fn ($q) =>
+            $q->where('ms_jenjang_id', $this->selectedJenjang)
+        )
+        ->when($this->selectedTahunAjar, fn ($q) =>
+            $q->where('ms_tahun_ajar_id', $this->selectedTahunAjar)
+        )
+        ->when($this->search, fn ($q) =>
+            $q->where('nama_kelas', 'like', '%' . $this->search . '%')
+        )
+        ->withCount('ms_penempatan_siswa')
+        ->latest('ms_kelas_id') // optional sorting
+        ->paginate(10);
 
         // Return data ke view
         return view('livewire.kelas.index', [

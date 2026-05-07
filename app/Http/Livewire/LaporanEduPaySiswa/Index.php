@@ -19,8 +19,8 @@ class Index extends Component
     public $selectedTahunAjar = null;
     public $selectedKelas = null;
 
-    public $selectedPetugas = [];
     public $selectedJenisTransaksi = [];
+    public $selectedPetugas = [];
 
     public $startDate = null;
     public $endDate = null;
@@ -42,7 +42,6 @@ class Index extends Component
         $this->selectedJenjang = $jenjang;
         $this->selectedTahunAjar = $tahunAjar;
     }
-
 
     public function mount()
     {

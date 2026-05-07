@@ -22,76 +22,97 @@ class JenisTagihanSiswa extends Model
         'cicilan_status',
     ];
 
-    /**
-     * Relasi ke model KategoriTagihan
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | RELATIONSHIPS (BELONGS TO)
+    |--------------------------------------------------------------------------
+    */
+
     public function ms_kategori_tagihan_siswa()
     {
-        return $this->belongsTo(KategoriTagihanSiswa::class, 'ms_kategori_tagihan_siswa_id', 'ms_kategori_tagihan_siswa_id');
-    }
-
-    /**
-     * Relasi ke model TahunAjar
-     */
-    public function ms_tahun_ajar()
-    {
-        return $this->belongsTo(TahunAjar::class, 'ms_tahun_ajar_id', 'ms_tahun_ajar_id');
-    }
-
-    /**
-     * Relasi ke model Jenjang
-     */
-    public function ms_jenjang()
-    {
-        return $this->belongsTo(Jenjang::class, 'ms_jenjang_id', 'ms_jenjang_id');
-    }
-
-    /**
-     * Relasi ke model Tagihan
-     */
-    public function ms_tagihan_siswa()
-    {
-        return $this->hasMany(TagihanSiswa::class, 'ms_jenis_tagihan_siswa_id', 'ms_jenis_tagihan_siswa_id');
-    }
-
-    /**
-     * Mendapatkan Nama Tahun Ajar dari Penempatan Siswa
-     */
-    public function nama_kategori_tagihan_siswa()
-    {
-        return $this->ms_kategori_tagihan_siswa->nama_kategori_tagihan_siswa ?? 'Tidak Ditemukan';
-    }
-
-    /**
-     * Menghitung jumlah siswa yang terkait dengan jenis tagihan ini
-     *
-     * @return int
-     */
-    public function jumlah_tagihan_siswa()
-    {
-        return $this->hasMany(TagihanSiswa::class, 'ms_jenis_tagihan_siswa_id', 'ms_jenis_tagihan_siswa_id')->count();
-    }
-
-    public function dt_transaksi_tagihan_siswa()
-    {
-        return $this->hasManyThrough(
-            DetailTransaksiTagihanSiswa::class,
-            TagihanSiswa::class,
-            'ms_jenis_tagihan_siswa_id', // Foreign key di tabel Tagihan
-            'ms_tagihan_siswa_id',       // Foreign key di tabel DetailTransaksi
-            'ms_jenis_tagihan_siswa_id', // Local key di tabel JenisTagihan
-            'ms_tagihan_siswa_id'        // Local key di tabel Tagihan
+        return $this->belongsTo(KategoriTagihanSiswa::class,
+            'ms_kategori_tagihan_siswa_id',
+            'ms_kategori_tagihan_siswa_id'
         );
     }
 
-    /**
-     * Menghitung total nilai tagihan untuk jenis tagihan ini
-     *
-     * @return float
-     */
+    public function ms_tahun_ajar()
+    {
+        return $this->belongsTo(TahunAjar::class,
+            'ms_tahun_ajar_id',
+            'ms_tahun_ajar_id'
+        );
+    }
+
+    public function ms_jenjang()
+    {
+        return $this->belongsTo(Jenjang::class,
+            'ms_jenjang_id',
+            'ms_jenjang_id'
+        );
+    }
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | RELATIONSHIPS (HAS MANY)
+    |--------------------------------------------------------------------------
+    */
+
+    public function ms_tagihan_siswa()
+    {
+        return $this->hasMany(TagihanSiswa::class,
+            'ms_jenis_tagihan_siswa_id',
+            'ms_jenis_tagihan_siswa_id'
+        );
+    }
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | RELATIONSHIPS (ADVANCED)
+    |--------------------------------------------------------------------------
+    */
+    public function dt_transaksi_tagihan_siswa()
+    {
+        return $this->hasManyThrough(DetailTransaksiTagihanSiswa::class,
+            TagihanSiswa::class,
+            'ms_jenis_tagihan_siswa_id', // FK di tagihan
+            'ms_tagihan_siswa_id',       // FK di detail
+            'ms_jenis_tagihan_siswa_id', // PK lokal
+            'ms_tagihan_siswa_id'        // PK tagihan
+        );
+    }
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ACCESSOR / HELPER (SAFE FOR VIEW)
+    |--------------------------------------------------------------------------
+    */
+    public function nama_kategori_tagihan_siswa()
+    {
+        return $this->ms_kategori_tagihan_siswa->nama_kategori_tagihan_siswa ?? '-';
+    }
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | AGGREGATION (⚠️ JANGAN DIPAKAI DI LOOP BESAR)
+    |--------------------------------------------------------------------------
+    */
+    public function jumlah_tagihan_siswa()
+    {
+        return $this->ms_tagihan_siswa()->count();
+    }
+
     public function total_tagihan_siswa()
     {
-        return $this->hasMany(TagihanSiswa::class, 'ms_jenis_tagihan_siswa_id', 'ms_jenis_tagihan_siswa_id')->sum('jumlah_tagihan_siswa');
+        return $this->ms_tagihan_siswa()->sum('jumlah_tagihan_siswa');
     }
 
     public function total_tagihan_siswa_dibayarkan()
@@ -101,6 +122,6 @@ class JenisTagihanSiswa extends Model
 
     public function total_kekurangan()
     {
-        return $this->total_tagihan_siswa() - $this->total_dibayarkan();
+        return $this->total_tagihan_siswa() - $this->total_tagihan_siswa_dibayarkan();
     }
 }

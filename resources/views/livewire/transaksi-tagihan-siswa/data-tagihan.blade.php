@@ -113,11 +113,15 @@
                                 @endif
                                 {{-- Edit --}}
                                 <li class="list-inline-item" title="Edit Tagihan">
-                                    <button type="button" class="btn btn-sm btn-soft-warning d-inline-flex align-items-center gap-1"
+                                    <a href="#ModalAksiEdit" data-bs-toggle="modal" class="text-primary d-inline-block" title="Edit Siswa"
+                                        wire:click="$emit('loadTagihanEdit', {{ $item['ms_tagihan_siswa_id'] }})">
+                                        <i class="ri-quill-pen-line fs-17 align-middle"></i> Edit
+                                    </a>
+                                    {{-- <button type="button" class="btn btn-sm btn-soft-warning d-inline-flex align-items-center gap-1"
                                         data-bs-toggle="modal" data-bs-target="#ModalAksiEdit"
                                         wire:click="$emit('loadTagihanEdit', {{ $item['ms_tagihan_siswa_id'] }})">
                                         <i class="ri-quill-pen-line"></i> Edit
-                                    </button>
+                                    </button> --}}
                                 </li>
                             
                             </ul>

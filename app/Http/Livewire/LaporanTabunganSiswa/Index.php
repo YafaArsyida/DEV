@@ -6,10 +6,7 @@ use App\Models\Kelas;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
 
-use App\Models\Tabungan;
-use App\Models\TabunganSiswa;
 use App\Models\TransaksiTabungan;
 
 class Index extends Component

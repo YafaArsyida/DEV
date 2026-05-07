@@ -26,15 +26,11 @@ class Delete extends Component
     public function confirmDeleteEduPay($id)
     {
         // 🔥 Lock transaksi
-        $transaksi = TransaksiEduPay::find($this->ms_transaksi_edupay_id);
+        $transaksi = TransaksiEduPay::find($id);
 
         if (!$transaksi) {
             throw new \Exception('Transaksi tidak ditemukan!');
         }
-
-        $this->dispatchBrowserEvent('alertify-success', [
-            'message' => 'Transaksi dimuat'
-        ]);
         
         $this->ms_transaksi_edupay_id = $id;
     }

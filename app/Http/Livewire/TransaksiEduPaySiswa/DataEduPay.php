@@ -7,7 +7,6 @@ use App\Models\KuitansiTransaksiEduPay;
 use App\Models\PenempatanSiswa;
 use App\Models\TransaksiEduPay;
 use App\Models\WhatsAppTransaksiEduPay;
-use Carbon\Carbon;
 use Livewire\Component;
 
 class DataEduPay extends Component
@@ -64,12 +63,12 @@ class DataEduPay extends Component
         ]);
     }
 
-    public function updatingSearch()
-    {
-        $this->dispatchBrowserEvent('alertify-success', [
-            'message' => 'Memperbarui'
-        ]);
-    }
+    // public function updatingSearch()
+    // {
+    //     $this->dispatchBrowserEvent('alertify-success', [
+    //         'message' => 'Memperbarui'
+    //     ]);
+    // }
 
     public function resetTanggal()
     {
@@ -253,16 +252,19 @@ class DataEduPay extends Component
 
         if ($this->ms_siswa_id) {
             $transaksiEduPay = (clone $baseQuery)
-                ->when($this->startDate && $this->endDate, fn($q) => $q->whereBetween('tanggal', [$this->startDate, $this->endDate]))
-                ->when($this->selectedJenis, fn($q) => $q->where('jenis_transaksi', $this->selectedJenis))
-                ->when($this->search, function ($q) {
-                    $q->where(function ($sub) {
-                        $sub->where('deskripsi', 'like', '%' . $this->search . '%')
-                            ->orWhereHas('ms_pengguna', function ($u) {
-                                $u->where('nama', 'like', '%' . $this->search . '%');
-                            });
-                    });
-                })
+                ->when($this->startDate && $this->endDate, fn($q) => $q->whereBetween('tanggal', [
+                    $this->startDate . ' 00:00:00',
+                    $this->endDate . ' 23:59:59'
+                ]))
+                // ->when($this->selectedJenis, fn($q) => $q->where('jenis_transaksi', $this->selectedJenis))
+                // ->when($this->search, function ($q) {
+                //     $q->where(function ($sub) {
+                //         $sub->where('deskripsi', 'like', '%' . $this->search . '%')
+                //             ->orWhereHas('ms_pengguna', function ($u) {
+                //                 $u->where('nama', 'like', '%' . $this->search . '%');
+                //             });
+                //     });
+                // })
                 ->orderBy('tanggal')
                 ->orderBy('ms_transaksi_edupay_id')
                 ->get();

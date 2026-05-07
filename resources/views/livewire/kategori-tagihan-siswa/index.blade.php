@@ -46,12 +46,14 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($kategoris as $item)
+                        @forelse ($kategoris as $key => $item)
                         <tr>
-                            <td>{{ $item->urutan }}.</td>
-                            <td>
-                                <a href="#ModalDeleteKategoriTagihan" data-bs-toggle="modal" class="btn btn-sm btn-soft-danger d-inline-flex align-items-center gap-1" 
-                                wire:click.prevent="$emit('confirmDelete', {{ $item->ms_kategori_tagihan_siswa_id }})" data-bs-trigger="hover" data-bs-placement="top" title="Hapus Kategori">
+                            <td>{{ $kategoris->firstItem() + $key }}.</td>
+                            <td class="text-center">
+                                <a href="#ModalDeleteKategoriTagihan" data-bs-toggle="modal"
+                                    class="btn btn-sm btn-soft-danger d-inline-flex align-items-center gap-1" data-bs-target="#ModalDeleteKategoriTagihan"
+                                    title="Hapus Kategori Tagihan"
+                                    wire:click.prevent="$emit('confirmDeleteKategori', {{ $item->ms_kategori_tagihan_siswa_id }})">
                                     <i class="ri-delete-bin-5-line"></i>
                                 </a>
                             </td>
@@ -63,14 +65,10 @@
                             </td>
                             <td>
                                 <div class="hstack gap-2">
-                                    {{-- Tombol Edit Kategori Tagihan --}}
-                                    <button class="btn btn-sm btn-primary d-inline-flex align-items-center"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#ModalEditKategoriTagihan"
-                                            title="Edit Kategori"
-                                            wire:click.prevent="$emit('loadDataKategoriTagihan', {{ $item->ms_kategori_tagihan_siswa_id }})">
-                                        <i class="ri-quill-pen-line align-bottom me-1"></i> Edit
-                                    </button>
+                                    <a href="#ModalEditKategoriTagihan" data-bs-toggle="modal" class="text-primary d-inline-block"
+                                        title="Edit Jenis Tagihan Siswa" wire:click="$emit('loadDataKategoriTagihan', {{ $item->ms_kategori_tagihan_siswa_id }})">
+                                        <i class="ri-quill-pen-line fs-17 align-middle"></i> Edit
+                                    </a>
                                 </div>
                             </td>                            
                         </tr>

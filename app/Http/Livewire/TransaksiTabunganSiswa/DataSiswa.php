@@ -80,6 +80,11 @@ class DataSiswa extends Component
         $siswa = PenempatanSiswa::with('ms_siswa', 'ms_kelas', 'ms_jenjang', 'ms_tahun_ajar')
             ->findOrFail($id);
 
+        if (!$siswa) {
+            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Siswa tidak ditemukan.']);
+            return;
+        }
+        
         $this->fillSiswaData($siswa);
 
         // 🔥 ambil saldo sekali

@@ -4,6 +4,7 @@ namespace App\Http\Livewire\LaporanEduPayPegawai;
 
 use App\Models\Jabatan;
 use App\Models\Pegawai;
+use App\Models\SaldoEduPay;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -53,22 +54,56 @@ class Saldo extends Component
         // Data untuk dropdown Kelas (hanya jika Jenjang dan Tahun Ajar dipilih)
         $select_jabatan = Jabatan::get();
 
-        $pegawai = collect();
-        $pegawai = Pegawai::with(['ms_jabatan', 'ms_jenjang', 'ms_educard'])
-            ->where('ms_jenjang_id', $this->selectedJenjang)
-            ->when($this->selectedJabatan, fn($q) => $q->where('ms_jabatan_id', $this->selectedJabatan))
-            ->when($this->search, function ($query) {
-                $query->where('nama_pegawai', 'like', '%' . $this->search . '%');
-            })
-            ->get()
-            ->filter(fn($item) => $item->saldo_edupay_pegawai() !== 0)
-            ->sortByDesc(fn($item) => $item->saldo_edupay_pegawai())
-            ->values(); // reset index
+        // =========================
+        // QUERY UTAMA
+        // =========================
+        $query = Pegawai::with([
+            'ms_jabatan',
+            'ms_jenjang',
+            'ms_saldo_edupay'
+        ])
+            ->where('ms_jenjang_id', $this->selectedJenjang);
 
-        $this->totalSaldo = $pegawai->sum(fn($item) => $item->saldo_edupay_pegawai());
+        // Filter jabatan
+        if ($this->selectedJabatan) {
+            $query->where('ms_jabatan_id', $this->selectedJabatan);
+        }
 
-        // Cek apakah koleksi siswa kosong.
-        if (!$pegawai || $pegawai->isEmpty()) {
+        // Search
+        if ($this->search) {
+            $query->where('nama_pegawai', 'like', '%' . trim($this->search) . '%');
+        }
+
+        // 🔥 Hanya yang punya saldo ≠ 0
+        $query->whereHas('ms_saldo_edupay', function ($q) {
+            $q->where('saldo_edupay', '!=', 0);
+        });
+
+        // 🔥 Sort by saldo (subquery, TANPA join manual)
+        $query->orderByDesc(
+            SaldoEduPay::select('saldo_edupay')
+                ->whereColumn('user_id', 'ms_pegawai.ms_pegawai_id')
+                ->where('user_type', 'pegawai')
+                ->limit(1)
+        );
+
+        $pegawai = $query->get();
+
+        // =========================
+        // TOTAL SALDO
+        // =========================
+        // $this->totalSaldo = SaldoTabungan::pegawai()
+        //     ->whereIn('user_id', $pegawai->pluck('ms_pegawai_id'))
+        //     ->sum('saldo_edupay');
+
+        $this->totalSaldo = $pegawai->sum(function ($item) {
+            return $item->ms_saldo_edupay->saldo_edupay ?? 0;
+        });
+
+        // =========================
+        // NOTIF
+        // =========================
+        if ($pegawai->isEmpty()) {
             $this->dispatchBrowserEvent('alertify-error', ['message' => 'Data tidak ditemukan.']);
         } else {
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui..']);

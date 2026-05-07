@@ -14,31 +14,17 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-lg-12">
-                <!-- Tab panes -->
-                <div class="tab-content text-muted">
-                    <div class="tab-pane active" id="tabSiswaKelas" role="tabpanel">
-                        <div class="row">
-                            <div class="col-xxl-4 pe-1">
-                                <div class="card">
-                                    @livewire('transaksi-tabungan-pegawai.data-pegawai')  
-                                    @livewire('transaksi-tabungan-siswa.delete')  
-                                    @livewire('transaksi-tabungan-siswa.edit') 
-                                </div><!-- end card -->
-                            </div>
-                            <!--end col-->
-                            <div class="col-xxl-8 ps-0">
-                                <div class="sticky-side-div">
-                                    @livewire('transaksi-tabungan-pegawai.data-tabungan')   
-                                </div>
-                            </div>
-                        </div>
-                        <!--end row-->
-                    </div>
+            <div class="col-xxl-4">
+                <div class="sticky-side-div">
+                    @livewire('transaksi-tabungan-pegawai.data-pegawai')
                 </div>
-                <!--end tab-content-->
             </div>
-            <!--end row-->
+            <!--end col-->
+            <div class="col-xxl-8">
+                @livewire('transaksi-tabungan-pegawai.data-tabungan')
+                @livewire('transaksi-tabungan-siswa.delete')
+                @livewire('transaksi-tabungan-siswa.edit')
+            </div>
         </div>
     </div>
 </div><!-- End Page-content -->

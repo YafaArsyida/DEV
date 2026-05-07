@@ -5,6 +5,8 @@ namespace App\Http\Livewire\SmartCanteen\TransaksiProduk;
 use App\Models\EduCard;
 use App\Models\Jenjang;
 use App\Models\PenempatanSiswa;
+use App\Models\SaldoEduPay;
+use App\Models\SmartCanteen\Kantin;
 use App\Models\SmartCanteen\KategoriProdukSmartCanteen;
 use App\Models\SmartCanteen\ProdukSmartCanteen;
 use Livewire\Component;
@@ -14,10 +16,10 @@ class Index extends Component
     public $search = '';
 
 
-    public $selectedJenjang = null;
+    public $selectedKantin = null;
     public $selectedTahunAjar = null;
 
-    public $namaJenjang = '';
+    public $namaKantin = '';
     public $selectedKategori = null;
 
     public $smartcardInput;
@@ -25,6 +27,8 @@ class Index extends Component
     public $user_type;
     public $user_id;
     public $ms_penempatan_siswa_id;
+    public $ms_jenjang_id;
+
     public $nama;
     public $nama_kelas;
     public $educard;
@@ -46,14 +50,14 @@ class Index extends Component
         'filterKategori' => 'setKategori',
     ];
 
-    public function parameterUpdated($jenjang, $tahunAjar)
+    public function parameterUpdated($kantin, $tahunAjar)
     {
-        // Update nilai selectedJenjang dan selectedTahunAjar
-        $this->selectedJenjang = $jenjang;
+        // Update nilai selectedKantin dan selectedTahunAjar
+        $this->selectedKantin = $kantin;
         $this->selectedTahunAjar = $tahunAjar;
 
-        $j = Jenjang::find($jenjang);
-        $this->namaJenjang = $j ? $j->nama_jenjang : 'Tidak Diketahui';
+        $j = Kantin::find($kantin);
+        $this->namaKantin = $j ? $j->nama_kantin : 'Tidak Diketahui';
     }
 
     public function resetScan()
@@ -62,15 +66,13 @@ class Index extends Component
             'user_type',
             'user_id',
             'ms_penempatan_siswa_id',
+
             'nama',
             'nama_kelas',
+            'nama_jabatan',
+
             'educard',
             'saldo_edupay',
-
-            // 'ms_jenjang_id',
-            // 'ms_tahun_ajar_id',
-
-            'nama_jabatan',
         ]);
         $this->resetSmartcardInput();
     }
@@ -106,26 +108,32 @@ class Index extends Component
         if ($card->ms_siswa) {
             $penempatan = PenempatanSiswa::where('ms_siswa_id', $card->ms_siswa->ms_siswa_id)
                 ->where('ms_tahun_ajar_id', $this->selectedTahunAjar)
-                ->where('ms_jenjang_id', $this->selectedJenjang)
                 ->first();
 
             if (!$penempatan) {
                 $this->dispatchBrowserEvent('alertify-error', [
-                    'message' => 'Transaksi ditolak. Tidak ada penempatan pada Jenjang/Tahun Ajar ini.'
+                    'message' => 'Transaksi ditolak. Tidak ada penempatan pada Tahun Ajar ini.'
                 ]);
 
                 $this->resetSmartcardInput();
+                $this->resetScan();
+
                 return;
             }
 
             $this->user_type  = 'siswa';
             $this->user_id    = $card->ms_siswa->ms_siswa_id;
             $this->ms_penempatan_siswa_id = $penempatan->ms_penempatan_siswa_id;
+            $this->ms_jenjang_id = $penempatan->ms_jenjang_id;
 
             $this->nama       = $card->ms_siswa->nama_siswa;
             $this->nama_kelas = $penempatan->ms_kelas->nama_kelas;
+
             $this->educard    = $card->kode_kartu;
-            $this->saldo_edupay = $card->ms_siswa->saldo_edupay_siswa();
+
+            $saldo = SaldoEduPay::getSaldo($this->user_id, 'siswa');
+
+            $this->saldo_edupay = $saldo->saldo_edupay;
         }
 
         // =========================================
@@ -135,27 +143,31 @@ class Index extends Component
 
             $this->user_type  = 'pegawai';
             $this->user_id    = $card->ms_pegawai->ms_pegawai_id;
+            $this->ms_jenjang_id = $card->ms_pegawai->ms_jenjang_id;
 
             $this->nama       = $card->ms_pegawai->nama_pegawai;
             $this->nama_jabatan = $card->ms_pegawai->ms_jabatan->nama_jabatan;
 
             $this->educard    = $card->kode_kartu;
-            $this->saldo_edupay = method_exists($card->ms_pegawai, 'saldo_edupay_pegawai')
-                ? $card->ms_pegawai->saldo_edupay_pegawai()
-                : 0;
+
+            $saldo = SaldoEduPay::getSaldo($this->user_id, 'pegawai');
+
+            $this->saldo_edupay = $saldo->saldo_edupay;
         }
 
         $this->emit('scanSuccess', [
-            'user_type'             => $this->user_type,
-            'user_id'               => $this->user_id,
+            'user_type'              => $this->user_type,
+            'user_id'                => $this->user_id,
             'ms_penempatan_siswa_id' => $this->ms_penempatan_siswa_id,
-            'nama'                  => $this->nama,
-            'nama_kelas'            => $this->nama_kelas ?? null,
-            'nama_jabatan'            => $this->nama_jabatan ?? null,
-            'educard'               => $this->educard,
-            'saldo_edupay'          => $this->saldo_edupay,
-            'ms_jenjang_id'         => $this->selectedJenjang,
-            'ms_tahun_ajar_id'      => $this->selectedTahunAjar,
+            'ms_jenjang_id'          => $this->ms_jenjang_id,
+            'nama'                   => $this->nama,
+            'nama_kelas'             => $this->nama_kelas ?? null,
+            'nama_jabatan'           => $this->nama_jabatan ?? null,
+            'educard'                => $this->educard,
+            'saldo_edupay'           => $this->saldo_edupay,
+
+            'ms_kantin_id'           => $this->selectedKantin,
+            'ms_tahun_ajar_id'       => $this->selectedTahunAjar,
         ]);
 
         // NOTIFIKASI
@@ -175,8 +187,8 @@ class Index extends Component
     {
         $query = ProdukSmartCanteen::query();
 
-        if ($this->selectedJenjang) {
-            $query->where('ms_jenjang_id', $this->selectedJenjang);
+        if ($this->selectedKantin) {
+            $query->where('ms_kantin_id', $this->selectedKantin);
         }
 
         if ($this->search) {
@@ -196,7 +208,7 @@ class Index extends Component
         $allProduk = $query->get();
 
         // ambil kategori
-        $kategori = KategoriProdukSmartCanteen::where('ms_jenjang_id', $this->selectedJenjang)->get();
+        $kategori = KategoriProdukSmartCanteen::where('ms_kantin_id', $this->selectedKantin)->get();
 
         return view('livewire.smart-canteen.transaksi-produk.index', [
             'allProduk' => $allProduk,

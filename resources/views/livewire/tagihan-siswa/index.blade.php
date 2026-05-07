@@ -2,18 +2,18 @@
     <div class="card-header border-0 pb-0">
         <div class="d-flex align-items-center">
             <h5 class="card-title mb-0 flex-grow-1">Data Tagihan Siswa</h5>
-            @if ($selectedJenjang && $selectedTahunAjar)
             <div class="flex-shrink-0">
                 <div class="d-flex gap-2 flex-wrap">
+                    @if ($selectedJenjang && $selectedTahunAjar && $selectedKelas)
                     <button wire:click="cetakLaporanTagihan" class="btn btn-danger d-inline-flex align-items-center gap-1">
                         <i class="ri-printer-line align-bottom"></i>
                         <span>Cetak Laporan</span>
                     </button>
                     <button data-bs-toggle="modal" data-bs-target="#ExportLaporanExcel" class="btn btn-soft-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button>
+                    @endif
                     <button data-bs-toggle="modal" id="create-btn" data-bs-target="#ModalAddTagihan" wire:click.prevent="$emit('showCreateTagihan', {{ $selectedJenjang }}, {{ $selectedTahunAjar }})" class="btn btn-primary"><i class="ri-play-list-add-line"></i> Tagihan Baru</button>
                 </div>
             </div>
-            @endif
         </div>
     </div>
     <div class="card-body">
@@ -84,34 +84,40 @@
                                 {{-- <p class="text-muted mb-0">{{ $item->ms_siswa->deskripsi }}</p> --}}
                             </td>
                             <td>{{ $item->ms_kelas->nama_kelas }}</td>
-                            <td>{{ $item->jumlah_jenis_tagihan_siswa() }} item</td>
+                            <td>{{ $item->jumlah_item }} item</td>
+                            
                             <td>
                                 <span class="fs-14 fw-medium text-info">
-                                RP{{ number_format($item->total_tagihan_siswa(), 0, ',', '.') }}
+                                    RP{{ number_format($item->total_tagihan, 0, ',', '.') }}
                                 </span>
                             </td>
+                            
                             <td>
                                 <span class="fs-14 fw-medium text-success">
-                                    RP{{ number_format($item->total_dibayarkan(), 0, ',', '.') }}</td>
+                                    RP{{ number_format($item->total_bayar, 0, ',', '.') }}
                                 </span>
                             </td>
+                            
                             <td>
                                 <span class="fs-14 fw-medium text-danger">
-                                    RP{{ number_format($item->total_tagihan_siswa() - $item->total_dibayarkan(), 0, ',', '.') }}
+                                    RP{{ number_format($item->total_tagihan - $item->total_bayar, 0, ',', '.') }}
                                 </span>
                             </td>
-                            <td class="text-start">
+                            
+                            <td>
                                 @php
-                                    $estimasi = $item->total_tagihan_siswa();
-                                    $dibayarkan = $item->total_dibayarkan();
+                                $estimasi = $item->total_tagihan;
+                                $dibayarkan = $item->total_bayar;
                                 @endphp
-                                <span class="fs-14 fw-medium mb-0">
+                            
+                                <span class="fs-14 fw-medium">
                                     @if ($estimasi > 0)
                                     {{ number_format(($dibayarkan / $estimasi) * 100, 2) }}% <i class="ri-bar-chart-fill text-success fs-16 align-middle ms-2"></i>
-                                @else
+                                    @else
                                     -
-                                @endif</span>
-                            </td>                            
+                                    @endif
+                                </span>
+                            </td>                          
                             {{-- <td>
                                 <div class="hstack gap-2">
                                     <button class="btn btn-sm btn-success d-inline-flex align-items-center"
@@ -130,14 +136,10 @@
                                 <div class="hstack gap-2">
                                     {{-- Tombol Kelola Tagihan --}}
                                     <button class="btn btn-sm btn-primary d-inline-flex align-items-center"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#ModalKelolaTagihan"
+                                            data-bs-toggle="offcanvas" data-bs-target="#offcanvasManage"
+                                            aria-controls="offcanvasManage"
                                             title="Kelola Tagihan"
-                                            wire:click.prevent="$emit('showTagihan', {
-                                                ms_penempatan_siswa_id: {{ $item->ms_penempatan_siswa_id }},
-                                                jenjang: {{ $item->ms_jenjang_id }},
-                                                tahunAjar: {{ $item->ms_tahun_ajar_id }}
-                                            })">
+                                            wire:click.prevent="$emit('manageTagihan', {{ $item->ms_penempatan_siswa_id }})">
                                         <i class="ri-settings-3-line align-bottom me-1"></i> Kelola
                                     </button>
                             
@@ -215,7 +217,7 @@
                         </tr>
                     </tfoot>
                 </table>
-                {{-- {{ $tagihans->links() }} --}}
+                {{ $tagihans->links() }}
             </div>
 
             @endif

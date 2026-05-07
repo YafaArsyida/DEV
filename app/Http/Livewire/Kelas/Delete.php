@@ -2,10 +2,8 @@
 
 namespace App\Http\Livewire\Kelas;
 
-use App\Models\AktifitasPengguna;
-use App\Models\Kelas as KelasModel;
-use App\Models\PenempatanSiswa;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Kelas;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class Delete extends Component
@@ -21,30 +19,58 @@ class Delete extends Component
 
     public function deleteKelas()
     {
-        // Validasi apakah id tersedia
-        if ($this->ms_kelas_id) {
-            $kelas = KelasModel::find($this->ms_kelas_id);
+        if (!$this->ms_kelas_id) {
+            return;
+        }
 
-            if ($kelas) {
-                // Pengecekan apakah kelas ini sudah digunakan di PenempatanSiswa
-                $isUsedInPenempatan = PenempatanSiswa::where('ms_kelas_id', $this->ms_kelas_id)->exists();
+        DB::beginTransaction();
 
-                if ($isUsedInPenempatan) {
-                    // Jika sudah digunakan, beri peringatan
-                    $this->dispatchBrowserEvent('alertify-error', ['message' => 'Kelas tidak dapat dihapus karena sudah digunakan di Penempatan Siswa.']);
-                } else {
-                    // Simpan nama kelas untuk log aktivitas sebelum dihapus
-                    $namaKelas = $kelas->nama_kelas;
+        try {
+            $kelas = Kelas::lockForUpdate()
+                ->find($this->ms_kelas_id);
 
-                    // Hapus kelas
-                    $kelas->delete();
-                    $this->dispatchBrowserEvent('hide-delete-modal', ['modalId' => 'ModalDeleteKelas']);
-                    $this->emit('refreshKelass'); // Refresh data di komponen Index
-                    $this->dispatchBrowserEvent('alertify-success', ['message' => 'Kelas berhasil dihapus.']);
-                }
-            } else {
-                $this->dispatchBrowserEvent('alertify-error', ['message' => 'Kelas tidak ditemukan.']);
+            // 🔥 VALIDASI DATA
+            if (!$kelas) {
+                DB::rollBack();
+
+                $this->dispatchBrowserEvent('alertify-error', [
+                    'message' => 'Kelas tidak ditemukan'
+                ]);
+                return;
             }
+
+            // 🔥 VALIDASI BISNIS
+            if ($kelas->ms_penempatan_siswa()->exists()) {
+                DB::rollBack();
+
+                $this->dispatchBrowserEvent('alertify-error', [
+                    'message' => 'Kelas tidak bisa dihapus karena masih digunakan'
+                ]);
+                return;
+            }
+
+            $namaKelas = $kelas->nama_kelas;
+
+            $kelas->delete();
+
+            DB::commit();
+
+            $this->dispatchBrowserEvent('hide-modal', [
+                'modalId' => 'ModalDeleteKelas'
+            ]);
+
+            $this->dispatchBrowserEvent('alertify-success', [
+                'message' => "Kelas {$namaKelas} berhasil dihapus"
+            ]);
+
+            $this->reset('ms_kelas_id');
+            $this->emit('refreshKelass');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => $e->getMessage() ?? 'Terjadi kesalahan sistem'
+            ]);
         }
     }
 

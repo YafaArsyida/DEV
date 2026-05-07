@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Models\SmartCanteen\Kantin;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -72,5 +74,15 @@ class User extends Authenticatable
     public function ms_akses_jenjang()
     {
         return $this->hasMany(AksesJenjang::class, 'ms_pengguna_id', 'ms_pengguna_id');
+    }
+
+    public function ms_kantin()
+    {
+        return $this->belongsToMany(
+            Kantin::class,
+            'ms_akses_kantin',
+            'ms_pengguna_id',
+            'ms_kantin_id'
+        );
     }
 }

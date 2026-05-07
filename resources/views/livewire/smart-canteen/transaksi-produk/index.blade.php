@@ -2,78 +2,76 @@
     <div class="card mb-4 shadow-sm border-0">
         <div class="card-body p-4">
 
-    <div class="row g-4 align-items-center">
+            <div class="row g-4 align-items-center">
+                <!-- ============================ -->
+                <!-- KIRI — DATA PENGGUNA -->
+                <!-- ============================ -->
+                <div class="col-md-7">
 
-        <!-- ============================ -->
-        <!-- KIRI — DATA PENGGUNA -->
-        <!-- ============================ -->
-        <div class="col-md-7">
+                    @if($nama)
 
-            @if($nama)
+                        <h4 class="fw-bold text-dark mb-1">
+                            {{ $nama }}
+                            <span class="text-muted">—</span>
 
-                <h4 class="fw-bold text-dark mb-1">
-                    {{ $nama }}
-                    <span class="text-muted">—</span>
+                            @if($user_type === 'siswa')
+                                <span class="text-primary">{{ $nama_kelas ?: 'Belum ada kelas' }}</span>
+                            @elseif($user_type === 'pegawai')
+                                <span class="text-primary">{{ $nama_jabatan ?: 'Belum ada jabatan' }}</span>
+                            @else
+                                <span class="text-primary">Belum ada informasi</span>
+                            @endif
+                        </h4>
 
-                    @if($user_type === 'siswa')
-                        <span class="text-primary">{{ $nama_kelas ?: 'Belum ada kelas' }}</span>
-                    @elseif($user_type === 'pegawai')
-                        <span class="text-primary">{{ $nama_jabatan ?: 'Belum ada jabatan' }}</span>
+                        <div class="text-muted mb-2">
+                            SmartCard :
+                            <span class="fw-semibold text-primary">{{ $educard ?: '-' }}</span>
+                        </div>
+
+                        <div class="mt-1">
+                            {{-- <div class="text-muted small">Saldo EduPay</div> --}}
+                            <h3 class="fw-bold text-success mb-0">
+                                RP{{ number_format($saldo_edupay ?? 0, 0, ',', '.') }}
+                            </h3>
+                        </div>
+
                     @else
-                        <span class="text-primary">Belum ada informasi</span>
+
+                        <div class="text-muted">
+                            <h5 class="mb-0">Scan SmartCard untuk transaksi</h5>
+                        </div>
+
                     @endif
-                </h4>
 
-                <div class="text-muted mb-2">
-                    SmartCard :
-                    <span class="fw-semibold text-primary">{{ $educard ?: '-' }}</span>
                 </div>
 
-                <div class="mt-1">
-                    {{-- <div class="text-muted small">Saldo EduPay</div> --}}
-                    <h3 class="fw-bold text-success mb-0">
-                        RP{{ number_format($saldo_edupay ?? 0, 0, ',', '.') }}
-                    </h3>
+                <!-- ============================ -->
+                <!-- KANAN — INPUT SCAN -->
+                <!-- ============================ -->
+                <div class="col-md-5">
+
+                    <label class="fw-semibold mb-1">Scan / Input SmartCard</label>
+
+                    <div class="input-group input-group-lg shadow-sm">
+
+                        <span class="input-group-text bg-primary text-white border-primary">
+                            <i class="ri-sensor-fill fs-4"></i>
+                        </span>
+
+                        <input type="text"
+                            id="inputSmartcard"
+                            wire:model.defer="smartcardInput"
+                            wire:keydown.enter="prosesSmartcard"
+                            class="form-control border-primary"
+                            placeholder="Tempelkan SmartCard atau ketik kode..."
+                            autofocus>
+                    </div>
+
                 </div>
 
-            @else
-
-                <div class="text-muted">
-                    <h5 class="mb-0">Tempelkan SmartCard untuk menampilkan data pengguna.</h5>
-                </div>
-
-            @endif
-
-        </div>
-
-        <!-- ============================ -->
-        <!-- KANAN — INPUT SCAN -->
-        <!-- ============================ -->
-        <div class="col-md-5">
-
-            <label class="fw-semibold mb-1">Scan / Input SmartCard</label>
-
-            <div class="input-group input-group-lg shadow-sm">
-
-                <span class="input-group-text bg-primary text-white border-primary">
-                    <i class="ri-sensor-fill fs-4"></i>
-                </span>
-
-                <input type="text"
-                       id="inputSmartcard"
-                       wire:model.defer="smartcardInput"
-                       wire:keydown.enter="prosesSmartcard"
-                       class="form-control border-primary"
-                       placeholder="Tempelkan SmartCard atau ketik kode..."
-                       autofocus>
             </div>
 
         </div>
-
-    </div>
-
-</div>
-
     </div>
 
 

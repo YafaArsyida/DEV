@@ -7,77 +7,150 @@ use App\Models\Siswa as SiswaModel;
 use App\Models\Kelas as KelasModel;
 use App\Models\PenempatanSiswa as PenempatanSiswaModel;
 
+use Illuminate\Validation\ValidationException;
+
 use App\Http\Controllers\HelperController;
 use App\Models\EduCard;
 use App\Models\Jenjang;
 use App\Models\TahunAjar;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-
-use Illuminate\Validation\ValidationException;
 
 class Create extends Component
 {
-    public $nama_siswa, $nisn, $tempat_lahir, $tanggal_lahir, $jenis_kelamin, $alamat, $nama_ayah, $nama_ibu, $telepon, $deskripsi, $educard;
+    public $form = [
+        'nama_siswa' => null,
+        'nisn' => null,
+        'tempat_lahir' => null,
+        'tanggal_lahir' => null,
+        'jenis_kelamin' => null,
+        'alamat' => null,
+        'nama_ayah' => null,
+        'nama_ibu' => null,
+        'telepon' => null,
+        'deskripsi' => null,
 
-    public $ms_siswa_id, $ms_kelas_id, $ms_jenjang_id, $ms_tahun_ajar_id, $ms_pengguna_id;
+        'ms_kelas_id' => null,
+        'ms_jenjang_id' => null,
+        'ms_tahun_ajar_id' => null,
+
+        'educard' => null,
+    ];
 
     public $nama_jenjang;
     public $nama_tahun_ajar;
+    public $selectKelas = [];
 
     protected $listeners = [
         'showCreateSiswa',
     ];
 
-    public function showCreateSiswa($selectedJenjang, $selectedTahunAjar)
+    public function showCreateSiswa($jenjang, $tahunAjar)
     {
-        $this->ms_jenjang_id = $selectedJenjang;
-        $this->ms_tahun_ajar_id = $selectedTahunAjar;
+        $this->reset(['form']);
+        $this->resetErrorBag();
+        $this->resetValidation();
 
-        $this->nama_jenjang = Jenjang::where('ms_jenjang_id', $selectedJenjang)->value('nama_jenjang');
-        $this->nama_tahun_ajar = TahunAjar::where('ms_tahun_ajar_id', $selectedTahunAjar)->value('nama_tahun_ajar');
+        $this->form['ms_jenjang_id'] = $jenjang;
+        $this->form['ms_tahun_ajar_id'] = $tahunAjar;
 
-        // $this->emitSelf('render');
+        $this->nama_jenjang = Jenjang::whereKey($jenjang)->value('nama_jenjang');
+        $this->nama_tahun_ajar = TahunAjar::whereKey($tahunAjar)->value('nama_tahun_ajar');
+
+        $this->loadKelas();
     }
 
     protected function rules()
     {
         return [
-            'nama_siswa' => 'required|string|max:255',
-            'telepon' => 'required|string|max:20',
-            'tanggal_lahir' => 'required|date',
-            'ms_kelas_id' => 'required|exists:ms_kelas,ms_kelas_id',
-            'ms_jenjang_id' => 'required|exists:ms_jenjang,ms_jenjang_id',
-            'ms_tahun_ajar_id' => 'required|exists:ms_tahun_ajar,ms_tahun_ajar_id',
-            'deskripsi' => 'nullable|string',
+            'form.nama_siswa' => 'required|string|max:255',
+            'form.telepon' => 'required|string|max:20',
+            'form.ms_kelas_id' => 'required|exists:ms_kelas,ms_kelas_id',
+            'form.ms_jenjang_id' => 'required|exists:ms_jenjang,ms_jenjang_id',
+            'form.ms_tahun_ajar_id' => 'required|exists:ms_tahun_ajar,ms_tahun_ajar_id',
+            'form.deskripsi' => 'nullable|string',
         ];
     }
 
     protected $messages = [
-        'nama_siswa.required' => 'Nama siswa tidak boleh kosong',
-        'nama_siswa.string' => 'Nama siswa harus berupa teks',
-        'nama_siswa.max' => 'Nama siswa maksimal 255 karakter',
+        'form.nama_siswa.required' => 'Nama siswa tidak boleh kosong',
+        'form.nama_siswa.string' => 'Nama siswa harus berupa teks',
+        'form.nama_siswa.max' => 'Nama siswa maksimal 255 karakter',
 
-        'telepon.required' => 'Telepon tidak boleh kosong',
-        'telepon.string' => 'Telepon harus berupa teks',
-        'telepon.max' => 'Telepon maksimal 20 karakter',
+        'form.telepon.required' => 'Telepon tidak boleh kosong',
+        'form.telepon.string' => 'Telepon harus berupa teks',
+        'form.telepon.max' => 'Telepon maksimal 20 karakter',
 
-        'tanggal_lahir.required' => 'Tanggal lahir tidak boleh kosong',
-        'tanggal_lahir.date' => 'Tanggal lahir harus berupa format tanggal yang valid (YYYY-MM-DD)',
+        'form.ms_kelas_id.required' => 'Kelas tidak boleh kosong',
+        'forn.ms_kelas_id.exists' => 'Kelas tidak valid',
 
-        'ms_kelas_id.required' => 'Kelas tidak boleh kosong',
-        'ms_kelas_id.exists' => 'Kelas tidak valid',
+        'form.ms_jenjang_id.required' => 'Jenjang tidak boleh kosong',
+        'form.ms_jenjang_id.exists' => 'Jenjang tidak valid',
 
-        'ms_jenjang_id.required' => 'Jenjang tidak boleh kosong',
-        'ms_jenjang_id.exists' => 'Jenjang tidak valid',
-
-        'ms_tahun_ajar_id.required' => 'Tahun ajar tidak boleh kosong',
-        'ms_tahun_ajar_id.exists' => 'Tahun ajar tidak valid',
+        'form.ms_tahun_ajar_id.required' => 'Tahun ajar tidak boleh kosong',
+        'form.ms_tahun_ajar_id.exists' => 'Tahun ajar tidak valid',
     ];
 
-    public function updated($fields)
+    public function updated($field)
     {
-        $this->validateOnly($fields);
+        if (str_starts_with($field, 'form.')) {
+            $this->validateOnly($field);
+        }
+    }
+
+    protected function createDataSiswa()
+    {
+        return SiswaModel::create([
+            'nama_siswa' => $this->form['nama_siswa'],
+            'nisn' => $this->form['nisn'] ?: null,
+            'tempat_lahir' => $this->form['tempat_lahir'],
+            'tanggal_lahir' => $this->form['tanggal_lahir'],
+            'jenis_kelamin' => $this->form['jenis_kelamin'],
+            'alamat' => $this->form['alamat'],
+            'nama_ayah' => $this->form['nama_ayah'],
+            'nama_ibu' => $this->form['nama_ibu'],
+            'telepon' => HelperController::normalizePhoneNumber($this->form['telepon']),
+            'deskripsi' => $this->form['deskripsi'],
+        ]);
+    }
+
+    protected function createPenempatan($siswaId)
+    {
+        return PenempatanSiswaModel::create([
+            'ms_siswa_id' => $siswaId,
+            'ms_kelas_id' => $this->form['ms_kelas_id'],
+            'ms_tahun_ajar_id' => $this->form['ms_tahun_ajar_id'],
+            'ms_jenjang_id' => $this->form['ms_jenjang_id'],
+            'ms_pengguna_id' => auth()->id(),
+        ]);
+    }
+
+    protected function syncEduCard($siswaId)
+    {
+        if ($this->form['educard']) {
+            EduCard::updateOrCreate(
+                ['ms_siswa_id' => $siswaId],
+                [
+                    'ms_pengguna_id' => auth()->id(),
+                    'kode_kartu' => $this->form['educard'],
+                    'jenis_pemilik' => 'siswa',
+                    'status_kartu' => 'aktif',
+                    'deskripsi' => 'EduCard ' . $this->form['nama_siswa'],
+                ]
+            );
+        }
+    }
+
+    protected function afterCreateSuccess()
+    {
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Berhasil menambah siswa!'
+        ]);
+
+        $this->dispatchBrowserEvent('hide-modal', [
+            'modalId' => 'ModalCreateSiswa'
+        ]);
+
+        $this->emit('refreshSiswas');
     }
 
     public function save()
@@ -85,96 +158,47 @@ class Create extends Component
         DB::beginTransaction();
 
         try {
-            $validatedData = $this->validate();
+            $this->validate();
 
-            $normalizedPhone = HelperController::normalizePhoneNumber($this->telepon);
-
-            $siswa = SiswaModel::create([
-                'nama_siswa' => $this->nama_siswa,
-                'nisn' => $this->nisn ?: null,
-                'tempat_lahir' => $this->tempat_lahir,
-                'tanggal_lahir' => $this->tanggal_lahir,
-                'jenis_kelamin' => $this->jenis_kelamin,
-                'alamat' => $this->alamat,
-                'nama_ayah' => $this->nama_ayah,
-                'nama_ibu' => $this->nama_ibu,
-                'telepon' => $normalizedPhone,
-                'deskripsi' => $this->deskripsi,
-            ]);
-
-            PenempatanSiswaModel::create([
-                'ms_siswa_id' => $siswa->ms_siswa_id,
-                'ms_kelas_id' => $this->ms_kelas_id,
-                'ms_tahun_ajar_id' => $this->ms_tahun_ajar_id,
-                'ms_jenjang_id' => $this->ms_jenjang_id,
-                'ms_pengguna_id' => Auth::id(),
-            ]);
-
-            if (!empty($this->educard)) {
-                EduCard::create([
-                    'ms_siswa_id' => $siswa->ms_siswa_id,
-                    'ms_pengguna_id' => Auth::id(),
-                    'kode_kartu' => $this->educard,
-                    'jenis_pemilik' => 'siswa',
-                    'status_kartu' => 'aktif',
-                    'deskripsi' => 'EduCard ' . $this->nama_siswa,
-                ]);
-            }
+            $siswa = $this->createDataSiswa();
+            $this->createPenempatan($siswa->ms_siswa_id);
+            $this->syncEduCard($siswa->ms_siswa_id);
 
             DB::commit();
 
-            $this->dispatchBrowserEvent('alertify-success', [
-                'message' => 'Berhasil menambah siswa!'
-            ]);
-
-            $this->resetInput();
-            $this->emit('refreshSiswas');
-            $this->emit('refreshKelass');
+            $this->afterCreateSuccess();
         } catch (ValidationException $e) {
             DB::rollBack();
 
-            // 🔥 INI KUNCINYA
             $this->dispatchBrowserEvent('alertify-error', [
-                'message' => 'Validasi gagal, cek kembali input!'
+                'message' => 'Validasi gagal, cek input'
             ]);
 
-            throw $e; // supaya error tetap tampil di blade
+            throw $e; // 🔥 INI KUNCI
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
 
             $this->dispatchBrowserEvent('alertify-error', [
-                'message' => 'Gagal menambah siswa: ' . $e->getMessage()
+                'message' => $e->getMessage() ?? 'Terjadi kesalahan sistem'
             ]);
         }
     }
 
-    public function resetInput()
+    public function loadKelas()
     {
-        $this->nama_siswa = '';
-        $this->nisn = '';
-        $this->tempat_lahir = '';
-        // $this->tanggal_lahir = '';
-        $this->jenis_kelamin = '';
-        $this->alamat = '';
-        $this->nama_ayah = '';
-        $this->nama_ibu = '';
-        $this->telepon = '';
-        $this->deskripsi = '';
+        if (!$this->form['ms_jenjang_id'] || !$this->form['ms_tahun_ajar_id']) {
+            $this->selectKelas = [];
+            return;
+        }
+
+        $this->selectKelas = KelasModel::where('ms_jenjang_id', $this->form['ms_jenjang_id'])
+            ->where('ms_tahun_ajar_id', $this->form['ms_tahun_ajar_id'])
+            ->get();
     }
 
     public function render()
     {
-        // Data untuk dropdown Kelas (hanya jika Jenjang dan Tahun Ajar dipilih)
-        $select_kelas = [];
-        if ($this->ms_jenjang_id && $this->ms_tahun_ajar_id) {
-            $select_kelas = KelasModel::where('ms_jenjang_id', $this->ms_jenjang_id)
-                ->where('ms_tahun_ajar_id', $this->ms_tahun_ajar_id)
-                ->get();
-        }
-
-        return view('livewire.siswa.create', [
-            'select_kelas' => $select_kelas,
-        ]);
+        return view('livewire.siswa.create');
     }
 }

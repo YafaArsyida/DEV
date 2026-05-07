@@ -2,7 +2,6 @@
 
 namespace App\Http\Livewire\LaporanEduPaySiswa;
 
-use App\Models\EduPaySiswa;
 use App\Models\Kelas;
 use App\Models\TransaksiEduPay;
 use Livewire\Component;

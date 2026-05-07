@@ -15,9 +15,6 @@
             <!--end col-->
         </div>
         <div class="row">
-            {{-- <div class="col-xxl-3 pe-1">
-                @livewire('kelas.navigation')
-            </div> --}}
             <div class="col-xxl-12">
                 @livewire('tagihan-jenis.index')   
                 @livewire('tagihan-jenis.detail')   

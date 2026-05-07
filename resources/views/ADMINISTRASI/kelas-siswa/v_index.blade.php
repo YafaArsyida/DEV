@@ -21,20 +21,23 @@
                 </div>
             </div>
             <!--end col-->
-            <div class="col-xxl-4 pe-1">
-                @livewire('kelas.index')   
+            <div class="col-xxl-4">
+                <div class="sticky-side-div">
+                    @livewire('kelas.index')   
+                </div>
                 @livewire('kelas.create')   
                 @livewire('kelas.edit')   
                 @livewire('kelas.delete')   
                 @livewire('kelas.change')   
                 @livewire('kelas.promote')   
             </div>
-            <div class="col-xxl-8 ps-0">
+            <div class="col-xxl-8">
                 @livewire('siswa.index')    
                 @livewire('siswa.detail')    
                 @livewire('siswa.create')    
                 @livewire('siswa.edit')    
                 @livewire('siswa.delete')    
+                @livewire('siswa.bulk-delete')    
                 @livewire('siswa.import')    
                 @livewire('siswa.export')    
                 @livewire('siswa.import-telepon')    

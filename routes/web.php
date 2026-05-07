@@ -33,6 +33,7 @@ use App\Http\Controllers\LaporanTabunganSiswa;
 use App\Http\Controllers\LaporanTagihanSiswa;
 use App\Http\Controllers\ManajemenKepegawaian;
 use App\Http\Controllers\PenggunaJenjang;
+use App\Http\Controllers\SmartCanteenAdministrasiKantin;
 use App\Http\Controllers\SmartCanteenAdministrasiProduk;
 use App\Http\Controllers\SmartCanteenDashboard;
 use App\Http\Controllers\SmartCanteenLaporanTransaksi;
@@ -77,7 +78,7 @@ Route::get('/', function () {
     // Jika sudah login → arahkan sesuai role
     $user = auth()->user();
 
-    if ($user->peran === 'kantin') {
+    if ($user->peran === 'KANTIN') {
         return redirect()->route('smartCanteen.dashboard');
     }
 
@@ -104,6 +105,7 @@ Route::middleware(['auth', 'peran:SUPERADMIN,ADMINISTRASI,KANTIN'])->group(funct
     // SMARTCANTEEN 
     Route::get('/smartCanteen/dashboard', [SmartCanteenDashboard::class, 'index'])->name('smartCanteen.dashboard');
 
+    Route::get('/smartCanteen/administrasi/kantin', [SmartCanteenAdministrasiKantin::class, 'index'])->name('smartCanteen.administrasi.kantin');
     Route::get('/smartCanteen/administrasi/produk', [SmartCanteenAdministrasiProduk::class, 'index'])->name('smartCanteen.administrasi.produk');
 
     Route::get('/smartCanteen/transaksi/produk', [SmartCanteenTransaksiProduk::class, 'index'])->name('smartCanteen.transaksi.produk');

@@ -16,13 +16,15 @@
         </div>
         <div class="row">
             <!--end col-->
-            <div class="col-xxl-4 pe-1">
-                @livewire('kategori-tagihan-siswa.index')   
+            <div class="col-xxl-4">
+                <div class="sticky-side-div">
+                    @livewire('kategori-tagihan-siswa.index')   
+                </div>
                 @livewire('kategori-tagihan-siswa.create')   
                 @livewire('kategori-tagihan-siswa.edit')   
                 @livewire('kategori-tagihan-siswa.delete')   
             </div>
-            <div class="col-xxl-8 ps-0">
+            <div class="col-xxl-8">
                 @livewire('jenis-tagihan-siswa.index')   
                 @livewire('jenis-tagihan-siswa.create')   
                 @livewire('jenis-tagihan-siswa.edit')   

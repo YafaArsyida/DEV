@@ -12,14 +12,14 @@
                         <div class="row g-3">
                             <div class="col-lg-8">
                                 <label for="nama_kategori_tagihan_siswa" class="form-label">Nama Kategori Tagihan</label>
-                                <input type="text" wire:model.defer="nama_kategori_tagihan_siswa" id="nama_kategori_tagihan_siswa"  class="form-control" placeholder="SPP/ UANG MAKAN/ TRANSPORT ......." />
+                                <input type="text" wire:model.defer="nama_kategori_tagihan_siswa" id="nama_kategori_tagihan_siswa"  class="form-control @error('nama_kategori_tagihan_siswa') is-invalid @enderror" placeholder="SPP/ UANG MAKAN/ TRANSPORT ......." />
                                 @error('nama_kategori_tagihan_siswa') 
                                     <footer class="text-danger mt-0">{{ $message }}</footer>
                                 @enderror
                             </div>
                             <div class="col-lg-4">
                                 <label for="urutan" class="form-label">Urutan</label>
-                                <input type="number" wire:model.defer="urutan" class="form-control" placeholder="1, 2, 3, ..." />
+                                <input type="number" wire:model.defer="urutan" class="form-control @error('urutan') is-invalid @enderror" placeholder="1, 2, 3, ..." />
                                 @error('urutan') 
                                     <footer class="text-danger mt-0">{{ $message }}</footer>
                                 @enderror

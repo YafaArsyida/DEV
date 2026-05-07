@@ -30,27 +30,25 @@ class Index extends Component
     public $namaTahunAjar = '';
     public $namaKelas = '';
 
-    // Listener untuk Livewire
     protected $listeners = [
         'refreshSiswas' => 'handleRefreshSiswas',
         'parameterUpdated' => 'updateParameters',
+        'refreshKelass' => 'updatedSelectedKelas'
     ];
 
     public function handleRefreshSiswas($selected = [])
     {
-        $this->siswaSelected = $selected; // Kosongkan array
-        $this->emitSelf('$refresh'); // Memicu render ulang komponen sendiri
+        $this->siswaSelected = $selected;
+        $this->selectAll = false;
+
+        $this->emitSelf('$refresh'); // optional
     }
 
     public function updatedSelectAll($value)
     {
-        if ($value) {
-            // Tambahkan semua ID siswa dari halaman aktif
-            $this->siswaSelected = collect($this->siswasOnPage)->pluck('ms_penempatan_siswa_id')->toArray();
-        } else {
-            // Kosongkan siswaSelected
-            $this->siswaSelected = [];
-        }
+        $this->siswaSelected = $value
+            ? collect($this->siswasOnPage)->pluck('ms_penempatan_siswa_id')->toArray()
+            : [];
     }
 
     public function updatingSearch()
@@ -58,110 +56,103 @@ class Index extends Component
         $this->resetPage(); // Reset pagination ketika pencarian berubah
     }
 
-    public function updatedSelectedKelas()
-    {
-        $kelas = KelasModel::find($this->selectedKelas);
-        $this->namaKelas = $kelas ? $kelas->nama_kelas : '';
-
-        $this->resetPage(); // Reset pagination ketika kelas berubah
-    }
-
     public function updateParameters($jenjang, $tahunAjar)
     {
         $this->selectedJenjang = $jenjang;
         $this->selectedTahunAjar = $tahunAjar;
 
-        $janjang = Jenjang::find($jenjang);
-        $tahunAjar = TahunAjar::find($tahunAjar);
-        $this->namaJenjang = $janjang ? $janjang->nama_jenjang : 'Tidak Diketahui';
-        $this->namaTahunAjar = $tahunAjar ? $tahunAjar->nama_tahun_ajar : 'Tidak Diketahui';
+        $this->namaJenjang = Jenjang::whereKey($jenjang)->value('nama_jenjang') ?? '-';
+        $this->namaTahunAjar = TahunAjar::whereKey($tahunAjar)->value('nama_tahun_ajar') ?? '-';
 
-        $this->resetPage(); // Reset pagination ketika parameter berubah
+        $this->resetPage();
     }
 
-    public function showExportSiswa()
+    public function updatedSelectedKelas()
     {
-        // Query dengan filter jenjang, tahun ajar, dan kelas
-        $query = PenempatanSiswaModel::with(['ms_siswa', 'ms_kelas', 'ms_tahun_ajar', 'ms_jenjang'])
-            ->join('ms_siswa', 'ms_penempatan_siswa.ms_siswa_id', '=', 'ms_siswa.ms_siswa_id')
-            ->where('ms_jenjang_id', $this->selectedJenjang)
-            ->where('ms_tahun_ajar_id', $this->selectedTahunAjar);
+        $this->namaKelas = KelasModel::whereKey($this->selectedKelas)
+            ->value('nama_kelas') ?? '';
 
-        // Filter berdasarkan kelas (jika dipilih)
-        if ($this->selectedKelas) {
-            $query->where('ms_kelas_id', $this->selectedKelas);
-        }
-
-        // Ambil semua data tanpa pagination
-        $siswas = $query->orderBy('ms_penempatan_siswa.ms_kelas_id')
-            ->orderBy('ms_siswa.nama_siswa')->get();
-
-        // Hitung saldo_tabungan dan saldo_edupay
-        $siswas = $siswas->map(function ($item) {
-            $item['saldo_tabungan'] = $item->ms_siswa->saldo_tabungan();
-            $item['saldo_edupay'] = $item->ms_siswa->saldo_edupay();
-            return $item;
-        });
-
-        // Emit data ke komponen Livewire lainnya
-        $this->emit('prepareExport', $this->selectedJenjang, $this->selectedTahunAjar, $siswas->toArray());
+        $this->resetPage();
     }
+
+    // public function showExportSiswa()
+    // {
+    //     // Query dengan filter jenjang, tahun ajar, dan kelas
+    //     $query = PenempatanSiswaModel::with(['ms_siswa', 'ms_kelas', 'ms_tahun_ajar', 'ms_jenjang'])
+    //         ->join('ms_siswa', 'ms_penempatan_siswa.ms_siswa_id', '=', 'ms_siswa.ms_siswa_id')
+    //         ->where('ms_jenjang_id', $this->selectedJenjang)
+    //         ->where('ms_tahun_ajar_id', $this->selectedTahunAjar);
+
+    //     // Filter berdasarkan kelas (jika dipilih)
+    //     if ($this->selectedKelas) {
+    //         $query->where('ms_kelas_id', $this->selectedKelas);
+    //     }
+
+    //     // Ambil semua data tanpa pagination
+    //     $siswas = $query->orderBy('ms_penempatan_siswa.ms_kelas_id')
+    //         ->orderBy('ms_siswa.nama_siswa')->get();
+
+    //     // Hitung saldo_tabungan dan saldo_edupay
+    //     $siswas = $siswas->map(function ($item) {
+    //         $item['saldo_tabungan'] = $item->ms_siswa->saldo_tabungan();
+    //         $item['saldo_edupay'] = $item->ms_siswa->saldo_edupay();
+    //         return $item;
+    //     });
+
+    //     // Emit data ke komponen Livewire lainnya
+    //     $this->emit('prepareExport', $this->selectedJenjang, $this->selectedTahunAjar, $siswas->toArray());
+    // }
 
 
     public function render()
     {
-        // Data untuk dropdown Kelas (hanya jika Jenjang dan Tahun Ajar dipilih)
-        $select_kelas = [];
+        $select_kelas = collect();
+
         if ($this->selectedJenjang && $this->selectedTahunAjar) {
-            $select_kelas = KelasModel::where('ms_jenjang_id', $this->selectedJenjang)
+            $select_kelas = KelasModel::query()
+                ->where('ms_jenjang_id', $this->selectedJenjang)
                 ->where('ms_tahun_ajar_id', $this->selectedTahunAjar)
                 ->get();
         }
 
         // Data siswa (hanya jika Jenjang dan Tahun Ajar dipilih)
-        $siswas = null;
+        $siswas = collect();
+
         if ($this->selectedJenjang && $this->selectedTahunAjar) {
-            $query = PenempatanSiswaModel::with([
-                'ms_siswa.ms_educard',
-                'ms_kelas',
-                'ms_tahun_ajar',
-                'ms_jenjang',
-                'ms_siswa.ms_penempatan_ekstrakurikuler.ms_ekstrakurikuler',
-            ])
+            $siswas = PenempatanSiswaModel::query()
                 ->join('ms_siswa', 'ms_penempatan_siswa.ms_siswa_id', '=', 'ms_siswa.ms_siswa_id')
+                ->select('ms_penempatan_siswa.*') // 🔥 WAJIB
+                ->with([
+                    'ms_siswa.ms_educard',
+                    'ms_kelas',
+                    'ms_siswa.ms_penempatan_ekstrakurikuler.ms_ekstrakurikuler'
+                ])
                 ->where('ms_jenjang_id', $this->selectedJenjang)
-                ->where('ms_tahun_ajar_id', $this->selectedTahunAjar);
+                ->where('ms_tahun_ajar_id', $this->selectedTahunAjar)
 
-            // Filter berdasarkan kelas (jika dipilih)
-            if ($this->selectedKelas) {
-                $query->where('ms_kelas_id', $this->selectedKelas);
-            }
-
-            if ($this->search) {
-                $query->where(function ($query) {
-                    $query->whereHas('ms_siswa', function ($query) {
-                        $query->where('nama_siswa', 'like', '%' . $this->search . '%');
-                    })->orWhereHas('ms_siswa.ms_educard', function ($query) {
-                        $query->where('kode_kartu', 'like', '%' . $this->search . '%');
+                ->when(
+                    $this->selectedKelas,
+                    fn($q) =>
+                    $q->where('ms_kelas_id', $this->selectedKelas)
+                )
+                ->when($this->search, function ($q) {
+                    $q->where(function ($q2) {
+                        $q2->whereHas('ms_siswa', function ($q3) {
+                            $q3->where('nama_siswa', 'like', '%' . $this->search . '%');
+                        })
+                            ->orWhereHas('ms_siswa.ms_educard', function ($q3) {
+                                $q3->where('kode_kartu', 'like', '%' . $this->search . '%');
+                            });
                     });
-                });
-            }
-
-            $siswas = $query->orderBy('ms_penempatan_siswa.ms_kelas_id')
-                ->orderBy('ms_siswa.nama_siswa')->paginate(100);
+                })
+                ->orderBy('ms_kelas_id')
+                ->orderBy('ms_siswa.nama_siswa')
+                ->paginate(10);
 
             $this->siswasOnPage = $siswas->items();
         }
 
-        // Cek apakah koleksi siswa kosong.
-        if (!$siswas || $siswas->isEmpty()) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Data siswa tidak ditemukan.']);
-        }
-
         // Return data ke view
-        return view('livewire.siswa.index', [
-            'select_kelas' => $select_kelas,
-            'siswas' => $siswas,
-        ]);
+        return view('livewire.siswa.index', compact('select_kelas', 'siswas'));
     }
 }

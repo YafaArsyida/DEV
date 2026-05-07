@@ -2,19 +2,15 @@
 
 namespace App\Http\Livewire\TagihanJenis;
 
-use App\Models\AktifitasPengguna;
 use App\Models\AkuntansiJurnalDetail;
-use App\Models\DetailTransaksi;
 use App\Models\DetailTransaksiTagihanSiswa;
-use App\Models\JenisTagihan;
+use App\Models\JenisTagihanSiswa;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\DB;
 
 use App\Models\Kelas;
 use App\Models\KeranjangTagihanSiswa;
-use App\Models\PenempatanSiswa;
-use App\Models\Tagihan;
 use App\Models\TagihanSiswa;
 
 class Manage extends Component
@@ -41,18 +37,8 @@ class Manage extends Component
     public $nama_petugas;
 
     protected $listeners = [
-        'showTagihan'
+        'manageTagihan'
     ];
-
-    public function showTagihan($params)
-    {
-        $this->selectedJenjang = $params['jenjang'];
-        $this->selectedTahunAjar = $params['tahunAjar'];
-        $this->ms_jenis_tagihan_siswa_id = $params['ms_jenis_tagihan_siswa_id'];
-        $this->resetPage();
-        $this->TagihanSelectAll = false;
-        $this->TagihanSelected = [];
-    }
 
     public function mount()
     {
@@ -67,6 +53,25 @@ class Manage extends Component
     public function updatingSelectedKelas()
     {
         $this->emitSelf('$refresh');
+    }
+
+    public function manageTagihan($id)
+    {
+        $jenis = JenisTagihanSiswa::with('ms_kategori_tagihan_siswa')->find($id);
+
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Tagihan dimuat'
+        ]);
+
+        $this->ms_jenis_tagihan_siswa_id = $id;
+
+        $this->selectedJenjang = $jenis->ms_jenjang_id;
+        $this->selectedTahunAjar = $jenis->ms_tahun_ajar_id;
+
+        // $this->resetPage();
+        
+        $this->TagihanSelectAll = false;
+        $this->TagihanSelected = [];
     }
 
     public function updatedTagihanSelectAll($value)
@@ -152,6 +157,10 @@ class Manage extends Component
         DB::beginTransaction();
 
         try {
+            if (empty($this->TagihanSelected)) {
+                throw new \Exception('Tidak ada data yang dipilih');
+            }
+
             // Validasi fleksibel berdasarkan input yang diberikan
             $rules = [];
             $messages = [];
@@ -232,7 +241,7 @@ class Manage extends Component
 
             // Berikan notifikasi sukses
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'Tagihan berhasil diperbarui.']);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // Rollback transaksi jika terjadi kesalahan
             DB::rollBack();
 
@@ -251,47 +260,48 @@ class Manage extends Component
                 ->get();
         }
 
-
         // Query untuk mendapatkan tagihan berdasarkan jenis tagihan dengan JOIN
-        $query = TagihanSiswa::select('ms_tagihan_siswa.*', 'ms_siswa.nama_siswa', 'ms_kelas.nama_kelas', 'ms_jenis_tagihan_siswa.nama_jenis_tagihan_siswa', 'ms_kategori_tagihan_siswa.nama_kategori_tagihan_siswa')
-            ->join('ms_penempatan_siswa', 'ms_tagihan_siswa.ms_penempatan_siswa_id', '=', 'ms_penempatan_siswa.ms_penempatan_siswa_id')
-            ->join('ms_siswa', 'ms_penempatan_siswa.ms_siswa_id', '=', 'ms_siswa.ms_siswa_id')
-            ->join('ms_kelas', 'ms_penempatan_siswa.ms_kelas_id', '=', 'ms_kelas.ms_kelas_id')
-            ->join('ms_jenis_tagihan_siswa', 'ms_tagihan_siswa.ms_jenis_tagihan_siswa_id', '=', 'ms_jenis_tagihan_siswa.ms_jenis_tagihan_siswa_id')
-            ->join('ms_kategori_tagihan_siswa', 'ms_jenis_tagihan_siswa.ms_kategori_tagihan_siswa_id', '=', 'ms_kategori_tagihan_siswa.ms_kategori_tagihan_siswa_id')
-            ->where('ms_tagihan_siswa.ms_jenis_tagihan_siswa_id', $this->ms_jenis_tagihan_siswa_id);
+        $query = TagihanSiswa::query()
+            ->with([
+                'ms_jenis_tagihan_siswa.ms_kategori_tagihan_siswa',
+                'ms_penempatan_siswa.ms_siswa',
+                'ms_penempatan_siswa.ms_kelas'
+            ])
+            ->select('ms_tagihan_siswa.*') // 🔥 penting biar tidak bentrok
+            ->join('ms_penempatan_siswa', 'ms_penempatan_siswa.ms_penempatan_siswa_id', '=', 'ms_tagihan_siswa.ms_penempatan_siswa_id')
+            ->join('ms_siswa', 'ms_siswa.ms_siswa_id', '=', 'ms_penempatan_siswa.ms_siswa_id')
+            ->join('ms_kelas', 'ms_kelas.ms_kelas_id', '=', 'ms_penempatan_siswa.ms_kelas_id')
+            ->where('ms_tagihan_siswa.ms_jenis_tagihan_siswa_id', $this->ms_jenis_tagihan_siswa_id)
+            ->withSum('dt_transaksi_tagihan_siswa as total_bayar', 'jumlah_bayar');
 
-        // Filter kelas jika dipilih
+        // FILTER tetap pakai relation (clean)
         if ($this->selectedKelas) {
             $query->where('ms_kelas.ms_kelas_id', $this->selectedKelas);
         }
 
-        // Filter pencarian siswa
         if ($this->search) {
             $query->where('ms_siswa.nama_siswa', 'like', '%' . $this->search . '%');
         }
 
-        // Mengambil tagihan yang sudah difilter
-        $tagihans = $query->orderBy('ms_kelas.ms_kelas_id', 'ASC')
-            ->orderBy('ms_siswa.nama_siswa', 'ASC')
+        // ORDER BY jadi simple & cepat
+        $tagihans = $query
+            ->orderBy('ms_kelas.nama_kelas')
+            ->orderBy('ms_siswa.nama_siswa')
             ->get();
 
-        // Simpan data tagihan dari halaman aktif
-        $this->tagihanOnPage = $tagihans;
-        // Hitung total estimasi, dibayarkan, dan kekurangan
+        // TOTAL
         $totalEstimasi = $tagihans->sum('jumlah_tagihan_siswa');
-        $totalDibayarkan = $tagihans->sum(function ($item) {
-            return $item->jumlah_sudah_dibayar();
-        });
+        $totalDibayarkan = $tagihans->sum(fn($t) => $t->total_bayar ?? 0);
         $totalKekurangan = $totalEstimasi - $totalDibayarkan;
+        
+        $this->tagihanOnPage = $tagihans;
 
-
-        return view('livewire.tagihan-jenis.manage', [
-            'select_kelas' => $select_kelas,
-            'tagihans' => $tagihans,
-            'totalEstimasi' => $totalEstimasi,
-            'totalDibayarkan' => $totalDibayarkan,
-            'totalKekurangan' => $totalKekurangan,
-        ]);
+        return view('livewire.tagihan-jenis.manage', compact(
+            'select_kelas',
+            'tagihans',
+            'totalEstimasi',
+            'totalDibayarkan',
+            'totalKekurangan'
+        ));
     }
 }

@@ -1,143 +1,119 @@
-{{-- Stop trying to control. --}}
-<div class="card-body">
-    <div class="row">
-        <div class="col-lg-12">
-        
-            <div class="card border-0 shadow-sm rounded-3 h-100">
-                <div class="card-body">
-        
-                    <!-- Nama -->
-                    <h4 class="fw-bold mb-1">
-                        {{ $nama_siswa ?? 'Siswa belum dipilih' }}
-                    </h4>
-        
-                    <!-- Meta -->
-                    <div class="d-flex flex-wrap gap-2 text-muted small mb-3">
-                        <div><a href="#" class="text-primary d-block">{{ $ms_penempatan_siswa_id }}-TemanSekolah</a></div>
-                        <div class="vr"></div>
-                        <div class="text-muted">Kelas : <span class="text-body fw-medium">{{ $nama_kelas ?? 'Belum ada'
-                                }}</span></div>
-                        <div class="vr"></div>
-                        <div class="text-muted">Telepon : <span class="text-body fw-medium">{{ $telepon ?? 'Tidak tersedia'
-                                }}</span></div>
-                    </div>
-        
-                    <!-- Alamat -->
-                    <p class="text-muted small mb-4">
-                        {{ $alamat ?? 'Tidak ada alamat' }}
-                    </p>
-        
-                    <!-- SALDO CARD -->
-                    <div class="p-3 rounded-3 text-white bg-warning">
-        
-                        <p class="mb-1 small">Saldo Edupay</p>
-        
-                        <h2 class="fw-bold text-white mb-0">
-                            Rp{{ number_format($saldoEduPaySiswa, 0, ',', '.') }}
-                        </h2>
-        
-                        <div class="mt-3">
-                            <i class="ri-wallet-3-fill fs-3"></i>
-                        </div>
-                    </div>
-        
-                </div>
+<div class="card">
+    <div class="card-body">
+        <!-- INFO SISWA -->
+        <div class="mb-3">
+            <h4 class="fw-bold mb-1">
+                {{ $nama_siswa ?? 'Siswa belum dipilih' }}
+            </h4>
+
+            <div class="d-flex flex-wrap gap-2 text-muted small">
+                <div>Kelas: <span class="text-body fw-medium">{{ $nama_kelas ?? '-' }}</span></div>
+                <div class="vr"></div>
+                <div>Telepon: <span class="text-body fw-medium">{{ $telepon ?? '-' }}</span></div>
             </div>
-        
+            <!-- Alamat -->
+            <p class="text-muted small">
+                {{ $alamat ?? 'Tidak ada alamat' }}
+            </p>
         </div>
-    </div>
-    <div class="col-lg-12">
-    
-        <div class="card border-0 shadow-sm rounded-3">
-            <div class="card-body">
-    
-                <!-- Tabs -->
-                <ul class="nav nav-tabs nav-tabs-custom nav-success mb-4" role="tablist" wire:ignore>
-                    <li class="nav-item">
-                        <a class="nav-link active" data-bs-toggle="tab" href="#tab-topup">
-                            <i class="ri-arrow-up-circle-fill me-1 text-success"></i> Top-Up
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" href="#tab-penarikan">
-                            <i class="ri-arrow-down-circle-fill me-1 text-danger"></i> Penarikan
-                        </a>
-                    </li>
-                </ul>
-    
-                <div class="tab-content" wire:ignore>
-    
-                    <!-- TOPUP -->
-                    <div class="tab-pane fade show active" id="tab-topup">
-    
-                        <p class="text-muted mb-3">
-                            Tambahkan saldo EduPay siswa
-                        </p>
-    
-                        <div class="input-group mb-3">
-                            <span class="input-group-text bg-success-subtle text-success">Rp</span>
-                            <input type="number" class="form-control form-control-lg" placeholder="Nominal top-up"
+
+        <!-- SALDO CARD -->
+        <div class="p-3 rounded-3 text-white bg-warning mb-4">
+            <p class="mb-1 small">Saldo EduPay</p>
+            <h2 class="fw-bold text-white mb-0">
+                Rp{{ number_format($saldoEduPaySiswa, 0, ',', '.') }}
+            </h2>
+            <div class="mt-3">
+                <i class="ri-wallet-3-fill fs-3"></i>
+            </div>
+        </div>
+
+        <!-- TABS -->
+        <ul class="nav nav-tabs nav-tabs-custom nav-success mb-4" role="tablist" wire:ignore>
+            <li class="nav-item">
+                <a class="nav-link active" data-bs-toggle="tab" href="#tab-topup">
+                    <i class="ri-arrow-up-circle-fill me-1 text-success"></i> Top-Up
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#tab-penarikan">
+                    <i class="ri-arrow-down-circle-fill me-1 text-danger"></i> Penarikan
+                </a>
+            </li>
+        </ul>
+
+        <div class="tab-content" wire:ignore>
+
+            <!-- TOPUP -->
+            <div class="tab-pane fade show active" id="tab-topup">
+
+                <div class="row g-3">
+
+                    <div class="col-lg-6 mb-3">
+                        <label class="form-label">Nominal</label>
+                        <div class="input-group">
+                            <span class="input-group-text">Rp</span>
+                            <input type="number" class="form-control" placeholder="Minimal Rp 1.000"
                                 wire:model.defer="nominal_topup">
                         </div>
-    
                         @error('nominal_topup')
                         <small class="text-danger">{{ $message }}</small>
                         @enderror
-    
-                        <div class="mb-3">
-                            <input type="text" class="form-control" placeholder="Deskripsi (opsional)"
-                                wire:model.defer="deskripsi_topup">
-                        </div>
-    
-                        <div class="mb-3">
-                            <select class="form-select" wire:model.defer="jenis_transaksi_topup">
-                                <option value="topup tunai">Teller Tunai</option>
-                                <option value="topup online">Transfer Bank</option>
-                            </select>
-                        </div>
-    
-                        <div class="d-flex justify-content-end">
-                            <button wire:click="simpanTopUp" class="btn btn-success px-4">
-                                <i class="ri-check-line me-1"></i> Simpan
-                            </button>
-                        </div>
-    
                     </div>
-    
-                    <!-- PENARIKAN -->
-                    <div class="tab-pane fade" id="tab-penarikan">
-    
-                        <p class="text-muted mb-3">
-                            Kurangi saldo EduPay siswa
-                        </p>
-    
-                        <div class="input-group mb-3">
-                            <span class="input-group-text bg-danger-subtle text-danger">Rp</span>
-                            <input type="number" class="form-control form-control-lg" placeholder="Nominal penarikan"
+
+                    <div class="col-lg-6 mb-3">
+                        <label class="form-label">Metode</label>
+                        <select class="form-select" wire:model.defer="jenis_transaksi_topup">
+                            <option value="topup tunai">Teller Tunai</option>
+                            <option value="topup online">Transfer Bank</option>
+                        </select>
+                    </div>
+                    <!-- Tombol Simpan -->
+                    <div class="hstack gap-2 justify-content-end d-print-none mt-4">
+                        <input type="text" id="deskripsi" class="form-control" wire:model.defer="deskripsi_topup"
+                            placeholder="Deskripsi transaksi (opsional)">
+                        @error('deskripsi_topup') <span class="text-danger">{{ $message }}</span> @enderror
+                        <button wire:click="simpanTopUp" class="btn btn-success">
+                            <i class="ri-save-line align-bottom me-1"></i> Simpan Top-Up
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- PENARIKAN -->
+            <div class="tab-pane fade" id="tab-penarikan">
+
+                <div class="row g-3">
+
+                    <div class="col-lg-12 mb-3">
+                        <label class="form-label">Nominal</label>
+                        <div class="input-group">
+                            <span class="input-group-text">Rp</span>
+                            <input type="number" class="form-control" placeholder="Nominal penarikan"
                                 wire:model.defer="nominal_penarikan">
                         </div>
-    
                         @error('nominal_penarikan')
                         <small class="text-danger">{{ $message }}</small>
                         @enderror
-    
-                        <div class="mb-3">
-                            <input type="text" class="form-control" placeholder="Deskripsi (opsional)"
-                                wire:model.defer="deskripsi_penarikan">
-                        </div>
-    
-                        <div class="d-flex justify-content-end">
-                            <button wire:click="simpanPenarikan" class="btn btn-danger px-4">
-                                <i class="ri-check-line me-1"></i> Simpan
-                            </button>
-                        </div>
-    
                     </div>
-    
+
+                    <!-- Tombol Simpan -->
+                    <div class="hstack gap-2 justify-content-end d-print-none mt-4">
+                        <input type="text" id="deskripsi" class="form-control" wire:model.defer="deskripsi_penarikan"
+                            placeholder="Deskripsi transaksi (opsional)">
+                        @error('deskripsi_penarikan') <span class="text-danger">{{ $message }}</span> @enderror
+                        <button wire:click="simpanPenarikan" class="btn btn-danger">
+                            <i class="ri-save-line align-bottom me-1"></i> Simpan Penarikan
+                        </button>
+                    </div>
+
                 </div>
-    
+
             </div>
+
         </div>
-    
+
     </div>
 </div>

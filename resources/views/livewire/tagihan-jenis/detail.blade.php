@@ -94,42 +94,51 @@
                                                         <td>{{ $loop->iteration }}. </td>
                                                         <td class="text-start">
                                                             <span class="fw-medium">
-                                                                {{ $item->nama_siswa() }}
+                                                                {{ $item->ms_penempatan_siswa->ms_siswa->nama_siswa }}
                                                             </span>
                                                         </td>
-                                                        <td>{{ $item->nama_kelas() }}</td>
+                                                        
+                                                        <td>
+                                                            {{ $item->ms_penempatan_siswa->ms_kelas->nama_kelas }}
+                                                        </td>
+                                                        
                                                         <td class="text-start">
                                                             <span class="fw-medium">
                                                                 {{ $item->ms_jenis_tagihan_siswa->nama_jenis_tagihan_siswa }}
                                                             </span>
                                                         </td>
-                                                        <td>{{ $item->nama_kategori_tagihan_siswa() }}</td>
-                                                        <td>{{ $item->ms_jenis_tagihan_siswa->cicilan_status }}</td>
+                                                        
+                                                        <td>
+                                                            {{ $item->ms_jenis_tagihan_siswa->ms_kategori_tagihan_siswa->nama_kategori_tagihan_siswa }}
+                                                        </td>
+                                                        
+                                                        <td>
+                                                            {{ $item->ms_jenis_tagihan_siswa->cicilan_status }}
+                                                        </td>
+                                                        
                                                         <td class="text-center">
                                                             <span class="fs-14 fw-medium text-info">
                                                                 RP{{ number_format($item->jumlah_tagihan_siswa, 0, ',', '.') }}
-                                                        </td>
-                                                        <td class="text-center">
-                                                            <span class="fs-14 fw-medium text-success">
-                                                                RP{{ number_format($item->jumlah_sudah_dibayar(), 0, ',', '.') }}
-                                                        </td>
-                                                        </span>
-                                                        </td>
-                                                        <td class="text-center">
-                                                            <span class="fs-14 fw-medium text-danger">
-                                                                RP{{ number_format($item->jumlah_tagihan_siswa - $item->jumlah_sudah_dibayar(), 0, ',', '.')
-                                                                }}
                                                             </span>
                                                         </td>
-                                                        <td>{{
-                                                            \App\Http\Controllers\HelperController::formatTanggalIndonesia($item->ms_jenis_tagihan_siswa->tanggal_jatuh_tempo,
-                                                            'd F Y') }}</td>
+                                                        
+                                                        <td class="text-center">
+                                                            <span class="fs-14 fw-medium text-success">
+                                                                RP{{ number_format($item->total_bayar ?? 0, 0, ',', '.') }}
+                                                            </span>
+                                                        </td>
+                                                        
+                                                        <td class="text-center">
+                                                            <span class="fs-14 fw-medium text-danger">
+                                                                RP{{ number_format(($item->jumlah_tagihan_siswa - ($item->total_bayar ?? 0)), 0, ',', '.') }}
+                                                            </span>
+                                                        </td>
+                                                        <td>{{\App\Http\Controllers\HelperController::formatTanggalIndonesia($item->ms_jenis_tagihan_siswa->tanggal_jatuh_tempo, 'd F Y') }}</td>
                                                         <td class="
-                                                                                {{ $item->status === 'Belum Dibayar' ? 'text-warning' : '' }}
-                                                                                {{ $item->status === 'Masih Dicicil' ? 'text-info' : '' }}
-                                                                                {{ $item->status === 'Lunas' ? 'text-success' : '' }}">
-                                                            <i
-                                                                class="ri-{{ $item->status === 'Belum Dibayar' ? 'time-line' : ($item->status === 'Masih Dicicil' ? 'money-dollar-circle-line' : 'checkbox-circle-line') }} fs-17 align-middle"></i>
+                                                            {{ $item->status === 'Belum Dibayar' ? 'text-warning' : '' }}
+                                                            {{ $item->status === 'Masih Dicicil' ? 'text-info' : '' }}
+                                                            {{ $item->status === 'Lunas' ? 'text-success' : '' }}">
+                                                            <i class="ri-{{ $item->status === 'Belum Dibayar' ? 'time-line' : ($item->status === 'Masih Dicicil' ? 'money-dollar-circle-line' : 'checkbox-circle-line') }} fs-17 align-middle"></i>
                                                             {{ $item->status }}
                                                         </td>
                                                     </tr>
@@ -175,7 +184,7 @@
                                                     </tr>
                                                 </tfoot>
                                             </table>
-                                            {{ $tagihans->links() }}
+                                            {{-- {{ $tagihans->links() }} --}}
                                         </div>
                                         @endif
                                     </div>

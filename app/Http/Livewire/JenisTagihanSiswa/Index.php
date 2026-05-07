@@ -73,8 +73,8 @@ class Index extends Component
     }
     public function render()
     {
-        // Data untuk dropdown Kelas (hanya jika Jenjang dan Tahun Ajar dipilih)
-        $select_kategori = [];
+        $select_kategori = collect();
+
         if ($this->selectedJenjang && $this->selectedTahunAjar) {
             $select_kategori = KategoriTagihanSiswa::with(['ms_jenjang', 'ms_tahun_ajar'])
                 ->where('ms_jenjang_id', $this->selectedJenjang)
@@ -82,7 +82,8 @@ class Index extends Component
                 ->get();
         }
 
-        $jenis_tagihans = [];
+        $jenis_tagihans = collect();
+
         if ($this->selectedJenjang && $this->selectedTahunAjar) {
             $query = JenisTagihanSiswa::with(['ms_kategori_tagihan_siswa', 'ms_tahun_ajar', 'ms_jenjang'])
                 ->where('ms_jenjang_id', $this->selectedJenjang)
@@ -97,11 +98,12 @@ class Index extends Component
                 $query->where('nama_jenis_tagihan_siswa', 'like', '%' . $this->search . '%');
             }
 
-            $jenis_tagihans = $query->orderBy('created_at', 'ASC')->get();
+            $jenis_tagihans = $query->orderBy('created_at', 'ASC')
+            ->paginate(20);
         }
-        return view('livewire.jenis-tagihan-siswa.index', [
-            'jenis_tagihans' => $jenis_tagihans,
-            'select_kategori' => $select_kategori
-        ]);
+        return view('livewire.jenis-tagihan-siswa.index', compact(
+            'select_kategori',
+            'jenis_tagihans'
+        ));
     }
 }

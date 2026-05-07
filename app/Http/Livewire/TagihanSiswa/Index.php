@@ -9,6 +9,7 @@ use App\Models\SuratTagihanSiswa;
 use App\Models\User;
 use App\Models\WhatsAppTagihanSiswa;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -31,33 +32,29 @@ class Index extends Component
 
     // Listener untuk Livewire
     protected $listeners = [
-        'refreshTagihans' => '$refresh',
-        'parameterUpdated' => 'updateParameters',
-        'tagihanUpdated'
-    ];
+        'refreshTagihanSiswa' => '$refresh',
 
-    public function tagihanUpdated()
-    {
-        $this->emitSelf('$refresh'); //lebih ringan
-    }
+        'parameterUpdated' => 'updateParameters',
+    ];
 
     public function updatingSearch()
     {
-        $this->emitSelf('$refresh'); //lebih ringan
+        $this->resetPage(); // Reset paginasi saat parameter berubah
+
     }
 
     public function updatingSelectedKelas()
     {
-        $this->emitSelf('$refresh'); //lebih ringan
+        $this->resetPage(); // Reset paginasi saat parameter berubah
+
     }
 
     public function updateParameters($jenjang, $tahunAjar)
     {
         $this->selectedJenjang = $jenjang;
         $this->selectedTahunAjar = $tahunAjar;
-        $this->emitSelf('$refresh'); //lebih ringan
 
-        // $this->resetPage(); // Reset paginasi saat parameter berubah
+        $this->resetPage(); // Reset paginasi saat parameter berubah
     }
 
     public function cetakLaporanTagihan()
@@ -236,41 +233,45 @@ class Index extends Component
         $this->totalKekurangan = 0;
 
         if ($this->selectedJenjang && $this->selectedTahunAjar) {
-            $query = PenempatanSiswa::with(['ms_siswa', 'ms_kelas'])
+            $query = PenempatanSiswa::query()
+                // JOIN untuk kebutuhan filter/sort
                 ->join('ms_siswa', 'ms_penempatan_siswa.ms_siswa_id', '=', 'ms_siswa.ms_siswa_id')
-                ->where('ms_penempatan_siswa.ms_jenjang_id', $this->selectedJenjang)
-                ->where('ms_penempatan_siswa.ms_tahun_ajar_id', $this->selectedTahunAjar);
 
+                // FILTER utama
+                ->where('ms_jenjang_id', $this->selectedJenjang)
+                ->where('ms_tahun_ajar_id', $this->selectedTahunAjar)
+
+                // AGREGASI
+                ->withCount([
+                    'ms_tagihan_siswa as jumlah_item' => function ($q) {
+                        $q->select(DB::raw('COUNT(DISTINCT ms_jenis_tagihan_siswa_id)'));
+                    }
+                ])
+                ->withSum('ms_tagihan_siswa as total_tagihan', 'jumlah_tagihan_siswa')
+                ->withSum('dt_transaksi_tagihan_siswa as total_bayar', 'jumlah_bayar');
+                
             if ($this->selectedKelas) {
                 $query->where('ms_penempatan_siswa.ms_kelas_id', $this->selectedKelas);
             }
 
             if ($this->search) {
-                $query->whereHas('ms_siswa', function ($q) {
-                    $q->where('nama_siswa', 'like', '%' . $this->search . '%');
-                });
+                $query->where('ms_siswa.nama_siswa', 'like', '%' . $this->search . '%');
             }
 
-            $tagihans = $query->orderBy('ms_penempatan_siswa.ms_kelas_id')
-                ->orderBy('ms_siswa.nama_siswa')->get();
+            // 🔥 PAGINATE (WAJIB)
+            $tagihans = $query
+                ->orderBy('ms_penempatan_siswa.ms_kelas_id')
+                ->orderBy('ms_siswa.nama_siswa')
+                ->paginate(100);
 
-            foreach ($tagihans as $item) {
-                $tagihan = $item->total_tagihan_siswa();
-                $dibayar = $item->total_dibayarkan();
-                $jumlah = $item->jumlah_jenis_tagihan_siswa();
-
-                $this->totalTagihan += $tagihan;
-                $this->totalDibayarkan += $dibayar;
-                $this->jumlahTagihan += $jumlah;
-            }
-
+            $this->totalTagihan = $tagihans->sum('total_tagihan');
+            $this->totalDibayarkan = $tagihans->sum('total_bayar');
+            $this->jumlahTagihan = $tagihans->sum('jumlah_item');
             $this->totalKekurangan = $this->totalTagihan - $this->totalDibayarkan;
-            // Hindari pembagian 0
-            if ($this->totalTagihan > 0) {
-                $this->totalPersen = round(($this->totalDibayarkan / $this->totalTagihan) * 100, 2);
-            } else {
-                $this->totalPersen = 0;
-            }
+
+            $this->totalPersen = $this->totalTagihan > 0
+                ? round(($this->totalDibayarkan / $this->totalTagihan) * 100, 2)
+                : 0;
         }
 
         return view('livewire.tagihan-siswa.index', [
