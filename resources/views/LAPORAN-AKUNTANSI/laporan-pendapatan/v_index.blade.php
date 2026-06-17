@@ -9,7 +9,7 @@
                         <h4 class="fs-16 mb-1">Laporan Pendapatan</h4>
                         <p class="text-muted mb-0">Laporan Akuntansi > Laporan Pendapatan</p>
                     </div>
-                    @livewire('parameter.jenjang-tahun-ajar')   
+                    @livewire('parameter.jenjang')   
                 </div><!-- end card header -->
             </div>
             <!--end col-->

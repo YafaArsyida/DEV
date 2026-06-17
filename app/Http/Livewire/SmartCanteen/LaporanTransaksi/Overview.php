@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 class Overview extends Component
 {
-    public $selectedJenjang = null;
+    public $selectedKantin = null;
     public $selectedTahunAjar = null;
     public $selectedPeriode = 'hari_ini'; // default
 
@@ -18,10 +18,10 @@ class Overview extends Component
         'refreshSaldoEduPay'
     ];
 
-    public function updateParameters($jenjang, $tahunAjar)
+    public function updateParameters($kantin, $tahunAjar)
     {
-        // Update nilai selectedJenjang dan selectedTahunAjar
-        $this->selectedJenjang = $jenjang;
+        // Update nilai selectedKantin dan selectedTahunAjar
+        $this->selectedKantin = $kantin;
         $this->selectedTahunAjar = $tahunAjar;
     }
 
@@ -39,15 +39,8 @@ class Overview extends Component
 
     public function render()
     {
-        $user = Auth::user();
-
         // base query
-        $query = TransaksiSmartCanteen::where('ms_jenjang_id', $this->selectedJenjang);
-
-        // filter sesuai peran
-        if ($user->peran === 'kantin') {
-            $query->where('ms_pengguna_id', $user->ms_pengguna_id);
-        }
+        $query = TransaksiSmartCanteen::where('ms_kantin_id', $this->selectedKantin);
 
         // build periode range dengan start/end yang jelas
         $start = null;
@@ -74,12 +67,14 @@ class Overview extends Component
         // Hitung total
         $totalSiswa   = (clone $query)->where('user_type', 'siswa')->sum('total_transaksi');
         $totalPegawai = (clone $query)->where('user_type', 'pegawai')->sum('total_transaksi');
-        $totalSemua   = $totalPegawai + $totalSiswa;
+        $totalUmum = (clone $query)->where('user_type', 'umum')->sum('total_transaksi');
+        $totalSemua   = $totalPegawai + $totalSiswa + $totalUmum;
 
         return view('livewire.smart-canteen.laporan-transaksi.overview', [
             'totalSemua'   => $totalSemua,
             'totalSiswa'   => $totalSiswa,
             'totalPegawai' => $totalPegawai,
+            'totalUmum' => $totalUmum,
         ]);
     }
 }

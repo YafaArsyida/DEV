@@ -247,14 +247,14 @@
                         </a>
                     </li>
                      
-                    <li class="menu-title"><span data-key="t-laporan">Laporan</span></li>
+                    <li class="menu-title"><span data-key="t-laporan">Laporan Akademik/Jenjang</span></li>
 
                     <!-- Pembayaran Tagihan Siswa -->
                     <li class="nav-item">
                         <a class="nav-link menu-link {{ request()->routeIs('laporan.pembayaran-tagihan-siswa') ? 'active' : '' }}"
                             href="{{ route('laporan.pembayaran-tagihan-siswa') }}">
                             <i class="mdi mdi-file-check-outline"></i>
-                            <span data-key="t-pembayaran-tagihan">Pembayaran Tagihan Siswa</span>
+                            <span data-key="t-pembayaran-tagihan">Pembayaran Siswa</span>
                         </a>
                     </li>
                     
@@ -263,7 +263,7 @@
                         <a class="nav-link menu-link {{ request()->routeIs('laporan.tagihan-siswa') ? 'active' : '' }}"
                             href="{{ route('laporan.tagihan-siswa') }}">
                             <i class="mdi mdi-file-alert-outline"></i>
-                            <span data-key="t-tunggakan-tagihan">Piutang Tagihan Siswa</span>
+                            <span data-key="t-tunggakan-tagihan">Piutang Siswa</span>
                         </a>
                     </li>
 
@@ -306,7 +306,7 @@
                         <a class="nav-link menu-link {{ request()->routeIs('laporan.rekapitulasi-keuangan') ? 'active' : '' }}"
                             href="{{ route('laporan.rekapitulasi-keuangan') }}">
                             <i class="mdi mdi-chart-bar-stacked"></i>
-                            <span data-key="t-rekapitulasi-keuangan">Rekapitulasi Keuangan Siswa</span>
+                            <span data-key="t-rekapitulasi-keuangan">Rekapitulasi Pembayaran Siswa</span>
                         </a>
                     </li>
                     
@@ -344,10 +344,9 @@
                             </ul>
                         </div>
                     </li>     
-
                     <li class="nav-item">
                         <a class="nav-link menu-link {{ request()->routeIs('akuntansi.laporan-pendapatan') ? 'active' : '' }}"
-                           href="{{ route('akuntansi.laporan-pendapatan') }}">
+                            href="{{ route('akuntansi.laporan-pendapatan') }}">
                             <i class="mdi mdi-trending-up"></i>
                             <span data-key="t-pendapatan-unit">Laporan Pendapatan</span>
                         </a>
@@ -355,12 +354,11 @@
                     
                     <li class="nav-item">
                         <a class="nav-link menu-link {{ request()->routeIs('akuntansi.laporan-pengeluaran') ? 'active' : '' }}"
-                           href="{{ route('akuntansi.laporan-pengeluaran') }}">
+                            href="{{ route('akuntansi.laporan-pengeluaran') }}">
                             <i class="mdi mdi-trending-down"></i>
                             <span data-key="t-pengeluaran-unit">Laporan Pengeluaran</span>
                         </a>
                     </li>
-                    
                     <!-- Laporan Rekapitulasi Keuangan -->
                     <li class="menu-title"><span data-key="t-laporan-rekapitulasi-keuangan">Laporan Akuntansi</span></li>
                     

@@ -2,7 +2,7 @@
 <div class="card">
     <div class="card-header border-0 pb-0">
         <div class="d-flex align-items-center">
-            <h5 class="card-title mb-0 flex-grow-1">Top Jajan SmartCantteen</h5>
+            <h5 class="card-title mb-0 flex-grow-1">Top Jajan</h5>
             <div class="flex-shrink-0">
                 <div class="d-flex gap-2 flex-wrap">
                     <button data-bs-toggle="modal" data-bs-target="#ExportLaporanTopExcel" class="btn btn-soft-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button>

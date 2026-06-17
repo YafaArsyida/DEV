@@ -4,6 +4,7 @@ namespace App\Http\Livewire\SmartCanteen\Widget;
 
 use App\Models\AkuntansiJurnalDetail;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -15,7 +16,7 @@ class KartuJurnalKantin extends Component
 
     public $periode = 'hari_ini'; // default
 
-    public $selectedJenjang = null;
+    public $selectedKantin = null;
     public $selectedTahunAjar = null;
 
     protected $listeners = [
@@ -33,10 +34,10 @@ class KartuJurnalKantin extends Component
         $this->emitSelf('$refresh'); //ringan
     }
 
-    public function updateParameters($jenjang, $tahunAjar)
+    public function updateParameters($kantin, $tahunAjar)
     {
-        // Update nilai selectedJenjang dan selectedTahunAjar
-        $this->selectedJenjang = $jenjang;
+        // Update nilai selectedKantin dan selectedTahunAjar
+        $this->selectedKantin = $kantin;
         $this->selectedTahunAjar = $tahunAjar;
     }
 
@@ -60,16 +61,22 @@ class KartuJurnalKantin extends Component
     {
         [$startDate, $endDate] = $this->getTanggalFilter();
 
+        $user = Auth::user();
+
         $jurnal = AkuntansiJurnalDetail::with('akuntansi_rekening', 'ms_pengguna')
             ->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
-            ->where('ms_jenjang_id', $this->selectedJenjang)
+
+            ->when($user->peran !== 'SUPERADMIN', function ($query) use ($user) {
+                $query->where('ms_pengguna_id', $user->ms_pengguna_id);
+            })
+            
             ->where('kode_rekening', '21001.01')
             ->whereBetween('tanggal_transaksi', [
                 $startDate->startOfDay(),
                 $endDate->endOfDay()
             ])
             ->orderBy('tanggal_transaksi', 'desc')
-            ->paginate(10); // ⬅️ pagination di sini
+            ->paginate(10);
 
         // grouping SETELAH paginate
         $transaksiJurnal = $jurnal->getCollection()

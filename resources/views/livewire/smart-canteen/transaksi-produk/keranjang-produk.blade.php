@@ -18,45 +18,39 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @if ($user_id)
-                        @forelse($keranjang as $index => $item)
-                        <tr>
-                            <td class="text-start">
-                                <span class="fs-12 fw-semibold text-uppercase">
-                                    {{ $item['nama'] }}
-                                </span>
-                                <p class="text-muted mb-0">
-                                    RP{{ number_format($item['harga'], 0, ',', '.') }}
-                                </p>
-                            </td>
-                        
-                            <td class="text-center">
-                                <div class="d-flex justify-content-center gap-1">
-                                    <button class="btn btn-sm btn-light" wire:click="decrementQty({{ $index }})">–</button>
-                        
-                                    <input class="form-control form-control-sm text-center" style="width:50px" value="{{ $item['jumlah'] }}"
-                                        readonly>
-                        
-                                    <button class="btn btn-sm btn-light" wire:click="incrementQty({{ $index }})">+</button>
-                                </div>
-                            </td>
-                        
-                            <td class="text-end fw-medium fs-14 text-success">
-                                RP{{ number_format($item['subtotal'], 0, ',', '.') }}
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="3" class="text-center text-muted">
-                                Keranjang masih kosong
-                            </td>
-                        </tr>
-                        @endforelse
-                    @else
-                        <tr>
-                            <td colspan="3" class="text-center">Silakan scan kartu</td>
-                        </tr>
-                    @endif
+                    @forelse($keranjang as $index => $item)
+                    <tr>
+                        <td class="text-start">
+                            <span class="fs-12 fw-semibold text-uppercase">
+                                {{ $item['nama'] }}
+                            </span>
+                            <p class="text-muted mb-0">
+                                RP{{ number_format($item['harga'], 0, ',', '.') }}
+                            </p>
+                        </td>
+                    
+                        <td class="text-center">
+                            <div class="d-flex justify-content-center gap-1">
+                                <button class="btn btn-sm btn-light" wire:click="decrementQty({{ $index }})">–</button>
+                    
+                                <input class="form-control form-control-sm text-center" style="width:50px" value="{{ $item['jumlah'] }}"
+                                    readonly>
+                    
+                                <button class="btn btn-sm btn-light" wire:click="incrementQty({{ $index }})">+</button>
+                            </div>
+                        </td>
+                    
+                        <td class="text-end fw-medium fs-14 text-success">
+                            RP{{ number_format($item['subtotal'], 0, ',', '.') }}
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="3" class="text-center text-muted">
+                            Keranjang masih kosong
+                        </td>
+                    </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
@@ -78,8 +72,12 @@
             <select class="form-select w-auto" 
                     wire:model.defer="metode_pembayaran" 
                     aria-label="Pilih metode pembayaran">
-                {{-- <option value="Tunai">Tunai</option> --}}
-                <option value="EduPay">EduPay</option>
+                <option value="Tunai">Tunai</option>
+                <option value="EduPay" {{ !$user_id ? 'disabled' : '' }}>
+                    EduPay
+                </option>
+                <option value="QRIS">QRIS</option>
+                <option value="Transfer">Transfer</option>
             </select>
             {{-- <a href="#ModalScanRFID" data-bs-toggle="modal" 
                 wire:click.prevent="simpanTransaksiKantin"

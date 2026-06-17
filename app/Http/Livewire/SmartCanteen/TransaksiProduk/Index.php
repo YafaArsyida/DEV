@@ -74,6 +74,7 @@ class Index extends Component
             'educard',
             'saldo_edupay',
         ]);
+        $this->emit('resetKeranjang');
         $this->resetSmartcardInput();
     }
 
@@ -98,7 +99,7 @@ class Index extends Component
             $this->dispatchBrowserEvent('alertify-error', ['message' => 'Kartu tidak terdaftar.']);
             $this->resetSmartcardInput();
             $this->resetScan();
-            $this->emit('resetScan');
+            $this->emit('resetKeranjang');
             return;
         }
 
@@ -185,30 +186,27 @@ class Index extends Component
 
     public function render()
     {
-        $query = ProdukSmartCanteen::query();
+        // default kosong
+        $allProduk = collect();
+        $kategori = collect();
 
         if ($this->selectedKantin) {
-            $query->where('ms_kantin_id', $this->selectedKantin);
-        }
+            $query = ProdukSmartCanteen::where(
+                'ms_kantin_id',
+                $this->selectedKantin
+            );
 
-        if ($this->search) {
-            $query->where('nama_produk_kantin', 'like', '%' . $this->search . '%');
-        }
-
-        if (auth()->check()) {
-            $peran = auth()->user()->peran;
-
-            if ($peran === 'kantin') {
-                $query->where('ms_pengguna_id', auth()->id());
+            if ($this->search) {
+                $query->where(
+                    'nama_produk_kantin',
+                    'like',
+                    '%' . $this->search . '%'
+                );
             }
-            // superadmin → tidak difilter (lihat semua)
+
+            $allProduk = $query->get();
+            $kategori = KategoriProdukSmartCanteen::where('ms_kantin_id', $this->selectedKantin)->get();
         }
-
-        // ini ambil SEMUA produk sesuai jenjang + search
-        $allProduk = $query->get();
-
-        // ambil kategori
-        $kategori = KategoriProdukSmartCanteen::where('ms_kantin_id', $this->selectedKantin)->get();
 
         return view('livewire.smart-canteen.transaksi-produk.index', [
             'allProduk' => $allProduk,

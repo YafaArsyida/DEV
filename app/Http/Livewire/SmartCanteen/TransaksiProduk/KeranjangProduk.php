@@ -15,7 +15,7 @@ use Exception;
 
 class KeranjangProduk extends Component
 {
-    public $user_type;
+    public $user_type = 'umum';
     public $user_id;
     public $ms_penempatan_siswa_id;
     public $nama;
@@ -25,19 +25,30 @@ class KeranjangProduk extends Component
 
     public $nama_jabatan;
 
-    public $metode_pembayaran = 'EduPay';
+    public $metode_pembayaran = 'Tunai';
 
     public $ms_kantin_id;
     public $ms_tahun_ajar_id;
-    public $ms_jenjang_id;
+    public $ms_jenjang_id = null;
 
     public $keranjang = []; // IN-MEMORY CART
 
     protected $listeners = [
+        'parameterUpdated',
+
         'scanSuccess',
-        'resetScan',
+        'resetKeranjang',
         'tambahKeranjang',
     ];
+
+    public function parameterUpdated($kantin, $tahunAjar)
+    {
+        // Update nilai selectedKantin dan selectedTahunAjar
+        $this->ms_kantin_id = $kantin;
+        $this->ms_tahun_ajar_id = $tahunAjar;
+
+        $this->user_type = 'umum';
+    }
 
     public function scanSuccess($data)
     {
@@ -57,14 +68,15 @@ class KeranjangProduk extends Component
         $this->ms_kantin_id            = $data['ms_kantin_id'];
         $this->ms_tahun_ajar_id         = $data['ms_tahun_ajar_id'];
 
+        $this->metode_pembayaran      = 'EduPay';
+
         // reset transaksi lama
         $this->keranjang = [];
     }
 
-    public function resetScan()
+    public function resetKeranjang()
     {
         $this->reset([
-            'user_type',
             'user_id',
             'ms_penempatan_siswa_id',
             'nama',
@@ -73,10 +85,11 @@ class KeranjangProduk extends Component
             'saldo_edupay',
 
             // 'ms_kantin_id',
-            'ms_tahun_ajar_id',
-
             'nama_jabatan',
         ]);
+
+        $this->user_type             = 'umum';
+        $this->metode_pembayaran     = 'Tunai';
 
         // reset transaksi lama
         $this->keranjang = [];
@@ -84,13 +97,6 @@ class KeranjangProduk extends Component
 
     public function tambahKeranjang($produkId)
     {
-        if (!$this->user_id || !$this->user_type) {
-            $this->dispatchBrowserEvent('alertify-error', [
-                'message' => 'Gagal, Scan EduCard'
-            ]);
-            return;
-        }
-
         // Ambil produk (lookup SAJA)
         $produk = ProdukSmartCanteen::find($produkId);
 
@@ -193,60 +199,100 @@ class KeranjangProduk extends Component
                     ->join(', ');
 
                 $deskripsiJurnal =
-                    "Pembelian kantin {$this->nama} "
-                    . "dengan metode {$this->metode_pembayaran}: "
+                    "Pembelian kantin "
+                    . ($this->nama ?: 'Umum')
+                    . " metode {$this->metode_pembayaran}: "
                     . $detailProduk;
 
-                /*
-                |--------------------------------------------------------------------------
-                | LOCK SALDO EDU PAY
-                |--------------------------------------------------------------------------
-                */
+                // default
 
                 $saldo = null;
 
-                if ($this->metode_pembayaran === 'EduPay') {
+                $akunDebit = null;
+                $akunKredit = null;
 
-                    if (!$this->user_id) {
-                        throw new \Exception('Scan kartu terlebih dahulu.');
-                    }
+                $statusSettlement = null;
 
-                    $saldo = SaldoEduPay::where('user_id', $this->user_id)
-                        ->lockForUpdate()
-                        ->first();
+                // mapping akun
+                switch ($this->metode_pembayaran) {
+                    case 'Tunai':
 
-                    if (!$saldo) {
-                        throw new \Exception('Saldo EduPay tidak ditemukan.');
-                    }
+                        // Debit Kas Kantin
+                        $akunDebit = 11003;
 
-                    if ($saldo->saldo_edupay < $totalBayar) {
-                        throw new \Exception('Saldo EduPay tidak cukup.');
-                    }
+                        // Kredit Pendapatan Kantin
+                        $akunKredit = 41002;
+
+                        $statusSettlement = null;
+
+                        break;
+
+                    case 'QRIS':
+
+                        // Debit Bank Kantin
+                        $akunDebit = 11004;
+
+                        // Kredit Pendapatan Kantin
+                        $akunKredit = 41002;
+
+                        $statusSettlement = null;
+
+                        break;
+
+                    case 'Transfer':
+
+                        // Debit Bank Kantin
+                        $akunDebit = 11004;
+
+                        // Kredit Pendapatan Kantin
+                        $akunKredit = 41002;
+
+                        $statusSettlement = null;
+
+                        break;
+
+                    case 'EduPay':
+
+                        if (!$this->user_id) {
+                            throw new \Exception(
+                                'Scan kartu EduPay terlebih dahulu.'
+                            );
+                        }
+
+                        $saldo = SaldoEduPay::where('user_id', $this->user_id)
+                            ->where('user_type', $this->user_type)
+                            ->lockForUpdate()
+                            ->first();
+
+                        if (!$saldo) {
+                            throw new \Exception(
+                                'Saldo EduPay tidak ditemukan.'
+                            );
+                        }
+
+                        if ($saldo->saldo_edupay < $totalBayar) {
+                            throw new \Exception(
+                                'Saldo EduPay tidak cukup.'
+                            );
+                        }
+
+                        // Debit saldo edupay
+                        $akunDebit = $this->user_type === 'siswa' ? 22002 : 22005;
+
+                        // Kredit hutang kantin
+                        $akunKredit = 21001.01;
+
+                        $statusSettlement = 'belum';
+
+                        break;
+
+                    default:
+                        throw new \Exception(
+                            'Metode pembayaran tidak valid.'
+                        );
                 }
 
-                /*
-                |--------------------------------------------------------------------------
-                | KODE REKENING
-                |--------------------------------------------------------------------------
-                */
-
-                $kode_rekening_kas = 11001;
-
-                $kode_rekening_edupay = $this->user_type === 'siswa'
-                    ? 22002
-                    : 22005;
-
-                $kode_rekening_hutang_kantin = 21001.01;
-
-                $akunDebit = $this->metode_pembayaran === 'Tunai'
-                    ? $kode_rekening_kas
-                    : $kode_rekening_edupay;
-
-                /*
-                |--------------------------------------------------------------------------
-                | JURNAL
-                |--------------------------------------------------------------------------
-                */
+                // jurnal debit
 
                 $jurnalDebit = AkuntansiJurnalDetail::create([
                     'kode_rekening' => $akunDebit,
@@ -256,28 +302,27 @@ class KeranjangProduk extends Component
                     'ms_pengguna_id' => $ms_pengguna_id,
                     'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
                     'ms_jenjang_id' => $this->ms_jenjang_id,
+                    'ms_departemen_id' => 'KANTIN',
                     'deskripsi' => $deskripsiJurnal,
                 ]);
 
+                // jurnal kredit
+
                 $jurnalKredit = AkuntansiJurnalDetail::create([
-                    'kode_rekening' => $kode_rekening_hutang_kantin,
+                    'kode_rekening' => $akunKredit,
                     'posisi' => 'kredit',
                     'nominal' => $totalBayar,
                     'tanggal_transaksi' => now(),
                     'ms_pengguna_id' => $ms_pengguna_id,
                     'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
                     'ms_jenjang_id' => $this->ms_jenjang_id,
+                    'ms_departemen_id' => 'KANTIN',
                     'deskripsi' => $deskripsiJurnal,
                 ]);
 
-                /*
-                |--------------------------------------------------------------------------
-                | TRANSAKSI EDUPAY
-                |--------------------------------------------------------------------------
-                */
+                // hanya jika metode edupay
 
                 if ($this->metode_pembayaran === 'EduPay') {
-
                     TransaksiEduPay::create([
                         'user_type' => $this->user_type,
                         'user_id' => $this->user_id,
@@ -287,52 +332,40 @@ class KeranjangProduk extends Component
                         'nominal' => $totalBayar,
                         'tanggal' => now(),
                         'akuntansi_jurnal_detail_debit_id' => $jurnalDebit->akuntansi_jurnal_detail_id,
-
                         'akuntansi_jurnal_detail_kredit_id' => $jurnalKredit->akuntansi_jurnal_detail_id,
-
                         'deskripsi' => $deskripsiJurnal,
                     ]);
 
-                    // 🔥 pakai object lock yg sama
+                    // 🔥 anti race condition
                     $saldo->decrement('saldo_edupay', $totalBayar);
                 }
 
-                /*
-                |--------------------------------------------------------------------------
-                | TRANSAKSI KANTIN
-                |--------------------------------------------------------------------------
-                */
+                // transaksi kantin
 
                 $transaksi = TransaksiSmartCanteen::create([
-                    'user_type'                   => $this->user_type,
-                    'user_id'                     => $this->user_id,
-                    'ms_penempatan_siswa_id'      => $this->ms_penempatan_siswa_id,
-                    'ms_pengguna_id'              => $ms_pengguna_id,
-                    'ms_kantin_id'                => $this->ms_kantin_id,
-                    'tanggal_transaksi'           => now(),
-                    'total_transaksi'             => $totalBayar,
-                    'metode_pembayaran'           => $this->metode_pembayaran,
-                    'deskripsi'                   => $deskripsiJurnal,
-                    'akuntansi_jurnal_detail_debit_id'  => $jurnalDebit->akuntansi_jurnal_detail_id,
-
+                    'user_type' => $this->user_type,
+                    'user_id' => $this->user_id,
+                    'ms_penempatan_siswa_id' => $this->ms_penempatan_siswa_id,
+                    'ms_pengguna_id' => $ms_pengguna_id,
+                    'ms_kantin_id' => $this->ms_kantin_id,
+                    'tanggal_transaksi' => now(),
+                    'total_transaksi' => $totalBayar,
+                    'metode_pembayaran' => $this->metode_pembayaran,
+                    'deskripsi' => $deskripsiJurnal,
+                    'akuntansi_jurnal_detail_debit_id' => $jurnalDebit->akuntansi_jurnal_detail_id,
                     'akuntansi_jurnal_detail_kredit_id' => $jurnalKredit->akuntansi_jurnal_detail_id,
-
-                    'status_settlement'           => 'belum',
+                    'status_settlement' => $statusSettlement,
                 ]);
 
-                /*
-                |--------------------------------------------------------------------------
-                | DETAIL TRANSAKSI
-                |--------------------------------------------------------------------------
-                */
+                // DT Transaksi kantin
 
                 $detailInsert = [];
 
                 foreach ($this->keranjang as $item) {
 
                     $detailInsert[] = [
-                        'ms_transaksi_kantin_id' => $transaksi->ms_transaksi_kantin_id,
 
+                        'ms_transaksi_kantin_id' => $transaksi->ms_transaksi_kantin_id,
                         'ms_produk_kantin_id' => $item['produk_id'],
                         'jumlah_produk' => $item['jumlah'],
                         'jumlah_bayar' => $item['subtotal'],
@@ -343,15 +376,13 @@ class KeranjangProduk extends Component
                 DetailTransaksiSmartCanteen::insert($detailInsert);
             });
 
-            $this->keranjang = [];
+            $this->resetKeranjang();
 
             $this->dispatchBrowserEvent('alertify-success', [
                 'message' => 'Transaksi berhasil disimpan.'
             ]);
 
             $this->emit('resetScan');
-
-            $this->resetScan();
         } catch (\Exception $e) {
 
             $this->dispatchBrowserEvent('alertify-error', [

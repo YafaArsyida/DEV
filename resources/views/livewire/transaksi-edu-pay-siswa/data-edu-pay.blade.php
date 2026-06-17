@@ -83,7 +83,7 @@
                     <tr>
                         <td style="width: 50px">{{ $loop->iteration }}.</td>
                         <td>
-                                @if ($item->jenis_transaksi === 'pembayaran' || $item->jenis_transaksi === 'kantin')
+                            @if ($item->jenis_transaksi === 'pembayaran' || $item->jenis_transaksi === 'kantin')
                                 <span class="text-muted" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" 
                                     title="Hapus Transaksi lewat Histori {{ ucfirst($item->jenis_transaksi) }}">
                                     <i class="ri-delete-bin-5-line align-bottom"></i>

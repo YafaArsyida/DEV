@@ -49,24 +49,28 @@
                 <!-- KANAN — INPUT SCAN -->
                 <!-- ============================ -->
                 <div class="col-md-5">
-
-                    <label class="fw-semibold mb-1">Scan / Input SmartCard</label>
-
+                
+                    <label class="fw-semibold mb-1">
+                        Scan / Input SmartCard
+                    </label>
+                
                     <div class="input-group input-group-lg shadow-sm">
-
+                
                         <span class="input-group-text bg-primary text-white border-primary">
                             <i class="ri-sensor-fill fs-4"></i>
                         </span>
-
-                        <input type="text"
-                            id="inputSmartcard"
-                            wire:model.defer="smartcardInput"
-                            wire:keydown.enter="prosesSmartcard"
-                            class="form-control border-primary"
-                            placeholder="Tempelkan SmartCard atau ketik kode..."
-                            autofocus>
+                
+                        <input type="text" id="inputSmartcard" wire:model.defer="smartcardInput" wire:keydown.enter="prosesSmartcard"
+                            class="form-control border-primary" placeholder="Tempelkan SmartCard atau ketik kode..." autofocus>
+                
+                        {{-- tombol reset --}}
+                        <button type="button" class="btn btn-primary" wire:click="resetScan">
+            
+                            <i class="ri-refresh-line"></i>
+                        </button>
+                
                     </div>
-
+                
                 </div>
 
             </div>

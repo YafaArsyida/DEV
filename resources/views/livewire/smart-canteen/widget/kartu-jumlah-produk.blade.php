@@ -41,8 +41,8 @@
                     </h2>
 
                     <p class="mb-0 text-muted">
-                        Jenjang:
-                        <strong>{{ $namaJenjang ?: '-' }}</strong>
+                        Kantin:
+                        <strong>{{ $namaKantin ?: '-' }}</strong>
                     </p>
                 </div>
 

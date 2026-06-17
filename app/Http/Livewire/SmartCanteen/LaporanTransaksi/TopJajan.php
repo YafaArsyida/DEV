@@ -10,7 +10,7 @@ use Livewire\Component;
 
 class TopJajan extends Component
 {
-    public $selectedJenjang = null;
+    public $selectedKantin = null;
     public $selectedTahunAjar = null;
 
     public $selectedJenis = '';   // siswa / pegawai / semua
@@ -23,21 +23,18 @@ class TopJajan extends Component
 
     public function updateParameters($jenjang, $tahunAjar)
     {
-        // Update nilai selectedJenjang dan selectedTahunAjar
-        $this->selectedJenjang = $jenjang;
+        // Update nilai selectedKantin dan selectedTahunAjar
+        $this->selectedKantin = $jenjang;
         $this->selectedTahunAjar = $tahunAjar;
     }
 
     public function render()
     {
-        $user = Auth::user();
 
-        $query = TransaksiSmartCanteen::where('ms_jenjang_id', $this->selectedJenjang);
-
-        // filter sesuai peran
-        if ($user->peran === 'kantin') {
-            $query->where('ms_pengguna_id', $user->ms_pengguna_id);
-        }
+        $query = TransaksiSmartCanteen::where('ms_kantin_id', $this->selectedKantin) 
+            // hanya siswa & pegawai
+            ->whereNotNull('user_id')
+            ->whereIn('user_type', ['siswa', 'pegawai']);;
 
         // Filter periode
         $startDate = null;

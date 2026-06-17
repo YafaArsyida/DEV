@@ -17,7 +17,7 @@ class Index extends Component
     protected $paginationTheme = 'bootstrap'; // Menggunakan tema Bootstrap untuk paginasi
 
     // Parameter dari listener
-    public $selectedJenjang = null;
+    public $selectedKantin = null;
     public $selectedTahunAjar = null;
 
     public $selectedPetugas = [];
@@ -34,16 +34,16 @@ class Index extends Component
         'parameterUpdated' => 'updateParameters',
     ];
 
-    public function updateParameters($jenjang, $tahunAjar)
+    public function updateParameters($kantin, $tahunAjar)
     {
-        $this->selectedJenjang = $jenjang;
+        $this->selectedKantin = $kantin;
         $this->selectedTahunAjar = $tahunAjar;
 
         // Reset petugas setiap parameter berubah
         $this->selectedPetugas = null;
 
-        // Reload petugas sesuai jenjang
-        $this->loadPetugasByJenjang();
+        // Reload petugas sesuai Kantin
+        $this->loadPetugasByKantin();
 
         $this->resetPage();
     }
@@ -55,28 +55,19 @@ class Index extends Component
         $this->endDate   = now()->format('Y-m-d');
     }
 
-    protected function loadPetugasByJenjang()
+    protected function loadPetugasByKantin()
     {
-        $user = auth()->user();
-
         // Jika jenjang belum dipilih → kosongkan
-        if (!$this->selectedJenjang) {
+        if (!$this->selectedKantin) {
+            $this->selectedPetugas = null;
             $this->select_petugas = collect();
             return;
         }
 
-        // Jika login sebagai kantin → auto set, tidak perlu list
-        if ($user->peran === 'kantin') {
-            $this->selectedPetugas = $user->ms_pengguna_id;
-            $this->select_petugas = collect();
-            return;
-        }
-
-        // Admin / TU → load petugas kantin sesuai akses jenjang
-        $this->select_petugas = User::where('peran', 'kantin')
-            ->whereHas('ms_akses_jenjang', function ($q) {
-                $q->where('ms_jenjang_id', $this->selectedJenjang);
-            })
+        $this->select_petugas = User::whereHas('ms_kantin', function ($q) {
+            $q->where('ms_kantin.ms_kantin_id', $this->selectedKantin);
+        })
+            ->where('peran', 'KANTIN')
             ->orderBy('nama')
             ->get();
     }
@@ -130,18 +121,7 @@ class Index extends Component
 
     public function render()
     {
-        $user = Auth::user();
-
-        $query = TransaksiSmartCanteen::where('ms_jenjang_id', $this->selectedJenjang);
-
-        if ($user->peran === 'kantin') {
-            $query->where('ms_pengguna_id', $user->ms_pengguna_id);
-        } else {
-            // Kalau bukan kantin, cek apakah ada filter petugas
-            if (!empty($this->selectedPetugas)) {
-                $query->where('ms_pengguna_id', $this->selectedPetugas);
-            }
-        }
+        $query = TransaksiSmartCanteen::where('ms_kantin_id', $this->selectedKantin);
 
         if ($this->startDate && $this->endDate) {
             $query->whereBetween('tanggal_transaksi', [
@@ -152,6 +132,10 @@ class Index extends Component
 
         if (!empty($this->selectedJenis)) {
             $query->where('user_type', $this->selectedJenis);
+        }
+
+        if (!empty($this->selectedPetugas)) {
+            $query->where('ms_pengguna_id', $this->selectedPetugas);
         }
 
         // // // Search nama siswa

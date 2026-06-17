@@ -40,6 +40,7 @@
                     </a>
                 </li>
                 <li class="menu-title"><span data-key="t-administrasi">Administrasi</span></li>
+                @if($peran == 'SUPERADMIN')
                 <li class="nav-item">
                     <a href="{{ route('smartCanteen.administrasi.kantin') }}"
                         class="nav-link menu-link {{ request()->routeIs('smartCanteen.administrasi.kantin') ? 'active' : '' }}">
@@ -47,7 +48,8 @@
                         <span data-key="t-kelas-siswa">Master Kantin</span>
                     </a>
                 </li>
-                {{-- @if($peran == 'KANTIN') --}}
+                @endif
+                @if($peran == 'KANTIN')
                 <li class="nav-item">
                     <a href="{{ route('smartCanteen.administrasi.produk') }}"
                     class="nav-link menu-link {{ request()->routeIs('smartCanteen.administrasi.produk') ? 'active' : '' }}">
@@ -71,7 +73,7 @@
                         <span data-key="t-kelas-siswa">Laporan Transaksi</span>
                     </a>
                 </li>
-                {{-- @else --}}
+                @else
                 <li class="menu-title"><span data-key="t-administrasi">Laporan</span></li>
                 <li class="nav-item">
                     <a href="{{ route('smartCanteen.laporan.transaksi') }}"
@@ -87,7 +89,7 @@
                         <span data-key="t-kelas-siswa">Settlement Transaksi</span>
                     </a>
                 </li>
-                {{-- @endif --}}
+                @endif
             </ul>
         </div>
         <!-- Sidebar -->

@@ -11,7 +11,7 @@ class ProdukTerlaris extends Component
 {
     use WithPagination;
 
-    public $selectedJenjang = null;
+    public $selectedKantin = null;
     public $selectedTahunAjar = null;
 
     public $selectedPeriode = 'today';
@@ -34,9 +34,9 @@ class ProdukTerlaris extends Component
     /** 
      * Menerima parameter dari komponen Parameter (jenjang & tahun ajar)
      */
-    public function updateParameters($jenjang, $tahunAjar)
+    public function updateParameters($kantin, $tahunAjar)
     {
-        $this->selectedJenjang = $jenjang;
+        $this->selectedKantin = $kantin;
         $this->selectedTahunAjar = $tahunAjar;
 
         $this->resetPage();
@@ -96,9 +96,9 @@ class ProdukTerlaris extends Component
             ->join('ms_produk_kantin', 'ms_produk_kantin.ms_produk_kantin_id', '=', 'dt_transaksi_kantin.ms_produk_kantin_id')
             ->join('ms_transaksi_kantin', 'ms_transaksi_kantin.ms_transaksi_kantin_id', '=', 'dt_transaksi_kantin.ms_transaksi_kantin_id')
             ->when(
-                $this->selectedJenjang,
+                $this->selectedKantin,
                 fn($q) =>
-                $q->where('ms_produk_kantin.ms_jenjang_id', $this->selectedJenjang)
+                $q->where('ms_produk_kantin.ms_kantin_id', $this->selectedKantin)
             )
             ->when(
                 $start && $end,

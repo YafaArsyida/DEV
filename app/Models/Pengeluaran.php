@@ -15,7 +15,7 @@ class Pengeluaran extends Model
     protected $fillable = [
         'ms_pengguna_id',
         'ms_jenjang_id',
-        'ms_tahun_ajar_id',
+        // 'ms_tahun_ajar_id',
         'kode_rekening',
         'nominal',
         'metode_pembayaran', //untuk mengurangi saldo kas atau bank
@@ -32,10 +32,10 @@ class Pengeluaran extends Model
     /**
      * Relasi ke model TahunAjar
      */
-    public function ms_tahun_ajar()
-    {
-        return $this->belongsTo(TahunAjar::class, 'ms_tahun_ajar_id', 'ms_tahun_ajar_id');
-    }
+    // public function ms_tahun_ajar()
+    // {
+    //     return $this->belongsTo(TahunAjar::class, 'ms_tahun_ajar_id', 'ms_tahun_ajar_id');
+    // }
 
     /**
      * Relasi ke model Jenjang

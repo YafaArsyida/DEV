@@ -11,7 +11,7 @@ class ProdukAktif extends Component
 {
     use WithPagination;
 
-    public $selectedJenjang;
+    public $selectedKantin;
     public $selectKategoriProduk = '';
     public $kategoriList = [];
 
@@ -38,14 +38,14 @@ class ProdukAktif extends Component
     }
 
     /**
-     * Listener untuk update jenjang
+     * Listener untuk update kantin
      */
-    public function updateParameters($jenjang, $tahunAjar)
+    public function updateParameters($kantin, $tahunAjar)
     {
-        $this->selectedJenjang = $jenjang;
+        $this->selectedKantin = $kantin;
 
-        // filter kategori berdasar jenjang
-        $this->kategoriList = KategoriProdukSmartCanteen::where('ms_jenjang_id', $jenjang)->get();
+        // filter kategori berdasar kantin
+        $this->kategoriList = KategoriProdukSmartCanteen::where('ms_kantin_id', $kantin)->get();
 
         $this->resetPage();
     }
@@ -54,8 +54,8 @@ class ProdukAktif extends Component
     {
         return ProdukSmartCanteen::with('ms_kategori_produk_kantin')
             ->where('status', 1)
-            ->when($this->selectedJenjang, function ($q) {
-                $q->where('ms_jenjang_id', $this->selectedJenjang);
+            ->when($this->selectedKantin, function ($q) {
+                $q->where('ms_kantin_id', $this->selectedKantin);
             })
             ->when($this->selectKategoriProduk, function ($q) {
                 $q->where('ms_kategori_produk_kantin_id', $this->selectKategoriProduk);

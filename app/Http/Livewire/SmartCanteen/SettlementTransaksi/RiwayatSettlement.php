@@ -2,9 +2,7 @@
 
 namespace App\Http\Livewire\SmartCanteen\SettlementTransaksi;
 
-use App\Models\Jenjang;
 use App\Models\SmartCanteen\SettlementSmartCanteen;
-use App\Models\TahunAjar;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -20,7 +18,7 @@ class RiwayatSettlement extends Component
     public $endDate;
 
     // Parameter dari listener
-    public $selectedJenjang = null;
+    public $selectedKantin = null;
     public $selectedTahunAjar = null;
 
     public $namaJenjang = '-';
@@ -34,12 +32,10 @@ class RiwayatSettlement extends Component
         'refreshSettlement'
     ];
 
-    public function updateParameters($jenjang, $tahunAjar)
+    public function updateParameters($kantin, $tahunAjar)
     {
-        $this->selectedJenjang = $jenjang;
+        $this->selectedKantin = $kantin;
         $this->selectedTahunAjar = $tahunAjar;
-
-        $this->loadPetugasByJenjang();
 
         $this->resetPage();
     }
@@ -54,32 +50,6 @@ class RiwayatSettlement extends Component
         $this->endDate   = now()->format('Y-m-d');
     }
 
-    protected function loadPetugasByJenjang()
-    {
-        $user = auth()->user();
-
-        // Jika jenjang belum dipilih → kosongkan
-        if (!$this->selectedJenjang) {
-            $this->select_petugas = collect();
-            return;
-        }
-
-        // Jika login sebagai kantin → auto set, tidak perlu list
-        if ($user->peran === 'kantin') {
-            $this->selectedPetugas = $user->ms_pengguna_id;
-            $this->select_petugas = collect();
-            return;
-        }
-
-        // Admin / TU → load petugas kantin sesuai akses jenjang
-        $this->select_petugas = User::where('peran', 'kantin')
-            ->whereHas('ms_akses_jenjang', function ($q) {
-                $q->where('ms_jenjang_id', $this->selectedJenjang);
-            })
-            ->orderBy('nama')
-            ->get();
-    }
-
     public function resetTanggal()
     {
         // $this->startDate = now()->format('Y-m-d');
@@ -89,32 +59,12 @@ class RiwayatSettlement extends Component
         $this->resetPage();
     }
 
-    public function updatedSelectedPetugas()
-    {
-        $this->dispatchBrowserEvent('alertify-success', [
-            'message' => 'Filter petugas diperbarui'
-        ]);
-    }
-
     // Query utama riwayat settlement
     public function getDataProperty()
     {
-        $user = Auth::user();
-
         $query = SettlementSmartCanteen::query()
-            ->where('ms_jenjang_id', $this->selectedJenjang)
+            ->where('ms_kantin_id', $this->selectedKantin)
             ->orderBy('tanggal_settlement', 'desc');
-
-        // Jika role kantin → otomatis filter
-        if ($user->peran === 'kantin') {
-
-            $query->where('ms_pengguna_kantin_id', $user->ms_pengguna_id);
-        } else {
-            // Untuk admin → filter berdasarkan dropdown petugas (opsional)
-            if (!empty($this->selectedPetugas)) {
-                $query->where('ms_pengguna_kantin_id', $this->selectedPetugas);
-            }
-        }
 
         // Filter tanggal
         if ($this->startDate && $this->endDate) {
@@ -125,7 +75,7 @@ class RiwayatSettlement extends Component
         }
 
         // return $query->get();
-    return $query->paginate(10);
+        return $query->paginate(10);
     }
 
     public function render()

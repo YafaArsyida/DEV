@@ -2,51 +2,32 @@
     <div class="col-xxl-12">
         <div class="card">
             <div class="card-header border-0 pb-0">
-                <div class="d-flex align-items-center">
-                    <div class="flex-grow-1">
-                        <h5 class="card-title mb-0">
-                            Laporan Pendapatan
-                        </h5>
-                        {{-- <p class="mb-0">kjsbhdjjsjjs</p>        --}}
+                <div class="d-flex align-items-center flex-wrap gap-3">
+                    {{-- Judul --}}
+                    <h5 class="card-title mb-0 flex-grow-1">Laporan Pendapatan</h5>
+                
+                    {{-- Tombol Export & Cetak --}}
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button data-bs-toggle="modal" data-bs-target="#ExportLaporan" class="btn btn-soft-success">
+                            <i class="ri-file-excel-2-line pb-0"></i> Export
+                        </button>
+                        <button wire:click="cetakLaporan" class="btn btn-danger d-inline-flex align-items-center gap-1">
+                            <i class="ri-printer-line align-bottom"></i>
+                            <span>Cetak Laporan</span>
+                        </button>
                     </div>
-                    <div class="flex-shrink-0">
-                        <div class="d-flex gap-2 flex-wrap">
-                            <button data-bs-toggle="modal" data-bs-target="#ExportLaporan" class="btn btn-soft-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button>
-                            @if ($selectedJenjang && $selectedTahunAjar)
-                            <div class="flex-shrink-0">
-                                <div class="d-flex gap-2 flex-wrap">
-                                    <button wire:click="cetakLaporan" class="btn btn-danger d-inline-flex align-items-center gap-1">
-                                        <i class="ri-printer-line align-bottom"></i>
-                                        <span>Cetak Laporan</span>
-                                    </button>
-                                </div>
-                            </div>
-                            @endif
-                        </div>
+                
+                    <div class="d-flex align-items-center gap-2">
+                        <input type="date" class="form-control" wire:model="startDate">
+                        <span class="text-muted">–</span>
+                        <input type="date" class="form-control" wire:model="endDate">
+                        <button type="button" class="btn btn-soft-secondary" wire:click="resetTanggal" title="Reset Tanggal">
+                            <i class="ri-refresh-line"></i>
+                        </button>
                     </div>
                 </div>
             </div><!-- end card header -->
             <div class="card-body">
-                <div class="row g-3 mb-3">
-                    {{-- <div class="col-xxl-4 col-sm-6">
-                        <div class="search-box">
-                            <input type="text" class="form-control search" wire:model.debounce.300ms="search" placeholder="cari nama, deskripsi atau lainnya...">
-                            <i class="ri-search-line search-icon"></i>
-                        </div>
-                    </div> --}}
-                    <div class="col-xxl-12">
-                        <label class="form-label fw-semibold">Periode</label>
-                        <div class="d-flex align-items-center gap-2">
-                            <input type="date" class="form-control" wire:model="startDate">
-                            <span class="text-muted">–</span>
-                            <input type="date" class="form-control" wire:model="endDate">
-                            <button type="button" class="btn btn-soft-secondary" wire:click="resetTanggal" title="Reset Tanggal">
-                                <i class="ri-refresh-line"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                {{-- DATA --}}
                 <div class="live-preview">
                     <div class="table-responsive">
                         <div class="text-center my-3">

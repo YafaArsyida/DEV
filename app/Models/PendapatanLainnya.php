@@ -15,7 +15,6 @@ class PendapatanLainnya extends Model
     protected $fillable = [
         'ms_pengguna_id',
         'ms_jenjang_id',
-        'ms_tahun_ajar_id',
         'kode_rekening',
         'nominal',
         'metode_pembayaran',
@@ -27,13 +26,6 @@ class PendapatanLainnya extends Model
     public function ms_pengguna()
     {
         return $this->belongsTo(User::class, 'ms_pengguna_id', 'ms_pengguna_id');
-    }
-    /**
-     * Relasi ke model TahunAjar
-     */
-    public function ms_tahun_ajar()
-    {
-        return $this->belongsTo(TahunAjar::class, 'ms_tahun_ajar_id', 'ms_tahun_ajar_id');
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\SmartCanteen\Widget;
 
 use App\Models\Jenjang;
+use App\Models\SmartCanteen\Kantin;
 use App\Models\SmartCanteen\KategoriProdukSmartCanteen;
 use App\Models\SmartCanteen\ProdukSmartCanteen;
 use App\Models\TahunAjar;
@@ -11,10 +12,10 @@ use Livewire\Component;
 
 class KartuJumlahProduk extends Component
 {
-    public $selectedJenjang = null;
+    public $selectedKantin = null;
     public $selectedTahunAjar = null;
 
-    public $namaJenjang = null;
+    public $namaKantin = null;
     public $namaTahunAjar = null;
 
     public $selectedKategori = null;
@@ -43,15 +44,15 @@ class KartuJumlahProduk extends Component
         ]);
     }
 
-    public function updateParameters($jenjang, $tahunAjar)
+    public function updateParameters($kantin, $tahunAjar)
     {
-        $this->selectedJenjang = $jenjang;
+        $this->selectedKantin = $kantin;
         $this->selectedTahunAjar = $tahunAjar;
 
-        $janjang = Jenjang::find($jenjang);
+        $kantin = Kantin::find($kantin);
         $tahunAjar = TahunAjar::find($tahunAjar);
 
-        $this->namaJenjang = $janjang ? $janjang->nama_jenjang : 'Tidak Diketahui';
+        $this->namaKantin = $kantin ? $kantin->nama_kantin : 'Tidak Diketahui';
         $this->namaTahunAjar = $tahunAjar ? $tahunAjar->nama_tahun_ajar : 'Tidak Diketahui';
 
         // Load kategori sesuai jenjang
@@ -63,26 +64,21 @@ class KartuJumlahProduk extends Component
 
     public function loadKategori()
     {
-        if (!$this->selectedJenjang) {
+        if (!$this->selectedKantin) {
             $this->listKategori = [];
             return;
         }
 
-        $this->listKategori = KategoriProdukSmartCanteen::where('ms_jenjang_id', $this->selectedJenjang)
+        $this->listKategori = KategoriProdukSmartCanteen::where('ms_kantin_id', $this->selectedKantin)
             ->orderBy('nama_kategori_produk_kantin')
             ->get();
     }
 
     public function render()
     {
-        $query = ProdukSmartCanteen::where('ms_jenjang_id', $this->selectedJenjang);
+        $query = ProdukSmartCanteen::where('ms_kantin_id', $this->selectedKantin);
 
         $user = Auth::user();
-
-        // Jika petugas kantin → hanya data miliknya
-        if ($user->peran === 'kantin') {
-            $query->where('ms_pengguna_id', $user->ms_pengguna_id);
-        }
 
         if ($this->selectedKategori) {
             $query->where('ms_kategori_produk_kantin_id', $this->selectedKategori);

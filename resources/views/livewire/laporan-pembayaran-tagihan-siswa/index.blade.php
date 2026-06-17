@@ -1,7 +1,7 @@
 <div class="card">
     <div class="card-header border-0 pb-0">
         <div class="d-flex align-items-center">
-            <h5 class="card-title mb-0 flex-grow-1">Laporan Pembayaran Tagihan Siswa</h5>
+            <h5 class="card-title mb-0 flex-grow-1">Riwayat Pembayaran Siswa</h5>
             @if ($selectedJenjang && $selectedTahunAjar)
             <div class="flex-shrink-0">
                 <div class="d-flex gap-2 flex-wrap">
@@ -20,7 +20,7 @@
     <div class="card-body">
         <div class="row g-3 align-items-end mb-3">
             <!-- Input Pencarian -->
-            <div class="col-xxl-8 col-sm-6">
+            <div class="col-xxl-6 col-sm-6">
                 <label for="searchInput" class="form-label">Pencarian</label>
                 <div class="position-relative">
                     <input type="text" id="searchInput" 
@@ -32,7 +32,7 @@
             </div>
 
             <!-- Filter Periode -->
-            <div class="col-xxl-4 col-sm-6">
+            <div class="col-xxl-6 col-sm-6">
                 <label class="form-label fw-semibold">Periode</label>
                 <div class="d-flex align-items-center gap-2">
                     <input type="date" class="form-control" wire:model="startDate">

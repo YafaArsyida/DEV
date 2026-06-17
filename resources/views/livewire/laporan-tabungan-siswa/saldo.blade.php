@@ -3,7 +3,6 @@
         <div class="d-flex align-items-center">
             <div class="flex-grow-1">
                 <h5 class="card-title mb-0">Saldo Tabungan Siswa</h5>
-                <p>saldo ditampilkan global dalam semua tahun ajaran</p>
             </div>
             <div class="flex-shrink-0">
                 <div class="d-flex gap-2 flex-wrap">

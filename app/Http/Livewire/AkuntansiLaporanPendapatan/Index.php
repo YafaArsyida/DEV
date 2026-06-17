@@ -11,7 +11,7 @@ use Livewire\Component;
 class Index extends Component
 {
     public $selectedJenjang = null;
-    public $selectedTahunAjar = null;
+    // public $selectedTahunAjar = null;
     public $selectedBulan = null;
     public $startDate = null;
     public $endDate = null;
@@ -23,6 +23,12 @@ class Index extends Component
     protected $listeners = [
         'parameterUpdated' => 'updateParameters',
     ];
+
+    public function mount()
+    {
+        $this->startDate = now()->startOfMonth()->format('Y-m-d');
+        $this->endDate   = now()->endOfMonth()->format('Y-m-d');
+    }
     
     public function updatedStartDate()
     {
@@ -38,16 +44,24 @@ class Index extends Component
         ]);
     }
 
+    public function resetTanggal()
+    {
+        $this->startDate = now()->startOfMonth()->format('Y-m-d');
+        $this->endDate   = now()->endOfMonth()->format('Y-m-d');
+
+        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
+    }
+
     public function updatingSearch()
     {
         $this->emitSelf('$refresh'); //ringan
     }
 
-    public function updateParameters($jenjang, $tahunAjar)
+    public function updateParameters($jenjang)
     {
         // Update nilai selectedJenjang dan selectedTahunAjar
         $this->selectedJenjang = $jenjang;
-        $this->selectedTahunAjar = $tahunAjar;
+        // $this->selectedTahunAjar = $tahunAjar;
 
         $janjang = Jenjang::find($jenjang);
         $this->namaJenjang = $janjang ? $janjang->nama_jenjang : 'Tidak Diketahui';
@@ -58,16 +72,10 @@ class Index extends Component
         $this->selectedBulan = $bulan;
     }
 
-    public function resetTanggal()
-    {
-        $this->startDate = null;
-        $this->endDate = null;
-        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
-    }
     public function cetakLaporan()
     {
-        if (!$this->selectedJenjang || !$this->selectedTahunAjar) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Jenjang dan Tahun Ajar wajib dipilih']);
+        if (!$this->selectedJenjang) {
+            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Jenjang wajib dipilih']);
             return;
         }
 
@@ -75,7 +83,7 @@ class Index extends Component
 
         $url = route('akuntansi.laporan-pendapatan.pdf', [
             'jenjang' => $this->selectedJenjang,
-            'tahun' => $this->selectedTahunAjar,
+            // 'tahun' => $this->selectedTahunAjar,
             'start_date' => $this->startDate,
             'end_date' => $this->endDate,
         ]);
@@ -87,15 +95,12 @@ class Index extends Component
     {
         $pendapatanPerBulan = AkuntansiJurnalDetail::with('akuntansi_rekening')
             ->where('ms_jenjang_id', $this->selectedJenjang)
-            ->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
             ->where('posisi', 'kredit')
 
-            ->when($this->startDate && $this->endDate, function ($query) {
-                $startDate = Carbon::createFromFormat('Y-m-d', $this->startDate)->startOfDay();
-                $endDate   = Carbon::createFromFormat('Y-m-d', $this->endDate)->endOfDay();
-
-                $query->whereBetween('tanggal_transaksi', [$startDate, $endDate]);
-            })
+            ->when($this->startDate && $this->endDate, fn($q) => $q->whereBetween('tanggal_transaksi', [
+                $this->startDate . ' 00:00:00',
+                $this->endDate . ' 23:59:59'
+            ]))
 
             ->whereHas('akuntansi_rekening', function ($query) {
                 $query->where('kode_rekening', 'like', '4%');

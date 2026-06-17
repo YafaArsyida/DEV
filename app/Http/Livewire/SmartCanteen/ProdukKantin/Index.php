@@ -44,29 +44,28 @@ class Index extends Component
 
     public function render()
     {
-        $query = ProdukSmartCanteen::query();
+        // default kosong
+        $allProduk = collect();
+        $kategori = collect();
 
+        // hanya query jika kantin dipilih
         if ($this->selectedKantin) {
-            $query->where('ms_kantin_id', $this->selectedKantin);
-        }
+            $query = ProdukSmartCanteen::where(
+                'ms_kantin_id',
+                $this->selectedKantin
+            );
 
-        if ($this->search) {
-            $query->where('nama_produk_kantin', 'like', '%' . $this->search . '%');
-        }
-        // 🔐 FILTER BERDASARKAN PERAN LOGIN
-        if (auth()->check()) {
-            $peran = auth()->user()->peran;
-
-            if ($peran === 'kantin') {
-                $query->where('ms_pengguna_id', auth()->id());
+            if ($this->search) {
+                $query->where(
+                    'nama_produk_kantin',
+                    'like',
+                    '%' . $this->search . '%'
+                );
             }
-            // superadmin → tidak difilter (lihat semua)
+
+            $allProduk = $query->get();
+            $kategori = KategoriProdukSmartCanteen::where('ms_kantin_id', $this->selectedKantin)->get();
         }
-
-        $allProduk = $query->get();
-
-        // ambil kategori
-        $kategori = KategoriProdukSmartCanteen::where('ms_kantin_id', $this->selectedKantin)->get();
 
         return view('livewire.smart-canteen.produk-kantin.index', [
             'allProduk' => $allProduk,

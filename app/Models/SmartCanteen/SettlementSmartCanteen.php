@@ -15,13 +15,12 @@ class SettlementSmartCanteen extends Model
     protected $primaryKey = 'ms_settlement_kantin_id';
 
     protected $fillable = [
+        'ms_pengguna_id',
+        'ms_kantin_id',
         'tanggal_settlement',
         'total_settlement',
         'metode_pembayaran', // tunai / transfer
         'deskripsi',
-        'ms_pengguna_id',
-        'ms_jenjang_id',
-        'ms_pengguna_kantin_id',
         'akun_jurnal_debit_id',
         'akun_jurnal_kredit_id',
     ];
@@ -31,13 +30,13 @@ class SettlementSmartCanteen extends Model
     {
         return $this->hasMany(TransaksiSmartCanteen::class, 'ms_settlement_kantin_id');
     }
-
+    
+    public function ms_kantin()
+    {
+        return $this->belongsTo(Kantin::class, 'ms_kantin_id', 'ms_kantin_id');
+    }
     public function ms_pengguna()
     {
         return $this->belongsTo(User::class, 'ms_pengguna_id', 'ms_pengguna_id');
-    }
-    public function ms_jenjang()
-    {
-        return $this->belongsTo(Jenjang::class, 'ms_jenjang_id', 'ms_jenjang_id');
     }
 }

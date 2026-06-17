@@ -9,7 +9,7 @@
                         <h4 class="fs-16 mb-1">Transaksi Pengeluaran</h4>
                         <p class="text-muted mb-0">Transaksi > Transaksi Pengeluaran</p>
                     </div>
-                    @livewire('parameter.jenjang-tahun-ajar')   
+                    @livewire('parameter.jenjang')   
                 </div><!-- end card header -->
             </div>
         </div>

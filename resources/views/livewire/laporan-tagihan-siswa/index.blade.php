@@ -2,7 +2,7 @@
 <div class="card">
     <div class="card-header border-0 pb-0">
         <div class="d-flex align-items-center">
-            <h5 class="card-title mb-0 flex-grow-1">Laporan Piutang Tagihan Siswa</h5>
+            <h5 class="card-title mb-0 flex-grow-1">Laporan Piutang Siswa</h5>
             @if ($selectedJenjang && $selectedTahunAjar)
             <div class="flex-shrink-0">
                 <div class="d-flex gap-2 flex-wrap">

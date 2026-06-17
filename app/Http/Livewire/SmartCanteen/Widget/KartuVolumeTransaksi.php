@@ -12,7 +12,7 @@ use Livewire\Component;
 
 class KartuVolumeTransaksi extends Component
 {
-    public $selectedJenjang = null;
+    public $selectedKantin = null;
     public $selectedTahunAjar = null;
 
     // Periode
@@ -31,25 +31,25 @@ class KartuVolumeTransaksi extends Component
     protected $listeners = [
         'parameterUpdated' => 'updateParameters',
     ];
-    public function updateParameters($jenjang, $tahunAjar)
+    public function updateParameters($kantin, $tahunAjar)
     {
-        $this->selectedJenjang = $jenjang;
+        $this->selectedKantin = $kantin;
         $this->selectedTahunAjar = $tahunAjar;
 
-        $this->loadPetugasByJenjang();
+        $this->loadPetugasByKantin();
     }
 
-    protected function loadPetugasByJenjang()
+    protected function loadPetugasByKantin()
     {
-        if (!$this->selectedJenjang || !$this->selectedTahunAjar) {
+        if (!$this->selectedKantin || !$this->selectedTahunAjar) {
             $this->select_petugas = collect();
             return;
         }
 
-        $this->select_petugas = User::whereHas('ms_akses_jenjang', function ($q) {
-            $q->where('ms_jenjang_id', $this->selectedJenjang);
+        $this->select_petugas = User::whereHas('ms_kantin', function ($q) {
+            $q->where('ms_kantin.ms_kantin_id', $this->selectedKantin);
         })
-            ->where('peran', 'kantin')
+            ->where('peran', 'KANTIN')
             ->orderBy('nama')
             ->get();
     }
@@ -98,7 +98,7 @@ class KartuVolumeTransaksi extends Component
 
     public function hitungJumlahTransaksi()
     {
-        $query = TransaksiSmartCanteen::where('ms_jenjang_id', $this->selectedJenjang);
+        $query = TransaksiSmartCanteen::where('ms_kantin_id', $this->selectedKantin);
 
         // Filter petugas
         if ($this->selectedPetugas) {

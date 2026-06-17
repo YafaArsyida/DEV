@@ -28,20 +28,26 @@ class Index extends Component
 
     public function render()
     {
-        $kategori = KategoriProdukSmartCanteen::query();
+        $kategori = collect();
 
-        // filter jenjang
-        if ($this->selectedKantin) {
-            $kategori->where('ms_kantin_id', $this->selectedKantin);
+        if($this->selectedKantin){
+            $query = KategoriProdukSmartCanteen::where(
+                'ms_kantin_id',
+                $this->selectedKantin
+            );
+
+            // filter pencarian
+            if ($this->search) {
+                $query->where(
+                    'nama_kategori_produk_kantin',
+                    'like',
+                    '%' . $this->search . '%');
+            }
+            $kategori = $query->get();
         }
-
-        // filter pencarian
-        if ($this->search) {
-            $kategori->where('nama_kategori_produk_kantin', 'like', '%' . $this->search . '%');
-        }
-
+        
         return view('livewire.smart-canteen.kategori-produk-kantin.index', [
-            'kategori' => $kategori->get()
+            'kategori' => $kategori
         ]);
     }
 }

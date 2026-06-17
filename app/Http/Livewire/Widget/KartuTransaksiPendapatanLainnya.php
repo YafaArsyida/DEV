@@ -45,7 +45,6 @@ class KartuTransaksiPendapatanLainnya extends Component
     public function loadData()
     {
         $this->totalPendapatanLainnya = PendapatanLainnya::query()
-            ->where('ms_tahun_ajar_id', $this->selectedTahunAjar)
             ->where('ms_jenjang_id', $this->selectedJenjang)
             ->sum('nominal');
     }
@@ -94,8 +93,8 @@ class KartuTransaksiPendapatanLainnya extends Component
                 'nominal' => $this->nominal,
                 'tanggal_transaksi' => now(),
                 'ms_pengguna_id' => auth()->id(),
-                'ms_tahun_ajaran_id' => $this->selectedTahunAjar,
                 'ms_jenjang_id' => $this->selectedJenjang,
+                'ms_departemen_id' => 'SEKOLAH',
                 'deskripsi' => $deskripsi,
             ];
 
@@ -121,7 +120,6 @@ class KartuTransaksiPendapatanLainnya extends Component
             PendapatanLainnya::create([
                 'ms_pengguna_id' => auth()->id(),
                 'ms_jenjang_id' => $this->selectedJenjang,
-                'ms_tahun_ajar_id' => $this->selectedTahunAjar,
                 'kode_rekening' => $this->kode_rekening,
                 'nominal' => $this->nominal,
                 'metode_pembayaran' => $this->metode_pembayaran,

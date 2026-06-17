@@ -74,18 +74,13 @@
                     <input type="date" id="startDate" class="form-control" wire:model="startDate">
                     <span class="text-muted">–</span>
                     <input type="date" id="endDate" class="form-control" wire:model="endDate">
-                    <div class="col-auto">
-                        <button type="button" class="btn btn-soft-secondary btn-icon rounded-circle" wire:click="resetTanggal"
-                            title="Reset Tanggal">
-                            <i class="ri-refresh-line fs-16"></i>
-                        </button>
-                    </div>
+                    <button type="button" class="btn btn-soft-secondary" wire:click="resetTanggal" title="Reset Tanggal">
+                        <i class="ri-refresh-line"></i>
+                    </button>
                 </div>
             </div>
 
         </div>
-
-
         <!--end row-->
         {{-- DATA --}}
         <div class="live-preview">
@@ -123,7 +118,7 @@
                                         {{ $item->ms_pegawai->ms_jabatan->nama_jabatan ?? '' }}
                                     </p>
                                 @else
-                                    <span class="text-muted">-</span>
+                                    <span class="text-muted">Umum</span>
                                 @endif
                             </td>
                             <td class="text-start">
@@ -139,14 +134,18 @@
                                 </span>
                             </td>
                             <!-- 🔥 STATUS SETTLEMENT -->
-                            <td class="text-center">
+                            <td style="white-space: nowrap;" class="text-center">
                                 @if($item->status_settlement === 'sudah')
                                     <span class="text-success fw-semibold">
-                                        <i class="ri-check-line me-1"></i> Sudah
+                                        <i class="ri-check-line me-1"></i> Sudah Disettlement
+                                    </span>
+                                @elseif($item->status_settlement === 'belum')
+                                    <span class="text-warning fw-semibold">
+                                        <i class="ri-timer-line me-1"></i> Menunggu Settlement
                                     </span>
                                 @else
-                                    <span class="text-danger fw-semibold">
-                                        <i class="ri-close-line me-1"></i> Belum
+                                    <span class="text-primary fw-semibold">
+                                        <i class="ri-check-double-line me-1"></i> Langsung Masuk Kantin
                                     </span>
                                 @endif
                             </td>

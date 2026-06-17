@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\SmartCanteen\Widget;
 
 use App\Models\Jenjang;
+use App\Models\SmartCanteen\Kantin;
 use App\Models\SmartCanteen\TransaksiSmartCanteen;
 use App\Models\TahunAjar;
 use Carbon\Carbon;
@@ -11,7 +12,7 @@ use Livewire\Component;
 
 class KartuPendapatan extends Component
 {
-    public $selectedJenjang = null;
+    public $selectedKantin = null;
     public $selectedTahunAjar = null;
 
     public $periode = 'today'; // today | yesterday | 1_month | 3_month
@@ -27,12 +28,12 @@ class KartuPendapatan extends Component
         'parameterUpdated' => 'updateParameters',
     ];
 
-    public function updateParameters($jenjang, $tahunAjar)
+    public function updateParameters($kantin, $tahunAjar)
     {
-        $this->selectedJenjang = $jenjang;
+        $this->selectedKantin = $kantin;
         $this->selectedTahunAjar = $tahunAjar;
 
-        $janjang = Jenjang::find($jenjang);
+        $kantin = Kantin::find($kantin);
         $tahunAjar = TahunAjar::find($tahunAjar);
     }
 
@@ -89,12 +90,7 @@ class KartuPendapatan extends Component
     {
         $user = Auth::user();
 
-        $query = TransaksiSmartCanteen::where('ms_jenjang_id', $this->selectedJenjang);
-
-        // Role kantin → hanya data sendiri
-        if ($user->peran === 'kantin') {
-            $query->where('ms_pengguna_id', $user->ms_pengguna_id);
-        }
+        $query = TransaksiSmartCanteen::where('ms_kantin_id', $this->selectedKantin);
 
         // Filter tanggal
         $query->whereBetween('tanggal_transaksi', [

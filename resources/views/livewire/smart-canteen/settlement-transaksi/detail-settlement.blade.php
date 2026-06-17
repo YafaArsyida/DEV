@@ -30,17 +30,17 @@
                     </thead>
                     <tbody>
                         @forelse($detailList as $i => $d)
-                        <tr>
+                        <tr class="text-center">
                             <td>{{ $i + 1 }}.</td>
 
                             {{-- Tanggal --}}
-                            <td class="text-start text-uppercase">
+                            <td style="white-space: nowrap;" class="text-start text-uppercase">
                                 {{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($d->tanggal_transaksi, 'd F Y') }}
                             </td>
 
                             {{-- Jenis + Nama Pengguna + Deskripsi --}}
                             <td class="text-start">
-                                <span class="fs-14 fw-semibold text-dark">
+                                <span class="fw-semibold text-dark">
                                     {{ ucfirst($d->user_type) }} -
                                     @if ($d->user_type === 'siswa')
                                         {{ $d->ms_siswa->nama_siswa ?? '-' }}

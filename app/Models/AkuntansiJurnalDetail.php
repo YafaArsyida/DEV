@@ -24,6 +24,7 @@ class AkuntansiJurnalDetail extends Model
         'ms_jenjang_id',
         'is_canceled',
         'deskripsi',
+        'ms_departemen_id',
     ];
     /**
      * Relasi ke model Rekening

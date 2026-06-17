@@ -10,7 +10,6 @@ use Livewire\Component;
 class DataTransaksi extends Component
 {
     public $selectedJenjang = null;
-    public $selectedTahunAjar = null;
     public $selectedRekening = null;
 
     public $startDate = null;
@@ -37,11 +36,10 @@ class DataTransaksi extends Component
             ->get();
     }
 
-    public function parameterUpdated($jenjang, $tahunAjar)
+    public function parameterUpdated($jenjang)
     {
-        // Update nilai selectedJenjang dan selectedTahunAjar
+        // Update nilai selectedJenjang
         $this->selectedJenjang = $jenjang;
-        $this->selectedTahunAjar = $tahunAjar;
     }
 
     public function updatedStartDate()
@@ -68,8 +66,8 @@ class DataTransaksi extends Component
 
     public function cetakLaporan()
     {
-        if (!$this->selectedJenjang || !$this->selectedTahunAjar) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Jenjang dan Tahun Ajar wajib dipilih']);
+        if (!$this->selectedJenjang) {
+            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Jenjang wajib dipilih']);
             return;
         }
 
@@ -77,7 +75,6 @@ class DataTransaksi extends Component
 
         $url = route('transaksi.pengeluaran.pdf', [
             'jenjang' => $this->selectedJenjang,
-            'tahun' => $this->selectedTahunAjar,
             'rekening' => $this->selectedRekening,
             'start_date' => $this->startDate,
             'end_date' => $this->endDate,
@@ -93,7 +90,6 @@ class DataTransaksi extends Component
         // ======================
         $base = Pengeluaran::query()
             ->with(['akuntansi_rekening', 'ms_pengguna'])
-            ->where('ms_tahun_ajar_id', $this->selectedTahunAjar)
             ->where('ms_jenjang_id', $this->selectedJenjang);
 
         // ======================
@@ -134,12 +130,10 @@ class DataTransaksi extends Component
                 });
             })
 
-            ->when($this->startDate && $this->endDate, function ($q) {
-                $q->whereBetween('tanggal', [
-                    Carbon::parse($this->startDate)->startOfDay(),
-                    Carbon::parse($this->endDate)->endOfDay()
-                ]);
-            })
+            ->when($this->startDate && $this->endDate, fn($q) => $q->whereBetween('tanggal', [
+                $this->startDate . ' 00:00:00',
+                $this->endDate . ' 23:59:59'
+            ]))
 
             ->orderBy('tanggal', 'ASC')
             ->get()

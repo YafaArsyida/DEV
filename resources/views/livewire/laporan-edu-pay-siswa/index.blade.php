@@ -3,7 +3,7 @@
     <div class="card-header border-0 pb-0">
         <div class="d-flex align-items-center">
             <div class="flex-grow-1">
-                <h5 class="card-title mb-0">Laporan Transaksi EduPay</h5>
+                <h5 class="card-title mb-0">Riwayat Transaksi EduPay</h5>
                 {{-- <p class="mb-0">Transaksi akan ditampilkan dari semua petugas untuk memastikan penghitungan yang akurat dan terkini.</p> --}}
             </div>
             <div class="flex-shrink-0">
@@ -37,7 +37,7 @@
                 </select>
             </div>
             <!-- Input Pencarian -->
-            <div class="col-xxl-6 col-sm-6">
+            <div class="col-xxl-4 col-sm-6">
                 <label for="searchInput" class="form-label">Pencarian</label>
                 <div class="position-relative">
                     <input type="text" id="searchInput" class="form-control ps-4" 
@@ -47,7 +47,7 @@
                 </div>
             </div>
             <!-- Filter Periode -->
-            <div class="col-xxl-4">
+            <div class="col-xxl-6">
                 <label class="form-label fw-semibold">Periode</label>
                 <div class="d-flex align-items-center gap-2">
                     <input type="date" class="form-control" wire:model="startDate">
