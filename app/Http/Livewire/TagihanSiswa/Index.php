@@ -20,6 +20,8 @@ class Index extends Component
     protected $paginationTheme = 'bootstrap'; // Menggunakan tema Bootstrap untuk paginasi
 
     public $search = '';
+    public $perPage = 10;
+
     public $selectedJenjang = null;
     public $selectedTahunAjar = null;
     public $selectedKelas = null;
@@ -47,6 +49,11 @@ class Index extends Component
     {
         $this->resetPage(); // Reset paginasi saat parameter berubah
 
+    }
+
+    public function updatedPerPage()
+    {
+        $this->resetPage();
     }
 
     public function updateParameters($jenjang, $tahunAjar)
@@ -262,7 +269,7 @@ class Index extends Component
             $tagihans = $query
                 ->orderBy('ms_penempatan_siswa.ms_kelas_id')
                 ->orderBy('ms_siswa.nama_siswa')
-                ->paginate(100);
+                ->paginate($this->perPage);
 
             $this->totalTagihan = $tagihans->sum('total_tagihan');
             $this->totalDibayarkan = $tagihans->sum('total_bayar');

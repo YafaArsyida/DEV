@@ -36,95 +36,99 @@
                     <p class="text-muted mb-0">Untuk melihat data kelas, harap pilih Jenjang dan Tahun Ajar terlebih dahulu.</p>
                 </div>
             @else
-                <!-- Tabel Data Kelas -->
-                <table class="table table-hover nowrap align-middle" style="width:100%">
-                    <thead class="table-light">
-                        <tr>
-                            <th class="text-uppercase" width="50px">no</th>
-                            <th class="text-uppercase" style="width: 50px;">Hapus</th>
-                            <th class="text-uppercase">kelas</th>
-                            <th class="text-uppercase">siswa</th>
-                            <th class="text-uppercase">aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($kelass as $item)
+                <div class="table-responsive">
+                    <!-- Tabel Data Kelas -->
+                    <table class="table table-hover table-nowrap align-middle" style="width:100%">
+                        <thead class="table-light">
                             <tr>
-                                <td>
-                                    {{ ($kelass->firstItem() ?? 0) + $loop->index }}.
-                                </td>
-                                <th class="text-center">
-                                    <a href="#ModalAksiDelete" data-bs-toggle="modal" class="btn btn-sm btn-soft-danger d-inline-flex align-items-center gap-1"
-                                        data-bs-target="#ModalDeleteKelas"
-                                        title="Hapus Kelas"
-                                        wire:click.prevent="$emit('confirmDeleteKelas', {{ $item->ms_kelas_id }})">
-                                        <i class="ri-delete-bin-5-line"></i>
-                                    </a>
-                                </th>
-                                <td>
-                                    <span class="fw-medium" style="white-space: nowrap;">
-                                        {{ $item->nama_kelas }}
-                                    </span>
-                                    <p class="text-muted mb-0">{{ $item->deskripsi }}</p>
-                                </td>
-                                <td>{{ $item->ms_penempatan_siswa_count }} siswa</td>
-                                <td>
-                                    <div class="d-flex align-items-center gap-1">
-                                
-                                        {{-- Pindah Kelas --}}
-                                        <a href="#ModalChangeKelas" data-bs-toggle="modal" class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1"
-                                            title="Pindah Kelas" wire:click.prevent="$emit('showKelas', {
-                                                        jenjang: {{ $item->ms_jenjang_id }},
-                                                        tahunAjar: {{ $item->ms_tahun_ajar_id }},
-                                                        kelasId: {{ $item->ms_kelas_id }}
-                                                   })">
-                                            <i class="ri-arrow-left-right-line align-middle"></i>
-                                            <span>Pindah</span>
-                                        </a>
-                                        <div class="vr mx-1"></div>
-                                        {{-- Naik Kelas --}}
-                                        <a href="#ModalPromoteKelas" data-bs-toggle="modal" class="btn btn-sm btn-soft-danger d-inline-flex align-items-center gap-1"
-                                            title="Naik Kelas" wire:click.prevent="$emit('showPromote', {
-                                                        jenjang: {{ $item->ms_jenjang_id }},
-                                                        tahunAjar: {{ $item->ms_tahun_ajar_id }},
-                                                        kelasId: {{ $item->ms_kelas_id }}
-                                                   })">
-                                            <i class="ri-plane-line align-middle"></i>
-                                            <span>Naik</span>
-                                        </a>
-                                
-                                        {{-- DIVIDER --}}
-                                        <div class="vr mx-1"></div>
-                                
-                                        {{-- EDIT --}}
-                                        
-                                        <a href="#ModalEditKelas" data-bs-toggle="modal" class="text-primary d-inline-block" title="Edit Kelas" 
-                                            wire:click="$emit('loadDataKelas', {{ $item->ms_kelas_id }})">
-                                            <i class="ri-quill-pen-line fs-17 align-middle"></i> Edit
-                                        </a>
-                                
-                                    </div>
-                                </td>                                 
+                                <th class="text-uppercase" width="30px">no</th>
+                                <th class="text-uppercase text-center">hapus</th>
+                                <th class="text-uppercase">kelas</th>
+                                <th class="text-uppercase">siswa</th>
+                                <th class="text-uppercase text-center">aksi</th>
                             </tr>
-                        @empty
-                            <!-- Jika Tidak Ada Data Kelas -->
-                            <tr>
-                                <td colspan="7">
-                                    <div class="noresult text-center py-3">
-                                        <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop"
-                                            colors="primary:#405189,secondary:#08a88a"
-                                            style="width:75px;height:75px">
-                                        </lord-icon>
-                                        <h5 class="mt-2">Maaf, Tidak Ada Data yang Ditemukan</h5>
-                                        <p class="text-muted mb-0">Kami telah mencari keseluruhan data, namun tidak ditemukan hasil yang sesuai.</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-                <!-- Pagination -->
-                {{ $kelass->links() }}
+                        </thead>
+                        <tbody>
+                            @forelse ($kelass as $item)
+                                <tr>
+                                    <td>
+                                        {{ ($kelass->firstItem() ?? 0) + $loop->index }}.
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="#ModalDeleteKelas" data-bs-toggle="modal" class="text-danger d-inline-block remove-item-btn"
+                                            wire:click.prevent="$emit('confirmDeleteKelas', {{ $item->ms_kelas_id }})"
+                                            data-bs-trigger="hover" data-bs-placement="top" title="Hapus Kelas">
+                                            <i class="ri-delete-bin-5-fill fs-14"></i>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <span class="fw-medium" style="white-space: nowrap;">
+                                            {{ $item->nama_kelas }}
+                                        </span>
+                                        <p class="text-muted mb-0">{{ $item->deskripsi }}</p>
+                                    </td>
+                                    <td>{{ $item->ms_penempatan_siswa_count }} siswa</td>
+                                    <td>
+                                        <div class="d-flex justify-content-center gap-2">
+                                            {{-- Detail/Transfer --}}
+                                            <a href="#ModalDetailKelas" data-bs-toggle="modal" class="btn btn-soft-primary btn-sm rounded-pill px-3"
+                                                title="Detail & Transfer Siswa" wire:click.prevent="$emit('loadDetailKelas', {
+                                                    kelasId: {{ $item->ms_kelas_id }},
+                                                    namaKelas: '{{ addslashes($item->nama_kelas) }}',
+                                                    jenjang: {{ $item->ms_jenjang_id }},
+                                                    tahunAjar: {{ $item->ms_tahun_ajar_id }}
+                                                })">
+                                                <i class="ri-eye-line me-1"></i> Detail
+                                            </a>
+                                            {{-- edit --}}
+                                            <a href="#ModalEditKelas" data-bs-toggle="modal" class="btn btn-primary btn-sm rounded-pill px-3" title="Edit Kelas" 
+                                                wire:click="$emit('loadDataKelas', {{ $item->ms_kelas_id }})">
+                                                <i class="ri-mark-pen-line me-1"></i> Edit
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <!-- Jika Tidak Ada Data Kelas -->
+                                <tr>
+                                    <td colspan="4">
+                                        <div class="noresult text-center py-3">
+                                            <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop"
+                                                colors="primary:#405189,secondary:#08a88a"
+                                                style="width:75px;height:75px">
+                                            </lord-icon>
+                                            <h5 class="mt-2">Maaf, Tidak Ada Data yang Ditemukan</h5>
+                                            <p class="text-muted mb-0">Kami telah mencari keseluruhan data, namun tidak ditemukan hasil yang sesuai.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                    {{-- PAGINATION --}}
+                    <div class="mt-3">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div class="text-muted fs-13">
+                                Menampilkan
+                                <span class="fw-semibold">
+                                    {{ $kelass->firstItem() ?? 0 }}
+                                </span>
+                                -
+                                <span class="fw-semibold">
+                                    {{ $kelass->lastItem() ?? 0 }}
+                                </span>
+                                dari
+                                <span class="fw-semibold">
+                                    {{ $kelass->total() }}
+                                </span>
+                                data kelas
+                            </div>
+                            <div>
+                                {{ $kelass->links() }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
             @endif
         </div>
         {{-- DATA --}}

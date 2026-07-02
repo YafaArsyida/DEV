@@ -36,13 +36,13 @@
                 </div>
             @else
             <div class="table-responsive">
-                <table class="table table-hover nowrap align-middle" style="width:100%">
+                <table class="table table-hover table-nowrap align-middle" style="width:100%">
                     <thead class="table-light">
                         <tr>
                             <th class="text-uppercase" width="50px">NO</th>
                             <th class="text-uppercase" style="width: 50px;">Hapus</th>
                             <th class="text-uppercase">kategori</th>
-                            <th class="text-uppercase">aksi</th>
+                            <th class="text-uppercase text-center">aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -50,11 +50,10 @@
                         <tr>
                             <td>{{ $kategoris->firstItem() + $key }}.</td>
                             <td class="text-center">
-                                <a href="#ModalDeleteKategoriTagihan" data-bs-toggle="modal"
-                                    class="btn btn-sm btn-soft-danger d-inline-flex align-items-center gap-1" data-bs-target="#ModalDeleteKategoriTagihan"
-                                    title="Hapus Kategori Tagihan"
-                                    wire:click.prevent="$emit('confirmDeleteKategori', {{ $item->ms_kategori_tagihan_siswa_id }})">
-                                    <i class="ri-delete-bin-5-line"></i>
+                                <a href="#ModalDeleteKategoriTagihan" data-bs-toggle="modal" class="text-danger d-inline-block remove-item-btn"
+                                    wire:click.prevent="$emit('confirmDeleteKategori', {{ $item->ms_kategori_tagihan_siswa_id }})"
+                                    data-bs-trigger="hover" data-bs-placement="top" title="Hapus Kategori">
+                                    <i class="ri-delete-bin-5-fill fs-14"></i>
                                 </a>
                             </td>
                             <td>
@@ -63,14 +62,13 @@
                                 </span>
                                 <p class="text-muted mb-0">{{ $item->deskripsi }}</p>
                             </td>
-                            <td>
-                                <div class="hstack gap-2">
-                                    <a href="#ModalEditKategoriTagihan" data-bs-toggle="modal" class="text-primary d-inline-block"
-                                        title="Edit Jenis Tagihan Siswa" wire:click="$emit('loadDataKategoriTagihan', {{ $item->ms_kategori_tagihan_siswa_id }})">
-                                        <i class="ri-quill-pen-line fs-17 align-middle"></i> Edit
-                                    </a>
-                                </div>
-                            </td>                            
+                            <td class="text-center">
+                                {{-- edit --}}
+                                <a href="#ModalEditKategoriTagihan" data-bs-toggle="modal" class="btn btn-primary btn-sm rounded-pill px-3" title="Edit Kategori" 
+                                    wire:click="$emit('loadDataKategoriTagihan', {{ $item->ms_kategori_tagihan_siswa_id }})">
+                                    <i class="ri-mark-pen-line me-1"></i> Edit
+                                </a>
+                            </td>                
                         </tr>
                         @empty
                             <tr>

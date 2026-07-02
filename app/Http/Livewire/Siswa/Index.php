@@ -16,6 +16,7 @@ class Index extends Component
     protected $paginationTheme = 'bootstrap'; // Gunakan tema Bootstrap
 
     public $search = '';
+    public $perPage = 10;
 
     public $isExport = false;
     public $selectedJenjang = null;
@@ -54,6 +55,11 @@ class Index extends Component
     public function updatingSearch()
     {
         $this->resetPage(); // Reset pagination ketika pencarian berubah
+    }
+
+    public function updatedPerPage()
+    {
+        $this->resetPage();
     }
 
     public function updateParameters($jenjang, $tahunAjar)
@@ -147,7 +153,7 @@ class Index extends Component
                 })
                 ->orderBy('ms_kelas_id')
                 ->orderBy('ms_siswa.nama_siswa')
-                ->paginate(10);
+                ->paginate($this->perPage);
 
             $this->siswasOnPage = $siswas->items();
         }

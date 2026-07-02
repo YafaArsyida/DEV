@@ -60,11 +60,27 @@ class Index extends Component
         )
         ->withCount('ms_penempatan_siswa')
         ->latest('ms_kelas_id') // optional sorting
-        ->paginate(10);
+        ->paginate(12);
+
+        // Calculate stats
+        $totalKelas = KelasModel::query()
+            ->when($this->selectedJenjang, fn ($q) => $q->where('ms_jenjang_id', $this->selectedJenjang))
+            ->when($this->selectedTahunAjar, fn ($q) => $q->where('ms_tahun_ajar_id', $this->selectedTahunAjar))
+            ->count();
+
+        $totalSiswa = \App\Models\PenempatanSiswa::query()
+            ->when($this->selectedJenjang, fn ($q) => $q->whereHas('ms_kelas', fn ($sq) => $sq->where('ms_jenjang_id', $this->selectedJenjang)))
+            ->when($this->selectedTahunAjar, fn ($q) => $q->whereHas('ms_kelas', fn ($sq) => $sq->where('ms_tahun_ajar_id', $this->selectedTahunAjar)))
+            ->count();
+
+        $rataRataSiswa = $totalKelas > 0 ? round($totalSiswa / $totalKelas, 1) : 0;
 
         // Return data ke view
         return view('livewire.kelas.index', [
             'kelass' => $kelass,
+            'totalKelas' => $totalKelas,
+            'totalSiswa' => $totalSiswa,
+            'rataRataSiswa' => $rataRataSiswa,
         ]);
     }
 }

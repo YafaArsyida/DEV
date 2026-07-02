@@ -28,6 +28,7 @@
                 @livewire('kelas.delete')   
                 @livewire('kelas.change')   
                 @livewire('kelas.promote')   
+                @livewire('kelas.detail')   
             </div>
             <div class="col-xxl-8 ps-0">
                 @livewire('siswa.index')    

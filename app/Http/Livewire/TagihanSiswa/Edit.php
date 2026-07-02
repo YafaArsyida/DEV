@@ -68,6 +68,8 @@ class Edit extends Component
 
         // Reset jumlah bayar saat tagihan di-load
         $this->jumlah_perubahan_tagihan = $this->tagihan->jumlah_tagihan_siswa;
+
+        $this->dispatchBrowserEvent('tagihan-edit-loaded');
     }
 
     public function aksiEdit()
@@ -75,6 +77,8 @@ class Edit extends Component
         DB::beginTransaction();
 
         try {
+            $this->jumlah_perubahan_tagihan = $this->normalizeDecimalAmount($this->jumlah_perubahan_tagihan);
+
             // Validasi input jumlah tagihan
             $rules = ['jumlah_perubahan_tagihan' => 'numeric|min:0'];
             $messages = [
@@ -162,5 +166,28 @@ class Edit extends Component
         return view('livewire.tagihan-siswa.edit', [
             'tagihan' => $this->tagihan,
         ]);
+    }
+
+    private function normalizeDecimalAmount($value)
+    {
+        if (is_numeric($value)) {
+            return $value;
+        }
+
+        $value = trim((string) $value);
+        if ($value === '') {
+            return 0;
+        }
+
+        $clean = preg_replace('/[^\d\.,\-]/', '', $value);
+
+        if (strpos($clean, ',') !== false) {
+            $clean = str_replace('.', '', $clean);
+            $clean = str_replace(',', '.', $clean);
+        } elseif (substr_count($clean, '.') > 1) {
+            $clean = str_replace('.', '', $clean);
+        }
+
+        return $clean;
     }
 }

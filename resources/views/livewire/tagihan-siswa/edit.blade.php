@@ -42,13 +42,17 @@
                             <td>
                                 <div class="input-group input-group-sm">
                                     <span class="input-group-text">RP</span>
-                                    <input type="number" class="form-control @error('jumlah_perubahan_tagihan') is-invalid @enderror"
-                                        wire:model.defer="jumlah_perubahan_tagihan" min="0" step="0.01"
-                                        aria-label="Amount">
-                                        @error('jumlah_perubahan_tagihan')
-                                        <footer class="text-danger mt-0">{{ $message }}</footer>
-                                        @enderror
+                                    <input id="jumlah_perubahan_tagihan_visible" type="text"
+                                        class="form-control @error('jumlah_perubahan_tagihan') is-invalid @enderror"
+                                        value="{{ $jumlah_perubahan_tagihan !== null ? number_format($jumlah_perubahan_tagihan, 2, ',', '.') : '' }}"
+                                        aria-label="Amount" wire:ignore>
+                                    <input id="jumlah_perubahan_tagihan" type="hidden"
+                                        wire:model.defer="jumlah_perubahan_tagihan"
+                                        value="{{ $jumlah_perubahan_tagihan }}">
                                 </div>
+                                @error('jumlah_perubahan_tagihan')
+                                <footer class="text-danger mt-0">{{ $message }}</footer>
+                                @enderror
                             </td>
                         </tr>
                         @endif
@@ -68,3 +72,52 @@
         </div>
     </div>
 </div>
+
+<script>
+    function initEditTagihanCleave() {
+        var visibleInput = document.getElementById('jumlah_perubahan_tagihan_visible');
+        var rawInput = document.getElementById('jumlah_perubahan_tagihan');
+        if (!visibleInput || !rawInput || typeof Cleave === 'undefined') {
+            return;
+        }
+
+        if (window.tagihanPerubahanCleave) {
+            try {
+                window.tagihanPerubahanCleave.destroy();
+            } catch (e) {
+                // ignore
+            }
+        }
+
+        window.tagihanPerubahanCleave = new Cleave(visibleInput, {
+            numeral: true,
+            numeralThousandsGroupStyle: 'thousand',
+            numeralDecimalMark: ',',
+            delimiter: '.',
+            numeralDecimalScale: 2,
+            numeralIntegerScale: 15,
+            rawValueTrimPrefix: true,
+        });
+
+        function syncHiddenValue() {
+            rawInput.value = window.tagihanPerubahanCleave.getRawValue();
+            rawInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+
+        visibleInput.addEventListener('input', syncHiddenValue);
+        visibleInput.addEventListener('change', syncHiddenValue);
+
+        if (rawInput.value) {
+            window.tagihanPerubahanCleave.setRawValue(rawInput.value);
+            syncHiddenValue();
+        }
+    }
+
+    document.addEventListener('livewire:load', function () {
+        initEditTagihanCleave();
+    });
+
+    window.addEventListener('tagihan-edit-loaded', function () {
+        setTimeout(initEditTagihanCleave, 50);
+    });
+</script>

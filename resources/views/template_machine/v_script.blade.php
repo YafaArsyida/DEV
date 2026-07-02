@@ -42,6 +42,7 @@
 <script src="{{asset('assets')}}/libs/filepond-plugin-image-exif-orientation/filepond-plugin-image-exif-orientation.min.js"></script>
 <script src="{{asset('assets')}}/libs/filepond-plugin-file-encode/filepond-plugin-file-encode.min.js"></script>
 
+<script src="{{asset('assets')}}/libs/cleave.js/cleave.min.js"></script>
 <script src="{{asset('assets')}}/js/select2.min.js"></script>
 
 <script src="{{asset('assets')}}/libs/choices.js/public/assets/scripts/choices.min.js"></script>

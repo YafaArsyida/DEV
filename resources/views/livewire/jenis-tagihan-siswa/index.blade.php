@@ -56,26 +56,26 @@
                         <tr>
                             <th class="text-uppercase" width="50px">NO</th>
                             <th class="text-uppercase" style="width: 50px;">Hapus</th>
-                            <th class="text-uppercase" width="50px">cicilan</th>
+                            <th class="text-uppercase text-center" width="50px">cicilan</th>
                             <th class="text-uppercase">tagihan</th>
                             <th class="text-uppercase">kategori</th>
                             <th class="text-uppercase">cicilan</th>
                             <th class="text-uppercase">jatuh tempo</th>
-                            <th class="text-uppercase">aksi</th>
+                            <th class="text-uppercase text-center">aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse ($jenis_tagihans as $key => $item)
                         <tr>
                             <td>{{ $jenis_tagihans->firstItem() + $key }}.</td>
-                            <th class="text-center">
-                                <a href="#ModalDeleteJenisTagihan" data-bs-toggle="modal"
-                                    class="btn btn-sm btn-soft-danger d-inline-flex align-items-center gap-1" data-bs-target="#ModalDeleteJenisTagihan"
-                                    title="Hapus Jenis Tagihan" wire:click.prevent="$emit('confirmDeleteJenis', {{ $item->ms_jenis_tagihan_siswa_id }})">
-                                    <i class="ri-delete-bin-5-line"></i>
+                            <td class="text-center">
+                                <a href="#ModalDeleteJenisTagihan" data-bs-toggle="modal" class="text-danger d-inline-block remove-item-btn"
+                                    wire:click.prevent="$emit('confirmDeleteJenis', {{ $item->ms_jenis_tagihan_siswa_id }})"
+                                    data-bs-trigger="hover" data-bs-placement="top" title="Hapus Jenis Tagihan">
+                                    <i class="ri-delete-bin-5-fill fs-14"></i>
                                 </a>
-                            </th>
-                            <td>
+                            </td>
+                            <td class="text-center">
                                 <div class="form-check ps-3 form-switch form-switch-md" dir="ltr" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Ubah Status Cicilan">
                                     <input type="checkbox" class="form-check-input" id="customSwitchsizemd-{{ $item->ms_jenis_tagihan_siswa_id }}" 
                                         {{ $item->cicilan_status == 'Aktif' ? 'checked' : '' }}
@@ -90,15 +90,13 @@
                             <td>{{ $item->ms_kategori_tagihan_siswa->nama_kategori_tagihan_siswa }}</td>
                             <td class="{{ $item->cicilan_status == 'Aktif' ? 'text-success' : 'text-danger' }}"><i class="ri-{{ $item->cicilan_status == 'Aktif' ? 'checkbox' : 'close' }}-circle-line fs-17 align-middle"></i> {{ $item->cicilan_status }}</td>
                             <td>{{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($item->tanggal_jatuh_tempo, 'd F Y') }}</td>
-                            <td>
-                                <div class="hstack gap-2">
-                                    {{-- EDIT --}}
-                                    <a href="#ModalEditJenisTagihan" data-bs-toggle="modal" class="text-primary d-inline-block" title="Edit Jenis Tagihan Siswa"
-                                        wire:click="$emit('loadDataJenisTagihan', {{ $item->ms_jenis_tagihan_siswa_id }})">
-                                        <i class="ri-quill-pen-line fs-17 align-middle"></i> Edit
-                                    </a>
-                                </div>
-                            </td>                            
+                            <td class="text-center">
+                                {{-- edit --}}
+                                <a href="#ModalEditJenisTagihan" data-bs-toggle="modal" class="btn btn-primary btn-sm rounded-pill px-3" title="Edit Jenis Tagihan" 
+                                    wire:click="$emit('loadDataJenisTagihan', {{ $item->ms_jenis_tagihan_siswa_id }})">
+                                    <i class="ri-mark-pen-line me-1"></i> Edit
+                                </a>
+                            </td>                                   
                         </tr>
                         @empty
                             <tr>

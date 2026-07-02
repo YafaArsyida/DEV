@@ -25,21 +25,8 @@
     </div>
     <div class="card-body">
         <div class="row g-3 align-items-end mb-3">
-        
-            <!-- Dropdown Kelas -->
-            <div class="col-xxl-3 col-sm-6">
-                <label for="filterKelas" class="form-label">Kelas</label>
-                <select id="filterKelas" wire:model="selectedKelas" style="cursor: pointer" class="form-select"
-                    data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Kelas">
-                    <option value="">Semua Kelas</option>
-                    @foreach ($select_kelas as $item)
-                    <option value="{{ $item->ms_kelas_id }}">{{ $item->nama_kelas }}</option>
-                    @endforeach
-                </select>
-            </div>
-        
             <!-- Input Pencarian -->
-            <div class="col-xxl-9 col-sm-6">
+            <div class="col-12 col-lg-6">
                 <label for="searchData" class="form-label">Pencarian</label>
                 <div class="search-box">
                     <input type="text" id="searchData" class="form-control search" wire:model.debounce.300ms="search"
@@ -47,7 +34,30 @@
                     <i class="ri-search-line search-icon"></i>
                 </div>
             </div>
-        
+            <!-- Dropdown Kelas -->
+            <div class="col-6 col-lg-3">
+                <label for="filterKelas" class="form-label">Kelas</label>
+                <select id="filterKelas" wire:model="selectedKelas" class="form-select" style="cursor: pointer;"
+                    data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Kelas">
+                    <option value="">Semua Kelas</option>
+                    @foreach ($select_kelas as $item)
+                    <option value="{{ $item->ms_kelas_id }}">{{ $item->nama_kelas }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <!-- Dropdown Jumlah Per Halaman -->
+            <div class="col-6 col-lg-3">
+                <label for="perPage" class="form-label">Tampilkan</label>
+                <select id="perPage" wire:model="perPage" class="form-select" style="cursor: pointer;">
+                    <option value="10">10 Data</option>
+                    <option value="20">20 Data</option>
+                    <option value="30">30 Data</option>
+                    <option value="40">40 Data</option>
+                    <option value="50">50 Data</option>
+                    <option value="75">75 Data</option>
+                    <option value="100">100 Data</option>
+                </select>
+            </div>
         </div>
         <!--end row-->
         {{-- DATA --}}
@@ -64,7 +74,7 @@
                 </div>
             @else
             <div class="table-responsive">
-                <table class="table table-hover nowrap align-middle" style="width:100%">
+                <table class="table table-hover table-nowrap align-middle" style="width:100%">
                     <thead class="table-light">
                         <tr>
                             <th scope="col" style="width: 50px;">
@@ -75,9 +85,7 @@
                             <th class="text-uppercase" width="50px">no</th>
                             <th class="text-uppercase" style="width: 50px;">Hapus</th>
                             <th class="text-uppercase">siswa</th>
-                            {{-- <th class="text-uppercase">L/P</th> --}}
                             <th class="text-uppercase">kelas</th>
-                            {{-- <th class="text-uppercase">ekstrakurikuler</th> --}}
                             <th class="text-uppercase">whatsapp</th>
                             <th class="text-uppercase">EduCard</th>
                             <th class="text-uppercase">aksi</th>
@@ -93,14 +101,14 @@
                                         wire:model.live="siswaSelected" value="{{ $item->ms_penempatan_siswa_id }}">
                                 </div>
                             </td>
-                            <td>{{ $siswas->firstItem() + $key }}.</td> 
-                            <th class="text-center">
-                                <a href="#ModalDeleteSiswa" data-bs-toggle="modal"
-                                    class="btn btn-sm btn-soft-danger d-inline-flex align-items-center gap-1" data-bs-target="#ModalDeleteSiswa"
-                                    title="Hapus Siswa" wire:click.prevent="$emit('confirmDeleteSiswa', {{ $item->ms_penempatan_siswa_id }})">
-                                    <i class="ri-delete-bin-5-line"></i>
+                            <td>{{ $siswas->firstItem() + $key }}.</td>
+                            <td class="text-center">
+                                <a href="#ModalDeleteSiswa" data-bs-toggle="modal" class="text-danger d-inline-block remove-item-btn"
+                                    wire:click.prevent="$emit('confirmDeleteSiswa', {{ $item->ms_penempatan_siswa_id }})"
+                                    data-bs-trigger="hover" data-bs-placement="top" title="Hapus Siswa">
+                                    <i class="ri-delete-bin-5-fill fs-14"></i>
                                 </a>
-                            </th>
+                            </td>
                             <td>
                                 <span class="fw-medium">
                                     {{ $item->ms_siswa->nama_siswa }}
@@ -108,21 +116,14 @@
                                 <p class="text-muted mb-0">{{ $item->deskripsi }}</p>
                             </td>
                             <td>{{ $item->ms_kelas->nama_kelas }}</td>
-                            {{-- <td>
-                                @foreach ($item->ms_siswa->ms_penempatan_ekstrakurikuler as $ekskul)
-                                    <span class="badge bg-info">
-                                        {{ $ekskul->ms_ekstrakurikuler->nama_ekstrakurikuler ?? '-' }}
-                                    </span>
-                                @endforeach
-                            </td> --}}
                             <td>
-                                <span class="fs-14 text-success">    
+                                <span class="fw-semibold text-success">    
                                     {{ $item->ms_siswa->telepon }}
                                 </span>
                             </td>
                             <td>
                                 @if($item->ms_siswa->ms_educard)
-                                <span class="fs-14 text-warning">    
+                                <span class="fw-semibold text-warning">    
                                     {{ $item->ms_siswa->ms_educard->kode_kartu }}
                                 </span>
                                 @else
@@ -130,29 +131,24 @@
                                 @endif
                             </td>
                             <td>
-                                <div class="hstack gap-2">
-                                    {{-- Tombol Detail Siswa --}}
-
-                                    <a href="#ModalDetailSiswa" data-bs-toggle="modal" class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1" title="Detail Siswa"
-                                        wire:click="$emit('showDetailSiswa', {{ $item->ms_penempatan_siswa_id }})">
-                                        <i class="ri-eye-line align-bottom"></i> Detail
+                                <div class="d-flex justify-content-center gap-2">
+                                    {{-- Detail/Transfer --}}
+                                    <a href="#ModalDetailSiswa" data-bs-toggle="modal" class="btn btn-soft-primary btn-sm rounded-pill px-3"
+                                        title="Detail Siswa" wire:click.prevent="$emit('showDetailSiswa', {{ $item->ms_penempatan_siswa_id }})">
+                                        <i class="ri-eye-line me-1"></i> Detail
                                     </a>
-                            
-                                    {{-- DIVIDER --}}
-                                    <div class="vr mx-1"></div>
-                                    
-                                    {{-- EDIT --}}  
-                                    <a href="#ModalEditSiswa" data-bs-toggle="modal" class="text-primary d-inline-block" title="Edit Siswa"
+                                    {{-- edit --}}
+                                    <a href="#ModalEditSiswa" data-bs-toggle="modal" class="btn btn-primary btn-sm rounded-pill px-3" title="Edit Siswa" 
                                         wire:click="$emit('loadDataSiswa', {{ $item->ms_penempatan_siswa_id }})">
-                                        <i class="ri-quill-pen-line fs-17 align-middle"></i> Edit
+                                        <i class="ri-mark-pen-line me-1"></i> Edit
                                     </a>
                                 </div>
-                            </td>                            
+                            </td>
                         </tr>
                         @empty
                             <!-- Jika Tidak Ada Data Kelas -->
                             <tr>
-                                <td colspan="7">
+                                <td colspan="8">
                                     <div class="noresult text-center py-3">
                                         <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop"
                                             colors="primary:#405189,secondary:#08a88a"
@@ -166,7 +162,29 @@
                         @endforelse
                     </tbody>
                 </table>
-                {{ $siswas->links() }}
+                {{-- PAGINATION --}}
+                <div class="mt-3">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div class="text-muted fs-13">
+                            Menampilkan
+                            <span class="fw-semibold">
+                                {{ $siswas->firstItem() ?? 0 }}
+                            </span>
+                            -
+                            <span class="fw-semibold">
+                                {{ $siswas->lastItem() ?? 0 }}
+                            </span>
+                            dari
+                            <span class="fw-semibold">
+                                {{ $siswas->total() }}
+                            </span>
+                            data siswa
+                        </div>
+                        <div>
+                            {{ $siswas->links() }}
+                        </div>
+                    </div>
+                </div>
             </div>
             @endif
         </div>

@@ -15,7 +15,7 @@
                             default => 'bg-info',
                         };
                     @endphp
-                    <h4 class="card-title mb-0 flex-grow-1">Rekapitulasi Tagihan Siswa</h4>
+                    <h4 class="card-title mb-0 flex-grow-1">Rekap Tagihan Siswa</h4>
                     <div class="dropdown">
                         <a href="#" class="text-reset dropdown-btn" data-bs-toggle="dropdown">
                             <span class="fw-semibold text-uppercase fs-12">by:</span>
