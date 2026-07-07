@@ -37,7 +37,8 @@ class Manage extends Component
     public $nama_petugas;
 
     protected $listeners = [
-        'manageTagihan'
+        'manageTagihan',
+        'refreshTagihanSiswa' => '$refresh',
     ];
 
     public function mount()
@@ -67,8 +68,6 @@ class Manage extends Component
 
         $this->selectedJenjang = $jenis->ms_jenjang_id;
         $this->selectedTahunAjar = $jenis->ms_tahun_ajar_id;
-
-        // $this->resetPage();
         
         $this->TagihanSelectAll = false;
         $this->TagihanSelected = [];
@@ -135,6 +134,10 @@ class Manage extends Component
 
             // Commit transaksi jika berhasil
             DB::commit();
+            $this->dispatchBrowserEvent('hide-modal', [
+                'modalId' => 'ModalAksiDeleteMultiple'
+            ]);
+
             if ($anyTagihanDeleted) {
                 $this->dispatchBrowserEvent('alertify-success', ['message' => 'Tagihan berhasil dihapus.']);
             }
@@ -157,6 +160,7 @@ class Manage extends Component
         DB::beginTransaction();
 
         try {
+            $this->jumlahTagihan = $this->normalizeAmount($this->jumlahTagihan);
             if (empty($this->TagihanSelected)) {
                 throw new \Exception('Tidak ada data yang dipilih');
             }
@@ -237,7 +241,7 @@ class Manage extends Component
 
             // Emit event untuk refresh data
             $this->emitSelf('$refresh');
-            $this->emit('refreshTagihans');
+            $this->emit('refreshTagihanSiswa');
 
             // Berikan notifikasi sukses
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'Tagihan berhasil diperbarui.']);
@@ -303,5 +307,13 @@ class Manage extends Component
             'totalDibayarkan',
             'totalKekurangan'
         ));
+    }
+    private function normalizeAmount($value)
+    {
+        if ($value === null || $value === '') {
+            return 0;
+        }
+
+        return (int) str_replace('.', '', $value);
     }
 }

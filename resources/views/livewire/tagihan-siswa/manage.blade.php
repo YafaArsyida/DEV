@@ -1,38 +1,88 @@
-<div>
+<div class="">
     <div wire:ignore.self class="offcanvas offcanvas-top" id="offcanvasManage" aria-labelledby="offcanvasManageLabel" style="min-height:100vh;">
-        <div class="offcanvas-header border-0" style="background: linear-gradient(135deg, #405189 0%, #08a88a 100%);">
-            <div>
-                <h5 class="offcanvas-title text-white fw-semibold" id="offcanvasManageLabel">Kelola Tagihan Siswa</h5>
-                <p class="text-white-50 mb-0">Gunakan filter dan pilihan cepat untuk mengelola tagihan secara efisien.</p>
+        <div class="offcanvas-header border-bottom bg-white px-4 py-3 shadow-sm">
+            <div class="d-flex justify-content-between align-items-start w-100">
+                <!-- Kiri -->
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-sm">
+                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-18">
+                            <i class="ri-file-chart-line"></i>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h5 class="fw-bold mb-1">
+                            Kelola Tagihan Siswa
+                        </h5>
+                        <small class="text-muted">
+                            Gunakan filter dan pilihan cepat untuk mengelola tagihan secara efisien.
+                        </small>
+                    </div>
+                </div>
+                <!-- Kanan -->
+                <button type="button"
+                    class="btn btn-light btn-icon rounded-circle shadow-none"
+                    data-bs-dismiss="offcanvas">
+                    <i class="ri-close-line fs-18"></i>
+                </button>
             </div>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
-        <div class="offcanvas-body p-4">
+        <div class="offcanvas-body">
             <div class="row g-4">
                 <div class="col-xxl-9">
-                    <div class="card shadow-sm">
-                        <div class="card-header border-0 pb-0">
-                            <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3">
+                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                        <div class="card-header">
+                            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4">
+
+                                {{-- TITLE --}}
                                 <div>
-                                    <h4 class="card-title mb-1">Daftar Tagihan</h4>
-                                    <p class="text-muted mb-0">Pilih tagihan untuk hapus massal atau lakukan edit nominal.</p>
-                                </div>
-                                <div class="d-flex flex-wrap gap-2 align-items-center">
-                                    <div class="alert alert-secondary alert-label-icon rounded-label shadow-sm mb-0">
-                                        <i class="ri-check-double-line label-icon"></i>
-                                        <strong>{{ count($TagihanSelected) }}</strong> dipilih
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="avatar-sm">
+                                            <div class="avatar-title bg-info-subtle text-info rounded-circle fs-20">
+                                                <i class="ri-file-list-3-line"></i>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <h5 class="fw-bold mb-1">
+                                                Daftar Tagihan
+                                            </h5>
+                                            <small class="text-muted">
+                                                Pilih tagihan untuk hapus massal atau lakukan edit nominal.
+                                            </small>
+                                        </div>
                                     </div>
-                                    <button type="button" class="btn btn-soft-danger" wire:click="HapusTagihan" {{ count($TagihanSelected)===0 ? 'disabled' : '' }}>
+                                </div>
+
+                                {{-- ACTION --}}
+                                <div class="d-flex gap-2 flex-wrap align-items-center">
+                                    <div class="border rounded-pill px-3 py-2 bg-light">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i class="ri-check-double-line text-success fs-5"></i>
+                                            <span class="text-muted">Dipilih</span>
+                                            <span class="badge bg-success rounded-pill px-3">
+                                                {{ count($TagihanSelected) }}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        class="btn btn-danger rounded-pill px-4 d-inline-flex align-items-center gap-1"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#ModalAksiDeleteMultiple"
+                                        {{ count($TagihanSelected) === 0 ? 'disabled' : '' }}>
                                         <i class="ri-delete-bin-2-line"></i>
-                                        Hapus
+                                        <span>Hapus</span>
                                     </button>
                                 </div>
+
                             </div>
-                        </div><!-- end card header -->
-                        <div class="card-body pt-3">
-                            <div class="row g-3 mb-4">
-                                <div class="col-lg-4">
-                                    <label class="form-label small text-muted text-uppercase fw-semibold mb-2">Kategori</label>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3 mb-3">
+                                <div class="col-lg-2 col-sm-6">
+                                    <label class="form-label small text-muted text-uppercase fw-medium mb-2">Kategori</label>
                                     <select wire:model="selectedKategori" style="cursor: pointer" class="form-select"
                                         data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top"
                                         title="Pilih Kategori">
@@ -42,8 +92,8 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-lg-8">
-                                    <label class="form-label small text-muted text-uppercase fw-semibold mb-2">Cari Tagihan</label>
+                                <div class="col-lg-10 col-sm-6">
+                                    <label class="form-label small text-muted text-uppercase fw-medium mb-2">Cari Tagihan</label>
                                     <div class="search-box">
                                         <input type="text" class="form-control search" wire:model.debounce.300ms="search"
                                             placeholder="Cari nama siswa, jenis, atau kategori...">
@@ -65,25 +115,25 @@
                                 <div class="table-responsive">
                                     <table class="table table-hover table-nowrap align-middle" style="width:100%">
                                         <thead class="table-light">
-                                            <tr style="white-space: nowrap;">
+                                            <tr class="text-uppercase" style="white-space: nowrap;">
                                                 <th scope="col" style="width: 50px;">
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="checkbox" id="checkAll"
                                                             wire:model="TagihanSelectAll">
                                                     </div>
                                                 </th>
-                                                <th class="text-uppercase text-center" style="width: 50px;">Hapus</th>
-                                                <th class="text-uppercase" style="width: 50px;">NO</th>
-                                                <th class="text-uppercase">Siswa</th>
-                                                <th class="text-uppercase">Kelas</th>
-                                                <th class="text-uppercase">Jenis Tagihan</th>
-                                                <th class="text-uppercase">Kategori</th>
-                                                <th class="text-uppercase text-center">Estimasi</th>
-                                                <th class="text-uppercase text-center">Dibayarkan</th>
-                                                <th class="text-uppercase text-center">Kekurangan</th>
-                                                <th class="text-uppercase">Jatuh Tempo</th>
-                                                <th class="text-uppercase">Status</th>
-                                                <th class="text-uppercase">Edit</th>
+                                                <th class="text-center" style="width: 50px;">Hapus</th>
+                                                <th style="width: 50px;">NO</th>
+                                                <th>Siswa</th>
+                                                <th>Kelas</th>
+                                                <th>Jenis Tagihan</th>
+                                                <th>Kategori</th>
+                                                <th class="text-center">Estimasi</th>
+                                                <th class="text-center">Dibayarkan</th>
+                                                <th class="text-center">Kekurangan</th>
+                                                <th class="text-center">Jatuh Tempo</th>
+                                                <th class="text-center">Status</th>
+                                                <th class="text-center">Edit</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -114,26 +164,26 @@
                                                 <td>{{ $item->ms_jenis_tagihan_siswa->nama_jenis_tagihan_siswa }}</td>
                                                 <td>{{ $item->ms_jenis_tagihan_siswa->ms_kategori_tagihan_siswa->nama_kategori_tagihan_siswa }}</td>
                                                 <td class="text-center">
-                                                    <span class="fs-12 fw-semibold text-info">
+                                                    <span class="fs-12 fw-medium text-info">
                                                     RP{{ number_format($item->jumlah_tagihan_siswa, 0, ',', '.') }}
                                                 </td>
                                                 <td class="text-center">
-                                                    <span class="fs-12 fw-semibold text-success">
+                                                    <span class="fs-12 fw-medium text-success">
                                                     RP{{ number_format($item->total_bayar ?? 0, 0, ',', '.') }}
                                                     </span>
                                                 </td>
                                                 </td>
                                                 <td class="text-center">
-                                                    <span class="fs-12 fw-semibold text-danger">
+                                                    <span class="fs-12 fw-medium text-danger">
                                                     RP{{ number_format($item->jumlah_tagihan_siswa - ($item->total_bayar ?? 0), 0, ',', '.') }}
                                                     </span>
                                                 </td>
-                                                <td>{{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($item->ms_jenis_tagihan_siswa->tanggal_jatuh_tempo, 'd F Y') }}</td>
+                                                <td class="text-center">{{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($item->ms_jenis_tagihan_siswa->tanggal_jatuh_tempo, 'd F Y') }}</td>
                                                 <td class="{{ $item->status === 'Belum Dibayar' ? 'text-warning' : '' }} {{ $item->status === 'Masih Dicicil' ? 'text-info' : '' }} {{ $item->status === 'Lunas' ? 'text-success' : '' }}">
                                                     <i class="ri-{{ $item->status === 'Belum Dibayar' ? 'time-line' : ($item->status === 'Masih Dicicil' ? 'money-dollar-circle-line' : 'checkbox-circle-line') }} fs-17 align-middle"></i>
                                                     {{ $item->status }}
                                                 </td>
-                                                <td>
+                                                <td class="text-center">
                                                     <a href="#ModalAksiEdit" data-bs-toggle="modal" class="btn btn-primary btn-sm rounded-pill px-3" title="Edit Tagihan" 
                                                         wire:click="$emit('loadTagihanEdit', {{ $item->ms_tagihan_siswa_id }})">
                                                         <i class="ri-mark-pen-line me-1"></i> Edit
@@ -159,17 +209,17 @@
                                             <tr>
                                                 <td colspan="7" class="text-end">TOTAL</td>
                                                 <td class="text-center">
-                                                    <span class="fs-12 fw-semibold text-info">
+                                                    <span class="fs-12 fw-medium text-info">
                                                         Rp{{ number_format($totalEstimasi, 0, ',', '.') }}
                                                     </span>
                                                 </td>
                                                 <td class="text-center">
-                                                    <span class="fs-12 fw-semibold text-success">
+                                                    <span class="fs-12 fw-medium text-success">
                                                         Rp{{ number_format($totalDibayarkan, 0, ',', '.') }}
                                                     </span>
                                                 </td>
                                                 <td class="text-center">
-                                                    <span class="fs-12 fw-semibold text-danger">
+                                                    <span class="fs-12 fw-medium text-danger">
                                                         Rp{{ number_format($totalKekurangan, 0, ',', '.') }}
                                                     </span>
                                                 </td>
@@ -184,17 +234,32 @@
                     </div>
                 </div>
                 <div class="col-xxl-3">
-                    <div class="card shadow-sm sticky-top" style="top: 1.5rem;">
-                        <div class="card-header border-0">
-                            <h5 class="card-title mb-0">Edit Nominal Tagihan by Check</h5>
+                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden sticky-top">
+                        <div class="card-header">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="avatar-sm">
+                                    <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                                        <i class="ri-calendar-event-line">
+                                        </i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold mb-1">
+                                        Edit Nominal Tagihan by Check
+                                    </h5>
+                                </div>
+                            </div>
                         </div><!-- end card header -->
                         <div class="card-body">
                             <div class="mb-4">
                                 <label class="form-label">Nominal</label>
                                 <div class="input-group">
                                     <span class="input-group-text">Rp</span>
-                                    <input type="text" class="form-control" wire:model.defer="jumlahTagihan"
-                                        aria-label="Amount">
+                                    <input type="text" 
+                                        class="form-control" 
+                                        wire:model.defer="jumlahTagihan"
+                                        aria-label="Amount"
+                                        onkeyup="formatTagihan(this)">
                                 </div>
                                 <div class="form-text">Perbarui nilai tagihan sebelum menyimpan perubahan.</div>
                             </div>
@@ -209,4 +274,71 @@
             </div>
         </div>
     </div>
+    <div class="modal fade zoomIn"
+        id="ModalAksiDeleteMultiple"
+        tabindex="-1"
+        aria-hidden="true"
+        wire:ignore.self>
+
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body p-5 text-center">
+
+                    <lord-icon
+                        src="https://cdn.lordicon.com/gsqxdxog.json"
+                        trigger="loop"
+                        colors="primary:#405189,secondary:#f06548"
+                        style="width:90px;height:90px">
+                    </lord-icon>
+
+                    <div class="mt-4">
+                        <h4 class="fs-medium">
+                            Hapus {{ count($TagihanSelected) }} Tagihan?
+                        </h4>
+
+                        <p class="text-muted fs-14 mb-4 pt-1">
+                            Anda akan menghapus
+                            <strong>{{ count($TagihanSelected) }}</strong>
+                            tagihan yang dipilih.
+                            <br>
+                            Tindakan ini tidak dapat dibatalkan.
+                        </p>
+
+                        <div class="alert alert-warning text-start">
+                            <i class="ri-error-warning-line me-1"></i>
+                            Pastikan tagihan yang dipilih sudah benar sebelum melanjutkan.
+                        </div>
+
+                        <div class="hstack gap-2 justify-content-center">
+
+                            <button
+                                class="btn btn-link link-success fw-medium text-decoration-none"
+                                data-bs-dismiss="modal">
+                                <i class="ri-close-line me-1"></i>
+                                Batal
+                            </button>
+
+                            <button
+                                class="btn btn-danger"
+                                wire:click="HapusTagihan">
+                                <i class="ri-delete-bin-2-line me-1"></i>
+                                Ya, Hapus Semua
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+<script>
+    function formatTagihan(el) {
+        let angka = el.value.replace(/\D/g, '');
+        el.value = new Intl.NumberFormat('id-ID').format(angka);
+    }
+</script>

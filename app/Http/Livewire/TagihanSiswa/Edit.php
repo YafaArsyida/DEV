@@ -67,7 +67,7 @@ class Edit extends Component
         $this->jumlah_tagihan_siswa = $tagihan->jumlah_tagihan_siswa;
 
         // Reset jumlah bayar saat tagihan di-load
-        $this->jumlah_perubahan_tagihan = $this->tagihan->jumlah_tagihan_siswa;
+        // $this->jumlah_perubahan_tagihan = $this->tagihan->jumlah_tagihan_siswa;
 
         $this->dispatchBrowserEvent('tagihan-edit-loaded');
     }
@@ -77,7 +77,7 @@ class Edit extends Component
         DB::beginTransaction();
 
         try {
-            $this->jumlah_perubahan_tagihan = $this->normalizeDecimalAmount($this->jumlah_perubahan_tagihan);
+            $this->jumlah_perubahan_tagihan = $this->normalizeAmount($this->jumlah_perubahan_tagihan);
 
             // Validasi input jumlah tagihan
             $rules = ['jumlah_perubahan_tagihan' => 'numeric|min:0'];
@@ -168,26 +168,12 @@ class Edit extends Component
         ]);
     }
 
-    private function normalizeDecimalAmount($value)
+    private function normalizeAmount($value)
     {
-        if (is_numeric($value)) {
-            return $value;
-        }
-
-        $value = trim((string) $value);
-        if ($value === '') {
+        if ($value === null || $value === '') {
             return 0;
         }
 
-        $clean = preg_replace('/[^\d\.,\-]/', '', $value);
-
-        if (strpos($clean, ',') !== false) {
-            $clean = str_replace('.', '', $clean);
-            $clean = str_replace(',', '.', $clean);
-        } elseif (substr_count($clean, '.') > 1) {
-            $clean = str_replace('.', '', $clean);
-        }
-
-        return $clean;
+        return (int) str_replace('.', '', $value);
     }
 }

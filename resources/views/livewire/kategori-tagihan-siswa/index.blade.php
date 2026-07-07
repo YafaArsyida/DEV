@@ -1,12 +1,34 @@
-<div class="card">
-    <div class="card-header border-0 pb-0">
-        <div class="d-flex align-items-center">
-            <h5 class="card-title mb-0 flex-grow-1">Data Kategori Tagihan</h5>
-            @if ($selectedJenjang && $selectedTahunAjar)
-            <div class="flex-shrink-0">
-                <div class="d-flex gap-2 flex-wrap">
-                    <button data-bs-toggle="modal" id="create-btn" data-bs-target="#ModalAddKategoriTagihan" wire:click.prevent="$emit('showCreateKategori', {{ $selectedJenjang }}, {{ $selectedTahunAjar }})" class="btn btn-primary"><i class="ri-play-list-add-line me-1 align-bottom"></i> Kategori Baru</button>
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card-header">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4">
+            {{-- TITLE --}}
+            <div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-sm">
+                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                            <i class="ri-calendar-event-line">
+                            </i>
+                        </div>
+                    </div>
+    
+                    <div>
+                        <h5 class="fw-bold mb-1">
+                            Data Kategori Tagihan
+                        </h5>
+                        {{-- <small>
+                            Kelola laporan kegiatan generus 
+                        </small> --}}
+                    </div>
                 </div>
+            </div>
+    
+            {{-- ACTION --}}
+            @if ($selectedJenjang && $selectedTahunAjar)
+            <div class="d-flex gap-2 flex-wrap">
+                {{-- TAMBAH --}}
+                <button type="button" class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#ModalAddKategoriTagihan" wire:click.prevent="$emit('showCreateKategori', {{ $selectedJenjang }}, {{ $selectedTahunAjar }})">
+                    <i class="ri-add-line me-1"></i>Tambah Kategori
+                </button>
             </div>
             @endif
         </div>
@@ -39,7 +61,7 @@
                 <table class="table table-hover table-nowrap align-middle" style="width:100%">
                     <thead class="table-light">
                         <tr>
-                            <th class="text-uppercase" width="50px">NO</th>
+                            <th class="text-uppercase" width="30px">NO</th>
                             <th class="text-uppercase" style="width: 50px;">Hapus</th>
                             <th class="text-uppercase">kategori</th>
                             <th class="text-uppercase text-center">aksi</th>
@@ -85,10 +107,31 @@
                         @endforelse
                     </tbody>
                 </table>
-                {{ $kategoris->links() }}
+                {{-- PAGINATION --}}
+                <div class="mt-3">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div class="text-muted fs-13">
+                            Menampilkan
+                            <span class="fw-semibold">
+                                {{ $kategoris->firstItem() ?? 0 }}
+                            </span>
+                            -
+                            <span class="fw-semibold">
+                                {{ $kategoris->lastItem() ?? 0 }}
+                            </span>
+                            dari
+                            <span class="fw-semibold">
+                                {{ $kategoris->total() }}
+                            </span>
+                            data kategori
+                        </div>
+                        <div>
+                            {{ $kategoris->links() }}
+                        </div>
+                    </div>
+                </div>
             </div>
             @endif
-
         </div>
     </div>
 </div>

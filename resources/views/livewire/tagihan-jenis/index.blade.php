@@ -1,25 +1,56 @@
-<div class="card">
-    <div class="card-header border-0 pb-0">
-        <div class="d-flex align-items-center">
-            <h5 class="card-title mb-0 flex-grow-1">Data Jenis Tagihan</h5>
-            @if ($selectedJenjang && $selectedTahunAjar)
-            <div class="flex-shrink-0">
-                <div class="d-flex gap-2 flex-wrap">
-                    <button wire:click="cetakLaporanJenisTagihan" class="btn btn-danger d-inline-flex align-items-center gap-1">
-                        <i class="ri-printer-line align-bottom"></i>
-                        <span>Cetak Laporan</span>
-                    </button>
-                    <button data-bs-toggle="modal" id="create-btn" data-bs-target="#ModalAddTagihan" wire:click.prevent="$emit('showCreateTagihan', {{ $selectedJenjang }}, {{ $selectedTahunAjar }})" class="btn btn-primary"><i class="ri-play-list-add-line"></i> Tagihan Baru</button>
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card-header">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4">
+            {{-- TITLE --}}
+            <div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-sm">
+                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                            <i class="ri-calendar-event-line">
+                            </i>
+                        </div>
+                    </div>
+    
+                    <div>
+                        <h5 class="fw-bold mb-1">
+                            Data Jenis Tagihan
+                        </h5>
+                        {{-- <small>
+                            Kelola data jenis tagihan siswa berdasarkan jenjang dan tahun ajar yang dipilih.
+                        </small> --}}
+                    </div>
                 </div>
             </div>
-            @endif
+    
+            {{-- ACTION --}}
+            <div class="d-flex gap-2 flex-wrap">
+                @if ($selectedJenjang && $selectedTahunAjar && $selectedKategoriTagihan)
+                <button
+                    type="button"
+                    wire:click="cetakLaporanJenisTagihan"
+                    class="btn rounded-pill px-4 btn-danger d-inline-flex align-items-center gap-1">
+                    <i class="ri-printer-line align-bottom"></i>
+                    <span>Cetak Laporan</span>
+                </button>
+                @endif
+                <button data-bs-toggle="offcanvas" id="create-btn" data-bs-target="#offcanvasAddTagihan" wire:click.prevent="$emit('showCreateTagihan', {{ $selectedJenjang }}, {{ $selectedTahunAjar }})" class="btn rounded-pill px-4 btn-primary"><i class="ri-play-list-add-line"></i> Tagihan Baru</button>
+                <button data-bs-toggle="modal" data-bs-target="#ExportLaporanExcel" class="btn rounded-pill px-4 btn-soft-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button>
+            </div>
         </div>
     </div>
     <div class="card-body">
         <div class="row g-3 align-items-end mb-3">
-        
+            <!-- Pencarian -->
+            <div class="col-6 col-lg-6">
+                <label for="searchTagihan" class="form-label">Pencarian</label>
+                <div class="search-box">
+                    <input type="text" id="searchTagihan" class="form-control search" wire:model.debounce.300ms="search"
+                        placeholder="Cari nama tagihan, kategori, atau deskripsi...">
+                    <i class="ri-search-line search-icon"></i>
+                </div>
+            </div>
             <!-- Filter Kategori -->
-            <div class="col-xxl-2 col-sm-6">
+            <div class="col-6 col-lg-3">
                 <label for="filterKategoriTagihan" class="form-label">Kategori</label>
                 <select id="filterKategoriTagihan" wire:model="selectedKategoriTagihan" style="cursor: pointer"
                     class="form-select" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top"
@@ -32,17 +63,18 @@
                     @endforeach
                 </select>
             </div>
-        
-            <!-- Pencarian -->
-            <div class="col-xxl-10 col-sm-6">
-                <label for="searchTagihan" class="form-label">Pencarian</label>
-                <div class="search-box">
-                    <input type="text" id="searchTagihan" class="form-control search" wire:model.debounce.300ms="search"
-                        placeholder="Cari nama tagihan, kategori, atau deskripsi...">
-                    <i class="ri-search-line search-icon"></i>
-                </div>
+            <div class="col-6 col-lg-3">
+                <label for="perPage" class="form-label">Tampilkan</label>
+                <select id="perPage" wire:model="perPage" class="form-select" style="cursor: pointer;">
+                    <option value="10">10 Data</option>
+                    <option value="20">20 Data</option>
+                    <option value="30">30 Data</option>
+                    <option value="40">40 Data</option>
+                    <option value="50">50 Data</option>
+                    <option value="75">75 Data</option>
+                    <option value="100">100 Data</option>
+                </select>
             </div>
-        
         </div>
         <!--end row-->
         {{-- DATA --}}
@@ -59,19 +91,19 @@
                 </div>
             @else
             <div class="table-responsive">
-                <table class="table table-hover nowrap align-middle" style="width:100%">
+                <table id="Laporan" class="table table-hover nowrap align-middle" style="width:100%">
                     <thead class="table-light">
-                        <tr style="white-space: nowrap;">
-                            <th class="text-uppercase" style="width: 50px;">NO</th>
-                            <th class="text-uppercase">Jenis Tagihan</th>
-                            <th class="text-uppercase">Kategori</th>
-                            {{-- <th class="text-uppercase">cicilan</th> --}}
-                            <th class="text-uppercase">Tagihan</th>
-                            <th class="text-uppercase">Estimasi</th>
-                            <th class="text-uppercase">Dibayarkan</th>
-                            <th class="text-uppercase">Kekurangan</th>
-                            <th class="text-uppercase">Lunas</th>
-                            <th class="text-uppercase">Aksi</th>
+                        <tr class="text-uppercase" style="white-space: nowrap;">
+                            <th style="width: 50px;">NO</th>
+                            <th>Jenis Tagihan</th>
+                            <th>Kategori</th>
+                            {{-- <th>cicilan</th> --}}
+                            <th>Tagihan</th>
+                            <th>Estimasi</th>
+                            <th>Dibayarkan</th>
+                            <th>Kekurangan</th>
+                            <th>Lunas</th>
+                            <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -94,24 +126,24 @@
                             </td>
                             
                             <td>
-                                <span class="fs-14 fw-medium text-info">
+                                <span class="fs-12 fw-medium text-info">
                                     RP{{ number_format($item->total_tagihan ?? 0, 0, ',', '.') }}
                                 </span>
                             </td>
                             
                             <td>
-                                <span class="fs-14 fw-medium text-success">
+                                <span class="fs-12 fw-medium text-success">
                                     RP{{ number_format($item->total_bayar ?? 0, 0, ',', '.') }}
                                 </span>
                             </td>
                             
                             <td>
-                                <span class="fs-14 fw-medium text-danger">
+                                <span class="fs-12 fw-medium text-danger">
                                     RP{{ number_format(($item->total_tagihan ?? 0) - ($item->total_bayar ?? 0), 0, ',', '.') }}
                                 </span>
                             </td>
                             
-                            <td class="fs-14 fw-medium text-start">
+                            <td class="fs-12 fw-medium text-start">
                                 @php
                                 $estimasi = $item->total_tagihan ?? 0;
                                 $dibayarkan = $item->total_bayar ?? 0;
@@ -119,32 +151,33 @@
                             
                                 @if ($estimasi > 0)
                                 {{ number_format(($dibayarkan / $estimasi) * 100, 2) }}%
-                                <i class="ri-bar-chart-fill text-success fs-16 align-middle ms-2"></i>
+                                <i class="ri-bar-chart-fill text-success fs-12 align-middle ms-2"></i>
                                 @else
                                 -
                                 @endif
                             </td>
                             <td>
-                                <div class="hstack gap-2">
+                                <div class="d-flex justify-content-center gap-2">
+                                    {{-- Detail Tagihan --}}
+                                    <button class="btn btn-soft-primary btn-sm rounded-pill px-3"
+                                            data-bs-toggle="offcanvas"
+                                            data-bs-target="#offcanvasDetailTagihan"
+                                            title="Detail Tagihan"
+                                            wire:click.prevent="$emit('showDetailTagihan', {
+                                                ms_jenis_tagihan_siswa_id: {{ $item->ms_jenis_tagihan_siswa_id }},
+                                                jenjang: {{ $item->ms_jenjang_id }},
+                                                tahunAjar: {{ $item->ms_tahun_ajar_id }},
+                                                nama_tagihan: '{{ addslashes($item->nama_jenis_tagihan_siswa) }}'
+                                            })">
+                                        <i class="ri-eye-line align-bottom me-1"></i> Detail
+                                    </button>
                                     {{-- Kelola Tagihan --}}
-                                    <button class="btn btn-sm btn-primary d-inline-flex align-items-center" 
+                                    <button class="btn btn-primary btn-sm rounded-pill px-3" 
                                             data-bs-toggle="offcanvas" data-bs-target="#offcanvasManage"
                                             aria-controls="offcanvasManage"
                                             title="Kelola Tagihan"
                                             wire:click.prevent="$emit('manageTagihan', {{ $item->ms_jenis_tagihan_siswa_id }})">
                                         <i class="ri-settings-3-line align-bottom me-1"></i> Kelola
-                                    </button>
-                            
-                                    {{-- Detail Tagihan --}}
-                                    <button class="btn btn-sm btn-secondary d-inline-flex align-items-center"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#ModalDetailTagihan"
-                                            wire:click.prevent="$emit('showDetailTagihan', {
-                                                ms_jenis_tagihan_siswa_id: {{ $item->ms_jenis_tagihan_siswa_id }},
-                                                jenjang: {{ $item->ms_jenjang_id }},
-                                                tahunAjar: {{ $item->ms_tahun_ajar_id }}
-                                            })">
-                                        <i class="ri-eye-line align-bottom me-1"></i> Detail
                                     </button>
                                 </div>
                             </td>                            
@@ -171,33 +204,131 @@
                             <td class="text-start"><strong>TOTAL</strong></td>
                             <td>{{ $totalSiswa }} item</td>
                             <td>
-                                <span class="fs-14 fw-medium text-info">
+                                <span class="fs-12 fw-medium text-info">
                                     RP{{ number_format($totalEstimasi, 0, ',', '.') }}
                                 </span>
                             </td>
                             <td>
-                                <span class="fs-14 fw-medium text-success">
+                                <span class="fs-12 fw-medium text-success">
                                     RP{{ number_format($totalDibayarkan, 0, ',', '.') }}
                                 </span>
                             </td>
                             <td>
-                                <span class="fs-14 fw-medium text-danger">
+                                <span class="fs-12 fw-medium text-danger">
                                     RP{{ number_format($totalKekurangan, 0, ',', '.') }}
                                 </span>
                             </td>
                             <td>
-                                <span class="fs-14 fw-medium">
-                                    {{ number_format($totalPersen, 2) }}% <i class="ri-bar-chart-fill text-success fs-16 align-middle ms-2"></i>
+                                <span class="fs-12 fw-medium">
+                                    {{ number_format($totalPersen, 2) }}% <i class="ri-bar-chart-fill text-success fs-12 align-middle ms-2"></i>
                                 </span>
                             </td>
                         </tr>
                     </tfoot>
                 </table>
-                {{ $tagihans->links() }}
+                {{-- PAGINATION --}}
+                <div class="mt-3">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div class="text-muted fs-13">
+                            Menampilkan
+                            <span class="fw-medium">
+                                {{ $tagihans->firstItem() ?? 0 }}
+                            </span>
+                            -
+                            <span class="fw-medium">
+                                {{ $tagihans->lastItem() ?? 0 }}
+                            </span>
+                            dari
+                            <span class="fw-medium">
+                                {{ $tagihans->total() }}
+                            </span>
+                            data tagihan
+                        </div>
+                        <div>
+                            {{ $tagihans->links() }}
+                        </div>
+                    </div>
+                </div>
             </div>
 
             @endif
         </div>
         {{-- end data --}}
     </div>
+     {{-- MODAL --}}
+    <div class="modal fade zoomIn" id="ExportLaporanExcel" tabindex="-1" aria-labelledby="exportRecordLabel" aria-hidden="true" wire:ignore.self>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-5 text-center">
+                    <lord-icon src="https://cdn.lordicon.com/fjvfsqea.json" trigger="loop" colors="primary:#405189,secondary:#f06548" style="width:90px;height:90px"></lord-icon>
+                    <div class="mt-4 text-center">
+                        <h4 class="fs-medium">Konfirmasi Export</h4>
+                        <p class="text-muted fs-14 mb-4 pt-1">
+                            Apakah Anda yakin ingin mengekspor laporan Administrasi Tagihan Siswa? Data yang diekspor akan sesuai dengan tabel yang ditampilkan.
+                        </p>
+                        <div class="hstack gap-2 justify-content-center remove">
+                            <button class="btn btn-link link-success fw-medium text-decoration-none shadow-none" data-bs-dismiss="modal">
+                                <i class="ri-close-line me-1 align-middle"></i> Batal
+                            </button>
+                            <button class="btn btn-primary" id="konfirmasiExportLaporan" data-bs-dismiss="modal">Ya, Export!</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('konfirmasiExportLaporan').addEventListener('click', function () {
+            alertify.success("Menyiapkan Dokumen");
+
+            setTimeout(function () {
+                var table = document.getElementById("Laporan");
+
+                var data = [];
+                // Kolom yang ingin diexport (NO=0, Siswa=1, Kelas=2, Tagihan=3, Estimasi=4, Dibayarkan=5, Kekurangan=6, Lunas=7)
+                var exportCols = [0,1,2,3,4,5,6,7];
+
+                // Ambil header
+                var headers = [];
+                for(var i=0; i<exportCols.length; i++){
+                    headers.push(table.tHead.rows[0].cells[exportCols[i]].innerText.trim());
+                }
+                data.push(headers);
+
+                // Ambil data tbody
+                for(var i=0; i<table.tBodies[0].rows.length; i++){
+                    var row = table.tBodies[0].rows[i];
+                    var rowData = [];
+                    for(var j=0; j<exportCols.length; j++){
+                        rowData.push(row.cells[exportCols[j]].innerText.trim());
+                    }
+                    data.push(rowData);
+                }
+
+                // Ambil data tfoot (jika ada)
+                if(table.tFoot){
+                    for(var i=0; i<table.tFoot.rows.length; i++){
+                        var row = table.tFoot.rows[i];
+                        var rowData = [];
+                        for(var j=0; j<exportCols.length; j++){
+                            rowData.push(row.cells[exportCols[j]].innerText.trim());
+                        }
+                        data.push(rowData);
+                    }
+                }
+
+                // Buat workbook
+                var wb = XLSX.utils.book_new();
+                var ws = XLSX.utils.aoa_to_sheet(data);
+                XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+                XLSX.writeFile(wb, "Laporan-Administrasi-Siswa.xlsx");
+
+            }, 1000);
+        });
+
+    </script>
 </div>

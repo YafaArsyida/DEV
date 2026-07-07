@@ -23,6 +23,7 @@ class Detail extends Component
     public $selectedKelas = null; // Filter kelas
 
     public $search = ''; // Untuk pencarian
+    public $nama_tagihan = ''; // Nama tagihan
 
     protected $listeners = [
         'showDetailTagihan'
@@ -44,6 +45,7 @@ class Detail extends Component
         $this->selectedJenjang = $params['jenjang'];
         $this->selectedTahunAjar = $params['tahunAjar'];
         $this->ms_jenis_tagihan_siswa_id = $params['ms_jenis_tagihan_siswa_id'];
+        $this->nama_tagihan = $params['nama_tagihan'];
         $this->resetPage();
     }
 

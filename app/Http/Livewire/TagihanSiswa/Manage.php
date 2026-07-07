@@ -133,6 +133,9 @@ class Manage extends Component
                 }
             }
             DB::commit();
+            $this->dispatchBrowserEvent('hide-modal', [
+                'modalId' => 'ModalAksiDeleteMultiple'
+            ]);
 
             if ($anyTagihanDeleted) {
                 $this->dispatchBrowserEvent('alertify-success', ['message' => 'Tagihan berhasil dihapus.']);
@@ -148,7 +151,7 @@ class Manage extends Component
         $this->TagihanSelected = [];
 
         $this->emitSelf('$refresh');
-        $this->emit('refreshTagihans');
+        $this->emit('refreshTagihanSiswa');
     }
 
     // EDIT TAGIHAN
@@ -157,6 +160,8 @@ class Manage extends Component
         DB::beginTransaction();
 
         try {
+            $this->jumlahTagihan = $this->normalizeAmount($this->jumlahTagihan);
+
             if (empty($this->TagihanSelected)) {
                 throw new \Exception('Tidak ada data yang dipilih');
             }
@@ -166,7 +171,7 @@ class Manage extends Component
             $messages = [];
 
             if ($this->jumlahTagihan !== null) {
-                $rules['jumlahTagihan'] = 'numeric|min:0';
+                $rules['jumlahTagihan'] = 'integer|min:0';
                 $messages['jumlahTagihan.numeric'] = 'Jumlah tagihan harus berupa angka.';
                 $messages['jumlahTagihan.min'] = 'Jumlah tagihan tidak boleh kurang dari 0.';
             }
@@ -238,7 +243,7 @@ class Manage extends Component
 
             // Emit event untuk refresh data
             $this->emitSelf('$refresh');
-            $this->emit('refreshTagihans');
+            $this->emit('refreshTagihanSiswa');
 
             // Berikan notifikasi sukses
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'Tagihan berhasil diperbarui.']);
@@ -305,5 +310,13 @@ class Manage extends Component
             'totalDibayarkan' => $totalDibayarkan,
             'totalKekurangan' => $totalKekurangan,
         ]);
+    }
+    private function normalizeAmount($value)
+    {
+        if ($value === null || $value === '') {
+            return 0;
+        }
+
+        return (int) str_replace('.', '', $value);
     }
 }

@@ -1,10 +1,28 @@
 <div wire:ignore.self class="modal fade" id="ModalDetailSiswa" tabindex="-1" aria-labelledby="ModalDetailSiswaLabel"
     aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-light p-3">
-                <h5 class="modal-title">Detail Siswa</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header border-0">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-sm">
+                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                            <i class="ri-calendar-event-line">
+                            </i>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-1">
+                            Detail Siswa
+                        </h5>
+                        {{-- <small>
+                            Tambahkan agenda kegiatan generasi penerus dengan pengaturan tingkat, jadwal, dan lokasi.
+                        </small> --}}
+                    </div>
+                </div>
+                <button type="button" class="btn btn-light btn-icon rounded-circle" data-bs-dismiss="modal">
+                    <i class="ri-close-line fs-18">
+                    </i>
+                </button>
             </div>
             <div class="modal-body">
                 <div class="row g-3">
@@ -215,11 +233,11 @@
                 
                 </div>
             </div>
-
-
-            <div class="modal-footer">
-                <a href="javascript:void(0);" class="btn btn-link link-success shadow-none fw-medium"
-                    data-bs-dismiss="modal"><i class="ri-close-line me-1 align-middle"></i> Tutup</a>
+            <div class="modal-footer border-0 px-4 pb-4 pt-0">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">
+                    <i class="ri-close-line me-1"></i>
+                    Tutup
+                </button>
             </div>
         </div>
     </div>

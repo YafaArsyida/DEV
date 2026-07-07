@@ -16,10 +16,14 @@
         </div>
         <div class="row">
             <div class="col-xxl-12">
+                @livewire('tagihan-siswa.edit')   
+                @livewire('tagihan-siswa.create')  
+
                 @livewire('tagihan-jenis.index')   
                 @livewire('tagihan-jenis.detail')   
-                @livewire('tagihan-siswa.create')  
                 @livewire('tagihan-jenis.manage')  
+                
+                @livewire('tagihan-siswa.delete')   
             </div>  
         </div>
     </div>

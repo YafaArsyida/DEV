@@ -28,6 +28,8 @@ class ImportTelepon extends Component
 
     public $newSiswaList = []; // Menyimpan siswa baru di-upload
 
+    public $previewSiswaList = [];
+
     protected $listeners = ['showImportTelepon'];
 
     public function showImportTelepon($selectedKelas, $selectedJenjang, $selectedTahunAjar)
@@ -75,6 +77,8 @@ class ImportTelepon extends Component
             // Simpan data dari file ke properti $newSiswaList
             $this->newSiswaList = $import->getCollection()->toArray();
 
+            $this->generatePreview();
+
             // Informasikan pengguna bahwa file berhasil dibaca
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'File berhasil dibaca!']);
         } catch (\Exception $e) {
@@ -100,6 +104,55 @@ class ImportTelepon extends Component
     public function updated($fields)
     {
         $this->validateOnly($fields);
+    }
+
+    private function generatePreview()
+    {
+        $this->previewSiswaList = [];
+
+        if (empty($this->newSiswaList)) {
+            return;
+        }
+
+        $ids = collect($this->newSiswaList)
+            ->pluck('ms_siswa_id')
+            ->filter()
+            ->toArray();
+
+        $penempatan = PenempatanSiswa::with(['ms_siswa', 'ms_kelas'])
+            ->where('ms_jenjang_id', $this->selectedJenjang)
+            ->where('ms_tahun_ajar_id', $this->selectedTahunAjar)
+            ->where('ms_kelas_id', $this->selectedKelas)
+            ->whereIn('ms_siswa_id', $ids)
+            ->get()
+            ->keyBy('ms_siswa_id');
+
+        foreach ($this->newSiswaList as $item) {
+
+            $old = $penempatan[$item['ms_siswa_id']] ?? null;
+
+            $teleponLama = $old?->ms_siswa?->telepon;
+            $teleponBaru = HelperController::normalizePhoneNumber($item['telepon'] ?? '');
+
+            if (blank($teleponLama)) {
+                $status = 'tambah';
+            } elseif ($teleponLama == $teleponBaru) {
+                $status = 'sama';
+            } else {
+                $status = 'update';
+            }
+
+            $this->previewSiswaList[] = [
+                'ms_siswa_id' => $item['ms_siswa_id'],
+                'nama_siswa' => $old?->ms_siswa?->nama_siswa ?? '-',
+                'kelas' => $old?->ms_kelas?->nama_kelas ?? '-',
+
+                'telepon_lama' => $teleponLama,
+                'telepon_baru' => $teleponBaru,
+
+                'status' => $status,
+            ];
+        }
     }
 
     public function saveChanges()
@@ -169,8 +222,12 @@ class ImportTelepon extends Component
 
             // 🔥 reset state
             $this->newSiswaList = [];
+            $this->previewSiswaList = [];
             $this->file_import = null;
 
+            $this->dispatchBrowserEvent('hide-modal', [
+                'modalId' => 'ModalImportTelepon'
+            ]);
             $this->emit('refreshSiswas');
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -183,15 +240,8 @@ class ImportTelepon extends Component
 
     public function render()
     {
-        $oldSiswaList = PenempatanSiswa::with(['ms_siswa', 'ms_kelas'])
-            ->where('ms_jenjang_id', $this->selectedJenjang)
-            ->where('ms_tahun_ajar_id', $this->selectedTahunAjar)
-            ->where('ms_kelas_id', $this->selectedKelas)
-            ->get();
-
         return view('livewire.siswa.import-telepon', [
-            'oldSiswaList' => $oldSiswaList,
-            'newSiswaList' => $this->newSiswaList,
+            'previewSiswaList' => $this->previewSiswaList,
         ]);
     }
 }

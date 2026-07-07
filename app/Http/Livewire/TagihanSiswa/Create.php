@@ -222,6 +222,8 @@ class Create extends Component
                     }
 
                     $jumlah = $this->jumlahTagihan[$jenisId] ?? 0;
+                    
+                    $jumlah = $this->normalizeAmount($jumlah);
 
                     if ($jumlah <= 0) {
                         throw new \Exception("Jumlah tidak valid.");
@@ -333,5 +335,13 @@ class Create extends Component
             'select_kategori' => $select_kategori,
             'jenis_tagihans' => $this->jenis_tagihans,
         ]);
+    }
+    private function normalizeAmount($value)
+    {
+        if ($value === null || $value === '') {
+            return 0;
+        }
+
+        return (int) str_replace('.', '', $value);
     }
 }

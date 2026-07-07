@@ -65,7 +65,7 @@ class Edit extends Component
         ]);
 
         $this->dispatchBrowserEvent('hide-modal', [
-            'modalId' => 'editHistoriTagihan'
+            'modalId' => 'loadHistoriTransaksi'
         ]);
     }
 

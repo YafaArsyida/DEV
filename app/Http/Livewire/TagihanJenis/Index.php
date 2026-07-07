@@ -15,6 +15,8 @@ class Index extends Component
     protected $paginationTheme = 'bootstrap';
 
     public $search = ''; // Pencarian
+    public $perPage = 10;
+
     public $selectedJenjang = null;
     public $selectedTahunAjar = null;
     public $selectedKategoriTagihan = null; // Filter kategori tagihan
@@ -36,6 +38,11 @@ class Index extends Component
     }
 
     public function updatingselectedKategoriTagihan()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedPerPage()
     {
         $this->resetPage();
     }
@@ -109,7 +116,7 @@ class Index extends Component
 
             $jenis_tagihans = $query
                 ->orderBy('ms_kategori_tagihan_siswa_id')
-                ->paginate(100);
+                ->paginate($this->perPage);
 
 
             // Perhitungan total

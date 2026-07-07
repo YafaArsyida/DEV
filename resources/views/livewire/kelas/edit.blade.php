@@ -1,11 +1,28 @@
 {{-- If you look to others for fulfillment, you will never truly be fulfilled. --}}
-<div wire:ignore.self class="modal fade" id="ModalEditKelas" tabindex="-1" aria-labelledby="ModalEditKelasLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-light p-3">
-                <h5 class="modal-title" id="ModalEditKelasLabel">Perbarui Data Kelas</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div wire:ignore.self class="modal fade" id="ModalEditKelas" tabindex="-1" aria-labelledby="ModalEditKelasLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header border-0">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-sm">
+                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                            <i class="ri-calendar-event-line">
+                            </i>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-1">
+                            Perbarui Data Kelas
+                        </h5>
+                        {{-- <small>
+                            Tambahkan agenda kegiatan generasi penerus dengan pengaturan tingkat, jadwal, dan lokasi.
+                        </small> --}}
+                    </div>
+                </div>
+                <button type="button" class="btn btn-light btn-icon rounded-circle" data-bs-dismiss="modal">
+                    <i class="ri-close-line fs-18">
+                    </i>
+                </button>
             </div>
             <form wire:submit.prevent="updateKelas">
                 <div class="modal-body">
@@ -36,10 +53,15 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <a href="javascript:void(0);" class="btn btn-link link-success shadow-none fw-medium"
-                        data-bs-dismiss="modal"><i class="ri-close-line me-1 align-middle"></i> Tutup</a>
-                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                <div class="modal-footer border-0 px-4 pb-4 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">
+                        <i class="ri-close-line me-1"></i>
+                        Tutup
+                    </button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4">
+                        <i class="ri-save-3-line me-1"></i>
+                        Simpan
+                    </button>
                 </div>
             </form>
         </div>

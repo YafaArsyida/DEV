@@ -1,24 +1,43 @@
-<div class="card">
-    <div class="card-header border-0 pb-0">
-        <div class="d-flex align-items-center">
-            <h5 class="card-title mb-0 flex-grow-1">Data Siswa</h5>
-            @if ($selectedJenjang && $selectedTahunAjar)
-            <div class="flex-shrink-0">
-                <div class="d-flex gap-2 flex-wrap">
-                    @if ($siswaSelected)
-                        <button href="#ModalBulkDeleteSiswa" data-bs-toggle="modal" class="btn btn-soft-danger d-inline-flex align-items-center gap-1" wire:click.prevent="$emit('confirmBulkDelete', {{ json_encode($siswaSelected) }})">
-                            <i class="ri-delete-bin-2-line me-1 align-bottom"></i> Hapus {{ count($siswaSelected) }}
-                        </button>
-                    @endif
-                    @if ($selectedKelas)
-                        <button data-bs-toggle="modal" data-bs-target="#ModalImportTelepon" wire:click.prevent="$emit('showImportTelepon', {{ $selectedKelas }}, {{ $selectedJenjang }}, {{ $selectedTahunAjar }})" class="btn btn-success"><i class="ri-whatsapp-line me-1 align-bottom"></i> Import Telepon</button>                        
-                        <button data-bs-toggle="modal" data-bs-target="#ModalImportEduCard" wire:click.prevent="$emit('showImportEduCard', {{ $selectedKelas }}, {{ $selectedJenjang }}, {{ $selectedTahunAjar }})"  class="btn btn-warning"><i class="ri-bank-card-line me-1 align-bottom"></i> Import EduCard</button>                        
-                    @endif
-
-                    <button data-bs-toggle="modal" data-bs-target="#ModalImportSiswa" wire:click.prevent="$emit('showImportSiswa', {{ $selectedJenjang }}, {{ $selectedTahunAjar }})"  class="btn btn-secondary"><i class="ri-contacts-line me-1 align-bottom"></i> Import Siswa</button>
-                    <button data-bs-toggle="modal" data-bs-target="#ModalAddSiswa" wire:click.prevent="$emit('showCreateSiswa', {{ $selectedJenjang }}, {{ $selectedTahunAjar }})" class="btn btn-primary"><i class="ri-play-list-add-line me-1 align-bottom"></i> Siswa Baru</button>
-                    <button data-bs-toggle="modal" data-bs-target="#ModalExportSiswa" wire:click.prevent="showExportSiswa"  class="btn btn-soft-success"><i class="ri-file-excel-2-line me-1 align-bottom"></i> Export</button>
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card-header">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4">
+            {{-- TITLE --}}
+            <div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-sm">
+                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                            <i class="ri-calendar-event-line">
+                            </i>
+                        </div>
+                    </div>
+    
+                    <div>
+                        <h5 class="fw-bold mb-1">
+                            Data Siswa
+                        </h5>
+                        {{-- <small>
+                            Kelola laporan kegiatan generus 
+                        </small> --}}
+                    </div>
                 </div>
+            </div>
+    
+            {{-- ACTION --}}
+            @if ($selectedJenjang && $selectedTahunAjar)
+            <div class="d-flex gap-2 flex-wrap">
+                @if ($siswaSelected)
+                    <button href="#ModalBulkDeleteSiswa" data-bs-toggle="modal" class="btn rounded-pill px-4 btn-soft-danger d-inline-flex align-items-center gap-1" wire:click.prevent="$emit('confirmBulkDelete', {{ json_encode($siswaSelected) }})">
+                        <i class="ri-delete-bin-2-line me-1 align-bottom"></i> Hapus {{ count($siswaSelected) }}
+                    </button>
+                @endif
+                @if ($selectedKelas)
+                    <button data-bs-toggle="modal" data-bs-target="#ModalImportTelepon" wire:click.prevent="$emit('showImportTelepon', {{ $selectedKelas }}, {{ $selectedJenjang }}, {{ $selectedTahunAjar }})" class="btn rounded-pill px-4 btn-success"><i class="ri-whatsapp-line me-1 align-bottom"></i> Import Telepon</button>                        
+                    <button data-bs-toggle="modal" data-bs-target="#ModalImportEduCard" wire:click.prevent="$emit('showImportEduCard', {{ $selectedKelas }}, {{ $selectedJenjang }}, {{ $selectedTahunAjar }})"  class="btn rounded-pill px-4 btn-warning"><i class="ri-bank-card-line me-1 align-bottom"></i> Import EduCard</button>                        
+                @endif
+
+                <button data-bs-toggle="modal" data-bs-target="#ModalImportSiswa" wire:click.prevent="$emit('showImportSiswa', {{ $selectedJenjang }}, {{ $selectedTahunAjar }})"  class="btn rounded-pill px-4 btn-secondary"><i class="ri-contacts-line me-1 align-bottom"></i> Import Siswa</button>
+                <button data-bs-toggle="modal" data-bs-target="#ModalAddSiswa" wire:click.prevent="$emit('showCreateSiswa', {{ $selectedJenjang }}, {{ $selectedTahunAjar }})" class="btn rounded-pill px-4 btn-primary"><i class="ri-play-list-add-line me-1 align-bottom"></i> Siswa Baru</button>
+                <button data-bs-toggle="modal" data-bs-target="#ModalExportSiswa" class="btn rounded-pill px-4 btn-soft-success"><i class="ri-file-excel-2-line me-1 align-bottom"></i> Export</button>
             </div>
             @endif
         </div>

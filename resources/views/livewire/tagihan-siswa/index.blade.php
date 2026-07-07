@@ -1,18 +1,37 @@
-<div class="card">
-    <div class="card-header border-0 pb-0">
-        <div class="d-flex align-items-center">
-            <h5 class="card-title mb-0 flex-grow-1">Data Tagihan Siswa</h5>
-            <div class="flex-shrink-0">
-                <div class="d-flex gap-2 flex-wrap">
-                    @if ($selectedJenjang && $selectedTahunAjar && $selectedKelas)
-                    <button wire:click="cetakLaporanTagihan" class="btn btn-danger d-inline-flex align-items-center gap-1">
-                        <i class="ri-printer-line align-bottom"></i>
-                        <span>Cetak Laporan</span>
-                    </button>
-                    <button data-bs-toggle="modal" data-bs-target="#ExportLaporanExcel" class="btn btn-soft-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button>
-                    @endif
-                    <button data-bs-toggle="offcanvas" id="create-btn" data-bs-target="#offcanvasAddTagihan" wire:click.prevent="$emit('showCreateTagihan', {{ $selectedJenjang }}, {{ $selectedTahunAjar }})" class="btn btn-primary"><i class="ri-play-list-add-line"></i> Tagihan Baru</button>
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card-header">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4">
+            {{-- TITLE --}}
+            <div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-sm">
+                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                            <i class="ri-calendar-event-line">
+                            </i>
+                        </div>
+                    </div>
+    
+                    <div>
+                        <h5 class="fw-bold mb-1">
+                            Tagihan Siswa
+                        </h5>
+                        {{-- <small>
+                            Kelola laporan kegiatan generus 
+                        </small> --}}
+                    </div>
                 </div>
+            </div>
+    
+            {{-- ACTION --}}
+            <div class="d-flex gap-2 flex-wrap">
+                @if ($selectedJenjang && $selectedTahunAjar && $selectedKelas)
+                <button wire:click="cetakLaporanTagihan" class="btn rounded-pill px-4 btn-danger d-inline-flex align-items-center gap-1">
+                    <i class="ri-printer-line align-bottom"></i>
+                    <span>Cetak Laporan</span>
+                </button>
+                @endif
+                <button data-bs-toggle="offcanvas" id="create-btn" data-bs-target="#offcanvasAddTagihan" wire:click.prevent="$emit('showCreateTagihan', {{ $selectedJenjang }}, {{ $selectedTahunAjar }})" class="btn rounded-pill px-4 btn-primary"><i class="ri-play-list-add-line"></i> Tagihan Baru</button>
+                <button data-bs-toggle="modal" data-bs-target="#ExportLaporanExcel" class="btn rounded-pill px-4 btn-soft-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button>
             </div>
         </div>
     </div>
@@ -69,16 +88,16 @@
             <div class="table-responsive">
                 <table id="Laporan" class="table table-hover table-nowrap align-middle" style="width:100%">
                     <thead class="table-light">
-                        <tr>
-                            <th class="text-uppercase" style="width: 50px;">NO</th>
-                            <th class="text-uppercase">Siswa</th>
-                            <th class="text-uppercase">Kelas</th>
-                            <th class="text-uppercase">Tagihan</th>
-                            <th class="text-uppercase">Estimasi</th>
-                            <th class="text-uppercase">Dibayarkan</th>
-                            <th class="text-uppercase">Kekurangan</th>
-                            <th class="text-uppercase">Lunas</th>
-                            <th class="text-uppercase text-center">Aksi</th>
+                        <tr class="text-uppercase" style="white-space: nowrap;">
+                            <th style="width: 50px;">NO</th>
+                            <th>Siswa</th>
+                            <th>Kelas</th>
+                            <th>Tagihan</th>
+                            <th>Estimasi</th>
+                            <th>Dibayarkan</th>
+                            <th>Kekurangan</th>
+                            <th>Lunas</th>
+                            <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -95,19 +114,19 @@
                             <td>{{ $item->jumlah_item }} item</td>
                             
                             <td>
-                                <span class="fw-semibold fs-12 text-info">
+                                <span class="fw-medium fs-12 text-info">
                                     RP{{ number_format($item->total_tagihan, 0, ',', '.') }}
                                 </span>
                             </td>
                             
                             <td>
-                                <span class="fw-semibold fs-12 text-success">
+                                <span class="fw-medium fs-12 text-success">
                                     RP{{ number_format($item->total_bayar, 0, ',', '.') }}
                                 </span>
                             </td>
                             
                             <td>
-                                <span class="fw-semibold fs-12 text-danger">
+                                <span class="fw-medium fs-12 text-danger">
                                     RP{{ number_format($item->total_tagihan - $item->total_bayar, 0, ',', '.') }}
                                 </span>
                             </td>
@@ -118,7 +137,7 @@
                                 $dibayarkan = $item->total_bayar;
                                 @endphp
                             
-                                <span class="fs-12 fw-semibold">
+                                <span class="fs-12 fw-medium">
                                     @if ($estimasi > 0)
                                     {{ number_format(($dibayarkan / $estimasi) * 100, 2) }}% <i class="ri-bar-chart-fill text-success fs-16 align-middle ms-2"></i>
                                     @else
@@ -160,9 +179,10 @@
                                        aria-controls="offcanvasHistori"
                                        title="Riwayat Transaksi"
                                        wire:click.prevent="$emit('showHistoriTagihan', {
-                                           ms_penempatan_siswa_id: {{ $item->ms_penempatan_siswa_id }},
-                                           jenjang: {{ $item->ms_jenjang_id }},
-                                           tahunAjar: {{ $item->ms_tahun_ajar_id }}
+                                            ms_penempatan_siswa_id: {{ $item->ms_penempatan_siswa_id }},
+                                            jenjang: {{ $item->ms_jenjang_id }},
+                                            tahunAjar: {{ $item->ms_tahun_ajar_id }},
+                                            nama_siswa: '{{ addslashes($item->ms_siswa->nama_siswa) }}'
                                        })">
                                         <i class="ri-history-line align-bottom"></i> Riwayat
                                     </a>
@@ -193,22 +213,22 @@
                                 {{ $jumlahTagihan }} item
                             </td>
                             <td>
-                                <span class="fs-12 fw-semibold text-info">
+                                <span class="fs-12 fw-medium text-info">
                                     RP{{ number_format($totalTagihan, 0, ',', '.') }}
                                 </span>
                             </td>
                             <td>
-                                <span class="fs-12 fw-semibold text-success">
+                                <span class="fs-12 fw-medium text-success">
                                     RP{{ number_format($totalDibayarkan, 0, ',', '.') }}
                                 </span>
                             </td>
                             <td>
-                                <span class="fs-12 fw-semibold text-danger">
+                                <span class="fs-12 fw-medium text-danger">
                                     RP{{ number_format($totalKekurangan, 0, ',', '.') }}
                                 </span>
                             </td>
                             <td>
-                                <span class="fs-12 fw-semibold">{{ number_format($totalPersen, 2) }}% <i class="ri-bar-chart-fill text-success fs-16 align-middle ms-2"></i></span>
+                                <span class="fs-12 fw-medium">{{ number_format($totalPersen, 2) }}% <i class="ri-bar-chart-fill text-success fs-16 align-middle ms-2"></i></span>
                             </td>
                         </tr>
                     </tfoot>
@@ -218,15 +238,15 @@
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                         <div class="text-muted fs-13">
                             Menampilkan
-                            <span class="fw-semibold">
+                            <span class="fw-medium">
                                 {{ $tagihans->firstItem() ?? 0 }}
                             </span>
                             -
-                            <span class="fw-semibold">
+                            <span class="fw-medium">
                                 {{ $tagihans->lastItem() ?? 0 }}
                             </span>
                             dari
-                            <span class="fw-semibold">
+                            <span class="fw-medium">
                                 {{ $tagihans->total() }}
                             </span>
                             data tagihan
@@ -252,7 +272,7 @@
                 <div class="modal-body p-5 text-center">
                     <lord-icon src="https://cdn.lordicon.com/fjvfsqea.json" trigger="loop" colors="primary:#405189,secondary:#f06548" style="width:90px;height:90px"></lord-icon>
                     <div class="mt-4 text-center">
-                        <h4 class="fs-semibold">Konfirmasi Export</h4>
+                        <h4 class="fs-medium">Konfirmasi Export</h4>
                         <p class="text-muted fs-14 mb-4 pt-1">
                             Apakah Anda yakin ingin mengekspor laporan Administrasi Tagihan Siswa? Data yang diekspor akan sesuai dengan tabel yang ditampilkan.
                         </p>

@@ -20,6 +20,8 @@ class Histori extends Component
 
     public $search = '';
 
+    public $namaSiswaCurrent = '';
+
     // Listener untuk Livewire
     protected $listeners = [
         'showHistoriTagihan',
@@ -36,6 +38,7 @@ class Histori extends Component
         $this->selectedJenjang = $params['jenjang'];
         $this->selectedTahunAjar = $params['tahunAjar'];
         $this->ms_penempatan_siswa_id = $params['ms_penempatan_siswa_id'];
+        $this->namaSiswaCurrent = $params['nama_siswa'] ?? 'Siswa';
     }
 
     // whatsapp

@@ -1,14 +1,32 @@
 {{-- The whole world belongs to you. --}}
 <div wire:ignore.self class="modal fade" id="ModalAksiEdit" tabindex="-1" aria-labelledby="ModalAksiEditLabel"
     aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="ModalAksiEditLabel">Edit Tagihan</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header border-0">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-sm">
+                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                            <i class="ri-file-list-3-line">
+                            </i>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-1">
+                            Perbarui Data Tagihan
+                        </h5>
+                        {{-- <small>
+                            Tambahkan agenda kegiatan generasi penerus dengan pengaturan tingkat, jadwal, dan lokasi.
+                        </small> --}}
+                    </div>
+                </div>
+                <button type="button" class="btn btn-light btn-icon rounded-circle" data-bs-dismiss="modal">
+                    <i class="ri-close-line fs-18">
+                    </i>
+                </button>
             </div>
             <div class="modal-body">
-                <table class="table mb-0">
+                <table class="table">
                     <tbody>
                         @if($tagihan)
                         <tr>
@@ -42,16 +60,15 @@
                             <td>
                                 <div class="input-group input-group-sm">
                                     <span class="input-group-text">RP</span>
-                                    <input id="jumlah_perubahan_tagihan_visible" type="text"
-                                        class="form-control @error('jumlah_perubahan_tagihan') is-invalid @enderror"
-                                        value="{{ $jumlah_perubahan_tagihan !== null ? number_format($jumlah_perubahan_tagihan, 2, ',', '.') : '' }}"
-                                        aria-label="Amount" wire:ignore>
-                                    <input id="jumlah_perubahan_tagihan" type="hidden"
+                                    <input class="form-control @error('jumlah_perubahan_tagihan') is-invalid @enderror"
+                                        id="jumlah_perubahan_tagihan"
+                                        type="text"
                                         wire:model.defer="jumlah_perubahan_tagihan"
-                                        value="{{ $jumlah_perubahan_tagihan }}">
+                                        onkeyup="formatTagihan(this)">
                                 </div>
+
                                 @error('jumlah_perubahan_tagihan')
-                                <footer class="text-danger mt-0">{{ $message }}</footer>
+                                    <footer class="text-danger mt-0">{{ $message }}</footer>
                                 @enderror
                             </td>
                         </tr>
@@ -59,65 +76,25 @@
                     </tbody>
                 </table>
             </div>
-            <div class="modal-footer">
-                <a href="javascript:void(0);" class="btn btn-link link-success shadow-none fw-medium"
-                    data-bs-dismiss="modal"><i class="ri-close-line me-1 align-middle"></i> Tutup</a>
+            <div class="modal-footer border-0 px-4 pb-4 pt-0">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">
+                    <i class="ri-close-line me-1"></i>
+                    Tutup
+                </button>
                 @if($tagihan)
-                <button type="button" class="btn btn-primary" wire:click="aksiEdit({{ $tagihan->ms_tagihan_id }})">
-                    <i class="ri-printer-line align-bottom me-1"></i> Edit
+                <button type="button" class="btn btn-primary rounded-pill px-4" wire:click="aksiEdit({{ $tagihan->ms_tagihan_id }})">
+                    <i class="ri-save-3-line me-1"></i>
+                    Simpan
                 </button>
                 @endif
-
             </div>
         </div>
     </div>
 </div>
-
 <script>
-    function initEditTagihanCleave() {
-        var visibleInput = document.getElementById('jumlah_perubahan_tagihan_visible');
-        var rawInput = document.getElementById('jumlah_perubahan_tagihan');
-        if (!visibleInput || !rawInput || typeof Cleave === 'undefined') {
-            return;
-        }
-
-        if (window.tagihanPerubahanCleave) {
-            try {
-                window.tagihanPerubahanCleave.destroy();
-            } catch (e) {
-                // ignore
-            }
-        }
-
-        window.tagihanPerubahanCleave = new Cleave(visibleInput, {
-            numeral: true,
-            numeralThousandsGroupStyle: 'thousand',
-            numeralDecimalMark: ',',
-            delimiter: '.',
-            numeralDecimalScale: 2,
-            numeralIntegerScale: 15,
-            rawValueTrimPrefix: true,
-        });
-
-        function syncHiddenValue() {
-            rawInput.value = window.tagihanPerubahanCleave.getRawValue();
-            rawInput.dispatchEvent(new Event('input', { bubbles: true }));
-        }
-
-        visibleInput.addEventListener('input', syncHiddenValue);
-        visibleInput.addEventListener('change', syncHiddenValue);
-
-        if (rawInput.value) {
-            window.tagihanPerubahanCleave.setRawValue(rawInput.value);
-            syncHiddenValue();
-        }
+    function formatTagihan(el) {
+        let angka = el.value.replace(/\D/g, '');
+        el.value = new Intl.NumberFormat('id-ID').format(angka);
     }
-
-    document.addEventListener('livewire:load', function () {
-        initEditTagihanCleave();
-    });
-
-    window.addEventListener('tagihan-edit-loaded', function () {
-        setTimeout(initEditTagihanCleave, 50);
-    });
 </script>
+

@@ -27,6 +27,8 @@ class ImportEduCard extends Component
 
     public $newSiswaList = []; // Menyimpan siswa baru di-upload
 
+    public $previewSiswaList = [];
+
     protected $listeners = ['showImportEduCard'];
 
     public function showImportEduCard($selectedKelas, $selectedJenjang, $selectedTahunAjar)
@@ -73,7 +75,10 @@ class ImportEduCard extends Component
 
             // Simpan data dari file ke properti $newSiswaList
             $this->newSiswaList = $import->getCollection()->toArray();
-            $this->emit('logData', $this->newSiswaList);
+
+            $this->generatePreview();
+
+            // $this->emit('logData', $this->newSiswaList);
             // Informasikan pengguna bahwa file berhasil dibaca
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'File berhasil dibaca!']);
         } catch (\Exception $e) {
@@ -99,6 +104,60 @@ class ImportEduCard extends Component
     public function updated($fields)
     {
         $this->validateOnly($fields);
+    }
+
+    private function generatePreview()
+    {
+        $this->previewSiswaList = [];
+
+        if (empty($this->newSiswaList)) {
+            return;
+        }
+
+        $ids = collect($this->newSiswaList)
+            ->pluck('ms_siswa_id')
+            ->filter()
+            ->toArray();
+
+        $penempatan = PenempatanSiswa::with([
+                'ms_siswa.ms_educard',
+                'ms_kelas'
+            ])
+            ->where('ms_jenjang_id', $this->selectedJenjang)
+            ->where('ms_tahun_ajar_id', $this->selectedTahunAjar)
+            ->where('ms_kelas_id', $this->selectedKelas)
+            ->whereIn('ms_siswa_id', $ids)
+            ->get()
+            ->keyBy('ms_siswa_id');
+
+        foreach ($this->newSiswaList as $item) {
+
+            $old = $penempatan[$item['ms_siswa_id']] ?? null;
+
+            $kodeLama = $old?->ms_siswa?->ms_educard?->kode_kartu;
+            $kodeBaru = trim($item['educard'] ?? '');
+
+            if (blank($kodeLama) && filled($kodeBaru)) {
+                $status = 'tambah';
+            } elseif (filled($kodeLama) && blank($kodeBaru)) {
+                $status = 'hapus';
+            } elseif ($kodeLama != $kodeBaru) {
+                $status = 'update';
+            } else {
+                $status = 'sama';
+            }
+
+            $this->previewSiswaList[] = [
+                'ms_siswa_id' => $item['ms_siswa_id'],
+                'nama_siswa' => $old?->ms_siswa?->nama_siswa ?? '-',
+                'kelas' => $old?->ms_kelas?->nama_kelas ?? '-',
+                
+                'educard_lama' => $kodeLama,
+                'educard_baru' => $kodeBaru,
+                
+                'status' => $status,
+            ];
+        }
     }
 
     public function saveChanges()
@@ -195,8 +254,12 @@ class ImportEduCard extends Component
 
             // 🔥 reset state
             $this->newSiswaList = [];
+            $this->previewSiswaList = [];
             $this->file_import = null;
 
+            $this->dispatchBrowserEvent('hide-modal', [
+                'modalId' => 'ModalImportEduCard'
+            ]);
             $this->emit('refreshSiswas');
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -209,15 +272,8 @@ class ImportEduCard extends Component
 
     public function render()
     {
-        $oldSiswaList = PenempatanSiswa::with(['ms_siswa.ms_educard', 'ms_kelas'])
-            ->where('ms_jenjang_id', $this->selectedJenjang)
-            ->where('ms_tahun_ajar_id', $this->selectedTahunAjar)
-            ->where('ms_kelas_id', $this->selectedKelas)
-            ->get();
-
         return view('livewire.siswa.import-edu-card', [
-            'oldSiswaList' => $oldSiswaList,
-            'newSiswaList' => $this->newSiswaList,
+            'previewSiswaList' => $this->previewSiswaList,
         ]);
     }
 }

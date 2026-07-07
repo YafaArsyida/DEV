@@ -1,12 +1,36 @@
-<div class="card">
-    <div class="card-header border-0 pb-0">
-        <div class="d-flex align-items-center">
-            <h5 class="card-title mb-0 flex-grow-1">Data Kelas</h5>
-            @if ($selectedJenjang && $selectedTahunAjar)
-            <div class="flex-shrink-0">
-                <div class="d-flex gap-2 flex-wrap">
-                    <button data-bs-toggle="modal" id="create-btn" data-bs-target="#ModalAddKelas" wire:click.prevent="$emit('showCreateKelas', {{ $selectedJenjang }}, {{ $selectedTahunAjar }})" class="btn btn-primary"><i class="ri-play-list-add-line me-1 align-bottom"></i> Kelas Baru</button>
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    {{-- HEADER --}}
+    <div class="card-header">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4">
+            {{-- TITLE --}}
+            <div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-sm">
+                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                            <i class="ri-calendar-event-line">
+                            </i>
+                        </div>
+                    </div>
+    
+                    <div>
+                        <h5 class="fw-bold mb-1">
+                            Data Kelas
+                        </h5>
+                        {{-- <small>
+                            Kelola laporan kegiatan generus 
+                        </small> --}}
+                    </div>
                 </div>
+            </div>
+    
+            {{-- ACTION --}}
+            @if ($selectedJenjang && $selectedTahunAjar)
+            <div class="d-flex gap-2 flex-wrap">
+                {{-- TAMBAH --}}
+                <button type="button" class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#ModalAddKelas"
+                        wire:click.prevent="$emit('showCreateKelas', {{ $selectedJenjang }}, {{ $selectedTahunAjar }})">
+                    <i class="ri-add-line me-1"></i>Tambah Kelas
+                </button>
             </div>
             @endif
         </div>
