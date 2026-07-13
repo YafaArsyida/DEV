@@ -1,6 +1,6 @@
 <div>
     <div wire:ignore.self class="offcanvas offcanvas-top" id="offcanvasDetailTagihan" aria-labelledby="offcanvasDetailTagihanLabel" style="min-height:100vh;">
-        <div class="offcanvas-header border-bottom bg-white px-4 py-3 shadow-sm">
+        <div class="offcanvas-header border-bottom px-4 py-3 shadow-sm">
             <div class="d-flex justify-content-between align-items-start w-100">
                 <!-- Kiri -->
                 <div class="d-flex align-items-center gap-3">

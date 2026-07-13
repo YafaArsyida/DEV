@@ -30,82 +30,129 @@ class AksiTambah extends Component
     // properti model
     public $jumlahTagihan = [];
 
-    // fitur checkbox 
+    // fitur tagihanSelectedbox 
     public $tagihanSelected = []; // ID jenis tagihan yang dipilih
 
     public $selectAllTagihan = false;
 
     // Listeners
-    protected $listeners = ['showModalTambah' => 'showModalTambah'];
+    protected $listeners = ['tambahTagihanSiswa' => 'canvasTagihan'];
 
     public function updatedSearchJenisTagihan()
     {
-        // $this->selectAllTagihan = false;
-        // $this->tagihanSelected = [];
+        $this->resetSelectionState();
         $this->loadData();
     }
 
     public function updatedSelectedKategoriTagihan()
     {
-        // $this->selectAllTagihan = false;
-        // $this->tagihanSelected = [];
+        $this->resetSelectionState();
         $this->loadData();
+    }
+
+    protected function resetSelectionState()
+    {
+        $this->selectAllTagihan = false;
+        $this->tagihanSelected = [];
+        $this->jumlahTagihan = [];
     }
 
     public function loadData()
     {
-        if (!$this->ms_jenjang_id || !$this->ms_tahun_ajar_id) {
+        if (!$this->ms_penempatan_siswa_id) {
             $this->select_kategori = [];
             $this->tagihans = [];
             return;
         }
 
-        // 🔥 kategori
+        // Ambil informasi penempatan sekali saja
+        $penempatan = PenempatanSiswa::find($this->ms_penempatan_siswa_id);
+
+        if (!$penempatan) {
+            $this->select_kategori = [];
+            $this->tagihans = [];
+            return;
+        }
+
+        $this->ms_jenjang_id    = $penempatan->ms_jenjang_id;
+        $this->ms_tahun_ajar_id = $penempatan->ms_tahun_ajar_id;
+
+        // kategori
         $this->select_kategori = KategoriTagihanSiswa::select(
-            'ms_kategori_tagihan_siswa_id',
-            'nama_kategori_tagihan_siswa'
-        )
+                'ms_kategori_tagihan_siswa_id',
+                'nama_kategori_tagihan_siswa'
+            )
             ->where('ms_jenjang_id', $this->ms_jenjang_id)
             ->where('ms_tahun_ajar_id', $this->ms_tahun_ajar_id)
             ->get();
 
-        // 🔥 jenis tagihan
-        $query = JenisTagihanSiswa::with([
-            'ms_kategori_tagihan_siswa:ms_kategori_tagihan_siswa_id,nama_kategori_tagihan_siswa'
-        ])
-            ->select(
-                'ms_jenis_tagihan_siswa_id',
-                'ms_kategori_tagihan_siswa_id',
-                'nama_jenis_tagihan_siswa',
-                'tanggal_jatuh_tempo',
-                'cicilan_status'
-            )
-            ->where('ms_jenjang_id', $this->ms_jenjang_id)
-            ->where('ms_tahun_ajar_id', $this->ms_tahun_ajar_id);
+       $query = JenisTagihanSiswa::with([
+            'ms_kategori_tagihan_siswa',
+            'ms_tagihan_siswa' => function ($q) {
+                $q->where(
+                    'ms_penempatan_siswa_id',
+                    $this->ms_penempatan_siswa_id
+                );
+            }
+        ]);
 
+        $query->where('ms_jenjang_id', $this->ms_jenjang_id)
+        ->where('ms_tahun_ajar_id', $this->ms_tahun_ajar_id);
+        
         if ($this->selectedKategoriTagihan) {
-            $query->where('ms_kategori_tagihan_siswa_id', $this->selectedKategoriTagihan);
+            $query->where(
+                'ms_jenis_tagihan_siswa.ms_kategori_tagihan_siswa_id',
+                $this->selectedKategoriTagihan
+            );
         }
 
         if ($this->searchJenisTagihan) {
-            $query->where('nama_jenis_tagihan_siswa', 'like', '%' . $this->searchJenisTagihan . '%');
+            $query->where(
+                'ms_jenis_tagihan_siswa.nama_jenis_tagihan_siswa',
+                'like',
+                "%{$this->searchJenisTagihan}%"
+            );
         }
 
         $this->tagihans = $query
             ->orderBy('ms_kategori_tagihan_siswa_id')
             ->orderBy('ms_jenis_tagihan_siswa_id')
-            ->get();
+            ->get()
+            ->map(function ($item) {
+                $tagihan = $item->ms_tagihan_siswa->first();
+
+                return [
+                    // Master Jenis Tagihan
+                    'ms_jenis_tagihan_siswa_id' => $item->ms_jenis_tagihan_siswa_id,
+                    'nama_jenis_tagihan_siswa' => $item->nama_jenis_tagihan_siswa,
+                    'tanggal_jatuh_tempo' => $item->tanggal_jatuh_tempo,
+                    'cicilan_status' => $item->cicilan_status,
+
+                    // Kategori
+                    'nama_kategori_tagihan_siswa' =>
+                        $item->ms_kategori_tagihan_siswa->nama_kategori_tagihan_siswa ?? '-',
+
+                    // Existing Tagihan
+                    'sudah_ditetapkan' => $tagihan !== null,
+                    'ms_tagihan_siswa_id' => $tagihan->ms_tagihan_siswa_id ?? null,
+                    'jumlah_tagihan_siswa' => $tagihan->jumlah_tagihan_siswa ?? null,
+                    'status_tagihan' => $tagihan->status ?? null,
+                    'deskripsi_tagihan' => $tagihan->deskripsi ?? null,
+                ];
+            })
+            ->values()
+            ->all();
     }
 
-    public function showModalTambah($penempatanSiswa, $jenjang, $tahunAjar)
+    public function canvasTagihan($penempatanSiswa, $jenjang, $tahunAjar)
     {
         $this->ms_jenjang_id = $jenjang;
         $this->ms_tahun_ajar_id = $tahunAjar;
         $this->ms_penempatan_siswa_id = $penempatanSiswa;
 
-        $this->selectAllTagihan = false;
-        $this->tagihanSelected = [];
-        $this->jumlahTagihan = [];
+        $this->resetSelectionState();
+        $this->selectedKategoriTagihan = null;
+        $this->searchJenisTagihan = '';
 
         // Ambil nama siswa dari relasi
         $penempatan = PenempatanSiswa::with('ms_siswa')->find($penempatanSiswa);
@@ -134,12 +181,15 @@ class AksiTambah extends Component
                 throw new \Exception('Pilih jenis tagihan.');
             }
 
-            $this->validate([
-                'tagihanSelected' => 'required|array|min:1',
-                'jumlahTagihan.*' => 'required|numeric|min:1',
-            ]);
-
             $ms_pengguna_id = auth()->id();
+
+            foreach ($this->tagihanSelected as $id) {
+                $jumlah = $this->normalizeAmount($this->jumlahTagihan[$id] ?? null);
+
+                if ($jumlah <= 0) {
+                    throw new \Exception('Jumlah tagihan untuk item yang dipilih harus lebih dari 0.');
+                }
+            }
 
             // 🔒 Lock penempatan (biar aman)
             $penempatan = PenempatanSiswa::lockForUpdate()
@@ -178,7 +228,7 @@ class AksiTambah extends Component
                     continue;
                 }
 
-                $jumlah = $this->jumlahTagihan[$id] ?? 0;
+                $jumlah = $this->normalizeAmount($this->jumlahTagihan[$id] ?? null);
 
                 if ($jumlah <= 0) {
                     throw new \Exception("Jumlah tagihan tidak valid.");
@@ -201,6 +251,7 @@ class AksiTambah extends Component
                     'ms_pengguna_id' => $ms_pengguna_id,
                     'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
                     'ms_jenjang_id' => $this->ms_jenjang_id,
+                    'ms_departemen_id' => 'SEKOLAH',
                     'is_canceled' => 'active',
                     'deskripsi' => $deskripsiJurnal,
                 ])->akuntansi_jurnal_detail_id;
@@ -214,6 +265,7 @@ class AksiTambah extends Component
                     'ms_pengguna_id' => $ms_pengguna_id,
                     'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
                     'ms_jenjang_id' => $this->ms_jenjang_id,
+                    'ms_departemen_id' => 'SEKOLAH',
                     'is_canceled' => 'active',
                     'deskripsi' => $deskripsiJurnal,
                 ])->akuntansi_jurnal_detail_id;
@@ -240,7 +292,7 @@ class AksiTambah extends Component
             DB::commit();
 
             // 🔥 reset state
-            $this->reset(['selectAllTagihan', 'tagihanSelected', 'jumlahTagihan']);
+            $this->resetSelectionState();
 
             $this->dispatchBrowserEvent('alertify-success', [
                 'message' => !empty($existingIds)
@@ -249,6 +301,7 @@ class AksiTambah extends Component
             ]);
 
             $this->emit('refreshTagihanSiswa');
+            $this->emit('reloadTagihanSiswa');
         } catch (\Throwable $e) {
             DB::rollBack();
 
@@ -261,7 +314,19 @@ class AksiTambah extends Component
     {
         return view('livewire.transaksi-tagihan-siswa.aksi-tambah', [
             'select_kategori' => $this->select_kategori,
-            'tagihans' => $this->tagihans,
         ]);
+    }
+
+    private function normalizeAmount($value)
+    {
+        if ($value === null || $value === '') {
+            return 0;
+        }
+
+        if (is_string($value)) {
+            $value = str_replace(['.', ','], '', $value);
+        }
+
+        return (int) $value;
     }
 }

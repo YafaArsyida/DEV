@@ -4,6 +4,7 @@ namespace App\Http\Livewire\TransaksiTagihanSiswa;
 
 use App\Models\PenempatanSiswa;
 use App\Models\SaldoTabungan;
+use App\Models\SaldoEduPay;
 use App\Models\Siswa;
 use App\Models\TagihanSiswa;
 use Livewire\Component;
@@ -75,7 +76,9 @@ class DataSiswa extends Component
 
     protected function updateSaldoEduPay()
     {
-        $this->saldoEduPaySiswa = Siswa::find($this->ms_siswa_id)->saldo_edupay_siswa();
+        $saldo = SaldoEduPay::getSaldo($this->ms_siswa_id, 'siswa');
+
+        $this->saldoEduPaySiswa = $saldo->saldo_edupay;
     }
 
     protected function updateTagihan()
@@ -102,7 +105,7 @@ class DataSiswa extends Component
 
         // 🔥 modular update
         $this->updateSaldoTabungan();
-        $this->updateSaldoEdupay();
+        $this->updateSaldoEduPay();
         $this->updateTagihan();
     }
 

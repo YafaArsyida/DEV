@@ -51,21 +51,42 @@
     </div>
 
     <div wire:ignore.self class="offcanvas offcanvas-end" id="offcanvasSiswa" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" aria-labelledby="offcanvasSiswaLabel">
-        <div class="offcanvas-header border-bottom">
-            <h5 class="offcanvas-title" id="offcanvasSiswaLabel">Data Siswa Tersedia</h5>
-            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        <div class="offcanvas-header border-bottom px-4 py-3 shadow-sm">
+            <div class="d-flex justify-content-between align-items-start w-100">
+                <!-- Kiri -->
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-sm">
+                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-18">
+                            <i class="ri-file-chart-line"></i>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h5 class="fw-bold mb-1">
+                            Data Siswa
+                        </h5>
+                        {{-- <small class="text-muted">
+                            Lakukan pencarian data siswa 
+                        </small> --}}
+                    </div>
+                </div>
+                <!-- Kanan -->
+                <button type="button"
+                    class="btn btn-light btn-icon rounded-circle shadow-none"
+                    data-bs-dismiss="offcanvas">
+                    <i class="ri-close-line fs-18"></i>
+                </button>
+            </div>
         </div>
         <div class="offcanvas-body">
-            <div class="row g-3 mb-3">
-                <div class="col-xxl-12 col-sm-12">
+            <div class="row">
+                <div class="col-12">
                     <div class="search-box">
-                        <input type="text" class="form-control search" wire:model.debounce.300ms="search" placeholder="cari nama, deskripsi atau lainnya...">
+                        <input type="text" class="form-control search" wire:model.debounce.300ms="search" placeholder="cari nama atau educard siswa...">
                         <i class="ri-search-line search-icon"></i>
                     </div>
                 </div>
-            </div>
-            <div class="col-xl-12">
-                <div class="mt-4">
+                <div class="col-12 mt-3">
                     <div class="live-preview">
                     <!-- Jika Jenjang atau Tahun Ajar belum dipilih -->
                     @if (!$selectedJenjang || !$selectedTahunAjar)
@@ -81,30 +102,26 @@
                         <div class="table-responsive">
                             <table class="table table-bordered table-striped table-hover nowrap align-middle" style="width:100%">
                                 <thead class="table-light">
-                                    <tr>
-                                        <th class="text-uppercase">#</th>
-                                        <th class="text-uppercase">Siswa</th>
-                                        <th class="text-uppercase">Aksi</th>
+                                    <tr class="text-uppercase" style="white-space: nowrap;">
+                                        <th class="text-center">no</th>
+                                        <th>Siswa</th>
+                                        <th class="text-center">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @forelse ($siswa as $item)
-                                        <tr>
-                                            <td>{{ $loop->iteration }}</td>
+                                        <tr style="white-space: nowrap;">
+                                            <td class="text-center">{{ $loop->iteration }}</td>
                                             <td>
-                                                <div>
-                                                    <h5 class="fs-13 mb-0">{{ $item->ms_siswa->nama_siswa }}</h5>
-                                                    <p class="fs-12 mb-0 text-muted">{{ $item->ms_kelas->nama_kelas }}</p>
-                                                </div>
+                                                <span class="fw-medium" style="white-space: nowrap;">
+                                                    {{ $item->ms_siswa->nama_siswa }}
+                                                </span>
+                                                <p class="text-muted mb-0">{{ $item->ms_kelas->nama_kelas }}</p>
                                             </td>
-                                            <td>
-                                                <ul class="list-inline hstack gap-2 mb-0">
-                                                    <li class="list-inline-item detail" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Siswa">
-                                                        <button wire:click="$emit('siswaSelected', {{ $item->ms_penempatan_siswa_id }})" class="btn btn-primary d-inline-block detail-item-btn" data-bs-dismiss="offcanvas">
-                                                            <i class="ri-checkbox-circle-line align-bottom"></i> Pilih
-                                                        </button>
-                                                    </li>
-                                                </ul>
+                                            <td class="text-center">
+                                                <a title="Pilih Siswa" wire:click="$emit('siswaSelected', {{ $item->ms_penempatan_siswa_id }})" class="btn btn-primary btn-sm rounded-pill px-3" data-bs-dismiss="offcanvas">
+                                                    <i class="ri-checkbox-circle-line me-1"></i> Pilih
+                                                </a>
                                             </td>
                                         </tr>
                                     @empty
@@ -124,7 +141,29 @@
                                     @endforelse
                                 </tbody>
                             </table>
-                            {{ $siswa->links() }}
+                            {{-- PAGINATION --}}
+                            <div class="mt-3">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                    <div class="text-muted fs-13">
+                                        Menampilkan
+                                        <span class="fw-semibold">
+                                            {{ $siswa->firstItem() ?? 0 }}
+                                        </span>
+                                        -
+                                        <span class="fw-semibold">
+                                            {{ $siswa->lastItem() ?? 0 }}
+                                        </span>
+                                        dari
+                                        <span class="fw-semibold">
+                                            {{ $siswa->total() }}
+                                        </span>
+                                        data siswa
+                                    </div>
+                                    <div>
+                                        {{ $siswa->links() }}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     @endif

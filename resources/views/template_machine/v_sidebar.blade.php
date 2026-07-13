@@ -61,13 +61,13 @@
                 {{-- @if ($peran === 'tata usaha' || $peran === 'superadmin') --}}
                     <li class="menu-title"><span data-key="t-administrasi">Administrasi</span></li>
 
-                    <li class="nav-item">
+                    {{-- <li class="nav-item">
                         <a href="{{ route('akuntansi.konfigurasi') }}"
                         class="nav-link menu-link {{ request()->routeIs('akuntansi.konfigurasi') ? 'active' : '' }}">
                             <i class="mdi mdi-calculator-variant-outline"></i>
                             <span data-key="t-kelas-siswa">Konfigurasi Akuntansi</span>
                         </a>
-                    </li>
+                    </li> --}}
                     <!-- Single Menus -->
                     <li class="nav-item">
                         <a href="{{ route('administrasi.kelas-siswa') }}"
@@ -76,13 +76,13 @@
                             <span data-key="t-kelas-siswa">Kelas Siswa</span>
                         </a>
                     </li>
-                    <li class="nav-item">
+                    {{-- <li class="nav-item">
                         <a href="{{ route('administrasi.ekstrakurikuler-siswa') }}"
                         class="nav-link menu-link {{ request()->routeIs('administrasi.ekstrakurikuler-siswa') ? 'active' : '' }}">
                             <i class="mdi mdi-trophy-outline"></i>
                             <span data-key="t-kelas-siswa">Ekstrakurikuler Siswa</span>
                         </a>
-                    </li>
+                    </li> --}}
                     <li class="nav-item">
                         <a href="{{ route('keuangan.konfigurasi-tagihan-siswa') }}"
                         class="nav-link menu-link {{ request()->routeIs('keuangan.konfigurasi-tagihan-siswa') ? 'active' : '' }}">
@@ -104,13 +104,13 @@
                             <span data-key="t-jenis-tagihan">Jenis Tagihan</span>
                         </a>
                     </li>
-                    <li class="nav-item">
+                    {{-- <li class="nav-item">
                         <a href="{{ route('administrasi.manajemen-kepegawaian') }}"
                         class="nav-link menu-link {{ request()->routeIs('administrasi.manajemen-kepegawaian') ? 'active' : '' }}">
                             <i class="mdi mdi-account-outline"></i>
                             <span data-key="t-data-pegawai">Data Pegawai</span>
                         </a>
-                    </li>
+                    </li> --}}
 
                     {{-- @php
                         $administrasiPegawai = request()->routeIs('administrasi.jadwal-kerja-pegawai') ||
