@@ -1,23 +1,37 @@
-<div class="card">
-    <div class="card-body">
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card-header border-0 ">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+            <div class="flex-grow-1">
+                <h4 class="mb-1">
+                    {{ $nama_siswa ?? 'Siswa belum dipilih' }}
+                </h4>
 
-        <!-- INFO SISWA -->
-        <div class="mb-3">
-            <h4 class="fw-bold mb-1">
-                {{ $nama_siswa ?? 'Siswa belum dipilih' }}
-            </h4>
+                <div class="hstack gap-3 flex-wrap small">
+                    <div class="text-muted">
+                        Kelas :
+                        <span class="text-body fw-semibold">
+                            {{ $nama_kelas ?? 'Belum ada' }}
+                        </span>
+                    </div>
 
-            <div class="d-flex flex-wrap gap-2 text-muted small">
-                <div>Kelas: <span class="text-body fw-medium">{{ $nama_kelas ?? '-' }}</span></div>
-                <div class="vr"></div>
-                <div>Telepon: <span class="text-body fw-medium">{{ $telepon ?? '-' }}</span></div>
+                    <div class="vr"></div>
+
+                    <div class="text-muted">
+                        Telepon :
+                        <span class="text-body fw-semibold">
+                            {{ $telepon ?? 'Tidak tersedia' }}
+                        </span>
+                    </div>
+                </div>
+
+                <p class="text-muted mt-2 mb-0">
+                    {{ $alamat ?? 'Tidak ada alamat' }}
+                </p>
             </div>
 
-            <p class="text-muted small">
-                {{ $alamat ?? 'Tidak ada alamat' }}
-            </p>
         </div>
-
+    </div>
+    <div class="card-body">
         <!-- SALDO CARD -->
         <div class="p-3 rounded-3 text-white bg-primary mb-4">
             <p class="mb-1 small">Saldo Tabungan</p>
@@ -55,7 +69,8 @@
                         <div class="input-group">
                             <span class="input-group-text">Rp</span>
                             <input type="number" class="form-control" placeholder="Minimal Rp 1.000"
-                                wire:model.defer="nominal_kredit">
+                                wire:model.defer="nominal_kredit"
+                                onkeyup="formatTagihan(this)">
                         </div>
                         @error('nominal_kredit')
                         <small class="text-danger">{{ $message }}</small>
@@ -89,7 +104,8 @@
                         <div class="input-group">
                             <span class="input-group-text">Rp</span>
                             <input type="number" class="form-control" placeholder="Nominal debit"
-                                wire:model.defer="nominal_debit">
+                                wire:model.defer="nominal_debit"
+                                onkeyup="formatTagihan(this)">
                         </div>
                         @error('nominal_debit')
                         <small class="text-danger">{{ $message }}</small>
@@ -117,3 +133,9 @@
 
     </div>
 </div>
+<script>
+    function formatTagihan(el) {
+        let angka = el.value.replace(/\D/g, '');
+        el.value = new Intl.NumberFormat('id-ID').format(angka);
+    }
+</script>

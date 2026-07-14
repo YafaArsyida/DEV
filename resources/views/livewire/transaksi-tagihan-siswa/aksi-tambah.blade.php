@@ -29,16 +29,35 @@
     <div class="offcanvas-body">
         <div class="row">
             <div class="col-xxl-12">
-                <div class="card">
-                    <div class="card-header align-items-center d-flex border-0">
-                        <h4 class="card-title mb-0 flex-grow-1">Jenis Tagihan</h4>
-                        <div class="flex-shrink-0">
-                            @if ($tagihanSelected)
-                                <!-- Secondary Alert -->
-                                <div class="mb-0 alert alert-secondary alert-dismissible alert-label-icon rounded-label shadow fade show" role="alert">
-                                    <i class="ri-check-double-line label-icon"></i><strong>{{ count($tagihanSelected) }}</strong> -  tagihan telah dipilih
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div class="card-header">
+                        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4">
+
+                            {{-- TITLE --}}
+                            <div>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="avatar-sm">
+                                        <div class="avatar-title bg-info-subtle text-info rounded-circle fs-20">
+                                            <i class="ri-file-list-3-line"></i>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <h5 class="fw-bold mb-1">
+                                            Daftar Tagihan
+                                        </h5>
+                                        <small class="text-muted">
+                                            Pilih tagihan dan isikan jumlah tagihan untuk siswa.
+                                        </small>
+                                    </div>
                                 </div>
-                            @endif
+                            </div>
+
+                            {{-- ACTION --}}
+                            <div class="d-flex gap-2 flex-wrap align-items-center">
+                                
+                            </div>
+
                         </div>
                     </div><!-- end card header -->
                     <div class="card-body">
@@ -83,7 +102,7 @@
                                             <th class="text-uppercase">Kategori</th>
                                             <th class="text-uppercase">tagihan</th>
                                             <th class="text-uppercase">Jatuh Tempo</th>
-                                            <th class="text-uppercase">Cicilan</th>
+                                            <th class="text-uppercase text-center">Cicilan</th>
                                             <th class="text-uppercase text-center">Status</th>
                                         </tr>
                                     </thead>
@@ -108,7 +127,7 @@
                                             </td>
                                             <td>
                                                 @if($item['sudah_ditetapkan'])
-                                                    <span class="fs-12 fw-medium text-success">
+                                                    <span class="fs-12 fw-medium">
                                                         RP{{ number_format($item['jumlah_tagihan_siswa'] ?? 0, 0, ',', '.') }}
                                                     </span>
                                                 @else
@@ -121,8 +140,8 @@
                                                 @endif
                                             </td>
                                             <td>{{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($item['tanggal_jatuh_tempo'], 'd F Y') }}</td>
-                                            <td>{{ $item['cicilan_status'] }}</td>
-                                            <td>
+                                            <td class="text-center">{{ $item['cicilan_status'] }}</td>
+                                            <td style="width: 100px;" class="text-center">
                                                 @if(!$item['sudah_ditetapkan'])
                                                 <span class="badge bg-warning-subtle text-warning">
                                                     Belum Ditambahkan

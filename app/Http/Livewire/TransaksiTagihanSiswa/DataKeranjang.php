@@ -30,7 +30,7 @@ class DataKeranjang extends Component
 
     public $siswaSelected = false; // Status apakah siswa sudah dipilih
 
-    public $currentTransaksiId;
+    public $currentTransaksiId = null;
 
     protected $listeners = [
         'siswaSelected', // Listener untuk parameter siswa yang dipilih
@@ -194,6 +194,7 @@ class DataKeranjang extends Component
                 'ms_pengguna_id' => $ms_pengguna_id,
                 'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
                 'ms_jenjang_id' => $this->ms_jenjang_id,
+                'ms_departemen_id' => 'SEKOLAH',
                 'is_canceled' => 'active',
                 'deskripsi' => $deskripsiJurnal,
             ]);
@@ -206,6 +207,7 @@ class DataKeranjang extends Component
                 'ms_pengguna_id' => $ms_pengguna_id,
                 'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
                 'ms_jenjang_id' => $this->ms_jenjang_id,
+                'ms_departemen_id' => 'SEKOLAH',
                 'is_canceled' => 'active',
                 'deskripsi' => $deskripsiJurnal,
             ]);
@@ -285,6 +287,8 @@ class DataKeranjang extends Component
                 // ->where('ms_pengguna_id', $ms_pengguna_id)
                 ->delete();
 
+            $this->currentTransaksiId = $transaksi->ms_transaksi_tagihan_siswa_id;
+
             DB::commit();
 
             // 🔥 Reset local state
@@ -295,6 +299,7 @@ class DataKeranjang extends Component
             ]);
 
             $this->emit('refreshTagihanSiswa');
+            $this->emit('reloadTagihanSiswa');
         } catch (\Throwable $e) {
             DB::rollBack();
 
@@ -304,8 +309,15 @@ class DataKeranjang extends Component
         }
     }
 
-    public function cetakTransaksi($currentTransaksiId)
+    public function cetakTransaksi($currentTransaksiId = null)
     {
+        $currentTransaksiId = $currentTransaksiId ?? $this->currentTransaksiId;
+
+        if (!$currentTransaksiId) {
+            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Transaksi tidak tersedia untuk dicetak.']);
+            return;
+        }
+
         // Dispatch event alertify sukses
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Kuitansi sedang diproses.']);
 

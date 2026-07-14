@@ -1,13 +1,29 @@
 {{-- Success is as dangerous as failure. --}}
-<div class="card">
-    <div class="card-header border-0 pb-0">
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card-header">
         <div class="d-flex align-items-center flex-wrap gap-3">
             {{-- Judul --}}
-            <h5 class="card-title mb-0 flex-grow-1">Riwayat Transaksi EduPay</h5>
-    
+            <div class="flex-grow-1">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-sm">
+                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                            <i class="ri-bank-card-line"></i>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h5 class="fw-bold mb-1">
+                            Riwayat Transaksi EduPay Siswa
+                        </h5>
+                        {{-- <small class="text-muted">
+                            Riwayat transaksi tabungan siswa berdasarkan periode yang dipilih.
+                        </small> --}}
+                    </div>
+                </div>
+            </div>
             {{-- Tombol Export & Cetak --}}
             <div class="d-flex gap-2 flex-wrap">
-                <button data-bs-toggle="modal" data-bs-target="#ExportLaporan" class="btn btn-soft-success">
+                <button data-bs-toggle="modal" data-bs-target="#ExportLaporan" class="btn rounded-pill px-4 btn-soft-success">
                     <i class="ri-file-excel-2-line pb-0"></i> Export
                 </button>
                 {{-- <button wire:click="cetakLaporan" class="btn btn-danger d-inline-flex align-items-center gap-1">
@@ -27,79 +43,53 @@
         </div>
     </div>
     <div class="card-body">
-        {{-- <div class="row g-3 align-items-end mb-3">
-            <!-- Jenis -->
-            <div class="col-xxl-3 col-sm-6">
-                <label class="form-label">Jenis Transaksi</label>
-                <select wire:model="selectedJenis" class="form-select">
-                    <option value="">Semua</option>
-                    <option value="topup tunai">Top-Up Tunai</option>
-                    <option value="topup online">Top-Up Online</option>
-                    <option value="pengembalian dana">Pengembalian Dana</option>
-                    <option value="penarikan">Penarikan</option>
-                    <option value="pembayaran">Pembayaran</option>
-                    <option value="kantin">Kantin</option>
-                </select>
-            </div>
-        
-            <!-- Search -->
-            <div class="col-xxl-9 col-sm-6">
-                <label class="form-label">Pencarian</label>
-                <div class="search-box">
-                    <input type="text" class="form-control search" wire:model.debounce.300ms="search"
-                        placeholder="Cari nama, deskripsi, atau lainnya...">
-                    <i class="ri-search-line search-icon"></i>
-                </div>
-            </div>
-        
-        </div> --}}
         <div class="table-responsive">
-            <table id="data" class="table table-borderless table-hover text-center table-nowrap align-middle mb-0">
+            <table id="data" class="table table-hover nowrap align-middle">
                 <thead class="table-light">
-                    <tr class="table-active">
+                    <tr class="text-uppercase">
                         <th style="width: 50px;" class="text-uppercase">NO</th>
-                        <th class="text-uppercase" scope="col" style="width: 50px;">hapus</th>
-                        <th class="text-start text-uppercase" scope="col" style="width: 150px;">tanggal</th>
-                        <th class="text-start text-uppercase" scope="col">transaksi</th>
-                        <th class="text-uppercase" scope="col">petugas</th>
-                        <th class="text-uppercase" scope="col">pemasukan</th>
-                        <th class="text-uppercase" scope="col">pengeluaran</th>
-                        <th class="text-uppercase" scope="col" class="">saldo</th>
-                        <th class="text-start text-uppercase">aksi</th>
+                        <th class="text-center" scope="col" style="width: 50px;">hapus</th>
+                        <th class="text-start" scope="col" style="width: 150px;">tanggal</th>
+                        <th class="text-start" scope="col">transaksi</th>
+                        <th class="text-center" scope="col">petugas</th>
+                        <th class="text-center" scope="col">pemasukan</th>
+                        <th class="text-center" scope="col">pengeluaran</th>
+                        <th class="text-center" scope="col" class="">saldo</th>
+                        <th class="text-start">aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="table-secondary fw-semibold">
+                    <tr class="table-secondary fw-medium text-center">
                         <td colspan="5">
                             <i class="ri-wallet-3-line me-1"></i>
                             Saldo Awal Periode
                         </td>
-                        <td class="fs-14 text-success">Rp{{ number_format($totalMasukSebelum, 0, ',', '.') }}</td>
-                        <td class="fs-14 text-danger">Rp{{ number_format($totalKeluarSebelum, 0, ',', '.') }}</td>
-                        <td class="fs-14 text-info">Rp{{ number_format($saldoAwal, 0, ',', '.') }}</td>
+                        <td class="fs-12 text-success">Rp{{ number_format($totalMasukSebelum, 0, ',', '.') }}</td>
+                        <td class="fs-12 text-danger">Rp{{ number_format($totalKeluarSebelum, 0, ',', '.') }}</td>
+                        <td class="fs-12 text-info">Rp{{ number_format($saldoAwal, 0, ',', '.') }}</td>
                         <td></td>
                     </tr>
                     @forelse ($transaksiEduPay as $item)
-                    <tr>
-                        <td style="width: 50px">{{ $loop->iteration }}.</td>
-                        <td>
+                    <tr style="white-space: nowrap">    
+                        <td class="text-center" style="width: 50px">{{ $loop->iteration }}.</td>
+                        <td class="text-center">
                             @if ($item->jenis_transaksi === 'pembayaran' || $item->jenis_transaksi === 'kantin')
-                                <span class="text-muted" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" 
+                                <span class="d-inline-block remove-item-btn text-muted" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" 
                                     title="Hapus Transaksi lewat Histori {{ ucfirst($item->jenis_transaksi) }}">
-                                    <i class="ri-delete-bin-5-line align-bottom"></i>
+                                    <i class="ri-delete-bin-5-fill fs-14"></i>
                                 </span>
                             @elseif ($item->jenis_transaksi === 'topup online')
-                                <span class="text-muted" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Transaksi Topup Online tidak dapat dihapus">
-                                    <i class="ri-delete-bin-5-line align-bottom"></i>
+                                <span class="text-muted d-inline-block remove-item-btn" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Transaksi Topup Online tidak dapat dihapus">
+                                    <i class="ri-delete-bin-5-fill fs-14"></i>
                                 </span>
                             @elseif ($item->jenis_transaksi === 'pengembalian dana')
-                                <span class="text-muted" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pengembalian dana tidak dapat dihapus, hubungi CS">
-                                    <i class="ri-delete-bin-5-line align-bottom"></i>
+                                <span class="text-muted d-inline-block remove-item-btn" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pengembalian dana tidak dapat dihapus, hubungi CS">
+                                    <i class="ri-delete-bin-5-fill fs-14"></i>
                                 </span>
                             @else
-                                <a href="#ModalDeleteEduPay" data-bs-toggle="modal" class="btn btn-sm btn-soft-danger d-inline-flex align-items-center gap-1" 
+                                <a href="#ModalDeleteEduPay" data-bs-toggle="modal" class="text-danger d-inline-block remove-item-btn" 
                                 wire:click.prevent="$emit('confirmDeleteEduPay', {{ $item->ms_transaksi_edupay_id }})" data-bs-trigger="hover" data-bs-placement="top" title="Hapus Transaksi EduPay">
-                                    <i class="ri-delete-bin-5-line align-bottom"></i>
+                                    <i class="ri-delete-bin-5-fill fs-14"></i>
                                 </a>
                             @endif
 
@@ -107,29 +97,25 @@
                         <td class="text-uppercase text-start">
                             {{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($item->tanggal) }}
                         </td>
-                        <td class="text-start">
-                            <span class="fs-14">
+                        <td>
+                            <span class="fs-12 fw-medium">
                                 {!! 'RP' . number_format($item->nominal, 0, ',', '.') . ' - <i>' . ucfirst($item->jenis_transaksi) . '</i>' !!}
                             </span>
                             <p class="text-muted mb-0">{{ $item->deskripsi ?? '' }}</p>
                         </td>
-                        <td>
-                            <span class="fs-14">
-                                {{ $item->ms_pengguna->nama }}
-                            </span>
-                        </td>
-                        <td>
-                            <span class="fs-14 text-success">
+                        <td class="text-center">{{ $item->ms_pengguna->nama }}</td>
+                        <td class="text-center">
+                            <span class="fs-12 text-success">
                                 {{ in_array($item->jenis_transaksi, ['topup tunai', 'topup online', 'pengembalian dana']) ? 'RP' . number_format($item->nominal, 0, ',', '.') : '-' }}
                             </span>
                         </td>
-                        <td>
-                            <span class="fs-14 text-danger">
+                        <td class="text-center">
+                            <span class="fs-12 text-danger">
                                 {{ in_array($item->jenis_transaksi, ['penarikan', 'pembayaran','kantin']) ? 'RP' . number_format($item->nominal, 0, ',', '.') : '-' }}
                             </span>
                         </td>
-                        <td>
-                            <span class="fs-14 text-info">
+                        <td class="text-center">
+                            <span class="fs-12 text-info">
                                 Rp{{ number_format($item->saldo, 0, ',', '.') }}
                             </span>
                         </td>
@@ -141,32 +127,33 @@
                                         <a href="#loadTransaksiEduPay" 
                                             data-bs-toggle="modal" 
                                             wire:click.prevent="$emit('loadTransaksiEduPay', {{ $item->ms_transaksi_edupay_id }})" 
-                                            class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1">
-                                            <i class="ri-quill-pen-line align-bottom"></i>
-                                            <span>Edit Transaksi</span>
+                                            class="btn btn-primary btn-sm rounded-pill px-3">
+                                            <i class="ri-mark-pen-line me-1"></i>
+                                            <span>Edit</span>
                                         </a>
                                     @else
-                                        <span class="text-muted" 
+                                        <span class="btn btn-muted btn-sm rounded-pill px-3" 
                                             data-bs-toggle="tooltip" 
                                             data-bs-trigger="hover" 
                                             data-bs-placement="top" 
                                             title="Transaksi {{ ucfirst($item->jenis_transaksi) }} tidak dapat diedit">
-                                            <i class="ri-quill-pen-line align-bottom"></i>
-                                            <span>Edit Transaksi</span>
+                                            <i class="ri-mark-pen-line me-1"></i>
+                                            <span>Edit</span>
                                         </span>
                                     @endif
                                 </li>
 
-                                <li class="list-inline-item detail" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Kirim Pesan Transaksi">
-                                    <a  wire:click.prevent="kirimWhatsapp({{ $item->ms_transaksi_edupay_id }})" class="btn btn-sm btn-soft-success d-inline-flex align-items-center gap-1">
-                                        <i class="ri-whatsapp-line align-bottom"></i>
-                                        <span>Kirim WhatsApp</span>
+                                <li class="list-inline-item detail" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Cetak Bukti Transaksi">
+                                    <a wire:click="cetakTransaksi({{ $item->ms_transaksi_edupay_id }})" class="btn btn-sm btn-danger rounded-pill px-3">
+                                        <i class="ri-printer-line me-1"></i>
+                                            <span>Cetak</span>
                                     </a>
                                 </li>
-                                <li class="list-inline-item detail" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Cetak Bukti Transaksi">
-                                    <a wire:click="cetakTransaksi({{ $item->ms_transaksi_edupay_id }})" class="btn btn-sm btn-danger d-inline-flex align-items-center gap-1">
-                                        <i class="ri-printer-line align-bottom"></i>
-                                        <span>Cetak</span>
+
+                                <li class="list-inline-item detail" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Kirim Pesan Transaksi">
+                                    <a  wire:click.prevent="kirimWhatsapp({{ $item->ms_transaksi_edupay_id }})" class="btn btn-soft-success btn-sm rounded-pill px-3">
+                                        <i class="ri-whatsapp-line me-1"></i>
+                                        <span>Kirim WhatsApp</span>
                                     </a>
                                 </li>
                             </ul>

@@ -12,7 +12,7 @@ use Illuminate\Validation\ValidationException;
 class Cicilan extends Component
 {
     public $tagihan;
-    public $jumlah_bayar = 0;
+    public $jumlah_bayar;
 
     protected $listeners = [
         'loadCicilan' => 'loadCicilan',
@@ -24,6 +24,8 @@ class Cicilan extends Component
             ->where('ms_tagihan_siswa_id', $ms_tagihan_siswa_id)
             ->first();
 
+        $this->jumlah_bayar = null;
+
         if (!$this->tagihan) {
             throw new \Exception('Tagihan tidak ditemukan!');
         }
@@ -31,11 +33,6 @@ class Cicilan extends Component
         $this->dispatchBrowserEvent('alertify-success', [
             'message' => 'Tagihan dimuat'
         ]);
-
-        $this->jumlah_bayar = max(
-            0,
-            ($this->tagihan->jumlah_tagihan_siswa ?? 0) - ($this->tagihan->total_bayar ?? 0)
-        );
     }
 
     public function masukKeranjang($ms_tagihan_siswa_id)
@@ -43,6 +40,7 @@ class Cicilan extends Component
         DB::beginTransaction();
 
         try {
+            $this->jumlah_bayar = $this->normalizeAmount($this->jumlah_bayar);
             // ✅ Validasi basic dulu
             $this->validate([
                 'jumlah_bayar' => 'required|numeric|min:1',
@@ -134,5 +132,13 @@ class Cicilan extends Component
         return view('livewire.transaksi-tagihan-siswa.cicilan', [
             'tagihan' => $this->tagihan,
         ]);
+    }
+    private function normalizeAmount($value)
+    {
+        if ($value === null || $value === '') {
+            return 0;
+        }
+
+        return (int) str_replace('.', '', $value);
     }
 }

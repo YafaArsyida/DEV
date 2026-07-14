@@ -1,10 +1,28 @@
 {{-- The whole world belongs to you. --}}
 <div wire:ignore.self class="modal fade" id="loadTransaksiEduPay" tabindex="-1" aria-labelledby="loadTransaksiEduPayLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="loadTransaksiEduPayLabel">Edit Tanggal Transaksi</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header border-0">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-sm">
+                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                            <i class="ri-calendar-event-line">
+                            </i>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-1">
+                            Perbarui Data Transaksi
+                        </h5>
+                        {{-- <small>
+                            Tambahkan agenda kegiatan generasi penerus dengan pengaturan tingkat, jadwal, dan lokasi.
+                        </small> --}}
+                    </div>
+                </div>
+                <button type="button" class="btn btn-light btn-icon rounded-circle" data-bs-dismiss="modal">
+                    <i class="ri-close-line fs-18">
+                    </i>
+                </button>
             </div>
             <div class="modal-body">
                 @if($transaksi)
@@ -13,7 +31,7 @@
                         <tr>
                             <th scope="row">Nominal</th>
                             <td>
-                                <span class="text-success fs-14 fw-semibold ">
+                                <span class="text-success fs-12 fw-medium ">
                                     Rp{{ number_format($transaksi->nominal, 0, ',', '.') }} - {{ $transaksi->jenis_transaksi }}
                                 </span>
                             </td>
@@ -38,7 +56,7 @@
                         </tr>
 
                         <tr>
-                            <th scope="row" class="text-warning">Perubahan Tanggal</th>
+                            <th scope="row" class="text-primary">Perubahan Tanggal</th>
                             <td>
                                 <div class="input-group input-group-sm">
                                     <input type="date" class="form-control" wire:model.defer="tanggal">
@@ -48,27 +66,29 @@
                             </td>
                         </tr>
                         <tr>
-                            <th scope="row" class="text-warning">Perubahan Deskripsi</th>
+                            <th scope="row" class="text-primary">Perubahan Deskripsi</th>
                             <td>
                                 <div class="input-group input-group-sm">
                                     <input type="text" class="form-control" wire:model.defer="deskripsi" placeholder="Ubah keterangan (opsional)">
                                 </div>
-                                @error('tanggal') <span class="text-danger text-sm">{{ $message }}</span> @enderror
+                                @error('deskripsi') <span class="text-danger text-sm">{{ $message }}</span> @enderror
                             </td>
                         </tr>
                     </tbody>
                 </table>
                 @endif
             </div>
-            <div class="modal-footer">
-                <a href="javascript:void(0);" class="btn btn-link link-success shadow-none fw-medium" data-bs-dismiss="modal"><i class="ri-close-line me-1 align-middle"></i> Tutup</a>
+            <div class="modal-footer border-0 px-4 pb-4 pt-0">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">
+                    <i class="ri-close-line me-1"></i>
+                    Tutup
+                </button>
                 @if($transaksi)
-                <button type="button" class="btn btn-primary" 
-                    wire:click.prevent="updateTransaksi">
-                    <i class="ri-printer-line align-bottom me-1"></i> Edit
+                <button class="btn btn-primary rounded-pill px-4" wire:click.prevent="updateTransaksi">
+                    <i class="ri-save-3-line me-1"></i>
+                    Simpan
                 </button>
                 @endif
-
             </div>
         </div>
     </div>

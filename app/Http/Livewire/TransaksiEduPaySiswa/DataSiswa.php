@@ -33,11 +33,11 @@ class DataSiswa extends Component
 
     // TRANSAKSI TOPUP
     public $jenis_transaksi_topup = 'topup tunai';
-    public $nominal_topup = null;
+    public $nominal_topup = 0;
     public $deskripsi_topup = null;
 
     // TRANSAKSI PENARIKAN
-    public $nominal_penarikan = null;
+    public $nominal_penarikan = 0;
     public $deskripsi_penarikan = null;
 
     protected $listeners = [
@@ -241,6 +241,7 @@ class DataSiswa extends Component
         DB::beginTransaction();
 
         try {
+            $this->nominal_topup = $this->normalizeAmount($this->nominal_topup);
             $this->validate([
                 'nominal_topup' => 'required|numeric|min:1000',
                 'deskripsi_topup' => 'nullable|string|max:255',
@@ -284,6 +285,7 @@ class DataSiswa extends Component
         DB::beginTransaction();
 
         try {
+            $this->nominal_penarikan = $this->normalizeAmount($this->nominal_penarikan);
             $this->validate([
                 'nominal_penarikan' => 'required|numeric|min:1000',
                 'deskripsi_penarikan' => 'nullable|string|max:255',
@@ -328,5 +330,13 @@ class DataSiswa extends Component
     public function render()
     {
         return view('livewire.transaksi-edu-pay-siswa.data-siswa');
+    }
+    private function normalizeAmount($value)
+    {
+        if ($value === null || $value === '') {
+            return 0;
+        }
+
+        return (int) str_replace('.', '', $value);
     }
 }

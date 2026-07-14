@@ -242,7 +242,7 @@
                 <thead class="table-light">
                     <tr>
                         <th class="text-uppercase" style="width: 50px;">Hapus</th>
-                        <th class="text-uppercase">Jenis Tagihan</th>
+                        <th class="text-uppercase">Tagihan</th>
                         <th class="text-uppercase">Kategori</th>
                         <th class="text-uppercase text-center">Estimasi</th>
                         <th class="text-uppercase text-center">Dibayarkan</th>

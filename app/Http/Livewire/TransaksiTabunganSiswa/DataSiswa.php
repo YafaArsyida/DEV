@@ -30,11 +30,11 @@ class DataSiswa extends Component
     public $saldoTabunganSiswa;
 
     // TRANSAKSI KREDIT
-    public $nominal_kredit = null;
+    public $nominal_kredit = 0;
     public $deskripsi_kredit = null;
 
     // TRANSAKSI DEBIT
-    public $nominal_debit = null;
+    public $nominal_debit = 0;
     public $deskripsi_debit = null;
 
     protected $listeners = [
@@ -233,6 +233,8 @@ class DataSiswa extends Component
         DB::beginTransaction();
 
         try {
+            $this->nominal_kredit = $this->normalizeAmount($this->nominal_kredit);
+
             $this->validate([
                 'nominal_kredit' => 'required|numeric|min:1000',
                 'deskripsi_kredit' => 'nullable|string|max:255',
@@ -273,6 +275,8 @@ class DataSiswa extends Component
         DB::beginTransaction();
 
         try {
+            $this->nominal_debit = $this->normalizeAmount($this->nominal_debit);
+
             $this->validate([
                 'nominal_debit' => 'required|numeric|min:1000',
                 'deskripsi_debit' => 'nullable|string|max:255',
@@ -316,5 +320,13 @@ class DataSiswa extends Component
     public function render()
     {
         return view('livewire.transaksi-tabungan-siswa.data-siswa');
+    }
+    private function normalizeAmount($value)
+    {
+        if ($value === null || $value === '') {
+            return 0;
+        }
+
+        return (int) str_replace('.', '', $value);
     }
 }

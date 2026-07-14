@@ -300,6 +300,7 @@ class AksiTambah extends Component
                     : 'Tagihan berhasil dibuat.'
             ]);
 
+            $this->loadData();
             $this->emit('refreshTagihanSiswa');
             $this->emit('reloadTagihanSiswa');
         } catch (\Throwable $e) {

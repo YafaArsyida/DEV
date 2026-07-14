@@ -23,8 +23,6 @@
                 @livewire('transaksi-tagihan-siswa.aksi-tambah')
     
                 @livewire('transaksi-tagihan-siswa.index')
-
-                {{--  --}}
     
                 @livewire('transaksi-tagihan-siswa.cicilan')
     

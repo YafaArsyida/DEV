@@ -137,16 +137,9 @@
                     <i class="ri-close-line me-1"></i>
                     Tutup
                 </button>
-                <button type="button" class="btn btn-primary rounded-pill px-4" wire:click="pindahkanSiswa" {{ count($siswaSelected) === 0 ? 'disabled' : '' }}>
+                <button type="button" class="btn btn-primary rounded-pill px-4" wire:click="naikKelasSiswa" {{ count($siswaSelected) === 0 ? 'disabled' : '' }}>
                     <i class="ri-save-3-line me-1"></i>
-                    Pindahkan ({{ count($siswaSelected) }})
-                </button>
-            </div>
-
-            <div class="modal-footer">
-                <a href="javascript:void(0);" class="btn btn-link link-success shadow-none fw-medium" data-bs-dismiss="modal"><i class="ri-close-line me-1 align-middle"></i> Tutup</a>
-                <button type="button" class="btn btn-primary" wire:click="naikKelasSiswa" {{ count($siswaSelected) === 0 ? 'disabled' : '' }}>
-                    Naikkan ({{ count($siswaSelected) }})
+                    Naik Kelas ({{ count($siswaSelected) }})
                 </button>
             </div>
         </div>
