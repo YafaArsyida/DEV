@@ -1,18 +1,20 @@
-<div class="card">
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card-header border-0 ">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+            <div class="flex-grow-1">
+                <h4 class="mb-1">
+                    Transaksi Pengeluaran
+                </h4>
+                <p class="text-muted mt-2 mb-0">
+                    Silakan mencatat transaksi pengeluaran berdasarkan akun yang tersedia.
+                </p>
+            </div>
+
+        </div>
+    </div>
     <div class="card-body">
-
-        <!-- TITLE -->
-        <h4 class="fw-bold mb-1">
-            Transaksi Pengeluaran
-        </h4>
-
-        <!-- DESCRIPTION -->
-        <p class="text-muted small mb-4">
-            Silakan mencatat transaksi pengeluaran berdasarkan akun yang tersedia.
-        </p>
-
         <!-- SUMMARY CARD -->
-        <div class="p-3 rounded-3 text-white bg-primary mb-4">
+        <div class="p-3 rounded-3 text-white bg-warning mb-4">
             <p class="mb-1 small">Pengeluaran</p>
             <h2 class="fw-bold text-white mb-0">
                 Rp{{ number_format($totalPengeluaran, 0, ',', '.') }}
@@ -58,7 +60,9 @@
                 <label class="form-label">Nominal</label>
                 <div class="input-group">
                     <span class="input-group-text">Rp</span>
-                    <input type="number" class="form-control" placeholder="Minimal Rp 1.000" wire:model.defer="nominal">
+                    <input type="number" class="form-control" placeholder="Minimal Rp 1.000" 
+                        wire:model.defer="nominal"
+                        onkeyup="formatTagihan(this)">
                 </div>
                 @error('nominal')
                 <small class="text-danger">{{ $message }}</small>
@@ -82,3 +86,9 @@
 
     </div>
 </div>
+<script>
+    function formatTagihan(el) {
+        let angka = el.value.replace(/\D/g, '');
+        el.value = new Intl.NumberFormat('id-ID').format(angka);
+    }
+</script>

@@ -104,7 +104,7 @@ class LaporanTagihanSiswa extends Controller
         $pdf = new TCPDF('L', 'mm', 'A4', true, 'UTF-8', false); // Landscape
         // $pdf = new TCPDF('P', 'mm', array(210, 330), true, 'UTF-8', false); // Portrait F4
 
-        $pdf::SetMargins(20, 5, 20); // kiri, atas, kanan
+        $pdf::SetMargins(0, 0, 0); // kiri, atas, kanan
         $pdf::SetHeaderMargin(0);    // margin header
         $pdf::SetFooterMargin(10);    // margin footer
         $pdf::SetAutoPageBreak(TRUE, 20); // jarak bawah
@@ -125,13 +125,14 @@ class LaporanTagihanSiswa extends Controller
             <table border="0" cellpadding="0" cellspacing="0">
                 <tr>
                     <td style="text-align: center;">
-                        <img src="' . $kopBase64 . '" width="1400px"/>
+                        <img src="' . $kopBase64 . '" width="1500px"/>
                     </td>
                 </tr>
             </table>
             ';
         // Menulis HTML ke dalam PDF
         $pdf::writeHTML($htmlHeader, true, false, true, false, '');
+        // Kembalikan margin isi
 
         // $style = array('width' => 0.7, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0));
         // $stylet = array('width' => 0.1, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0));
@@ -157,6 +158,8 @@ class LaporanTagihanSiswa extends Controller
                     <td>: ' . $surat->hal . '</td>
                 </tr>
             </table>';
+        $pdf::SetMargins(20, 5, 20);
+        $pdf::SetX(20); //agar ke kiri 20
         $pdf::writeHTML($kop, true, false, true, false, '');
 
         $alamatTujuan = '<table border="0">
@@ -292,23 +295,27 @@ class LaporanTagihanSiswa extends Controller
         $pdf::writeHTML($tandaTangan, true, false, true, false, '');
 
         $pdf::AddPage();
+        $pdf::SetMargins(0, 0, 0); // kiri, atas, kanan
 
         $htmlHeader = '
-            <table border="0" cellpadding="1" cellspacing="0">
+            <table border="0" cellpadding="0" cellspacing="0">
                 <tr>
                     <td style="text-align: center;">
-                        <img src="' . $kopBase64 . '" width="1400px"/>
+                        <img src="' . $kopBase64 . '" width="1500px"/>
                     </td>
                 </tr>
             </table>
             ';
 
         $pdf::writeHTML($htmlHeader, true, false, true, false, '');
-
+        $pdf::SetMargins(20, 5, 20);
+        $pdf::SetX(20); //agar ke kiri 20
+        
         // $style = array('width' => 0.7, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0));
         // $stylet = array('width' => 0.1, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0));
         // $pdf::Line(10, 46, 202, 46, $style);
         // $pdf::Line(10, 47, 202, 47, $stylet);
+
 
         // Rincian Tagihan
         $htmlTagihan = "<p><b>Rincian Tagihan Administrasi Sekolah</b></p>";
@@ -354,6 +361,9 @@ class LaporanTagihanSiswa extends Controller
         // Menambahkan rincian tagihan ke PDF
         $pdf::writeHTML($htmlTagihan, true, false, true, false, '');
 
+        $pdf::SetMargins(20, 5, 20);
+        $pdf::SetX(20); //agar ke kiri 20
+        
         // Menambahkan Total Tagihan
         $totalTagihanHtml = "<h4>Total Kekurangan: Rp" . number_format($totalTagihan, 0, ',', '.') . "</h4>";
         $pdf::writeHTML($totalTagihanHtml, true, false, true, false, '');
@@ -497,7 +507,7 @@ class LaporanTagihanSiswa extends Controller
             // Inisialisasi TCPDF
             $pdf = new TCPDF('L', 'mm', 'A4', true, 'UTF-8', false); // Landscape
 
-            $pdf::SetMargins(20, 5, 20); // kiri, atas, kanan
+            $pdf::SetMargins(0, 0, 0); // kiri, atas, kanan
             $pdf::SetHeaderMargin(0);    // margin header
             $pdf::SetFooterMargin(10);    // margin footer
             $pdf::SetAutoPageBreak(TRUE, 20); // jarak bawah
@@ -518,7 +528,7 @@ class LaporanTagihanSiswa extends Controller
                 <table border="0" cellpadding="1" cellspacing="0">
                     <tr>
                         <td style="text-align: center;">
-                            <img src="' . $kopBase64 . '" width="1200px"/>
+                            <img src="' . $kopBase64 . '" width="1500px"/>
                         </td>
                     </tr>
                 </table>
@@ -550,6 +560,8 @@ class LaporanTagihanSiswa extends Controller
                     <td>: ' . $surat->hal . '</td>
                 </tr>
             </table>';
+            $pdf::SetMargins(20, 5, 20);
+            $pdf::SetX(20); //agar ke kiri 20
             $pdf::writeHTML($kop, true, false, true, false, '');
 
             $alamatTujuan = '<table border="0">
@@ -686,18 +698,21 @@ class LaporanTagihanSiswa extends Controller
             $pdf::writeHTML($tandaTangan, true, false, true, false, '');
 
             $pdf::AddPage();
+            $pdf::SetMargins(0, 0, 0); // kiri, atas, kanan
 
             $htmlHeader = '
             <table border="0" cellpadding="1" cellspacing="0">
                 <tr>
                     <td style="text-align: center;">
-                        <img src="' . $kopBase64 . '" widht="1400px"/>
+                        <img src="' . $kopBase64 . '" widht="1500px"/>
                     </td>
                 </tr>
             </table>
             ';
 
             $pdf::writeHTML($htmlHeader, true, false, true, false, '');
+            $pdf::SetMargins(20, 5, 20);
+            $pdf::SetX(20); //agar ke kiri 20
 
             // $style = array('width' => 0.7, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0));
             // $stylet = array('width' => 0.1, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0));
@@ -748,6 +763,9 @@ class LaporanTagihanSiswa extends Controller
             // Menambahkan rincian tagihan ke PDF
             $pdf::writeHTML($htmlTagihan, true, false, true, false, '');
 
+            $pdf::SetMargins(20, 5, 20);
+            $pdf::SetX(20); //agar ke kiri 20
+            
             // Menambahkan Total Tagihan
             $totalTagihanHtml = "<h4>Total Kekurangan: Rp" . number_format($totalTagihan, 0, ',', '.') . "</h4>";
             $pdf::writeHTML($totalTagihanHtml, true, false, true, false, '');

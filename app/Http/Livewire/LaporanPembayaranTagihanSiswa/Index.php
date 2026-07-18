@@ -15,6 +15,8 @@ class Index extends Component
     protected $paginationTheme = 'bootstrap'; // Menggunakan tema Bootstrap untuk paginasi
 
     public $search = '';
+    public $perPage = 40;
+
     public $selectedJenjang = null;
     public $selectedTahunAjar = null;
 
@@ -37,6 +39,11 @@ class Index extends Component
     public function updatingSearch()
     {
         $this->resetPage(); // Reset paginasi saat pencarian berubah
+    }
+
+    public function updatedPerPage()
+    {
+        $this->resetPage();
     }
 
     public function updateParameters($jenjang, $tahunAjar)
@@ -191,7 +198,7 @@ class Index extends Component
 
         // Sorting dan pagination
         $laporans = $query->orderBy('ms_transaksi_tagihan_siswa.tanggal_transaksi', 'ASC')
-            ->paginate(100);
+            ->paginate($this->perPage);
 
         $totalPembayaran = $laporans->sum('jumlah_bayar');
 

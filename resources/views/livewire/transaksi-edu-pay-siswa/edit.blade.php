@@ -26,13 +26,13 @@
             </div>
             <div class="modal-body">
                 @if($transaksi)
-                <table class="table mb-0">
+                <table class="table table-nowrap mb-0">
                     <tbody>
                         <tr>
                             <th scope="row">Nominal</th>
                             <td>
                                 <span class="text-success fs-12 fw-medium ">
-                                    Rp{{ number_format($transaksi->nominal, 0, ',', '.') }} - {{ $transaksi->jenis_transaksi }}
+                                    RP{{ number_format($transaksi->nominal, 0, ',', '.') }} - {{ $transaksi->jenis_transaksi }}
                                 </span>
                             </td>
                         </tr>

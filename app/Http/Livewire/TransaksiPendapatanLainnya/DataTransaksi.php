@@ -21,7 +21,7 @@ class DataTransaksi extends Component
 
     protected $listeners = [
         'parameterUpdated',
-        'refreshTransaksiPendapatanLainnya' => '$refresh'
+        'refreshTransaksi' => '$refresh'
     ];
 
     public function mount()

@@ -18,7 +18,7 @@ class Delete extends Component
         $this->ms_kategori_tagihan_siswa_id = $id;
     }
 
-    public function deleteKategori()
+    public function deleteData()
     {
         DB::beginTransaction();
 

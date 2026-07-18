@@ -1,27 +1,79 @@
 {{-- Knowing others is intelligence; knowing yourself is true wisdom. --}}
 <div wire:ignore.self class="modal fade" id="createSuratTagihan" tabindex="-1" aria-labelledby="createSuratTagihanLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="createSuratTagihanLabel">Setting Surat Tagihan Siswa</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header border-0">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-sm">
+                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                            <i class="ri-mail-send-line"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-1">
+                            Buat Template Surat Tagihan Siswa
+                        </h5>
+                        {{-- <small>
+                            Tambahkan agenda kegiatan generasi penerus dengan pengaturan tingkat, jadwal, dan lokasi.
+                        </small> --}}
+                    </div>
+                </div>
+                <button type="button" class="btn btn-light btn-icon rounded-circle" data-bs-dismiss="modal">
+                    <i class="ri-close-line fs-18">
+                    </i>
+                </button>
             </div>
             <form wire:submit.prevent="createSurat">
                 <div class="modal-body">
                     @if ($foto_kop && is_object($foto_kop))
-                        <div class="mb-3">
-                            <p>Preview Foto Baru:</p>
-                            <img src="{{ $foto_kop->temporaryUrl() }}" alt="Preview Foto Kop Baru" class="img-fluid" height="100px" accept="image/*">
+                        <div class="text-center mb-4">
+                            <p class="text-muted mb-2">Preview Foto Kop Baru</p>
+
+                            <img src="{{ $foto_kop->temporaryUrl() }}"
+                                alt="Preview Foto Kop"
+                                class="img-fluid rounded border shadow-sm"
+                                style="max-height:180px;">
                         </div>
                     @else
-                        <h3 class="text-muted">Belum ada foto kop yang diunggah.</h3>
+                        <div class="border border-2 border-dashed rounded-3 p-5 text-center bg-light-subtle mb-4">
+
+                            <div class="avatar-lg mx-auto mb-3">
+                                <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-1">
+                                    <i class="ri-image-add-line"></i>
+                                </div>
+                            </div>
+
+                            <h5 class="fw-semibold mb-2">
+                                Belum Ada Foto Kop
+                            </h5>
+
+                            <p class="text-muted mb-0">
+                                Unggah gambar kop surat untuk digunakan pada
+                                surat tagihan yang dicetak maupun dikirim.
+                            </p>
+
+                        </div>
                     @endif
-                    
+
                     <div class="mb-3">
-                        <label for="foto_kop" class="form-label">Unggah Foto Kop Baru</label>
-                        <input type="file" class="form-control" id="foto_kop" wire:model="foto_kop" accept="image/*">
-                        @error('foto_kop') 
-                            <footer class="text-danger mt-0">{{ $message }}</footer> 
+                        <label for="foto_kop" class="form-label fw-medium">
+                            Upload Foto Kop
+                        </label>
+
+                        <input type="file"
+                            class="form-control"
+                            id="foto_kop"
+                            wire:model="foto_kop"
+                            accept="image/*">
+
+                        <small class="text-muted">
+                            Format yang didukung: JPG, JPEG, PNG. Disarankan rasio landscape dengan resolusi tinggi.
+                        </small>
+
+                        @error('foto_kop')
+                            <div class="text-danger mt-1 small">
+                                {{ $message }}
+                            </div>
                         @enderror
                     </div>
                     
@@ -198,9 +250,15 @@
                     @endfor
                 
                 </div>
-                <div class="modal-footer">
-                    <a href="javascript:void(0);" class="btn btn-link link-success shadow-none fw-medium" data-bs-dismiss="modal"><i class="ri-close-line me-1 align-middle"></i> Tutup</a>
-                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                <div class="modal-footer border-0 px-4 pb-4 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">
+                        <i class="ri-close-line me-1"></i>
+                        Tutup
+                    </button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4">
+                        <i class="ri-save-3-line me-1"></i>
+                        Simpan
+                    </button>
                 </div>
             </form>
         </div>

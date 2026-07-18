@@ -126,7 +126,7 @@
                             </td>
                             
                             <td>
-                                <span class="fs-12 fw-medium text-info">
+                                <span class="fs-12 fw-medium text-primary">
                                     RP{{ number_format($item->total_tagihan ?? 0, 0, ',', '.') }}
                                 </span>
                             </td>
@@ -204,7 +204,7 @@
                             <td class="text-start"><strong>TOTAL</strong></td>
                             <td>{{ $totalSiswa }} item</td>
                             <td>
-                                <span class="fs-12 fw-medium text-info">
+                                <span class="fs-12 fw-medium text-primary">
                                     RP{{ number_format($totalEstimasi, 0, ',', '.') }}
                                 </span>
                             </td>

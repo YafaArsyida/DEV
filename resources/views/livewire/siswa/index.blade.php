@@ -24,20 +24,57 @@
     
             {{-- ACTION --}}
             @if ($selectedJenjang && $selectedTahunAjar)
-            <div class="d-flex gap-2 flex-wrap">
-                @if ($siswaSelected)
-                    <button href="#ModalBulkDeleteSiswa" data-bs-toggle="modal" class="btn rounded-pill px-4 btn-soft-danger d-inline-flex align-items-center gap-1" wire:click.prevent="$emit('confirmBulkDelete', {{ json_encode($siswaSelected) }})">
-                        <i class="ri-delete-bin-2-line me-1 align-bottom"></i> Hapus {{ count($siswaSelected) }}
+            <div class="d-flex align-items-center flex-wrap gap-2">
+                {{-- PRIMARY ACTION --}}
+                <button data-bs-toggle="modal" data-bs-target="#ModalAddSiswa"
+                    wire:click.prevent="$emit('showCreateSiswa', {{ $selectedJenjang }}, {{ $selectedTahunAjar }})"
+                    class="btn btn-primary rounded-pill px-4">
+                    <i class="ri-play-list-add-line me-1"></i>
+                    Siswa Baru
+                </button>
+
+                {{-- IMPORT SISWA --}}
+                <button data-bs-toggle="modal" data-bs-target="#ModalImportSiswa"
+                    wire:click.prevent="$emit('showImportSiswa', {{ $selectedJenjang }}, {{ $selectedTahunAjar }})"
+                    class="btn btn-secondary rounded-pill px-4">
+                    <i class="ri-contacts-line me-1"></i>
+                    Import Siswa
+                </button>
+
+                {{-- EXPORT --}}
+                <button data-bs-toggle="modal" data-bs-target="#ModalIndexSiswa"
+                    class="btn btn-soft-success rounded-pill px-4">
+                    <i class="ri-file-excel-2-line me-1"></i>
+                    Export
+                </button>
+
+                @if ($selectedKelas)
+                    {{-- IMPORT TELEPON --}}
+                    <button data-bs-toggle="modal" data-bs-target="#ModalImportTelepon"
+                        wire:click.prevent="$emit('showImportTelepon', {{ $selectedKelas }}, {{ $selectedJenjang }}, {{ $selectedTahunAjar }})"
+                        class="btn btn-soft-success rounded-pill px-4">
+                        <i class="ri-whatsapp-line me-1"></i>
+                        Import Telepon
+                    </button>
+
+                    {{-- IMPORT EDUCARD --}}
+                    <button data-bs-toggle="modal" data-bs-target="#ModalImportEduCard"
+                        wire:click.prevent="$emit('showImportEduCard', {{ $selectedKelas }}, {{ $selectedJenjang }}, {{ $selectedTahunAjar }})"
+                        class="btn btn-soft-warning rounded-pill px-4">
+                        <i class="ri-bank-card-line me-1"></i>
+                        Import EduCard
                     </button>
                 @endif
-                @if ($selectedKelas)
-                    <button data-bs-toggle="modal" data-bs-target="#ModalImportTelepon" wire:click.prevent="$emit('showImportTelepon', {{ $selectedKelas }}, {{ $selectedJenjang }}, {{ $selectedTahunAjar }})" class="btn rounded-pill px-4 btn-success"><i class="ri-whatsapp-line me-1 align-bottom"></i> Import Telepon</button>                        
-                    <button data-bs-toggle="modal" data-bs-target="#ModalImportEduCard" wire:click.prevent="$emit('showImportEduCard', {{ $selectedKelas }}, {{ $selectedJenjang }}, {{ $selectedTahunAjar }})"  class="btn rounded-pill px-4 btn-warning"><i class="ri-bank-card-line me-1 align-bottom"></i> Import EduCard</button>                        
-                @endif
 
-                <button data-bs-toggle="modal" data-bs-target="#ModalImportSiswa" wire:click.prevent="$emit('showImportSiswa', {{ $selectedJenjang }}, {{ $selectedTahunAjar }})"  class="btn rounded-pill px-4 btn-secondary"><i class="ri-contacts-line me-1 align-bottom"></i> Import Siswa</button>
-                <button data-bs-toggle="modal" data-bs-target="#ModalAddSiswa" wire:click.prevent="$emit('showCreateSiswa', {{ $selectedJenjang }}, {{ $selectedTahunAjar }})" class="btn rounded-pill px-4 btn-primary"><i class="ri-play-list-add-line me-1 align-bottom"></i> Siswa Baru</button>
-                <button data-bs-toggle="modal" data-bs-target="#ModalExportSiswa" class="btn rounded-pill px-4 btn-soft-success"><i class="ri-file-excel-2-line me-1 align-bottom"></i> Export</button>
+                {{-- DELETE --}}
+                @if ($siswaSelected)
+                    <button href="#ModalBulkDeleteSiswa" data-bs-toggle="modal"
+                        wire:click.prevent="$emit('confirmBulkDelete', {{ json_encode($siswaSelected) }})"
+                        class="btn btn-soft-danger rounded-pill px-4 ms-auto d-inline-flex align-items-center">
+                        <i class="ri-delete-bin-2-line me-1"></i>
+                        Hapus {{ count($siswaSelected) }}
+                    </button>
+                @endif
             </div>
             @endif
         </div>
@@ -93,7 +130,7 @@
                 </div>
             @else
             <div class="table-responsive">
-                <table class="table table-hover table-nowrap align-middle" style="width:100%">
+                <table id="DataIndexSiswa" class="table table-hover table-nowrap align-middle" style="width:100%">
                     <thead class="table-light">
                         <tr>
                             <th scope="col" style="width: 50px;">
@@ -209,4 +246,134 @@
         </div>
         {{-- DATA --}}
     </div>
+    {{-- MODAL --}}
+    <div class="modal fade" id="ModalIndexSiswa" tabindex="-1" aria-labelledby="exportRecordLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                {{-- CLOSE BUTTON --}}
+                <div class="modal-header border-0 pb-0">
+                    <button type="button" class="btn btn-light btn-icon rounded-circle ms-auto" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="ri-close-line fs-18"></i>
+                    </button>
+                </div>
+
+                {{-- BODY --}}
+                <div class="modal-body px-4 pb-5 pt-2 text-center">
+                    {{-- ICON --}}
+                    <div class="mb-4">
+                        <div class="avatar-xl mx-auto">
+                            <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
+                                <lord-icon src="https://cdn.lordicon.com/fjvfsqea.json"
+                                    trigger="loop" colors="primary:#405189,secondary:#0ab39c"
+                                    style="width:70px;height:70px">
+                                </lord-icon>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- TITLE --}}
+                    <div class="mb-2">
+                        <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill mb-3">
+                            Konfirmasi Export
+                        </span>
+
+                        <h3 class="fw-bold mb-2" id="exportRecordLabel">
+                            Export Administrasi Siswa?
+                        </h3>
+
+                        <p class="text-muted mb-0 lh-lg px-lg-4">
+                            Data yang diekspor akan mengikuti filter dan tabel yang
+                            sedang ditampilkan, sehingga hasil export sesuai dengan
+                            data yang Anda lihat saat ini.
+                        </p>
+
+                    </div>
+
+                    {{-- INFORMATION --}}
+                    <div class="alert alert-light border rounded-4 text-start mt-4 mb-0">
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="flex-shrink-0">
+                                <i class="ri-information-line text-primary fs-20"></i>
+                            </div>
+
+                            <div>
+                                <h6 class="fw-semibold mb-1">
+                                    Informasi
+                                </h6>
+                                <p class="text-muted mb-0 fs-13">
+                                    Pastikan filter jenjang, tahun ajar, kelas, maupun
+                                    pencarian sudah sesuai sebelum melakukan export.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- FOOTER --}}
+                <div class="modal-footer border-0 pt-0 px-4 pb-4 justify-content-center">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">
+                        <i class="ri-close-line me-1"></i>
+                        Batal
+                    </button>
+
+                    <button type="button" class="btn btn-primary rounded-pill px-4"
+                        id="ExportIndexSiswa" data-bs-dismiss="modal">
+                        <i class="ri-download-2-line me-1"></i>
+                        Ya, Export
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('ExportIndexSiswa').addEventListener('click', function () {
+            alertify.success("Menyiapkan Dokumen");
+
+            setTimeout(function () {
+                var table = document.getElementById("DataIndexSiswa");
+
+                var data = [];
+                // Kolom yang ingin diexport (NO=0, Siswa=1, Kelas=2, Tagihan=3, Estimasi=4, Dibayarkan=5, Kekurangan=6, Lunas=7)
+                var exportCols = [1,3,4,5,6];
+
+                // Ambil header
+                var headers = [];
+                for(var i=0; i<exportCols.length; i++){
+                    headers.push(table.tHead.rows[0].cells[exportCols[i]].innerText.trim());
+                }
+                data.push(headers);
+
+                // Ambil data tbody
+                for(var i=0; i<table.tBodies[0].rows.length; i++){
+                    var row = table.tBodies[0].rows[i];
+                    var rowData = [];
+                    for(var j=0; j<exportCols.length; j++){
+                        rowData.push(row.cells[exportCols[j]].innerText.trim());
+                    }
+                    data.push(rowData);
+                }
+
+                // Ambil data tfoot (jika ada)
+                if(table.tFoot){
+                    for(var i=0; i<table.tFoot.rows.length; i++){
+                        var row = table.tFoot.rows[i];
+                        var rowData = [];
+                        for(var j=0; j<exportCols.length; j++){
+                            rowData.push(row.cells[exportCols[j]].innerText.trim());
+                        }
+                        data.push(rowData);
+                    }
+                }
+
+                // Buat workbook
+                var wb = XLSX.utils.book_new();
+                var ws = XLSX.utils.aoa_to_sheet(data);
+                XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+                XLSX.writeFile(wb, "Laporan-Administrasi-Siswa.xlsx");
+
+            }, 1000);
+        });
+
+    </script>
 </div>

@@ -89,7 +89,7 @@ class Index extends Component
         // PENDAPATAN: akun kode 4%
         $pendapatanPerBulan = AkuntansiJurnalDetail::with('akuntansi_rekening')
             ->where('ms_jenjang_id', $this->selectedJenjang)
-            ->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
+            // ->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
             ->where('posisi', 'kredit')
             ->when($this->startDate && $this->endDate, function ($query) {
                 $startDate = Carbon::createFromFormat('Y-m-d', $this->startDate)->startOfDay();
@@ -110,7 +110,7 @@ class Index extends Component
         // BEBAN: akun kode 5%
         $bebanPerBulan = AkuntansiJurnalDetail::with('akuntansi_rekening')
             ->where('ms_jenjang_id', $this->selectedJenjang)
-            ->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
+            // ->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
             ->where('posisi', 'debit')
             ->when($this->startDate && $this->endDate, function ($query) {
                 $startDate = Carbon::createFromFormat('Y-m-d', $this->startDate)->startOfDay();

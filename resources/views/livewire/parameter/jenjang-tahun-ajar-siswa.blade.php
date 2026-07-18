@@ -100,7 +100,7 @@
                         </div>
                     @else
                         <div class="table-responsive">
-                            <table class="table table-bordered table-striped table-hover nowrap align-middle" style="width:100%">
+                            <table class="table table-nowrap table-bordered table-striped table-hover nowrap align-middle" style="width:100%">
                                 <thead class="table-light">
                                     <tr class="text-uppercase" style="white-space: nowrap;">
                                         <th class="text-center">no</th>
@@ -110,7 +110,7 @@
                                 </thead>
                                 <tbody>
                                     @forelse ($siswa as $item)
-                                        <tr style="white-space: nowrap;">
+                                        <tr>
                                             <td class="text-center">{{ $loop->iteration }}</td>
                                             <td>
                                                 <span class="fw-medium" style="white-space: nowrap;">

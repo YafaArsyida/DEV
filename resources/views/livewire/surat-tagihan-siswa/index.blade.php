@@ -1,33 +1,90 @@
-<div wire:ignore.self class="offcanvas offcanvas-top" id="suratTagihan" aria-labelledby="suratTagihanLabel" style="min-height:100vh;">
-    <div class="offcanvas-header border-bottom">
-        <h5 class="offcanvas-title" id="suratTagihanLabel">Format Surat Tagihan</h5>
-        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+<div wire:ignore.self class="offcanvas offcanvas-top bg-light" id="suratTagihan" aria-labelledby="suratTagihanLabel" style="min-height:100vh;">
+    <div class="offcanvas-header border-bottom px-4 py-3 shadow-sm">
+        <div class="d-flex justify-content-between align-items-start w-100">
+            <!-- Kiri -->
+            <div class="d-flex align-items-center gap-3">
+                <div class="avatar-sm">
+                    <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-18">
+                        <i class="ri-file-chart-line"></i>
+                    </div>
+                </div>
+
+                <div>
+                    <h5 class="fw-bold mb-1">
+                        Format Surat Tagihan Siswa
+                    </h5>
+                </div>
+            </div>
+            <!-- Kanan -->
+            <button type="button"
+                class="btn btn-light btn-icon rounded-circle shadow-none"
+                data-bs-dismiss="offcanvas">
+                <i class="ri-close-line fs-18"></i>
+            </button>
+        </div>
     </div>
     <div class="offcanvas-body">
         <div class="row justify-content-center">
             <div class="col-xxl-6">
-                <div class="card">
-                    <div class="card-header align-items-center d-flex">
-                        <h4 class="card-title mb-0">Surat Tagihan Siswa</h4>   
-                        <div class="ms-auto"> <!-- Menambahkan ms-auto untuk mendorong ke kanan -->
-                            <div class="dropdown">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div class="card-header">
+                        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4">
+
+                            {{-- TITLE --}}
+                            <div>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="avatar-sm">
+                                        <div class="avatar-title bg-warning-subtle text-warning rounded-circle fs-20">
+                                            <i class="ri-mail-send-line"></i>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <h5 class="fw-bold mb-1">
+                                            Surat Tagihan Siswa
+                                        </h5>
+                                        <small class="text-muted">
+                                            Atur format dan isi surat tagihan yang akan dicetak maupun dikirim kepada wali siswa.
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- ACTION --}}
+                            <div class="d-flex gap-2 flex-wrap">
+
                                 @if ($selectedJenjang)
                                     @if (!$surat)
-                                        <a href="#createSuratTagihan" data-bs-toggle="modal" class="btn btn-ghost-secondary btn-icon shadow-none" wire:click="$emit('createSuratTagihan', {{ $selectedJenjang }})">
-                                            <i class="ri-settings-5-line fs-20" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Setting Surat"></i>
-                                        </a>
+                                        <button
+                                            type="button"
+                                            class="btn btn-primary rounded-pill px-4 d-inline-flex align-items-center gap-1"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#createSuratTagihan"
+                                            wire:click="$emit('createSuratTagihan', {{ $selectedJenjang }})">
+
+                                            <i class="ri-add-line"></i>
+                                            <span>Buat Surat</span>
+                                        </button>
                                     @else
-                                    <a href="#editSuratTagihan" data-bs-toggle="modal" class="btn btn-ghost-secondary btn-icon shadow-none" 
-                                    wire:click="$emit('loadSuratTagihan', {{ $surat->ms_surat_tagihan_siswa_id }}, {{ $selectedJenjang }})">
-                                        <i class="ri-quill-pen-line fs-20" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Edit Surat"></i>
-                                    </a>
+                                        <button
+                                            type="button"
+                                            class="btn btn-primary rounded-pill px-4 d-inline-flex align-items-center gap-1"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editSuratTagihan"
+                                            wire:click="$emit('loadSuratTagihan', {{ $surat->ms_surat_tagihan_siswa_id }}, {{ $selectedJenjang }})">
+
+                                            <i class="ri-quill-pen-line"></i>
+                                            <span>Edit Surat</span>
+                                        </button>
                                     @endif
                                 @endif
+
                             </div>
+
                         </div>
                     </div>
                     @if ($surat)
-                    <div class="card-body p-4 bg-white mb-2">
+                    <div class="card-body p-4 bg-white">
                         <div class="text-center mb-0">
                             @if($surat->foto_kop)
                                 <img src="{{ Storage::url($surat->foto_kop) }}" alt="Kop Surat" class="img-fluid" style="max-width: 100%; height: auto;">
@@ -110,6 +167,7 @@
                             </table>
                         </div>
                     </div>
+                    <hr>
                     <div class="card-body p-4 bg-white">
                         <div class="text-center mb-0">
                             <img src="{{ Storage::url($surat->foto_kop) }}" alt="Kop Surat" class="img-fluid" style="max-width: 100%; height: auto;">
@@ -166,8 +224,38 @@
                         </div>
                     </div>
                     @else
-                    <div class="card-body p4 bg-white mb-2 text-center">
-                        <h3 class="p-4 text-black" style="font-family: 'Times New Roman', Times, serif; font-size: 12pt;">Template surat belum di atur untuk jenjang ini.</h3>
+                    <div class="card-body py-5">
+                        <div class="text-center">
+
+                            <div class="avatar-lg mx-auto mb-4">
+                                <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-1">
+                                    <i class="ri-file-warning-line"></i>
+                                </div>
+                            </div>
+
+                            <h5 class="fw-semibold mb-2">
+                                Template Surat Belum Tersedia
+                            </h5>
+
+                            <p class="text-muted mb-4 mx-auto" style="max-width: 500px;">
+                                Belum ada template surat tagihan untuk jenjang yang dipilih.
+                                Silakan buat atau atur template terlebih dahulu agar surat tagihan
+                                dapat dicetak maupun dikirim kepada wali siswa.
+                            </p>
+
+                            @if($selectedJenjang)
+                                <button
+                                    type="button"
+                                    class="btn btn-primary rounded-pill px-4"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#createSuratTagihan"
+                                    wire:click="$emit('createSuratTagihan', {{ $selectedJenjang }})">
+                                    <i class="ri-add-line me-1"></i>
+                                    Buat Template Surat
+                                </button>
+                            @endif
+
+                        </div>
                     </div>
                     @endif
                 </div>

@@ -1,39 +1,51 @@
 {{-- If your happiness depends on money, you will never be happy with yourself. --}}
-<div class="card mb-1">
-    <div class="card-header border-0 pb-0">
-        <div class="d-flex align-items-center">
-            <h5 class="card-title mb-0 flex-grow-1">Rangkuman Pembayaran Siswa</h5>
-            @if ($selectedJenjang && $selectedTahunAjar)
-            <div class="flex-shrink-0">
-                <div class="d-flex gap-2 flex-wrap">
-                    {{-- <button wire:click="cetakOverviewPembayaran" class="btn btn-danger d-inline-flex align-items-center gap-1">
-                        <i class="ri-printer-line align-bottom"></i>
-                        <span>Cetak</span>
-                    </button> --}}
-                    <button data-bs-toggle="modal" data-bs-target="#ExportOverviewExcel" class="btn btn-soft-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button>
-                    {{-- <button data-bs-toggle="modal" data-bs-target="#ExportOverviewPembayaran" wire:click.prevent="showExportOverviewPembayaran"  class="btn btn-soft-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button> --}}
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card-header">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4">
+            {{-- TITLE --}}
+            <div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-sm">
+                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                            <i class="ri-calendar-event-line">
+                            </i>
+                        </div>
+                    </div>
+    
+                    <div>
+                        <h5 class="fw-bold mb-1">
+                            Overview
+                        </h5>
+                        <small>
+                            Rangkuman Pembayaran Siswa
+                        </small>
+                    </div>
                 </div>
+            </div>
+    
+            {{-- ACTION --}}
+            @if ($selectedJenjang && $selectedTahunAjar)
+            <div class="d-flex gap-2 flex-wrap">
+                <button data-bs-toggle="modal" data-bs-target="#ExportOverviewExcel" class="btn rounded-pill px-4 btn-soft-success"><i class="ri-file-excel-2-line me-1 align-bottom"></i> Export</button>
             </div>
             @endif
         </div>
     </div>
     <div class="card-body">
-        <div class="mb-3">
-            <div class="row g-2 align-items-center">
-                <!-- Label di sisi kiri -->
-                <div class="col-xxl-12">
-                    <label class="form-label fw-semibold">Periode</label>
-                    <div class="d-flex align-items-center gap-2">
-                        <input type="date" class="form-control" wire:model="startDate">
-                        <span class="text-muted">–</span>
-                        <input type="date" class="form-control" wire:model="endDate">
-                        <button type="button" class="btn btn-soft-secondary" wire:click="resetTanggal" title="Reset Tanggal">
-                            <i class="ri-refresh-line"></i>
-                        </button>
-                    </div>
+        <div class="row g-2 align-items-center mb-3">
+            <!-- Label di sisi kiri -->
+            <div class="col-xxl-12">
+                <label class="form-label fw-semibold">Periode</label>
+                <div class="d-flex align-items-center gap-2">
+                    <input type="date" class="form-control" wire:model="startDate">
+                    <span class="text-muted">–</span>
+                    <input type="date" class="form-control" wire:model="endDate">
+                    <button type="button" class="btn btn-soft-secondary" wire:click="resetTanggal" title="Reset Tanggal">
+                        <i class="ri-refresh-line"></i>
+                    </button>
                 </div>
             </div>
-        </div>        
+        </div>     
         {{-- DATA --}}
         <div class="live-preview">
             @if (!$selectedJenjang || !$selectedTahunAjar)
@@ -69,7 +81,7 @@
                             <tr>
                                 <td style="width: 50px">{{ $loop->iteration }}.</td>
                                 <td class="text-uppercase">{{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($month['bulan'], 'F Y') }}</td>
-                                <td class="text-end fs-14 text-success">RP{{ number_format($month['total'], 0, ',', '.') }}</td>
+                                <td class="text-end fs-12 fw-medium text-success">RP{{ number_format($month['total'], 0, ',', '.') }}</td>
                             </tr>
                         @empty
                             <tr>
@@ -81,7 +93,7 @@
                         <tr class="fw-bold">
                             <td></td>
                             <td>TOTAL</td>
-                            <td class="text-end fs-14 text-success">RP{{ number_format($totalMonths, 0, ',', '.') }}</td>
+                            <td class="text-end fs-12 text-success">RP{{ number_format($totalMonths, 0, ',', '.') }}</td>
                         </tr>
                     </tbody>
 
@@ -99,7 +111,7 @@
                             <tr>
                                 <td style="width: 50px">{{ $loop->iteration }}.</td>
                                 <td class="text-uppercase">{{ $item['metode'] }}</td>
-                                <td class="text-end fs-14 text-success">RP{{ number_format($item['total'], 0, ',', '.') }}</td>
+                                <td class="text-end fs-12 fw-medium text-success">RP{{ number_format($item['total'], 0, ',', '.') }}</td>
                             </tr>
                         @empty
                             <tr>
@@ -111,7 +123,7 @@
                         <tr class="fw-bold">
                             <td></td>
                             <td>TOTAL</td>
-                            <td class="text-end fs-14 text-success">RP{{ number_format($totalMethods, 0, ',', '.') }}</td>
+                            <td class="text-end fs-12 text-success">RP{{ number_format($totalMethods, 0, ',', '.') }}</td>
                         </tr>
                     </tbody>
 
@@ -129,7 +141,7 @@
                             <tr>
                                 <td style="width: 50px">{{ $loop->iteration }}.</td>
                                 <td class="text-uppercase">{{ $class['nama_kelas'] }}</td>
-                                <td class="text-end fs-14 text-success">RP{{ number_format($class['total'], 0, ',', '.') }}</td>
+                                <td class="text-end fs-12 fw-medium text-success">RP{{ number_format($class['total'], 0, ',', '.') }}</td>
                             </tr>
                         @empty
                             <tr>
@@ -141,7 +153,7 @@
                         <tr class="fw-bold">
                             <td></td>
                             <td>TOTAL</td>
-                            <td class="text-end text-success fs-14">RP{{ number_format($totalClasses, 0, ',', '.') }}</td>
+                            <td class="text-end text-success fs-12">RP{{ number_format($totalClasses, 0, ',', '.') }}</td>
                         </tr>
                     </tbody>
 
@@ -163,7 +175,7 @@
                     <lord-icon src="https://cdn.lordicon.com/fjvfsqea.json" trigger="loop" colors="primary:#405189,secondary:#f06548" style="width:90px;height:90px"></lord-icon>
                     <div class="mt-4 text-center">
                         <h4 class="fs-semibold">Konfirmasi Export</h4>
-                        <p class="text-muted fs-14 mb-4 pt-1">
+                        <p class="text-muted fs-12 mb-4 pt-1">
                             Apakah Anda yakin ingin mengekspor Overview Pembayaran Tagihan Siswa? Data yang diekspor akan sesuai dengan tabel yang ditampilkan.
                         </p>
                         <div class="hstack gap-2 justify-content-center remove">

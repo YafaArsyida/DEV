@@ -15,7 +15,7 @@ class DataTransaksi extends Component
     public $startDate = null;
     public $endDate = null;
 
-    public $search;
+    public $search = '';
 
     public $select_transaksi = [];
 
@@ -136,7 +136,7 @@ class DataTransaksi extends Component
             ]))
 
             ->orderBy('tanggal', 'ASC')
-            ->get()
+            ->get()            
 
             ->map(function ($item) use (&$saldo) {
                 $saldo += $item->nominal;

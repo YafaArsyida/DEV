@@ -14,6 +14,8 @@ class Index extends Component
     use WithPagination;
     protected $paginationTheme = 'bootstrap'; // Menggunakan tema Bootstrap untuk paginasi
 
+    public $perPage = 50;
+
     public $selectedJenjang = null;
     public $selectedTahunAjar = null;
     public $selectedKelas = null;
@@ -81,7 +83,7 @@ class Index extends Component
 
     public function updatingSearch()
     {
-        $this->resetPage(); // Reset paginasi saat pencarian berubah
+        $this->resetPage(); // Reset pagination ketika pencarian berubah
     }
 
     public function cetakLaporan()
@@ -164,7 +166,7 @@ class Index extends Component
         $totalSaldo = $totalKredit - $totalDebit;
 
         // Ambil data transaksi yang telah difilter
-        $laporan = $query->paginate(50);
+        $laporan = $query->paginate($this->perPage);
 
         return view('livewire.laporan-tabungan-siswa.index', [
             'select_kelas' => $select_kelas,

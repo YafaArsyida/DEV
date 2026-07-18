@@ -27,7 +27,7 @@
                     <i class="ri-add-line me-1"></i>Import Jenis Tagihan
                 </button>
                 <button type="button" class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#ModalAddJenisTagihan" wire:click.prevent="$emit('showCreateJenis', {{ $selectedJenjang }}, {{ $selectedTahunAjar }})">
-                    <i class="ri-add-line me-1"></i>Tambah Jenis Tagihan
+                    <i class="ri-add-line me-1"></i>Jenis Tagihan Baru
                 </button>
             </div>
             @endif

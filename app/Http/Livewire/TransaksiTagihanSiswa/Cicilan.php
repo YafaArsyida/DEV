@@ -12,7 +12,7 @@ use Illuminate\Validation\ValidationException;
 class Cicilan extends Component
 {
     public $tagihan;
-    public $jumlah_bayar;
+    public $jumlah_bayar = 0;
 
     protected $listeners = [
         'loadCicilan' => 'loadCicilan',
@@ -24,7 +24,7 @@ class Cicilan extends Component
             ->where('ms_tagihan_siswa_id', $ms_tagihan_siswa_id)
             ->first();
 
-        $this->jumlah_bayar = null;
+        $this->jumlah_bayar = 0;
 
         if (!$this->tagihan) {
             throw new \Exception('Tagihan tidak ditemukan!');

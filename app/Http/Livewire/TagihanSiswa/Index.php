@@ -20,7 +20,7 @@ class Index extends Component
     protected $paginationTheme = 'bootstrap'; // Menggunakan tema Bootstrap untuk paginasi
 
     public $search = '';
-    public $perPage = 10;
+    public $perPage = 50;
 
     public $selectedJenjang = null;
     public $selectedTahunAjar = null;

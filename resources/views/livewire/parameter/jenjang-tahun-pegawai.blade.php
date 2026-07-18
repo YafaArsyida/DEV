@@ -41,9 +41,32 @@
     </div>
 
     <div wire:ignore.self class="offcanvas offcanvas-end" id="offcanvasPegawai" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" aria-labelledby="offcanvasPegawaiLabel">
-        <div class="offcanvas-header border-bottom">
-            <h5 class="offcanvas-title" id="offcanvasPegawaiLabel">Data Pegawai Tersedia</h5>
-            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        <div class="offcanvas-header border-bottom px-4 py-3 shadow-sm">
+            <div class="d-flex justify-content-between align-items-start w-100">
+                <!-- Kiri -->
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-sm">
+                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-18">
+                            <i class="ri-file-chart-line"></i>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h5 class="fw-bold mb-1">
+                            Data Pegawai
+                        </h5>
+                        {{-- <small class="text-muted">
+                            Lakukan pencarian data siswa 
+                        </small> --}}
+                    </div>
+                </div>
+                <!-- Kanan -->
+                <button type="button"
+                    class="btn btn-light btn-icon rounded-circle shadow-none"
+                    data-bs-dismiss="offcanvas">
+                    <i class="ri-close-line fs-18"></i>
+                </button>
+            </div>
         </div>
         <div class="offcanvas-body">
             <div class="row g-3 mb-3">
@@ -54,73 +77,88 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xl-12">
-                <div class="mt-4">
-                    <div class="live-preview">
-                        <!-- Jika Jenjang belum dipilih -->
-                        @if (!$selectedJenjang)
-                            <div class="text-center py-4">
-                                <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop"
-                                    colors="primary:#405189,secondary:#08a88a"
-                                    style="width:75px;height:75px">
-                                </lord-icon>
-                                <h5 class="mt-2">Silakan Pilih Jenjang</h5>
-                                <p class="text-muted mb-0">Untuk melihat data pegawai, harap pilih Jenjang terlebih dahulu.</p>
-                            </div>
-                        @else
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-striped table-hover nowrap align-middle" style="width:100%">
-                                    <thead class="table-light">
+            <div class="col-xl-12 mt-3">
+                <div class="live-preview">
+                    <!-- Jika Jenjang belum dipilih -->
+                    @if (!$selectedJenjang)
+                        <div class="text-center py-4">
+                            <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop"
+                                colors="primary:#405189,secondary:#08a88a"
+                                style="width:75px;height:75px">
+                            </lord-icon>
+                            <h5 class="mt-2">Silakan Pilih Jenjang</h5>
+                            <p class="text-muted mb-0">Untuk melihat data pegawai, harap pilih Jenjang terlebih dahulu.</p>
+                        </div>
+                    @else
+                        <div class="table-responsive">
+                            <table class="table table-nowrap table-bordered table-striped table-hover nowrap align-middle" style="width:100%">
+                                <thead class="table-light">
+                                    <tr class="text-uppercase">
+                                        <th class="text-center">no</th>
+                                        <th>Pegawai</th>
+                                        <th class="text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($pegawais as $pegawai)
                                         <tr>
-                                            <th class="text-uppercase">#</th>
-                                            <th class="text-uppercase">Pegawai</th>
-                                            <th class="text-uppercase">Aksi</th>
+                                            <td class="text-center">{{ $loop->iteration }}</td>
+                                            <td>
+                                                <span class="fw-medium" style="white-space: nowrap;">
+                                                    {{ $pegawai->nama_pegawai }}
+                                                </span>
+                                                <p class="text-muted mb-0">
+                                                    {{ $pegawai->ms_jabatan->nama_jabatan ?? 'Tidak ada jabatan' }}
+                                                </p>
+                                            </td>
+                                            <td class="text-center">
+                                                <a title="Pilih Pegawai" wire:click="$emit('pegawaiSelected', {{ $pegawai->ms_pegawai_id }})" class="btn btn-primary btn-sm rounded-pill px-3" data-bs-dismiss="offcanvas">
+                                                    <i class="ri-checkbox-circle-line me-1"></i> Pilih
+                                                </a>
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse ($pegawais as $pegawai)
-                                            <tr>
-                                                <td>{{ $loop->iteration }}</td>
-                                                <td>
-                                                    <div>
-                                                        <h5 class="fs-13 mb-0">{{ $pegawai->nama_pegawai }}</h5>
-                                                        <p class="fs-12 mb-0 text-muted">
-                                                            {{ $pegawai->ms_jabatan->nama_jabatan ?? 'Tidak ada jabatan' }}
-                                                        </p>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <ul class="list-inline hstack gap-2 mb-0">
-                                                        <li class="list-inline-item detail" data-bs-toggle="tooltip" 
-                                                            data-bs-trigger="hover" data-bs-placement="top" title="Pilih Pegawai">
-                                                            <button wire:click="$emit('pegawaiSelected', {{ $pegawai->ms_pegawai_id }})" class="btn btn-primary d-inline-block detail-item-btn" data-bs-dismiss="offcanvas">
-                                                                <i class="ri-checkbox-circle-line align-bottom"></i> Pilih
-                                                            </button>
-                                                        </li>
-                                                    </ul>
-                                                </td>
-                                            </tr>
-                                        @empty
-                                            <!-- Jika Tidak Ada Data Pegawai -->
-                                            <tr>
-                                                <td colspan="3">
-                                                    <div class="noresult text-center py-3">
-                                                        <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop"
-                                                            colors="primary:#405189,secondary:#08a88a"
-                                                            style="width:75px;height:75px">
-                                                        </lord-icon>
-                                                        <h5 class="mt-2">Maaf, Tidak Ada Data yang Ditemukan</h5>
-                                                        <p class="text-muted mb-0">Kami telah mencari keseluruhan data, namun tidak ditemukan hasil yang sesuai.</p>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                                {{ $pegawais->links() }}
+                                    @empty
+                                        <!-- Jika Tidak Ada Data Pegawai -->
+                                        <tr>
+                                            <td colspan="3">
+                                                <div class="noresult text-center py-3">
+                                                    <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop"
+                                                        colors="primary:#405189,secondary:#08a88a"
+                                                        style="width:75px;height:75px">
+                                                    </lord-icon>
+                                                    <h5 class="mt-2">Maaf, Tidak Ada Data yang Ditemukan</h5>
+                                                    <p class="text-muted mb-0">Kami telah mencari keseluruhan data, namun tidak ditemukan hasil yang sesuai.</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                            {{-- PAGINATION --}}
+                            <div class="mt-3">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                    <div class="text-muted fs-13">
+                                        Menampilkan
+                                        <span class="fw-semibold">
+                                            {{ $pegawais->firstItem() ?? 0 }}
+                                        </span>
+                                        -
+                                        <span class="fw-semibold">
+                                            {{ $pegawais->lastItem() ?? 0 }}
+                                        </span>
+                                        dari
+                                        <span class="fw-semibold">
+                                            {{ $pegawais->total() }}
+                                        </span>
+                                        data pegawai
+                                    </div>
+                                    <div>
+                                        {{ $pegawais->links() }}
+                                    </div>
+                                </div>
                             </div>
-                        @endif
-                    </div>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

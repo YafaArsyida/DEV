@@ -30,11 +30,11 @@ class DataPegawai extends Component
 
     // save topup
     public $jenis_transaksi_topup = 'topup tunai';
-    public $nominal_topup;
+    public $nominal_topup = 0;
     public $deskripsi_topup;
 
     // save penarikan
-    public $nominal_penarikan;
+    public $nominal_penarikan = 0;
     public $deskripsi_penarikan;
 
     protected $listeners = [
@@ -221,6 +221,8 @@ class DataPegawai extends Component
         DB::beginTransaction();
 
         try {
+            $this->nominal_topup = $this->normalizeAmount($this->nominal_topup);
+
             $this->validate([
                 'nominal_topup' => 'required|numeric|min:1000',
                 'deskripsi_topup' => 'nullable|string|max:255',
@@ -264,6 +266,7 @@ class DataPegawai extends Component
         DB::beginTransaction();
 
         try {
+            $this->nominal_penarikan = $this->normalizeAmount($this->nominal_penarikan);
             $this->validate([
                 'nominal_penarikan' => 'required|numeric|min:1000',
                 'deskripsi_penarikan' => 'nullable|string|max:255',
@@ -307,5 +310,13 @@ class DataPegawai extends Component
     public function render()
     {
         return view('livewire.transaksi-edu-pay-pegawai.data-pegawai');
+    }
+    private function normalizeAmount($value)
+    {
+        if ($value === null || $value === '') {
+            return 0;
+        }
+
+        return (int) str_replace('.', '', $value);
     }
 }

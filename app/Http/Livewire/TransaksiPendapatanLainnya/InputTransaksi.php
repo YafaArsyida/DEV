@@ -12,7 +12,10 @@ class InputTransaksi extends Component
 {
     public $selectedJenjang = null;
 
-    public $nominal, $kode_rekening, $metode_pembayaran = 'tunai', $deskripsi;
+    public $nominal = 0;
+    public $kode_rekening;
+    public $metode_pembayaran = 'tunai';
+    public $deskripsi;
 
     public $select_transaksi = [];
     public $totalPendapatanLainnya = 0;
@@ -50,6 +53,8 @@ class InputTransaksi extends Component
         DB::beginTransaction();
 
         try {
+            $this->nominal = $this->normalizeAmount($this->nominal);
+
             $this->validate([
                 'kode_rekening' => 'required',
                 'nominal' => 'required|numeric|min:1000',
@@ -133,10 +138,10 @@ class InputTransaksi extends Component
             // ======================
             // RESET & FEEDBACK
             // ======================
-            $this->reset(['nominal', 'deskripsi']);
+            $this->reset(['deskripsi']);
             $this->loadData();
 
-            $this->emit('refreshTransaksiPendapatanLainnya');
+            $this->emit('refreshTransaksi');
             $this->dispatchBrowserEvent('alertify-success', [
                 'message' => 'Transaksi berhasil disimpan.'
             ]);
@@ -152,5 +157,13 @@ class InputTransaksi extends Component
     public function render()
     {
         return view('livewire.transaksi-pendapatan-lainnya.input-transaksi');
+    }
+    private function normalizeAmount($value)
+    {
+        if ($value === null || $value === '') {
+            return 0;
+        }
+
+        return (int) str_replace('.', '', $value);
     }
 }

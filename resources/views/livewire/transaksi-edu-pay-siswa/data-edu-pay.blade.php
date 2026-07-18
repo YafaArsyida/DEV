@@ -44,7 +44,7 @@
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table id="data" class="table table-hover nowrap align-middle">
+            <table id="data" class="table table-hover table-nowrap align-middle">
                 <thead class="table-light">
                     <tr class="text-uppercase">
                         <th style="width: 50px;" class="text-uppercase">NO</th>
@@ -62,15 +62,15 @@
                     <tr class="table-secondary fw-medium text-center">
                         <td colspan="5">
                             <i class="ri-wallet-3-line me-1"></i>
-                            Saldo Awal Periode
+                            Saldo Sebelum Periode
                         </td>
-                        <td class="fs-12 text-success">Rp{{ number_format($totalMasukSebelum, 0, ',', '.') }}</td>
-                        <td class="fs-12 text-danger">Rp{{ number_format($totalKeluarSebelum, 0, ',', '.') }}</td>
-                        <td class="fs-12 text-info">Rp{{ number_format($saldoAwal, 0, ',', '.') }}</td>
+                        <td class="fs-12 text-success">RP{{ number_format($totalMasukSebelum, 0, ',', '.') }}</td>
+                        <td class="fs-12 text-danger">RP{{ number_format($totalKeluarSebelum, 0, ',', '.') }}</td>
+                        <td class="fs-12 text-primary">RP{{ number_format($saldoAwal, 0, ',', '.') }}</td>
                         <td></td>
                     </tr>
                     @forelse ($transaksiEduPay as $item)
-                    <tr style="white-space: nowrap">    
+                    <tr>    
                         <td class="text-center" style="width: 50px">{{ $loop->iteration }}.</td>
                         <td class="text-center">
                             @if ($item->jenis_transaksi === 'pembayaran' || $item->jenis_transaksi === 'kantin')
@@ -105,18 +105,18 @@
                         </td>
                         <td class="text-center">{{ $item->ms_pengguna->nama }}</td>
                         <td class="text-center">
-                            <span class="fs-12 text-success">
+                            <span class="fs-12 fw-medium text-success">
                                 {{ in_array($item->jenis_transaksi, ['topup tunai', 'topup online', 'pengembalian dana']) ? 'RP' . number_format($item->nominal, 0, ',', '.') : '-' }}
                             </span>
                         </td>
                         <td class="text-center">
-                            <span class="fs-12 text-danger">
+                            <span class="fs-12 fw-medium text-danger">
                                 {{ in_array($item->jenis_transaksi, ['penarikan', 'pembayaran','kantin']) ? 'RP' . number_format($item->nominal, 0, ',', '.') : '-' }}
                             </span>
                         </td>
                         <td class="text-center">
-                            <span class="fs-12 text-info">
-                                Rp{{ number_format($item->saldo, 0, ',', '.') }}
+                            <span class="fs-12 fw-medium text-primary">
+                                RP{{ number_format($item->saldo, 0, ',', '.') }}
                             </span>
                         </td>
 
@@ -173,8 +173,8 @@
     <div class="modal fade zoomIn" id="ExportLaporan" tabindex="-1" aria-labelledby="exportRecordLabel" aria-hidden="true"
         wire:ignore.self>
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
+            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="modal-header border-0">
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-5 text-center">
@@ -191,7 +191,7 @@
                                 data-bs-dismiss="modal">
                                 <i class="ri-close-line me-1 align-middle"></i> Batal
                             </button>
-                            <button class="btn btn-primary" id="konfirmasiExportLaporan" data-bs-dismiss="modal">Ya,
+                            <button class="btn btn-primary rounded-pill px-4" id="konfirmasiExportLaporan" data-bs-dismiss="modal">Ya,
                                 Export!</button>
                         </div>
                     </div>

@@ -1,21 +1,37 @@
-<div class="card">
-    <div class="card-body">
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card-header border-0">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+            <div class="flex-grow-1">
+                <h4 class="mb-1">
+                    {{ $nama_pegawai ?? 'Pegawai belum dipilih' }}
+                </h4>
 
-        <!-- INFO PEGAWAI -->
-        <div class="mb-3">
-            <h4 class="fw-bold mb-1">
-                {{ $nama_pegawai ?? 'Pegawai belum dipilih' }}
-            </h4>
+                <div class="hstack gap-3 flex-wrap small">
+                    <div class="text-muted">
+                        Jabatan :
+                        <span class="text-body fw-semibold">
+                            {{ $jabatan ?? 'Belum ada' }}
+                        </span>
+                    </div>
 
-            <div class="d-flex flex-wrap gap-2 text-muted small">
-                <div>ID: <span class="text-primary fw-medium">{{ $ms_pegawai_id }}</span></div>
-                <div class="vr"></div>
-                <div>Jabatan: <span class="text-body fw-medium">{{ $jabatan ?? '-' }}</span></div>
-                <div class="vr"></div>
-                <div>Telepon: <span class="text-body fw-medium">{{ $telepon_pegawai ?? '-' }}</span></div>
+                    <div class="vr"></div>
+
+                    <div class="text-muted">
+                        Telepon :
+                        <span class="text-body fw-semibold">
+                            {{ $telepon_pegawai ?? 'Tidak tersedia' }}
+                        </span>
+                    </div>
+                </div>
+
+                <p class="text-muted mt-2 mb-0">
+                    ID Pegawai: {{ $ms_pegawai_id ?? '-' }}
+                </p>
             </div>
-        </div>
 
+        </div>
+    </div>
+    <div class="card-body">
         <!-- SALDO CARD (FOCUS UTAMA) -->
         <div class="p-3 rounded-3 text-white bg-primary mb-4">
             <p class="mb-1 small">Saldo Tabungan Pegawai</p>
@@ -53,7 +69,8 @@
                         <div class="input-group">
                             <span class="input-group-text">Rp</span>
                             <input type="number" class="form-control" placeholder="Minimal Rp 1.000"
-                                wire:model.defer="nominal_kredit">
+                                wire:model.defer="nominal_kredit"
+                                onkeyup="formatTagihan(this)">
                         </div>
                         @error('nominal_kredit')
                         <small class="text-danger">{{ $message }}</small>
@@ -87,7 +104,8 @@
                         <div class="input-group">
                             <span class="input-group-text">Rp</span>
                             <input type="number" class="form-control" placeholder="Nominal debit"
-                                wire:model.defer="nominal_debit">
+                                wire:model.defer="nominal_debit"
+                                onkeyup="formatTagihan(this)">
                         </div>
                         @error('nominal_debit')
                         <small class="text-danger">{{ $message }}</small>
@@ -115,3 +133,9 @@
 
     </div>
 </div>
+<script>
+    function formatTagihan(el) {
+        let angka = el.value.replace(/\D/g, '');
+        el.value = new Intl.NumberFormat('id-ID').format(angka);
+    }
+</script>

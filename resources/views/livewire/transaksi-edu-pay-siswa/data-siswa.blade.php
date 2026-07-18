@@ -81,7 +81,7 @@
                         <label class="form-label">Metode</label>
                         <select class="form-select" wire:model.defer="jenis_transaksi_topup">
                             <option value="topup tunai">Teller Tunai</option>
-                            <option value="topup online">Transfer Bank</option>
+                            <option value="topup online">Transfer ke Sekolah</option>
                         </select>
                     </div>
                     <!-- Tombol Simpan -->
@@ -89,6 +89,7 @@
                         <input type="text" id="deskripsi" class="form-control" wire:model.defer="deskripsi_topup"
                             placeholder="Deskripsi transaksi (opsional)">
                         @error('deskripsi_topup') <span class="text-danger">{{ $message }}</span> @enderror
+                        
                         <button wire:click="simpanTopUp" class="btn btn-success">
                             <i class="ri-save-line align-bottom me-1"></i> Simpan Top-Up
                         </button>

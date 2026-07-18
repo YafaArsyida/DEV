@@ -138,6 +138,7 @@ class Edit extends Component
 
             // Emit event untuk refresh data
             $this->emit('refreshTagihanSiswa');
+            $this->emit('reloadTagihanSiswa');
             $this->dispatchBrowserEvent('hide-create-modal', ['modalId' => 'ModalAksiEdit']);
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'Tagihan berhasil diperbarui.']);
 

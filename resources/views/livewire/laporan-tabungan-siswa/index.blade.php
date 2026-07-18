@@ -1,24 +1,66 @@
 {{-- Stop trying to control. --}}
-<div class="card">
-    <div class="card-header border-0 pb-0">
-        <div class="d-flex align-items-center">
-            <div class="flex-grow-1">
-                <h5 class="card-title mb-0">Riwayat Transaksi Tabungan Siswa</h5>
-                {{-- <p class="mb-0">Transaksi akan ditampilkan dari semua petugas untuk memastikan penghitungan yang akurat dan terkini.</p> --}}
-            </div>
-            <div class="flex-shrink-0">
-                <div class="d-flex gap-2 flex-wrap">
-                    @if ($selectedKelas)
-                        <button wire:click="cetakLaporan" class="btn btn-danger d-inline-flex align-items-center gap-1">
-                            <i class="ri-printer-line align-bottom"></i>
-                            <span>Cetak Laporan</span>
-                        </button>
-                    @endif
-                    <button data-bs-toggle="modal" data-bs-target="#ExportLaporanExcel" class="btn btn-soft-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button>
-                    {{-- <button data-bs-toggle="modal" data-bs-target="#ExportTabunganSiswa" wire:click.prevent="showExportTabunganSiswa" class="btn btn-soft-success"><i class="ri-file-excel-2-line"></i> Export</button> --}}
-                    <button type="button" class="btn btn-info" data-bs-toggle="offcanvas" data-bs-target="#filterTabungan" aria-controls="filterTabungan"><i class="ri-filter-3-line align-bottom me-1"></i> Fliters</button>
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    {{-- HEADER --}}
+    <div class="card-header">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4">
+
+            {{-- TITLE --}}
+            <div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-sm">
+                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                            <i class="ri-history-line"></i>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h5 class="fw-bold mb-1">
+                            Riwayat Transaksi Tabungan Siswa
+                        </h5>
+                        <small class="text-muted">
+                            Lihat riwayat transaksi tabungan siswa berdasarkan filter yang dipilih.
+                        </small>
+                    </div>
                 </div>
             </div>
+
+            {{-- ACTION --}}
+            <div class="d-flex gap-2 flex-wrap">
+
+                @if ($selectedKelas)
+                    <button
+                        wire:click="cetakLaporan"
+                        type="button"
+                        class="btn btn-danger rounded-pill px-4 d-inline-flex align-items-center gap-1">
+
+                        <i class="ri-printer-line"></i>
+                        <span>Cetak</span>
+                    </button>
+                @endif
+
+                <button
+                    type="button"
+                    class="btn btn-success rounded-pill px-4 d-inline-flex align-items-center gap-1"
+                    data-bs-toggle="modal"
+                    data-bs-target="#ExportIndex">
+
+                    <i class="ri-file-excel-2-line"></i>
+                    <span>Excel</span>
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-info rounded-pill px-4 d-inline-flex align-items-center gap-1"
+                    data-bs-toggle="offcanvas"
+                    data-bs-target="#filterTabungan"
+                    aria-controls="filterTabungan">
+
+                    <i class="ri-filter-3-line"></i>
+                    <span>Filter</span>
+                </button>
+
+            </div>
+
         </div>
     </div>
     <div class="card-body">
@@ -38,12 +80,11 @@
             </div>
             <!-- Input Pencarian -->
             <div class="col-xxl-4 col-sm-6">
-                <label for="searchInput" class="form-label">Pencarian</label>
-                <div class="position-relative">
-                    <input type="text" id="searchInput" class="form-control ps-4" 
-                        wire:model.debounce.300ms="search" 
+                <label for="searchData" class="form-label">Pencarian</label>
+                <div class="search-box">
+                    <input type="text" id="searchData" class="form-control search" wire:model.debounce.300ms="search"
                         placeholder="Cari nama, deskripsi, atau lainnya...">
-                    <i class="ri-search-line position-absolute top-50 start-0 translate-middle-y ms-2 text-muted"></i>
+                    <i class="ri-search-line search-icon"></i>
                 </div>
             </div>
             <!-- Filter Periode -->
@@ -63,12 +104,13 @@
         {{-- DATA --}}
         <div class="live-preview">
             <div class="table-responsive">
-                <table id="tabelTabungan" class="table table-hover nowrap align-middle" style="width:100%">
+                <table id="indexTabungan" class="table table-hover table-nowrap align-middle" style="width:100%">
                     <thead class="table-light">
                         <tr>
                             <th class="text-uppercase">No</th>
-                            <th class="text-uppercase text start" scope="col" style="width: 200px;">Tanggal</th>
+                            <th class="text-uppercase text start">Tanggal</th>
                             <th class="text-uppercase">Siswa</th>
+                            <th class="text-uppercase">Kelas</th>
                             <th class="text-uppercase" scope="col">Transaksi</th>
                             <th class="text-uppercase text-center">Petugas</th>
                             <th class="text-uppercase text-center">Kredit</th>
@@ -76,31 +118,30 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($laporan as $item)
+                        @forelse ($laporan as $key => $item)
                             <tr class="text-center">
-                                <td class="text-start">{{ $loop->iteration }}.</td>
+                                <td class="text-start">{{ $laporan->firstItem() + $key }}.</td>
                                 <td class="text-uppercase text-start">
-                                    {{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($item->tanggal) }}
-                                </td>
-                                <td class="text-start" style="white-space: nowrap;">
-                                    {{ ucfirst($item->ms_siswa->nama_siswa) }}
-                                    <p class="fs-12 mb-0 text-muted">{{ $item->ms_penempatan_siswa->ms_kelas->nama_kelas ?? ''}}</p>
+                                    {{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($item->tanggal, 'd F Y') }}
                                 </td>
                                 <td class="text-start">
-                                    <span class="fs-14">
-                                        {!! 'RP' . number_format($item->nominal, 0, ',', '.') . ' - <i>' . ucfirst($item->jenis_transaksi) . '</i>' !!}
-                                    </span>
-                                    <p class="text-muted mb-0">{{ $item->deskripsi ?? '' }}</p>
+                                    {{ ucfirst($item->ms_siswa->nama_siswa) }}
                                 </td>
-                                <td style="white-space: nowrap;">{{ $item->ms_pengguna->nama ?? '-' }}</td>
+                                <td class="text-start">
+                                    {{ $item->ms_penempatan_siswa->ms_kelas->nama_kelas ?? ''}}
+                                </td>
+                                <td class="text-start fs-12 fw-medium">
+                                    {!! 'Rp' . number_format($item->nominal, 0, ',', '.') . ' - <i>' . ucfirst($item->jenis_transaksi) . '</i>' !!}
+                                </td>
+                                <td>{{ $item->ms_pengguna->nama ?? '-' }}</td>
                                 <td>
-                                    <span class="fs-14 text-success">
-                                        {{ $item->jenis_transaksi === 'setoran' ? 'RP' . number_format($item->nominal, 0, ',', '.') : '-' }}
+                                    <span class="fs-12 fw-medium text-success">
+                                        {{ $item->jenis_transaksi === 'setoran' ? 'Rp' . number_format($item->nominal, 0, ',', '.') : '-' }}
                                     </span>
                                 </td>
                                 <td>
-                                    <span class="fs-14 text-danger">
-                                        {{ $item->jenis_transaksi === 'penarikan' ? 'RP' . number_format($item->nominal, 0, ',', '.') : '-' }}
+                                    <span class="fs-12 fw-medium text-danger">
+                                        {{ $item->jenis_transaksi === 'penarikan' ? 'Rp' . number_format($item->nominal, 0, ',', '.') : '-' }}
                                     </span>
                                 </td>
                             </tr>
@@ -124,8 +165,8 @@
                             <td></td>
                             <td class="text-uppercase">Total Kredit</td>
                             <td colspan="1" class="text-end">
-                                <span class="fs-14 text-success">
-                                    RP{{ number_format($totalKredit, 0, ',', '.') }}
+                                <span class="fs-12 fw-medium text-success">
+                                    Rp{{ number_format($totalKredit, 0, ',', '.') }}
                                 </span>
                             </td>
                         </tr>
@@ -133,8 +174,8 @@
                             <td></td>
                             <td class="text-uppercase">Total Debit</td>
                             <td colspan="1" class="text-end">
-                                <span class="fs-14 text-danger">
-                                    RP{{ number_format($totalDebit, 0, ',', '.') }}
+                                <span class="fs-12 fw-medium text-danger">
+                                    Rp{{ number_format($totalDebit, 0, ',', '.') }}
                                 </span>
                             </td>
                         </tr>
@@ -142,18 +183,40 @@
                             <td></td>
                             <td class="text-uppercase">Total Saldo</td>
                             <td colspan="1" class="text-end">
-                                <span class="fs-14 text-info">
-                                    RP{{ number_format($totalSaldo, 0, ',', '.') }}
+                                <span class="fs-12 fw-medium text-primary">
+                                    Rp{{ number_format($totalSaldo, 0, ',', '.') }}
                                 </span>
                             </td>
                         </tr>
                     </tfoot>
                 </table>
+                <div class="mt-3">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div class="text-muted fs-13">
+                            Menampilkan
+                            <span class="fw-semibold">
+                                {{ $laporan->firstItem() ?? 0 }}
+                            </span>
+                            -
+                            <span class="fw-semibold">
+                                {{ $laporan->lastItem() ?? 0 }}
+                            </span>
+                            dari
+                            <span class="fw-semibold">
+                                {{ $laporan->total() }}
+                            </span>
+                            data
+                        </div>
+                        <div>
+                            {{ $laporan->links() }}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
     {{-- MODAL --}}
-    <div class="modal fade zoomIn" id="ExportLaporanExcel" tabindex="-1" aria-labelledby="exportRecordLabel" aria-hidden="true" wire:ignore.self>
+    <div class="modal fade zoomIn" id="ExportIndex" tabindex="-1" aria-labelledby="exportRecordLabel" aria-hidden="true" wire:ignore.self>
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
@@ -183,7 +246,7 @@
             // Tambahkan delay 1 detik
             setTimeout(function () {
                 // Ambil elemen tabel berdasarkan ID
-                var table = document.getElementById("tabelTabungan"); // ganti sesuai kebutuhan
+                var table = document.getElementById("indexTabungan"); // ganti sesuai kebutuhan
         
                 // Konversi tabel ke format Excel
                 var workbook = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
@@ -193,4 +256,5 @@
             }, 1000); // 1000 ms = 1 detik
         });
     </script>
+    
 </div>

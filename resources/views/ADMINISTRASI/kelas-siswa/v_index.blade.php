@@ -40,7 +40,7 @@
                 @livewire('siswa.delete')    
                 @livewire('siswa.bulk-delete')    
                 @livewire('siswa.import')    
-                @livewire('siswa.export')    
+                {{-- @livewire('siswa.export')     --}}
                 @livewire('siswa.import-telepon')    
                 @livewire('siswa.import-edu-card')    
             </div>

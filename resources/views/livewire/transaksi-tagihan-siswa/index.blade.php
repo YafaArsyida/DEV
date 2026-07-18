@@ -280,7 +280,7 @@
                         <td class="text-start">{{ $item['nama_jenis'] }}</td>
                         <td class="text-start">{{ $item['nama_kategori'] }}</td>
                         <td class="text-center">
-                            <span class="fw-medium fs-12 text-info">
+                            <span class="fw-medium fs-12 text-primary">
                                 RP{{ number_format($item['jumlah_tagihan_siswa'], 0, ',', '.') }}
                             </span>
                         </td>
@@ -300,7 +300,7 @@
                                     <i class="ri-checkbox-circle-line"></i> Lunas
                                 </span>
                             @elseif ($item['in_keranjang'])
-                                <span class="text-info d-inline-flex align-items-center gap-1">
+                                <span class="text-primary d-inline-flex align-items-center gap-1">
                                     <i class="ri-check-double-line"></i> Menunggu Bayar
                                 </span>
                             @else
@@ -387,7 +387,7 @@
                         <td></td>
                         <td class="text-start fw-medium">TOTAL</td>
                         <td class="text-center">
-                            <span class="fw-medium fs-12 text-info">
+                            <span class="fw-medium fs-12 text-primary">
                                 RP{{ number_format($totalEstimasi, 0, ',', '.') }}
                             </span>
                         </td>

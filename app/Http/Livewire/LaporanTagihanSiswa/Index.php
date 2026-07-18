@@ -20,6 +20,9 @@ class Index extends Component
 
     protected $paginationTheme = 'bootstrap'; // Menggunakan tema Bootstrap untuk paginasi
 
+    public $perPage = 40;
+    public $laporans = [];
+
     // public $penempatanSiswaList = [];
 
     public $search = '';
@@ -96,15 +99,10 @@ class Index extends Component
 
     public function kirimWhatsappTagihan($msPenempatanSiswaId)
     {
-        // Ambil penempatan + relasi dasar
-        $penempatanSiswa = PenempatanSiswa::with([
-            'ms_siswa',
-            'ms_kelas',
-            'ms_tagihan_siswa.ms_jenis_tagihan_siswa',
-            'ms_tagihan_siswa.dt_transaksi_tagihan_siswa'
-        ])->find($msPenempatanSiswaId);
+        $laporan = collect($this->laporans)
+            ->firstWhere('ms_penempatan_siswa_id', $msPenempatanSiswaId);
 
-        if (!$penempatanSiswa) {
+        if (!$laporan) {
             $this->dispatchBrowserEvent('alertify-error', ['message' => 'Data siswa tidak ditemukan']);
             return;
         } else {
@@ -112,11 +110,15 @@ class Index extends Component
         }
 
         // Nomor telepon
-        $telepon = $penempatanSiswa->ms_siswa->telepon;
+        $telepon = $laporan['telepon'] ?? null;
+
         if (!$telepon) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Nomor telepon siswa tidak ditemukan']);
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Nomor telepon siswa tidak ditemukan'
+            ]);
             return;
         }
+
         if (substr($telepon, 0, 1) === '0') {
             $telepon = '+62' . substr($telepon, 1);
         }
@@ -133,39 +135,29 @@ class Index extends Component
         $pesan .= $templatePesan->salam_pembuka . "\n\n";
         $pesan .= $templatePesan->kalimat_pembuka;
         $pesan .= "Kami informasikan bahwa Tagihan sekolah atas nama siswa *"
-            . $penempatanSiswa->ms_siswa->nama_siswa
-            . "* kelas *" . ($penempatanSiswa->ms_kelas->nama_kelas ?? '-') . "* masih perlu diselesaikan. Berikut adalah rincian tagihannya: \n\n";
+            . $laporan['nama_siswa']
+            . "* kelas *"
+            . ($laporan['nama_kelas'] ?? '-')
+            . "* masih perlu diselesaikan. Berikut adalah rincian tagihannya:\n\n";
 
         // ===============================
-        // AMBIL TAGIHAN YANG SUDAH DIFILTER & SORT (SAMA DENGAN TAMPILAN)
+        // AMBIL RINCIAN TAGIHAN
         // ===============================
-        $filteredTagihan = $this->getFilteredTagihan($penempatanSiswa);
+        foreach ($laporan['rincian_tagihan'] as $tagihan) {
 
-        $totalTagihan = 0;
+            if ($tagihan['jumlah_kekurangan'] <= 0) {
+                continue;
+            }
 
-        foreach ($filteredTagihan as $tagihan) {
-
-            // Hitung kekurangan
-            $kekurangan = $tagihan->jumlah_tagihan_siswa - $tagihan->jumlah_sudah_dibayar();
-            if ($kekurangan <= 0) continue;
-
-            // Nama & Jatuh Tempo
-            $namaTagihan = strtoupper($tagihan->ms_jenis_tagihan_siswa->nama_jenis_tagihan_siswa ?? '-');
-            $jatuhTempo  = $tagihan->ms_jenis_tagihan_siswa->tanggal_jatuh_tempo
-                ? HelperController::formatTanggalIndonesia($tagihan->ms_jenis_tagihan_siswa->tanggal_jatuh_tempo, 'd F Y')
-                : '-';
-
-            // Tambahkan baris untuk WA
-            $pesan .= " - *{$namaTagihan} : Rp" . number_format($kekurangan, 0, ',', '.') . "*\n";
-
-            // Jika mau tampilkan jatuh tempo, pakai ini:
-            // $pesan .= " - *{$namaTagihan} - Rp" . number_format($kekurangan, 0, ',', '.') . "*, jatuh tempo {$jatuhTempo}\n";
-
-            $totalTagihan += $kekurangan;
+            $pesan .= " - *"
+                . strtoupper($tagihan['nama_jenis_tagihan_siswa'])
+                . " : Rp"
+                . number_format($tagihan['jumlah_kekurangan'], 0, ',', '.')
+                . "*\n";
         }
 
         // Total
-        $pesan .= "\n*Total Tagihan Rp" . number_format($totalTagihan, 0, ',', '.') . "*\n";
+        $pesan .= "\n*Total Tagihan Rp" . number_format($laporan['total_tagihan'], 0, ',', '.') . "*\n";
 
         // Instruksi tambahan dari surat
         $surat = SuratTagihanSiswa::where('ms_jenjang_id', $this->selectedJenjang)->first();
@@ -303,7 +295,8 @@ class Index extends Component
             $penempatanQuery->where('ms_kelas_id', $this->selectedKelas);
         }
 
-        $penempatans = $penempatanQuery->paginate(25);
+        $penempatans = $penempatanQuery
+            ->paginate($this->perPage);
 
 
         // ================================
@@ -320,6 +313,7 @@ class Index extends Component
             $laporans->push([
                 'ms_penempatan_siswa_id' => $p->ms_penempatan_siswa_id,
                 'nama_siswa' => $p->ms_siswa->nama_siswa,
+                'telepon'    => $p->ms_siswa->telepon,
                 'nama_kelas' => $p->ms_kelas->nama_kelas,
                 'ms_kelas_id' => $p->ms_kelas->ms_kelas_id,
 
@@ -353,6 +347,9 @@ class Index extends Component
             ['nama_siswa', 'asc'],
         ])->values();
 
+
+        $this->laporans = $laporans->toArray();
+
         $totalTagihan = $laporans->sum('total_tagihan');
 
         $pesans = null;
@@ -362,7 +359,7 @@ class Index extends Component
         }
 
         return view('livewire.laporan-tagihan-siswa.index', [
-            'laporans' => $laporans,     // kumpulan siswa + tagihan per siswa
+            'laporans'      => $this->laporans,
             'totalTagihan' => $totalTagihan,     // kumpulan siswa + tagihan per siswa
             'pagination' => $penempatans, // untuk tombol paginate
 

@@ -17,9 +17,8 @@
         <div class="row">
             <div class="col-xxl-4">
                 @livewire('laporan-tabungan-siswa.overview')  
-                <div class="sticky-side-div">
-                    @livewire('laporan-tabungan-siswa.saldo')   
-                </div> 
+                @livewire('laporan-tabungan-siswa.saldo')   
+                
             </div>  
             <div class="col-xxl-8">
                 @livewire('parameter.filter-tabungan')   

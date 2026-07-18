@@ -25,11 +25,11 @@ class DataPegawai extends Component
     public $saldoTabunganPegawai;
 
     // save kredit
-    public $nominal_kredit;
+    public $nominal_kredit = 0;
     public $deskripsi_kredit;
 
     // save debit
-    public $nominal_debit;
+    public $nominal_debit = 0;
     public $deskripsi_debit;
 
     protected $listeners = [
@@ -212,6 +212,8 @@ class DataPegawai extends Component
         DB::beginTransaction();
 
         try {
+            $this->nominal_kredit = $this->normalizeAmount($this->nominal_kredit);
+
             $this->validate([
                 'nominal_kredit' => 'required|numeric|min:1000',
                 'deskripsi_kredit' => 'nullable|string|max:255',
@@ -252,6 +254,8 @@ class DataPegawai extends Component
         DB::beginTransaction();
 
         try {
+            $this->nominal_debit = $this->normalizeAmount($this->nominal_debit);
+
             $this->validate([
                 'nominal_debit' => 'required|numeric|min:1000',
                 'deskripsi_debit' => 'nullable|string|max:255',
@@ -294,5 +298,13 @@ class DataPegawai extends Component
     public function render()
     {
         return view('livewire.transaksi-tabungan-pegawai.data-pegawai');
+    }
+    private function normalizeAmount($value)
+    {
+        if ($value === null || $value === '') {
+            return 0;
+        }
+
+        return (int) str_replace('.', '', $value);
     }
 }

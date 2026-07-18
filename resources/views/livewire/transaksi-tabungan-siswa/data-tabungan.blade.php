@@ -15,9 +15,9 @@
                         <h5 class="fw-bold mb-1">
                             Riwayat Transaksi Tabungan Siswa
                         </h5>
-                        {{-- <small class="text-muted">
+                        <small class="text-muted">
                             Riwayat transaksi tabungan siswa berdasarkan periode yang dipilih.
-                        </small> --}}
+                        </small>
                     </div>
                 </div>
             </div>
@@ -44,11 +44,11 @@
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-hover nowrap align-middle">
+            <table class="table table-hover table-nowrap align-middle">
                 <thead class="table-light">
                     <tr class="text-uppercase">
                         <th class="text-center" style="width: 50px;">NO</th>
-                        <th class="text-uppercase text-center" scope="col" style="width: 50px;">hapus</th>
+                        <th class="text-center" scope="col" style="width: 50px;">hapus</th>
                         <th class="text-start" scope="col" style="width: 150px;">tanggal</th>
                         <th class="text-start" scope="col">transaksi</th>
                         <th scope="col" class="text-center">petugas</th>
@@ -62,25 +62,25 @@
                     <tr class="table-secondary fw-medium text-center">
                         <td colspan="5">
                             <i class="ri-wallet-3-line me-1"></i>
-                            Saldo Awal Periode
+                            Saldo Sebelum Periode
                         </td>
                     
-                        <td class="fs-12 text-success">
+                        <td class="fs-12 fw-medium text-success">
                             Rp{{ number_format($totalSetoranSebelum, 0, ',', '.') }}
                         </td>
                     
-                        <td class="fs-12 text-danger">
+                        <td class="fs-12 fw-medium text-danger">
                             Rp{{ number_format($totalPenarikanSebelum, 0, ',', '.') }}
                         </td>
                     
-                        <td class="fs-12 text-info">
+                        <td class="fs-12 fw-medium text-primary">
                             Rp{{ number_format($saldoAwal, 0, ',', '.') }}
                         </td>
                     
                         <td></td>
                     </tr>
                     @forelse ($transaksiTabungan as $item)
-                        <tr style="white-space: nowrap">
+                        <tr>
                             <td class="text-center">{{ $loop->iteration }}.</td>
                             <td class="text-center">
                                 <a href="#ModalDeleteTabungan" data-bs-toggle="modal" class="text-danger d-inline-block remove-item-btn"
@@ -94,26 +94,26 @@
                             </td>
                             <td>
                                 <span class="fs-12 fw-medium">
-                                    {!! 'RP' . number_format($item->nominal, 0, ',', '.') . ' - <i>' . ucfirst($item->jenis_transaksi) . '</i>' !!}
+                                    {!! 'Rp' . number_format($item->nominal, 0, ',', '.') . ' - <i>' . ucfirst($item->jenis_transaksi) . '</i>' !!}
                                 </span>
                                 <p class="text-muted mb-0">{{ $item->deskripsi ?? '' }}</p>
                             </td>
 
                             <td class="text-center">{{ $item->ms_pengguna->nama }}</td>
                             <td class="text-center">
-                                <span class="fs-12 text-success">
-                                    {{ $item->jenis_transaksi === 'setoran' ? 'RP' . number_format($item->nominal, 0, ',', '.') : '-' }}
+                                <span class="fs-12 fw-medium text-success">
+                                    {{ $item->jenis_transaksi === 'setoran' ? 'Rp' . number_format($item->nominal, 0, ',', '.') : '-' }}
                                 </span>
                             </td>
                             <td class="text-center">
-                                <span class="fs-12 text-danger">
-                                    {{ $item->jenis_transaksi === 'penarikan' ? 'RP' . number_format($item->nominal, 0, ',', '.') : '-' }}
+                                <span class="fs-12 fw-medium text-danger">
+                                    {{ $item->jenis_transaksi === 'penarikan' ? 'Rp' . number_format($item->nominal, 0, ',', '.') : '-' }}
                                 </span>
                             </td>
 
                             <td class="text-center">
-                                <span class="fs-12 text-info">
-                                    RP{{ number_format($item->saldo, 0, ',', '.') }}
+                                <span class="fs-12 fw-medium text-primary">
+                                    Rp{{ number_format($item->saldo, 0, ',', '.') }}
                                 </span>
                             </td>
                             <td class="text-start">
