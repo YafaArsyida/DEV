@@ -16,6 +16,7 @@ class Ekstrakurikuler extends Model
     protected $primaryKey = 'ms_ekstrakurikuler_id';
     protected $fillable = [
         'ms_jenjang_id',
+        'ms_tahun_ajar_id',
         'nama_ekstrakurikuler',
         'deskripsi',
         'biaya',
@@ -30,6 +31,11 @@ class Ekstrakurikuler extends Model
     public function ms_jenjang()
     {
         return $this->belongsTo(Jenjang::class, 'ms_jenjang_id', 'ms_jenjang_id');
+    }
+
+    public function ms_tahun_ajar()
+    {
+        return $this->belongsTo(TahunAjar::class, 'ms_tahun_ajar_id', 'ms_tahun_ajar_id');
     }
 
     public function ms_penempatan_ekstrakurikuler()

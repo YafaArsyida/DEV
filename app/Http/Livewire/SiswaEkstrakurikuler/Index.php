@@ -16,6 +16,7 @@ class Index extends Component
 
     protected $paginationTheme = 'bootstrap'; // Gunakan tema Bootstrap
 
+    public $perPage = 50;
     public $search = '';
 
     public $selectedJenjang = null;
@@ -28,6 +29,7 @@ class Index extends Component
 
     public $namaJenjang = '';
     public $namaTahunAjar = '';
+    public $namaKelas = '';
 
     // Listener untuk Livewire
     protected $listeners = [
@@ -53,6 +55,14 @@ class Index extends Component
         $this->resetPage(); // Reset pagination ketika parameter berubah
     }
 
+    public function updatedSelectedKelas()
+    {
+        $this->namaKelas = Kelas::whereKey($this->selectedKelas)
+            ->value('nama_kelas') ?? '';
+
+        $this->resetPage();
+    }
+
     public function cetakSiswaEkstrakurikuler()
     {
         if (!$this->selectedJenjang || !$this->selectedTahunAjar) {
@@ -74,55 +84,57 @@ class Index extends Component
 
     public function render()
     {
-        $select_kelas = [];
+        $select_kelas = collect();
+
         if ($this->selectedJenjang && $this->selectedTahunAjar) {
             $select_kelas = Kelas::where('ms_jenjang_id', $this->selectedJenjang)
                 ->where('ms_tahun_ajar_id', $this->selectedTahunAjar)
                 ->get();
         }
 
-        $siswas = null;
+        $siswas = collect();
+
         if ($this->selectedJenjang && $this->selectedTahunAjar) {
+
             $query = PenempatanSiswa::with([
                 'ms_siswa.ms_educard',
                 'ms_kelas',
                 'ms_tahun_ajar',
                 'ms_jenjang',
-                'ms_siswa.ms_penempatan_ekstrakurikuler.ms_ekstrakurikuler',
+                'ms_penempatan_ekstrakurikuler.ms_ekstrakurikuler',
             ])
-                ->join('ms_siswa', 'ms_penempatan_siswa.ms_siswa_id', '=', 'ms_siswa.ms_siswa_id')
-                ->where('ms_jenjang_id', $this->selectedJenjang)
-                ->where('ms_tahun_ajar_id', $this->selectedTahunAjar);
+            ->join('ms_siswa', 'ms_penempatan_siswa.ms_siswa_id', '=', 'ms_siswa.ms_siswa_id')
+            ->where('ms_penempatan_siswa.ms_jenjang_id', $this->selectedJenjang)
+            ->where('ms_penempatan_siswa.ms_tahun_ajar_id', $this->selectedTahunAjar);
 
-            // Filter berdasarkan kelas (jika dipilih)
+            // Filter kelas
             if ($this->selectedKelas) {
-                $query->where('ms_kelas_id', $this->selectedKelas);
+                $query->where('ms_penempatan_siswa.ms_kelas_id', $this->selectedKelas);
             }
 
+            // Pencarian
             if ($this->search) {
-                $query->where(function ($query) {
-                    $query->whereHas('ms_siswa', function ($query) {
-                        $query->where('nama_siswa', 'like', '%' . $this->search . '%');
-                    })->orWhereHas('ms_siswa.ms_educard', function ($query) {
-                        $query->where('kode_kartu', 'like', '%' . $this->search . '%');
+                $query->where(function ($q) {
+                    $q->whereHas('ms_siswa', function ($sub) {
+                        $sub->where('nama_siswa', 'like', "%{$this->search}%");
+                    })
+                    ->orWhereHas('ms_siswa.ms_educard', function ($sub) {
+                        $sub->where('kode_kartu', 'like', "%{$this->search}%");
                     });
                 });
             }
 
-            $siswas = $query->orderBy('ms_penempatan_siswa.ms_kelas_id')
-                ->orderBy('ms_siswa.nama_siswa')->paginate(100);
+            $siswas = $query
+                ->orderBy('ms_penempatan_siswa.ms_kelas_id')
+                ->orderBy('ms_siswa.nama_siswa')
+                ->paginate($this->perPage);
 
             $this->siswasOnPage = $siswas->items();
         }
 
-        // Cek apakah koleksi siswa kosong.
-        if (!$siswas || $siswas->isEmpty()) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Data siswa tidak ditemukan.']);
-        }
-
-        return view('livewire.siswa-ekstrakurikuler.index', [
-            'select_kelas' => $select_kelas,
-            'siswas' => $siswas,
-        ]);
+        return view('livewire.siswa-ekstrakurikuler.index', compact(
+            'select_kelas',
+            'siswas'
+        ));
     }
 }

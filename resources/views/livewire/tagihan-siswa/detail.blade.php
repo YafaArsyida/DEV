@@ -287,7 +287,7 @@
 
                 {{-- FOOTER --}}
                 <div class="modal-footer border-0 pt-0 px-4 pb-4 justify-content-center">
-                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">
                         <i class="ri-close-line me-1"></i>
                         Batal
                     </button>

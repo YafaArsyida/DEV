@@ -31,10 +31,10 @@ class EkstrakurikulerSiswa extends Controller
 
         $query = PenempatanSiswa::with([
             'ms_kelas',
-            'ms_siswa.ms_penempatan_ekstrakurikuler.ms_ekstrakurikuler',
+            'ms_penempatan_ekstrakurikuler.ms_ekstrakurikuler',
         ])
             ->where('ms_jenjang_id', $ekskul->ms_jenjang_id)
-            ->whereHas('ms_siswa.ms_penempatan_ekstrakurikuler', function ($q) use ($ms_ekstrakurikuler_id) {
+            ->whereHas('ms_penempatan_ekstrakurikuler', function ($q) use ($ms_ekstrakurikuler_id) {
                 $q->where('ms_ekstrakurikuler_id', $ms_ekstrakurikuler_id);
             });
 
@@ -86,11 +86,8 @@ class EkstrakurikulerSiswa extends Controller
         foreach ($siswa as $index => $item) {
             $nama = $item->ms_siswa->nama_siswa ?? '-';
             $kelas = $item->ms_kelas->nama_kelas ?? '-';
-            $ekskuls = collect($item->ms_siswa->ms_penempatan_ekstrakurikuler)
-                ->pluck('ms_ekstrakurikuler.nama_ekstrakurikuler')
-                ->filter()
-                ->implode(', ');
-            $biaya = number_format($item->ms_siswa->total_biaya_ekstrakurikuler() ?? 0, 0, ',', '.');
+            $ekskuls = $item->ms_penempatan_ekstrakurikuler->ms_ekstrakurikuler->nama_ekstrakurikuler;
+            $biaya = number_format($item->ms_penempatan_ekstrakurikuler->ms_ekstrakurikuler->biaya ?? 0, 0, ',', '.');
 
             $html .= '
             <tr>
@@ -120,7 +117,7 @@ class EkstrakurikulerSiswa extends Controller
             'ms_kelas',
             'ms_tahun_ajar',
             'ms_jenjang',
-            'ms_siswa.ms_penempatan_ekstrakurikuler.ms_ekstrakurikuler',
+            'ms_penempatan_ekstrakurikuler.ms_ekstrakurikuler',
         ])
             ->join('ms_siswa', 'ms_penempatan_siswa.ms_siswa_id', '=', 'ms_siswa.ms_siswa_id')
             ->where('ms_jenjang_id', $ms_jenjang_id)
@@ -154,8 +151,8 @@ class EkstrakurikulerSiswa extends Controller
         $pdf::Cell(0, 6, 'DATA SISWA EKSTRAKURIKULER', 0, 1, 'C');
         $pdf::SetFont('times', '', 12);
         $pdf::Cell(0, 6, strtoupper($jenjang->nama_jenjang ?? '-'), 0, 1, 'C');
-        // $pdf::SetFont('times', '', 12);
-        // $pdf::Cell(0, 6, 'Tahun Ajaran: ' . ($tahunAjar->nama_tahun_ajar ?? '-'), 0, 1, 'C');
+        $pdf::SetFont('times', '', 12);
+        $pdf::Cell(0, 6, 'Tahun Ajaran: ' . ($tahunAjar->nama_tahun_ajar ?? '-'), 0, 1, 'C');
         $pdf::SetFont('times', '', 10);
         $pdf::MultiCell(0, 6, 'Dusun No.2 RT.04/RW.01, Dusun 2, Kebonan, Karanggede, Boyolali, Jawa Tengah 57381', 0, 'C');
         $pdf::Ln(4);
@@ -165,9 +162,9 @@ class EkstrakurikulerSiswa extends Controller
         <table border="0.5" cellpadding="2" cellspacing="0" style="width:100%;">
             <thead>
                 <tr style="background-color:#f2f2f2;">
-                    <th width="5%">No</th>
-                    <th width="40%">Nama Siswa</th>
-                    <th width="15%">Kelas</th>
+                    <th width="5%" align="center">No</th>
+                    <th width="35%">Nama Siswa</th>
+                    <th width="20%">Kelas</th>
                     <th width="20%">Ekstrakurikuler</th>
                     <th width="20%" align="left">Biaya</th>
                 </tr>
@@ -177,18 +174,21 @@ class EkstrakurikulerSiswa extends Controller
         foreach ($siswas as $i => $item) {
             $nama = $item->ms_siswa->nama_siswa ?? '-';
             $kelas = $item->ms_kelas->nama_kelas ?? '-';
-            $biaya = 'Rp' . number_format($item->ms_siswa->total_biaya_ekstrakurikuler() ?? 0, 0, ',', '.');
-            $ekskuls = collect($item->ms_siswa->ms_penempatan_ekstrakurikuler)
-                ->pluck('ms_ekstrakurikuler.nama_ekstrakurikuler')
-                ->filter()
-                ->implode(', ');
+
+            $penempatanEkstrakurikuler = $item->ms_penempatan_ekstrakurikuler;
+            $namaEkskul = $penempatanEkstrakurikuler
+                ? ($penempatanEkstrakurikuler->ms_ekstrakurikuler->nama_ekstrakurikuler ?? '-')
+                : '-';
+             $biaya = $penempatanEkstrakurikuler
+                ? 'Rp' . number_format(
+                    $penempatanEkstrakurikuler->ms_ekstrakurikuler->biaya ?? 0, 0, ',', '.') : '-';
 
             $html .= '
             <tr>
                 <td width="5%" align="center">' . ($i + 1) . '</td>
-                <td width="40%">' . htmlspecialchars($nama) . '</td>
-                <td width="15%">' . htmlspecialchars($kelas) . '</td>
-                <td width="20%">' . htmlspecialchars($ekskuls) . '</td>
+                <td width="35%">' . htmlspecialchars($nama) . '</td>
+                <td width="20%">' . htmlspecialchars($kelas) . '</td>
+                <td width="20%">' . htmlspecialchars($namaEkskul) . '</td>
                 <td width="20%" align="left">' . $biaya . '</td>
             </tr>';
         }

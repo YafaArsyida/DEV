@@ -29,7 +29,7 @@
                 {{-- TAMBAH --}}
                 <button type="button" class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#ModalAddKelas"
                         wire:click.prevent="$emit('showCreateKelas', {{ $selectedJenjang }}, {{ $selectedTahunAjar }})">
-                    <i class="ri-add-line me-1"></i>Tambah Kelas
+                    <i class="ri-add-line me-1"></i>Kelas Baru
                 </button>
             </div>
             @endif
@@ -86,7 +86,7 @@
                                         </a>
                                     </td>
                                     <td>
-                                        <span class="fw-medium" style="white-space: nowrap;">
+                                        <span class="fw-medium">
                                             {{ $item->nama_kelas }}
                                         </span>
                                         <p class="text-muted mb-0">{{ $item->deskripsi }}</p>

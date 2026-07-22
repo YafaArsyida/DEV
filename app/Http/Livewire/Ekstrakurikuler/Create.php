@@ -3,11 +3,14 @@
 namespace App\Http\Livewire\Ekstrakurikuler;
 
 use App\Models\Ekstrakurikuler;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 
 class Create extends Component
 {
     public $ms_jenjang_id;
+    public $ms_tahun_ajar_id;
 
     public $nama_ekstrakurikuler, $biaya, $kuota, $deskripsi;
 
@@ -15,15 +18,20 @@ class Create extends Component
         'createEkstrakurikuler',
     ];
 
-    public function createEkstrakurikuler($jenjang)
+    public function createEkstrakurikuler($jenjang, $tahunAjar)
     {
+        $this->resetValidation();
+        $this->resetInput();
+
         $this->ms_jenjang_id = $jenjang;
-        $this->emitSelf('render');
+        $this->ms_tahun_ajar_id = $tahunAjar;
     }
 
     protected function rules()
     {
         return [
+            'ms_jenjang_id' => 'required|exists:ms_jenjang,ms_jenjang_id',
+            'ms_tahun_ajar_id' => 'required|exists:ms_tahun_ajar,ms_tahun_ajar_id',
             'nama_ekstrakurikuler' => 'required|string|max:255',
             'biaya' => 'required|numeric|min:0',
             'kuota' => 'required|integer|min:1',
@@ -32,6 +40,10 @@ class Create extends Component
     }
 
     protected $messages = [
+        'ms_jenjang_id.required' => 'Pilih jenjang',
+        'ms_jenjang_id.exists' => 'Jenjang tidak valid',
+        'ms_tahun_ajar_id.required' => 'Pilih tahun ajar',
+        'ms_tahun_ajar_id.exists' => 'Tahun ajar tidak valid',
         'nama_ekstrakurikuler.required' => 'Nama Ekstrakurikuler tidak boleh kosong',
         'biaya.required' => 'Biaya wajib diisi',
         'biaya.numeric' => 'Biaya harus berupa angka',
@@ -48,24 +60,51 @@ class Create extends Component
 
     public function save()
     {
+        DB::beginTransaction();
+
         try {
             $validatedData = $this->validate();
-            // Buat Ekstrakurikuler baru
+
             Ekstrakurikuler::create([
-                'nama_ekstrakurikuler' => $this->nama_ekstrakurikuler,
-                'ms_jenjang_id' => $this->ms_jenjang_id,
-                'biaya' => $this->biaya,
-                'kuota' => $this->kuota,
-                'deskripsi' => $this->deskripsi,
+                'nama_ekstrakurikuler'  => $validatedData['nama_ekstrakurikuler'],
+                'ms_jenjang_id'         => $validatedData['ms_jenjang_id'],
+                'ms_tahun_ajar_id'      => $validatedData['ms_tahun_ajar_id'],
+                'biaya'                 => $validatedData['biaya'],
+                'kuota'                 => $validatedData['kuota'],
+                'deskripsi'             => $validatedData['deskripsi'],
             ]);
 
-            $this->dispatchBrowserEvent('alertify-success', ['message' => 'Berhasil menambah Ekstrakurikuler!']);
-        } catch (\Exception $e) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+            DB::commit();
+
+            $this->dispatchBrowserEvent('alertify-success', [
+                'message' => 'Berhasil menambah ekstrakurikuler!'
+            ]);
+
+            $this->dispatchBrowserEvent('hide-modal', [
+                'modalId' => 'ModalAddEkstrakurikuler'
+            ]);
+
+            $this->resetInput();
+
+            $this->emit('refreshEkstrakurikuler');
+            $this->emit('refreshSiswas');
+
+        } catch (ValidationException $e) {
+            DB::rollBack();
+
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Validasi gagal, cek input!'
+            ]);
+
+            throw $e;
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => $e->getMessage() ?? 'Terjadi kesalahan sistem'
+            ]);
         }
-        $this->resetInput();
-        $this->emit('refreshEkstrakurikuler');
-        $this->emit('refreshSiswas');
     }
 
     public function resetInput()

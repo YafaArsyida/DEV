@@ -16,25 +16,26 @@ class PenempatanEkstrakurikuler extends Model
 
     protected $fillable = [
         'ms_ekstrakurikuler_id',       // ID ekstrakurikuler
-        'ms_siswa_id',       // ID Siswa
-        'ms_jenjang_id',     // ID Jenjang
+        'ms_penempatan_siswa_id',       // ID Siswa
     ];
     /**
-     * Relasi ke model Jenjang
+     * Relasi 
      */
-    public function ms_jenjang()
+    public function ms_penempatan_siswa()
     {
-        return $this->belongsTo(Jenjang::class, 'ms_jenjang_id', 'ms_jenjang_id');
+        return $this->belongsTo(
+            PenempatanSiswa::class,
+            'ms_penempatan_siswa_id',
+            'ms_penempatan_siswa_id'
+        );
     }
-    /**
-     * Relasi ke model Siswa
-     */
-    public function ms_siswa()
-    {
-        return $this->belongsTo(Siswa::class, 'ms_siswa_id', 'ms_siswa_id');
-    }
+
     public function ms_ekstrakurikuler()
     {
-        return $this->belongsTo(Ekstrakurikuler::class, 'ms_ekstrakurikuler_id', 'ms_ekstrakurikuler_id');
+        return $this->belongsTo(
+            Ekstrakurikuler::class,
+            'ms_ekstrakurikuler_id',
+            'ms_ekstrakurikuler_id'
+        );
     }
 }

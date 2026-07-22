@@ -35,6 +35,15 @@ class PenempatanSiswa extends Model
         );
     }
 
+    public function ms_penempatan_ekstrakurikuler()
+    {
+        return $this->hasOne(
+            PenempatanEkstrakurikuler::class,
+            'ms_penempatan_siswa_id',
+            'ms_penempatan_siswa_id'
+        );
+    }
+    
     public function ms_kelas()
     {
         return $this->belongsTo(Kelas::class, 

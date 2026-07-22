@@ -57,7 +57,7 @@
                                         </div>
                                         <!--end col-->
                                     </div> --}}
-                                    <h3 class='mb-0'>Yayasan Pandanaran</h3>
+                                    <h3 class='mb-0'>SD Islam Al Hidayah Karanggede</h3>
                                 </div>
                             </div>
                         </div>

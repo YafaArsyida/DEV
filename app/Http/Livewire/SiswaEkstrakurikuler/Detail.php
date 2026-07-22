@@ -19,27 +19,20 @@ class Detail extends Component
 
     public function detailSiswaEkstrakurikuler($ms_penempatan_siswa_id)
     {
-        // Temukan pengguna berdasarkan ID
         $penempatan = PenempatanSiswa::with([
-            'ms_siswa.ms_penempatan_ekstrakurikuler.ms_ekstrakurikuler',
-            'ms_kelas'
+            'ms_siswa',
+            'ms_kelas',
+            'ms_penempatan_ekstrakurikuler.ms_ekstrakurikuler',
         ])->findOrFail($ms_penempatan_siswa_id);
 
-        if (!$penempatan) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Siswa tidak ditemukan']);
-            return;
-        }
-
-        $siswa = $penempatan->ms_siswa;
-
-        $this->siswaDetail = $siswa;
-        $this->nama_siswa = $siswa->nama_siswa;
-        $this->telepon = $siswa->telepon;
-        $this->created_at = $siswa->created_at->format('d F Y H:i');
+        $this->siswaDetail = $penempatan->ms_siswa;
+        $this->nama_siswa = $penempatan->ms_siswa->nama_siswa;
+        $this->telepon = $penempatan->ms_siswa->telepon;
+        $this->created_at = $penempatan->ms_siswa->created_at->format('d F Y H:i');
 
         $this->nama_kelas = $penempatan->ms_kelas->nama_kelas ?? '-';
 
-        $this->ekstrakurikulerSiswa = $siswa->ms_penempatan_ekstrakurikuler;
+        $this->ekstrakurikulerSiswa = $penempatan->ms_penempatan_ekstrakurikuler;
     }
     public function render()
     {

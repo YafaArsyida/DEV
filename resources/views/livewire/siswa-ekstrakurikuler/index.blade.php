@@ -1,33 +1,43 @@
-<div class="card">
-    <div class="card-header border-0 pb-0">
-        <div class="d-flex align-items-center">
-            <h5 class="card-title mb-0 flex-grow-1">Data Siswa</h5>
-            @if ($selectedJenjang && $selectedTahunAjar)
-            <div class="flex-shrink-0">
-                <div class="d-flex gap-2 flex-wrap">
-                    {{-- <button 
-                        class="btn btn-primary"
-                        data-bs-toggle="modal" 
-                        data-bs-target="#addPenempatan" 
-                        data-bs-trigger="hover" 
-                        data-bs-placement="top" 
-                        title="Petugas Baru">
-                        <i class="ri-group-line"></i> Petugas Baru
-                    </button> --}}
-                    <button wire:click="cetakSiswaEkstrakurikuler" class="btn btn-danger d-inline-flex align-items-center gap-1">
-                        <i class="ri-printer-line align-bottom"></i>
-                        <span>Cetak Data Siswa</span>
-                    </button>
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card-header">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4">
+            {{-- TITLE --}}
+            <div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-sm">
+                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                            <i class="ri-team-line text-primary me-1"></i>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h5 class="fw-bold mb-1">
+                            Data Peserta Ekstrakurikuler
+                        </h5>
+                        <small class="text-muted">
+                            Daftar siswa yang mengikuti kegiatan ekstrakurikuler.
+                        </small>
+                    </div>
                 </div>
             </div>
-            @endif
+
+            {{-- ACTION --}}
+            <div class="d-flex gap-2 flex-wrap">
+                <button
+                    wire:click="cetakSiswaEkstrakurikuler"
+                    class="btn btn-danger rounded-pill d-inline-flex align-items-center gap-2">
+                    <i class="ri-printer-line"></i>
+                    <span>Cetak</span>
+                </button>
+            </div>
         </div>
     </div>
+
     <div class="card-body">
         <div class="row g-3 align-items-end mb-3">
         
             <!-- Filter Kelas -->
-            <div class="col-xxl-4 col-sm-6">
+            <div class="col-xxl-3 col-sm-6">
                 <label for="filterKelas" class="form-label">Kelas</label>
                 <select id="filterKelas" wire:model="selectedKelas" style="cursor: pointer" class="form-select"
                     data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Kelas">
@@ -39,7 +49,7 @@
             </div>
         
             <!-- Pencarian -->
-            <div class="col-xxl-8 col-sm-6">
+            <div class="col-xxl-9 col-sm-6">
                 <label for="searchData" class="form-label">Pencarian</label>
                 <div class="search-box">
                     <input type="text" id="searchData" class="form-control search" wire:model.debounce.300ms="search"
@@ -64,68 +74,74 @@
                 </div>
             @else
             <div class="table-responsive">
-            {{-- <div data-simplebar data-simplebar-auto-hide="false" style="max-height: 100vh" class="table-responsive"> --}}
-                <table class="table table-hover nowrap align-middle" style="width:100%">
-                    {{-- <div class="text-center my-3">
-                        <h4 class="mb-0">Data Siswa Jenjang {{ $namaJenjang }}</h4>
-                        <div>{{ $namaKelas }} Tahun Ajaran {{ $namaTahunAjar }}</div>
-                    </div> --}}
+                <table id="DataIndexSiswa" class="table table-hover table-nowrap align-middle" style="width:100%">
                     <thead class="table-light">
-                        <tr>
-                            <th class="text-uppercase" width="50px">no</th>
-                            <th class="text-uppercase">siswa</th>
-                            {{-- <th class="text-uppercase">L/P</th> --}}
-                            <th class="text-uppercase">kelas</th>
-                            <th class="text-uppercase text-center">biaya</th>
-                            <th class="text-uppercase">ekstrakurikuler</th>
-                            <th class="text-uppercase">aksi</th>
+                        <tr class="text-uppercase">
+                            <th class="text-center" width="50px">no</th>
+                            <th>siswa</th>
+                            <th>kelas</th>
+                            <th>ekstrakurikuler</th>
+                            <th class="text-center">biaya</th>
+                            <th class="text-center">aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         {{-- @forelse ($siswas as $item) --}}
                         @forelse ($siswas as $key => $item)
-                        <tr style="white-space: nowrap;">
-                            <td>{{ $siswas->firstItem() + $key }}.</td> 
+                        <tr>
+                            <td class="text-center">{{ $siswas->firstItem() + $key }}</td> 
                             <td>
                                 <span class="fw-medium">
                                     {{ $item->ms_siswa->nama_siswa }}
                                 </span>
-                                <p class="text-muted mb-0">{{ $item->deskripsi }}</p>
+                                {{-- <p class="text-muted mb-0">{{ $item->deskripsi }}</p> --}}
                             </td>
                             <td>{{ $item->ms_kelas->nama_kelas }}</td>
-                            <td class="text-center">
-                                <span class="fw-medium fs-14 text-success">    
-                                    RP{{ number_format($item->ms_siswa->total_biaya_ekstrakurikuler(), 0, ',', '.') }}
-                                </span>
+                            <td>
+                                @if ($item->ms_penempatan_ekstrakurikuler)
+                                    <span class="fw-semibold">
+                                        <i class="ri-trophy-line me-1"></i>
+                                        {{ $item->ms_penempatan_ekstrakurikuler->ms_ekstrakurikuler->nama_ekstrakurikuler ?? '-' }}
+                                    </span>
+                                @else
+                                    <em>Belum memilih</em>
+                                @endif
                             </td>
-                            <td> 
-                                @foreach ($item->ms_siswa->ms_penempatan_ekstrakurikuler as $ekskul)
-                                    <span class="badge bg-info">
-                                        {{ $ekskul->ms_ekstrakurikuler->nama_ekstrakurikuler ?? '-' }}
-                                    </span> 
-                                @endforeach
+                            <td class="text-center">
+                                @if ($item->ms_penempatan_ekstrakurikuler)
+                                <span class="fw-medium fs-12">    
+                                    Rp{{ number_format($item->ms_penempatan_ekstrakurikuler->ms_ekstrakurikuler->biaya, 0, ',', '.') }}
+                                </span>
+                                @else
+                                    <em>Belum memilih</em>
+                                @endif
                             </td>
                             <td>
-                                <div class="hstack gap-2">
-                                    {{-- Tombol Detail Siswa --}}
-                                    <button class="btn btn-sm btn-primary d-inline-flex align-items-center"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#detailSiswaEkstrakurikuler"
-                                            title="Detail Siswa"
-                                            wire:click.prevent="$emit('detailSiswaEkstrakurikuler', {{ $item->ms_penempatan_siswa_id }})">
-                                        <i class="ri-eye-line align-bottom me-1"></i> Detail
+                                <div class="d-flex justify-content-center gap-2">
+                                    {{-- Detail --}}
+                                    <button
+                                        class="btn btn-soft-primary btn-sm rounded-pill px-3"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#detailSiswaEkstrakurikuler"
+                                        title="Detail Siswa"
+                                        wire:click.prevent="$emit('detailSiswaEkstrakurikuler', {{ $item->ms_penempatan_siswa_id }})">
+                                        <i class="ri-eye-line me-1"></i>
+                                        Detail
                                     </button>
-                            
-                                    {{-- Tombol Edit Siswa --}}
-                                    <button class="btn btn-sm btn-info d-inline-flex align-items-center"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#editSiswaEkstrakurikuler"
-                                            title="Edit Siswa"
-                                            wire:click.prevent="$emit('editSiswaEkstrakurikuler', {{ $item->ms_penempatan_siswa_id }})">
-                                        <i class="ri-quill-pen-line align-bottom me-1"></i> Ekstrakurikuler
+
+                                    {{-- Kelola Ekstrakurikuler --}}
+                                    <button
+                                        class="btn btn-primary btn-sm rounded-pill px-3"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editSiswaEkstrakurikuler"
+                                        title="Kelola Ekstrakurikuler"
+                                        wire:click.prevent="$emit('editSiswaEkstrakurikuler', {{ $item->ms_penempatan_siswa_id }})">
+                                        <i class="ri-trophy-line me-1"></i>
+                                        Ekstrakurikuler
                                     </button>
+
                                 </div>
-                            </td>                            
+                            </td>                    
                         </tr>
                         @empty
                             <!-- Jika Tidak Ada Data Kelas -->
@@ -144,7 +160,29 @@
                         @endforelse
                     </tbody>
                 </table>
-                {{ $siswas->links() }}
+                {{-- PAGINATION --}}
+                <div class="mt-3">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div class="text-muted fs-13">
+                            Menampilkan
+                            <span class="fw-semibold">
+                                {{ $siswas->firstItem() ?? 0 }}
+                            </span>
+                            -
+                            <span class="fw-semibold">
+                                {{ $siswas->lastItem() ?? 0 }}
+                            </span>
+                            dari
+                            <span class="fw-semibold">
+                                {{ $siswas->total() }}
+                            </span>
+                            data siswa
+                        </div>
+                        <div>
+                            {{ $siswas->links() }}
+                        </div>
+                    </div>
+                </div>
             </div>
             @endif
         </div>

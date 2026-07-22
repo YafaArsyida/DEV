@@ -1,5 +1,5 @@
 <meta charset="utf-8" />
-<title>TemanSekolah | Yayasan Pandanaran</title>
+<title>TemanSekolah | SD Islam Al Hidayah Karanggede</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta content="Sistem Administrasi Terintegrasi untuk Sekolah" name="description" />
 <meta content="ManekaromaTeknologi" name="author" />

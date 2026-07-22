@@ -16,7 +16,7 @@ class Index extends Component
     protected $paginationTheme = 'bootstrap'; // Gunakan tema Bootstrap
 
     public $search = '';
-    public $perPage = 10;
+    public $perPage = 50;
 
     public $isExport = false;
     public $selectedJenjang = null;
@@ -131,7 +131,6 @@ class Index extends Component
                 ->with([
                     'ms_siswa.ms_educard',
                     'ms_kelas',
-                    'ms_siswa.ms_penempatan_ekstrakurikuler.ms_ekstrakurikuler'
                 ])
                 ->where('ms_jenjang_id', $this->selectedJenjang)
                 ->where('ms_tahun_ajar_id', $this->selectedTahunAjar)

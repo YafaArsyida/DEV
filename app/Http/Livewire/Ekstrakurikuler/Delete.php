@@ -4,6 +4,7 @@ namespace App\Http\Livewire\Ekstrakurikuler;
 
 use App\Models\Ekstrakurikuler;
 use App\Models\PenempatanEkstrakurikuler;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class Delete extends Component
@@ -21,27 +22,54 @@ class Delete extends Component
 
     public function deleteEkstrakurikuler()
     {
-        // Validasi apakah id tersedia
-        if ($this->ms_ekstrakurikuler_id) {
+        DB::beginTransaction();
+
+        try {
+            if (!$this->ms_ekstrakurikuler_id) {
+                throw new \Exception('Data tidak valid');
+            }
+
             $ekstrakurikuler = Ekstrakurikuler::find($this->ms_ekstrakurikuler_id);
 
-            if ($ekstrakurikuler) {
-                // Pengecekan apakah Ekstrakurikuler ini sudah digunakan di PenempatanSiswa
-                $isUsedInPenempatan = PenempatanEkstrakurikuler::where('ms_ekstrakurikuler_id', $this->ms_ekstrakurikuler_id)->exists();
-
-                if ($isUsedInPenempatan) {
-                    // Jika sudah digunakan, beri peringatan
-                    $this->dispatchBrowserEvent('alertify-error', ['message' => 'Ekstrakurikuler tidak dapat dihapus karena sudah digunakan di Penempatan.']);
-                } else {
-                    // Hapus Ekstrakurikuler
-                    $ekstrakurikuler->delete();
-                    $this->dispatchBrowserEvent('hide-delete-modal', ['modalId' => 'deleteEkstrakurikuler']);
-                    $this->emit('refreshEkstrakurikuler'); // Refresh data di komponen Index
-                    $this->dispatchBrowserEvent('alertify-success', ['message' => 'Ekstrakurikuler berhasil dihapus.']);
-                }
-            } else {
-                $this->dispatchBrowserEvent('alertify-error', ['message' => 'Ekstrakurikuler tidak ditemukan.']);
+            if (!$ekstrakurikuler) {
+                throw new \Exception('Data tidak ditemukan');
             }
+
+            // 🔥 VALIDASI RELASI (blocking rule)
+            $isUsed = PenempatanEkstrakurikuler::where(
+                'ms_ekstrakurikuler_id',
+                $this->ms_ekstrakurikuler_id
+            )->exists();
+
+            if ($isUsed) {
+                throw new \Exception('Ekstrakurikuler tidak dapat dihapus karena sudah digunakan');
+            }
+
+            // ✅ Delete
+            $ekstrakurikuler->delete();
+
+            DB::commit();
+
+            // ✅ SUCCESS FLOW
+            $this->dispatchBrowserEvent('alertify-success', [
+                'message' => 'Ekstrakurikuler berhasil dihapus'
+            ]);
+
+            $this->dispatchBrowserEvent('hide-modal', [
+                'modalId' => 'deleteEkstrakurikuler'
+            ]);
+
+            $this->ms_ekstrakurikuler_id = null;
+
+            $this->emit('refreshEkstrakurikuler');
+            $this->emit('refreshSiswas');
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => $e->getMessage() ?? 'Terjadi kesalahan sistem'
+            ]);
         }
     }
 

@@ -34,25 +34,6 @@ class Siswa extends Model
         return $this->hasMany(PenempatanSiswa::class, 'ms_siswa_id', 'ms_siswa_id');
     }
 
-    public function ms_penempatan_ekstrakurikuler()
-    {
-        return $this->hasMany(PenempatanEkstrakurikuler::class, 'ms_siswa_id', 'ms_siswa_id');
-    }
-
-    public function jumlah_ekstrakurikuler_diikuti()
-    {
-        return $this->ms_penempatan_ekstrakurikuler()->count();
-    }
-
-    public function total_biaya_ekstrakurikuler()
-    {
-        return $this->ms_penempatan_ekstrakurikuler
-            ->sum(function ($penempatan) {
-                return $penempatan->ms_ekstrakurikuler->biaya ?? 0;
-            });
-    }
-
-
     // Relasi ke Tagihan
     public function ms_tagihan_siswa()
     {

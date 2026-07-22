@@ -8,12 +8,14 @@ use App\Models\PenempatanEkstrakurikuler;
 use App\Models\PenempatanSiswa;
 use App\Models\Siswa;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class Index extends Component
 {
-    public $selectedJenjang, $ms_siswa_id, $ms_ekstrakurikuler_id;
+    public $selectedJenjang;
+    public $ms_siswa_id, $ms_ekstrakurikuler_id;
     public $selectedEkstrakurikuler = null;
     public $siswaSelected = null;
     public $ms_penempatan_siswa_id = null;
@@ -24,6 +26,12 @@ class Index extends Component
     public $nama_kelas = null;
     public $nama_jenjang = null;
 
+    public $registrationSuccess = false;
+
+    // Tambahan
+    public $sudahTerdaftar = false;
+    public $nama_ekstrakurikuler_terdaftar = null;
+    
     public function updatedSelectedJenjang()
     {
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
@@ -31,125 +39,203 @@ class Index extends Component
 
     public function mount()
     {
-        // Tetapkan nilai pertama dari data yang tersedia jika ada
-        $firstJenjang = Jenjang::whereIn('ms_jenjang_id', function ($query) {
-            $query->select('ms_jenjang_id')
-                ->from('ms_akses_jenjang')
-                ->where('ms_pengguna_id', Auth::id());
-        })->where('status', 'Aktif')->first();
+        $this->selectedJenjang = 1;
 
-        $this->selectedJenjang = $firstJenjang->ms_jenjang_id ?? null;
-        $this->nama_jenjang = $firstJenjang->nama_jenjang ?? '';
+        $jenjang = Jenjang::find(1);
+
+        $this->nama_jenjang = $jenjang->nama_jenjang ?? '';
     }
 
     public function siswaSelected($ms_penempatan_siswa_id)
     {
-        // $siswa = Siswa::find($ms_penempatan_siswa_id);
-        $penempatanSiswa = PenempatanSiswa::find($ms_penempatan_siswa_id);
+        // Reset status terlebih dahulu
+        $this->registrationSuccess = false;
+        $this->sudahTerdaftar = false;
+        $this->nama_ekstrakurikuler_terdaftar = null;
+        $this->selectedEkstrakurikuler = null;
+
+        $penempatanSiswa = PenempatanSiswa::with([
+            'ms_siswa',
+            'ms_kelas',
+        ])->find($ms_penempatan_siswa_id);
 
         if ($penempatanSiswa) {
-            $this->siswaSelected = $penempatanSiswa->ms_siswa_id;
-            $this->ms_penempatan_siswa_id = $penempatanSiswa->ms_penempatan_siswa_id;
-            $this->ms_kelas_id = $penempatanSiswa->ms_kelas_id;
-            $this->nama_siswa = $penempatanSiswa->ms_siswa->nama_siswa;
-            $this->nama_kelas = $penempatanSiswa->ms_kelas->nama_kelas;
+
+            $this->siswaSelected =
+                $penempatanSiswa->ms_siswa_id;
+
+            $this->ms_penempatan_siswa_id =
+                $penempatanSiswa->ms_penempatan_siswa_id;
+
+            $this->ms_kelas_id =
+                $penempatanSiswa->ms_kelas_id;
+
+            $this->nama_siswa =
+                $penempatanSiswa->ms_siswa->nama_siswa;
+
+            $this->nama_kelas =
+                $penempatanSiswa->ms_kelas->nama_kelas;
 
             $this->search = '';
+
+            // Cek apakah siswa sudah terdaftar
+            $this->cekPendaftaranSiswa();
+        }
+    }
+
+    private function cekPendaftaranSiswa()
+    {
+        $this->sudahTerdaftar = false;
+        $this->nama_ekstrakurikuler_terdaftar = null;
+
+        if (!$this->ms_penempatan_siswa_id) {
+            return;
+        }
+
+        $penempatanEkstrakurikuler = PenempatanEkstrakurikuler::with([
+            'ms_ekstrakurikuler'
+        ])
+            ->where(
+                'ms_penempatan_siswa_id',
+                $this->ms_penempatan_siswa_id
+            )
+            ->first();
+
+        if ($penempatanEkstrakurikuler) {
+            $this->sudahTerdaftar = true;
+
+            $this->selectedEkstrakurikuler =
+                $penempatanEkstrakurikuler->ms_ekstrakurikuler_id;
+
+            $this->nama_ekstrakurikuler_terdaftar =
+                $penempatanEkstrakurikuler->ms_ekstrakurikuler
+                    ->nama_ekstrakurikuler ?? '-';
         }
     }
 
     public function daftar()
     {
+        // Validasi siswa
         if (empty($this->siswaSelected)) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Pilih Siswa.']);
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Silakan pilih siswa terlebih dahulu.'
+            ]);
+
             return;
         }
 
+        // Validasi jenjang
         if (empty($this->selectedJenjang)) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Pilih Jenjang']);
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Jenjang siswa belum dipilih.'
+            ]);
+
             return;
         }
+
+        // Validasi ekstrakurikuler
         if (empty($this->selectedEkstrakurikuler)) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Pilih Ekstrakurikuler.']);
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Silakan pilih ekstrakurikuler terlebih dahulu.'
+            ]);
+
             return;
         }
 
-        $penempatan = PenempatanSiswa::with('ms_kelas')->find($this->ms_penempatan_siswa_id);
+        DB::beginTransaction();
 
-        if (!$penempatan) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Penempatan siswa tidak ditemukan.']);
-            return;
-        }
+        try {
+            $penempatan = PenempatanSiswa::with([
+                'ms_siswa', 'ms_kelas',
+            ])->find($this->ms_penempatan_siswa_id);
 
-        // $kelasId = $penempatan->ms_kelas_id;
-        // $ekskulId = $this->selectedEkstrakurikuler;
+            if (!$penempatan) {
+                throw new \Exception(
+                    'Data penempatan siswa tidak ditemukan.'
+                );
+            }
 
-        // // Validasi khusus: TIK hanya untuk kelas 3-6
-        // if ($ekskulId == 1 && in_array($kelasId, [8, 9, 10, 11])) {
-        //     $this->dispatchBrowserEvent('alertify-error', ['message' => 'Ekstrakurikuler TIK hanya tersedia untuk siswa kelas 3 sampai 6.']);
-        //     return;
-        // }
+            $ekskul = Ekstrakurikuler::withCount(
+                'ms_penempatan_ekstrakurikuler'
+            )->findOrFail(
+                $this->selectedEkstrakurikuler
+            );
 
-        // Cek apakah siswa sudah terdaftar di ekstrakurikuler yang sama
-        $exists = PenempatanEkstrakurikuler::where([
-            'ms_siswa_id' => $this->siswaSelected,
-            'ms_ekstrakurikuler_id' => $this->selectedEkstrakurikuler,
-            'ms_jenjang_id' => $this->selectedJenjang,
-        ])->exists();
+            // Cek apakah siswa sudah terdaftar
+            $sudahTerdaftar = PenempatanEkstrakurikuler::where(
+                    'ms_penempatan_siswa_id',
+                    $this->ms_penempatan_siswa_id
+                )
+                ->exists();
 
-        if ($exists) {
-            $this->dispatchBrowserEvent('alertify-success', ['message' => 'Siswa sudah terdaftar dalam ekstrakurikuler.']);
-            return;
-        }
-
-        // Ambil data ekstrakurikuler untuk cek kuota
-        $ekstra = Ekstrakurikuler::find($this->selectedEkstrakurikuler);
-
-        if ($ekstra) {
-            $kuota = (int) $ekstra->kuota;
-            $terisi = $ekstra->total_penempatan_siswa();
-            $tersedia = max($kuota - $terisi, 0);
-
-            if ($tersedia <= 0) {
-                $this->dispatchBrowserEvent('alertify-error', ['message' => 'Kuota ekstrakurikuler sudah penuh.']);
+            if ($sudahTerdaftar) {
+                DB::rollBack();
+                $this->sudahTerdaftar = true;
+                $this->dispatchBrowserEvent('alertify-error', [
+                    'message' => 'Siswa sudah terdaftar pada ekstrakurikuler.'
+                ]);
                 return;
             }
+
+            // Cek kuota
+            if (
+                $ekskul->ms_penempatan_ekstrakurikuler_count
+                >= $ekskul->kuota
+            ) {
+
+                DB::rollBack();
+
+                $this->dispatchBrowserEvent('alertify-error', [
+                    'message' => "Kuota {$ekskul->nama_ekstrakurikuler} sudah penuh."
+                ]);
+
+                return;
+            }
+
+            // Simpan pendaftaran
+            PenempatanEkstrakurikuler::create([
+                'ms_penempatan_siswa_id' => $this->ms_penempatan_siswa_id,
+                'ms_ekstrakurikuler_id' => $this->selectedEkstrakurikuler,
+            ]);
+
+            DB::commit();
+
+            // Ambil nama ekskul untuk kartu sukses
+            $this->nama_ekstrakurikuler_terdaftar = $ekskul->nama_ekstrakurikuler;
+
+            // Tandai berhasil
+            $this->registrationSuccess = true;
+
+            // Siswa sekarang dianggap sudah terdaftar
+            $this->sudahTerdaftar = true;
+
+            $this->dispatchBrowserEvent('alertify-success', [
+                'message' => 'Pendaftaran ekstrakurikuler berhasil disimpan.'
+            ]);
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => $e->getMessage() ?? 'Terjadi kesalahan saat menyimpan pendaftaran.'
+            ]);
         }
-
-        // Simpan ke database
-        PenempatanEkstrakurikuler::create([
-            'ms_ekstrakurikuler_id' => $this->selectedEkstrakurikuler,
-            'ms_siswa_id' => $this->siswaSelected,
-            'ms_jenjang_id' => $this->selectedJenjang,
-        ]);
-
-        // Reset input
-        $this->siswaSelected = null;
-        $this->selectedEkstrakurikuler = null;
-        $this->nama_siswa = null;
-
-        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Pendaftaran berhasil disimpan.']);
     }
+
     public function render()
     {
-        $select_ekstrakurikuler = collect(); // ← Tambahkan ini
-        if ($this->siswaSelected) {
-            $select_ekstrakurikuler = Ekstrakurikuler::where('ms_jenjang_id', $this->selectedJenjang)
-                ->get();
-
-            // Jika siswa sudah dipilih
-            if (in_array($this->ms_kelas_id, [8, 9, 10, 11])) {
-                $select_ekstrakurikuler->where('ms_ekstrakurikuler_id', '!=', 1);
-            }
-        }
-
+        $select_ekstrakurikuler = collect();
+        $select_ekstrakurikuler = Ekstrakurikuler::where(
+                'ms_jenjang_id',
+                $this->selectedJenjang
+            )->get();
+            
         $siswas = collect();
         if ($this->search && $this->selectedJenjang) {
             $siswas = PenempatanSiswa::with([
                 'ms_kelas',
                 'ms_tahun_ajar',
                 'ms_jenjang',
-                'ms_siswa.ms_penempatan_ekstrakurikuler.ms_ekstrakurikuler',
+                'ms_penempatan_ekstrakurikuler.ms_ekstrakurikuler',
             ])
                 ->join('ms_siswa', 'ms_penempatan_siswa.ms_siswa_id', '=', 'ms_siswa.ms_siswa_id')
                 ->where('ms_jenjang_id', $this->selectedJenjang)
@@ -163,8 +249,6 @@ class Index extends Component
         }
 
         return view('livewire.formulir-ekstrakurikuler.index', [
-            'select_jenjang' => Jenjang::where('status', 'Aktif')->get(),
-
             'select_ekstrakurikuler' => $select_ekstrakurikuler,
             'siswa' => $siswas
         ]);

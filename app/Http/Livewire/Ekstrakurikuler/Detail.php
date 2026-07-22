@@ -7,13 +7,21 @@ use App\Models\Kelas;
 use App\Models\PenempatanEkstrakurikuler;
 use App\Models\PenempatanSiswa;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class Detail extends Component
 {
+    use WithPagination;
+
+    protected $paginationTheme = 'bootstrap'; // Gunakan tema Bootstrap
+
     public $ms_ekstrakurikuler_id;
 
     public $search = '';
+
     public $selectedJenjang;
+    public $selectedTahunAjar;
+
     public $selectedKelas;
 
     public $siswaTerdaftar = [];
@@ -33,18 +41,25 @@ class Detail extends Component
 
         if ($ekskul) {
             $this->selectedJenjang = $ekskul->ms_jenjang_id;
+            $this->selectedTahunAjar = $ekskul->ms_tahun_ajar_id;
         }
     }
-    public function cetakEkstrakurikuler($ms_ekstrakurikuler_id)
+
+    public function updatingSearch()
     {
-        if (!$ms_ekstrakurikuler_id) {
+        $this->resetPage(); // Reset pagination ketika pencarian berubah
+    }
+
+    public function cetakEkstrakurikuler()
+    {
+        if (!$this->ms_ekstrakurikuler_id) {
             $this->dispatchBrowserEvent('alertify-error', ['message' => 'ektrakurikuler tidak diketahui']);
             return;
         }
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'laporan diproses.']);
 
         $url = route('administrasi.ekstrakurikuler-siswa.pdf', [
-            'ekstrakurikuler_id' => $ms_ekstrakurikuler_id,
+            'ekstrakurikuler_id' => $this->ms_ekstrakurikuler_id,
             'kelas' => $this->selectedKelas,
             'search' => $this->search,
         ]);
@@ -53,19 +68,23 @@ class Detail extends Component
     }
     public function render()
     {
-        $select_kelas = [];
-        if ($this->selectedJenjang) {
+        $select_kelas = collect();
+
+        if ($this->selectedJenjang && $this->selectedTahunAjar) {
             $select_kelas = Kelas::where('ms_jenjang_id', $this->selectedJenjang)
-                // ->where('ms_tahun_ajar_id', '1')
+                ->where('ms_tahun_ajar_id', $this->selectedTahunAjar)
                 ->get();
         }
 
-        $query = PenempatanSiswa::with([
-            'ms_kelas',
-            'ms_siswa.ms_penempatan_ekstrakurikuler.ms_ekstrakurikuler',
-        ])
+        $siswa = collect();
+        if($this->selectedJenjang && $this->selectedTahunAjar){
+                $query = PenempatanSiswa::with([
+                'ms_kelas',
+                'ms_penempatan_ekstrakurikuler.ms_ekstrakurikuler',
+            ])
             ->where('ms_jenjang_id', $this->selectedJenjang)
-            ->whereHas('ms_siswa.ms_penempatan_ekstrakurikuler', function ($q) {
+            ->where('ms_tahun_ajar_id', $this->selectedTahunAjar)
+            ->whereHas('ms_penempatan_ekstrakurikuler', function ($q) {
                 $q->where('ms_ekstrakurikuler_id', $this->ms_ekstrakurikuler_id);
             })
             ->when($this->search, function ($q) {
@@ -74,18 +93,18 @@ class Detail extends Component
                 });
             })
             ->orderBy('ms_kelas_id');
+            // Filter berdasarkan kelas (jika dipilih)
+            if ($this->selectedKelas) {
+                $query->where('ms_kelas_id', $this->selectedKelas);
+            }
 
-        // Filter berdasarkan kelas (jika dipilih)
-        if ($this->selectedKelas) {
-            $query->where('ms_kelas_id', $this->selectedKelas);
+            // Ambil data akhir
+            $siswa = $query->paginate(50);
         }
-
-        // Ambil data akhir
-        $siswa = $query->get();
-
-        return view('livewire.ekstrakurikuler.detail', [
-            'select_kelas' => $select_kelas,
-            'siswa' => $siswa
-        ]);
+        
+        return view('livewire.ekstrakurikuler.detail', compact(
+            'select_kelas',
+            'siswa'
+        ));
     }
 }

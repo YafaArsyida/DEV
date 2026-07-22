@@ -1,12 +1,35 @@
-<div class="card">
-    <div class="card-header border-0 pb-0">
-        <div class="d-flex align-items-center">
-            <h5 class="card-title mb-0 flex-grow-1">Data Ekstrakurikuler</h5>
-            @if ($selectedJenjang)
-            <div class="flex-shrink-0">
-                <div class="d-flex gap-2 flex-wrap">
-                    <button data-bs-toggle="modal" id="create-btn" data-bs-target="#ModalAddEkstrakurikuler" wire:click.prevent="$emit('createEkstrakurikuler', {{ $selectedJenjang }})" class="btn btn-primary"><i class="ri-play-list-add-line me-1 align-bottom"></i> Ekstrakurikuler Baru</button>
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    {{-- HEADER --}}
+    <div class="card-header">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4">
+            {{-- TITLE --}}
+            <div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-sm">
+                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                            <i class="ri-trophy-line"></i>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h5 class="fw-bold mb-1">
+                            Data Ekstrakurikuler
+                        </h5>
+                        {{-- <small class="text-muted">
+                            Kelola daftar ekstrakurikuler pada jenjang yang dipilih.
+                        </small> --}}
+                    </div>
                 </div>
+            </div>
+
+            {{-- ACTION --}}
+            @if ($selectedJenjang)
+            <div class="d-flex gap-2 flex-wrap">
+                <button type="button" class="btn btn-primary rounded-pill px-4"
+                    data-bs-toggle="modal" data-bs-target="#ModalAddEkstrakurikuler"
+                    wire:click.prevent="$emit('createEkstrakurikuler', {{ $selectedJenjang }}, {{ $selectedTahunAjar }})">
+                    <i class="ri-add-line me-1"></i>Ekstrakurikuler Baru
+                </button>
             </div>
             @endif
         </div>
@@ -38,72 +61,62 @@
             @else
                 <!-- Tabel Data Ekstrakurikuler -->
                 <div class="table-responsive">
-                    <table class="table table-hover nowrap align-middle" style="width:100%">
-                    {{-- <div class="text-center my-3">
-                        <h4 class="mb-0">Data Ekstrakurikuler Jenjang {{ $namaJenjang }}</h4>
-                        <div>Tahun Ajaran {{ $namaTahunAjar }}</div>
-                    </div> --}}
+                    <table class="table table-hover table-nowrap align-middle" style="width:100%">
                         <thead class="table-light">
-                            <tr>
-                                <th class="text-uppercase">hapus</th>
-                                <th class="text-uppercase" width="50px">no</th>
-                                <th class="text-uppercase">ekstrakurikuler</th>
-                                <th class="text-uppercase">biaya</th>
-                                <th class="text-uppercase">kuota</th>
-                                <th class="text-uppercase">terisi</th>
-                                <th class="text-uppercase">tersedia</th>
-                                <th class="text-uppercase">aksi</th>
+                            <tr class="text-uppercase">
+                                <th class="text-center" width="30px">no</th>
+                                <th class="text-center">hapus</th>
+                                <th>ekstrakurikuler</th>
+                                <th>biaya</th>
+                                <th>kuota</th>
+                                <th class="text-center">aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse ($data as $item)
                                 <tr>
-                                    <td>
-                                        <a href="#deleteEkstrakurikuler" data-bs-toggle="modal" class="btn btn-sm btn-soft-danger d-inline-flex align-items-center gap-1" wire:click.prevent="$emit('confirmDelete', {{ $item->ms_ekstrakurikuler_id }})" data-bs-trigger="hover" data-bs-placement="top" title="Hapus">
-                                            <i class="ri-delete-bin-5-line"></i>
+                                    <td class="text-center">{{ $loop->iteration }}</td>
+                                    <td class="text-center">
+                                        <a href="#deleteEkstrakurikuler" data-bs-toggle="modal" class="text-danger d-inline-block remove-item-btn"
+                                            wire:click.prevent="$emit('confirmDelete', {{ $item->ms_ekstrakurikuler_id }})"
+                                            data-bs-trigger="hover" data-bs-placement="top" title="Hapus Ekstrakurikuler">
+                                            <i class="ri-delete-bin-5-fill fs-14"></i>
                                         </a>
                                     </td>
-                                    <td>{{ $loop->iteration }}.</td>
                                     <td>
-                                        <span class="fw-medium" style="white-space: nowrap;">
+                                        <span class="fw-medium">
                                             {{ $item->nama_ekstrakurikuler }}
                                         </span>
                                         {{-- <p class="text-muted mb-0">{{ $item->deskripsi }}</p> --}}
                                     </td>
-                                    <td class="" style="white-space: nowrap;">
-                                        <span class="fw-medium fs-14 text-success">
-                                            RP{{ number_format($item->biaya, 0, ',', '.') }}
+                                    <td class="">
+                                        <span class="fw-medium fs-12">
+                                            Rp{{ number_format($item->biaya, 0, ',', '.') }}
                                         </span>
                                     </td>
-                                    <td style="white-space: nowrap;">{{ $item->kuota ?? '0' }} siswa</td>
-                                    <td style="white-space: nowrap;">{{ $item->total_penempatan_siswa() ?? '0' }} siswa</td>
-                                    <td style="white-space: nowrap;">{{ $item->kuota_tersedia() ?? '0' }} siswa</td>
-                                    <td style="white-space: nowrap;">
-                                        <div class="hstack gap-2">
-                                            {{-- Tombol Edit Ekstrakurikuler --}}
-                                            <button class="btn btn-sm btn-primary d-inline-flex align-items-center"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#editEkstrakurikuler"
-                                                    title="Edit Ekstrakurikuler"
-                                                    wire:click.prevent="$emit('loadEkstrakurikuler', {{ $item->ms_ekstrakurikuler_id }})">
-                                                <i class="ri-quill-pen-line align-bottom me-1"></i> Edit
+                                    <td>{{ $item->kuota ?? '0' }} / {{ $item->ms_penempatan_ekstrakurikuler_count ?? '0' }}  siswa</td>
+                                    <td>
+                                        <div class="d-flex justify-content-center gap-2">
+                                            {{-- Edit --}}
+                                            <button
+                                                class="btn btn-soft-primary btn-sm rounded-pill px-3"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editEkstrakurikuler"
+                                                title="Edit Ekstrakurikuler"
+                                                wire:click.prevent="$emit('loadEkstrakurikuler', {{ $item->ms_ekstrakurikuler_id }})">
+                                                <i class="ri-mark-pen-line me-1"></i> Edit
                                             </button>
-                                            {{-- Tombol Detail Tagihan --}}
-                                            <button class="btn btn-sm btn-secondary d-inline-flex align-items-center"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#detailEkstrakurikuler"
-                                                    title="Detail Ekstrakurikuler"
-                                                    wire:click.prevent="$emit('detailEkstrakurikuler', {{ $item->ms_ekstrakurikuler_id }})">
-                                                <i class="ri-eye-line align-bottom me-1"></i> Detail
-                                            </button>
-                                           {{-- cetak PDF --}}
-                                            <button class="btn btn-sm btn-danger d-inline-flex align-items-center"
-                                                    title="Cetak Ekstrakurikuler"
-                                                    wire:click.prevent="$emit('cetakEkstrakurikuler', {{ $item->ms_ekstrakurikuler_id }})">
-                                                <i class="ri-printer-line align-bottom me-1"></i> Cetak PDF
+                                             {{-- Detail --}}
+                                            <button
+                                                class="btn btn-primary btn-sm rounded-pill px-3"
+                                                data-bs-toggle="offcanvas"
+                                                data-bs-target="#detailEkstrakurikuler"
+                                                title="Detail Ekstrakurikuler"
+                                                wire:click.prevent="$emit('detailEkstrakurikuler', {{ $item->ms_ekstrakurikuler_id }})">
+                                                <i class="ri-eye-line me-1"></i> Detail
                                             </button>
                                         </div>
-                                    </td>                                    
+                                    </td>                                  
                                 </tr>
                             @empty
                                 <!-- Jika Tidak Ada Data Ekstrakurikuler -->
@@ -122,7 +135,29 @@
                             @endforelse
                         </tbody>
                     </table>
-                    <!-- Pagination -->
+                    {{-- PAGINATION --}}
+                    <div class="mt-3">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div class="text-muted fs-13">
+                                Menampilkan
+                                <span class="fw-semibold">
+                                    {{ $data->firstItem() ?? 0 }}
+                                </span>
+                                -
+                                <span class="fw-semibold">
+                                    {{ $data->lastItem() ?? 0 }}
+                                </span>
+                                dari
+                                <span class="fw-semibold">
+                                    {{ $data->total() }}
+                                </span>
+                                data ekstrakurikuler
+                            </div>
+                            <div>
+                                {{ $data->links() }}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             @endif
         </div>

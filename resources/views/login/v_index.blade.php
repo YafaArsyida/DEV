@@ -24,87 +24,209 @@
 
 <body>
 
-    <div class="auth-page-wrapper pt-5">
-        <!-- auth page bg -->
-        <div class="auth-one-bg-position auth-one-bg" id="auth-particles">
-            <div class="bg-overlay"></div>
-
-            <div class="shape">
-                <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1440 120">
-                    <path d="M 0,36 C 144,53.6 432,123.2 720,124 C 1008,124.8 1296,56.8 1440,40L1440 140L0 140z"></path>
-                </svg>
-            </div>
-        </div>
+     <!-- auth-page wrapper -->
+    <div class="auth-page-wrapper auth-bg-cover py-5 d-flex justify-content-center align-items-center min-vh-100">
+        <div class="bg-overlay"></div>
 
         <!-- auth page content -->
-        <div class="auth-page-content">
+        <div class="auth-page-content overflow-hidden pt-lg-5">
             <div class="container">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="text-center mt-sm-5 mb-4 text-white">
-                            <span class="fw-bold fs-3">TemanSekolah X SMP Pandanaran</span>
-                            <p class="mt-3 fs-15 fw-medium text-white-50">
-                                Sistem Administrasi Terintegrasi untuk SMP Pandanaran
-                            </p>
-                        </div>
-                    </div>
-
-                </div>
-                <!-- end row -->
-
                 <div class="row justify-content-center">
-                    <div class="col-md-8 col-lg-6 col-xl-5">
-                        <div class="card mt-4">
+                    <div class="col-xl-10">
 
-                            <div class="card-body p-4">
-                                <div class="text-center mt-2">
-                                    <h5 class="mb-0">Selamat Datang !</h5>
-                                    <p class="text-muted mt-2">Masuk untuk menjadi bagian kami</p>
-                                </div>
-                                @if (session()->has('loginError'))
-                                    <div class="alert alert-danger alert-dismissible alert-label-icon label-arrow fade show" role="alert">
-                                        <i class="mdi mdi-block-helper label-icon"></i><strong>Danger</strong> - {{ session('loginError') }}
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                    </div>
-                                @endif
-                                <div class="p-2 mt-4">
-                                    <form class="mt-4 pt-2" action="{{ route('login.authenticate') }}" method="POST">
-                                        @csrf
-                                        <div class="mb-3">
-                                            <label class="form-label">Email</label>
-                                            <input id="email" type="text" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}"   placeholder="Enter email/username..." autofocus>
-                                            @error('email')
-                                                <div class="invalid-feedback">
-                                                    {{ $message }}
+                        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+
+                            <div class="row g-0">
+
+                                <!-- ========================= -->
+                                <!-- LEFT PANEL -->
+                                <!-- ========================= -->
+                                <div class="col-lg-6">
+                                    <div class="p-lg-5 p-4 bg-primary h-100">
+                                        <div class="bg-overlay"></div>
+
+                                        <div class="position-relative h-100 d-flex flex-column text-white">
+
+                                            <div>
+                                                <h2 class="fw-bold text-white mb-1">
+                                                    TemanSekolah
+                                                </h2>
+
+                                                <p class="fs-12 text-white-75 mb-5">
+                                                    Sistem Administrasi Terintegrasi 
+                                                </p>
+                                            </div>
+
+                                            <div class="my-auto">
+
+                                                <div class="text-center">
+                                                    <div class="avatar-xl mx-auto mb-4">
+                                                        <div class="avatar-title rounded-circle bg-white bg-opacity-10">
+                                                            <i class="ri-school-line display-4 text-white"></i>
+                                                        </div>
+                                                    </div>
+
+                                                    <h3 class="text-white fw-semibold">
+                                                        SD Islam Al Hidayah Karanggede
+                                                    </h3>
                                                 </div>
-                                            @enderror
-                                        </div>
 
-                                        <div class="mb-3">
-                                            <label class="form-label" for="password-input">Password</label>
-                                            <div class="position-relative auth-pass-inputgroup mb-3">
-                                                <input type="password" name="password" class="form-control pe-5 password-input @error('password') is-invalid @enderror" placeholder="Enter password" id="password-input">
-                                                {{-- <button class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted shadow-none password-addon" type="button" id="password-addon"><i class="ri-eye-fill align-middle"></i></button> --}}
+                                            </div>
 
-                                                {{-- <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Enter password" aria-label="Password" aria-describedby="password-addon"> --}}
-                                                <button class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted shadow-none password-addon" type="button" id="password-addon"><i class="ri-eye-fill align-middle"></i></button>
+                                            <div class="mt-auto">
+                                                <div class="mb-3">
+                                                    <i class="ri-double-quotes-l display-4 text-success"></i>
+                                                </div>
+
+                                                <div id="qoutescarouselIndicators" class="carousel slide" data-bs-ride="carousel">
+                                                    <div class="carousel-indicators">
+                                                        <button type="button" data-bs-target="#qoutescarouselIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                                                        <button type="button" data-bs-target="#qoutescarouselIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                                                        <button type="button" data-bs-target="#qoutescarouselIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                                                    </div>
+                                                    <div class="carousel-inner text-center text-white-50 pb-5">
+                                                        <div class="carousel-item active">
+                                                            <p class="fs-15 fst-italic">
+                                                                "Kelola data siswa, keuangan, dan administrasi sekolah secara lebih cepat, aman, dan terintegrasi dalam satu platform."
+                                                            </p>
+                                                        </div>
+
+                                                        <div class="carousel-item">
+                                                            <p class="fs-15 fst-italic">
+                                                                "Dirancang untuk mendukung pelayanan administrasi yang lebih efisien, akurat, dan mudah digunakan oleh seluruh civitas sekolah."
+                                                            </p>
+                                                        </div>
+
+                                                        <div class="carousel-item">
+                                                            <p class="fs-15 fst-italic">
+                                                                "TemanSekolah X membantu sekolah bekerja lebih produktif melalui sistem digital yang modern, terpercaya, dan berkelanjutan."
+                                                            </p>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                                <!-- end carousel -->
                                             </div>
                                         </div>
-
-                                        <div class="mt-4">
-                                            <button class="btn btn-primary w-100" type="submit">Masuk</button>
-                                        </div>
-                                    </form>
+                                    </div>
                                 </div>
+
+                                <!-- ========================= -->
+                                <!-- RIGHT PANEL -->
+                                <!-- ========================= -->
+                                <div class="col-lg-6 my-auto">
+
+                                    <div class="p-lg-5 p-4">
+
+                                        <div class="mb-4">
+                                            <h3 class="fw-bold mb-2">
+                                                Masuk
+                                            </h3>
+
+                                            <p class="text-muted mb-0">
+                                                Silakan masuk menggunakan akun Anda.
+                                            </p>
+                                        </div>
+
+                                        @if (session()->has('loginError'))
+                                            <div class="alert alert-danger alert-dismissible fade show rounded-3" role="alert">
+                                                <i class="ri-error-warning-line me-2"></i>
+                                                {{ session('loginError') }}
+
+                                                <button type="button"
+                                                        class="btn-close"
+                                                        data-bs-dismiss="alert">
+                                                </button>
+                                            </div>
+                                        @endif
+
+                                        <form action="{{ route('login.authenticate') }}" method="POST">
+                                            @csrf
+
+                                            <div class="mb-3">
+
+                                                <label class="form-label">
+                                                    Email / Username
+                                                </label>
+
+                                                <input
+                                                    id="email"
+                                                    type="text"
+                                                    name="email"
+                                                    value="{{ old('email') }}"
+                                                    autofocus
+                                                    placeholder="Masukkan email atau username"
+                                                    class="form-control @error('email') is-invalid @enderror">
+
+                                                @error('email')
+                                                    <div class="invalid-feedback">
+                                                        {{ $message }}
+                                                    </div>
+                                                @enderror
+
+                                            </div>
+
+                                            <div class="mb-4">
+
+                                                <label class="form-label">
+                                                    Password
+                                                </label>
+
+                                                <div class="position-relative auth-pass-inputgroup">
+
+                                                    <input
+                                                        type="password"
+                                                        name="password"
+                                                        id="password-input"
+                                                        placeholder="Masukkan password"
+                                                        class="form-control pe-5 password-input @error('password') is-invalid @enderror">
+
+                                                    <button
+                                                        class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted shadow-none password-addon"
+                                                        type="button"
+                                                        id="password-addon">
+
+                                                        <i class="ri-eye-fill align-middle"></i>
+
+                                                    </button>
+
+                                                    @error('password')
+                                                        <div class="invalid-feedback d-block">
+                                                            {{ $message }}
+                                                        </div>
+                                                    @enderror
+
+                                                </div>
+
+                                            </div>
+
+                                            <div class="d-grid">
+
+                                                <button
+                                                    class="btn btn-primary btn-lg"
+                                                    type="submit">
+
+                                                    <i class="ri-login-box-line me-1"></i>
+
+                                                    Masuk
+
+                                                </button>
+
+                                            </div>
+
+                                        </form>
+
+                                    </div>
+
+                                </div>
+
                             </div>
-                            <!-- end card body -->
+
                         </div>
-                        <!-- end card -->
+
                     </div>
                 </div>
-                <!-- end row -->
             </div>
-            <!-- end container -->
         </div>
         <!-- end auth page content -->
 

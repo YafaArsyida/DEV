@@ -74,11 +74,11 @@ class Create extends Component
 
             JenisTagihanSiswa::create([
                 'nama_jenis_tagihan_siswa' => $validatedData['nama_jenis_tagihan_siswa'],
-                'ms_jenjang_id' => $validatedData['ms_jenjang_id'],
-                'ms_tahun_ajar_id' => $validatedData['ms_tahun_ajar_id'],
+                'ms_jenjang_id'            => $validatedData['ms_jenjang_id'],
+                'ms_tahun_ajar_id'         => $validatedData['ms_tahun_ajar_id'],
                 'ms_kategori_tagihan_siswa_id' => $validatedData['ms_kategori_tagihan_siswa_id'],
-                'tanggal_jatuh_tempo' => $validatedData['tanggal_jatuh_tempo'],
-                'deskripsi' => $validatedData['deskripsi'],
+                'tanggal_jatuh_tempo'      => $validatedData['tanggal_jatuh_tempo'],
+                'deskripsi'                => $validatedData['deskripsi'],
             ]);
 
             DB::commit();

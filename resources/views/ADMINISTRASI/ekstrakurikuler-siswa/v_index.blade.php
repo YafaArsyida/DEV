@@ -21,14 +21,16 @@
                 </div>
             </div>
             <!--end col-->
-            <div class="col-xxl-6 pe-1">
-                @livewire('ekstrakurikuler.index')   
+            <div class="col-xxl-5">
+                <div class="sticky-side-div">
+                    @livewire('ekstrakurikuler.index')   
+                </div>
                 @livewire('ekstrakurikuler.create')   
                 @livewire('ekstrakurikuler.edit')   
                 @livewire('ekstrakurikuler.delete')  
                 @livewire('ekstrakurikuler.detail')  
             </div>
-            <div class="col-xxl-6 ps-0">
+            <div class="col-xxl-7">
                 @livewire('siswa-ekstrakurikuler.index')
                 @livewire('siswa-ekstrakurikuler.detail')
                 @livewire('siswa-ekstrakurikuler.edit')

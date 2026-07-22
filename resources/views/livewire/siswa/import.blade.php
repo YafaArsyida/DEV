@@ -159,7 +159,7 @@
                             </div>
                         </div>
                     </div>
-                    @if(count($newSiswaList))
+                    @if(!empty($newSiswaList))
                     <div class="card mt-4">
                         <div class="card-header">
                             <h5 class="mb-0">
