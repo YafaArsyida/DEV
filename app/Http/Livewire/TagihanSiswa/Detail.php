@@ -51,6 +51,23 @@ class Detail extends Component
         $this->namaSiswaCurrent = $params['nama_siswa'] ?? 'Siswa';
     }
 
+    public function DetailPdf()
+    {
+        if (!$this->selectedJenjang || !$this->selectedTahunAjar) {
+            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Jenjang dan Tahun Ajar wajib dipilih']);
+            return;
+        }
+
+        $this->dispatchBrowserEvent('alertify-success', ['message' => 'laporan diproses.']);
+
+        $url = route('keuangan.tagihan-siswa.detail-pdf', [
+            'selectedSiswa' => $this->ms_penempatan_siswa_id,
+            'selectedKategori' => $this->selectedKategori
+        ]);
+
+        $this->emit('openNewTab', $url);
+    }
+
     public function render()
     {
         $select_kategori = [];

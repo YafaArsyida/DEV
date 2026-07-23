@@ -43,7 +43,7 @@
 
                                     <div>
                                         <h5 class="fw-bold mb-1">
-                                            Detail Tagihan Siswa
+                                            Detail Ekstrakurikuler Siswa
                                         </h5>
                                         <small class="text-muted">
                                             Tampilkan siswa dari daftar berdasarkan kategori dan pencarian.
@@ -64,7 +64,7 @@
                                     <span>Cetak</span>
                                 </button>
 
-                                {{-- <button data-bs-toggle="modal" data-bs-target="#ModalDetailTagihan" class="btn rounded-pill px-4 btn-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button> --}}
+                                {{-- <button data-bs-toggle="modal" data-bs-target="#ModalDetailEkstrakurikuler" class="btn rounded-pill px-4 btn-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button> --}}
                             </div>
 
                         </div>

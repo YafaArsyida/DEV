@@ -65,15 +65,7 @@
                                         <span>PDF</span>
                                     </button>
 
-                                    <button
-                                        id="exportExcelTagihanDetail"
-                                        type="button"
-                                        class="btn btn-success rounded-pill px-4 d-inline-flex align-items-center gap-1"
-                                        title="Export Excel">
-                                        <i class="ri-file-excel-2-line"></i>
-                                        <span>Excel</span>
-                                    </button>
-
+                                    <button data-bs-toggle="modal" data-bs-target="#ModalDetailTagihan" class="btn rounded-pill px-4 btn-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button>
                                 </div>
 
                             </div>
@@ -122,7 +114,7 @@
                                 </div>
                                 @else
                                 <div class="table-responsive">
-                                    <table id="laporanTagihanDetail" class="table table-hover nowrap align-middle" style="width:100%">
+                                    <table id="DataDetailTagihan" class="table table-hover nowrap align-middle" style="width:100%">
                                         <thead class="table-light">
                                             <tr class="text-uppercase" style="white-space: nowrap;">
                                                 <th class="text-center" style="width: 50px;">NO</th>
@@ -242,22 +234,105 @@
             </div>
         </div>
     </div>
+    <div class="modal fade zoomIn" id="ModalDetailTagihan" tabindex="-1" aria-labelledby="exportRecordLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                {{-- CLOSE BUTTON --}}
+                <div class="modal-header border-0 pb-0">
+                    <button type="button" class="btn btn-light btn-icon rounded-circle ms-auto" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="ri-close-line fs-18"></i>
+                    </button>
+                </div>
+
+                {{-- BODY --}}
+                <div class="modal-body px-4 pb-5 pt-2 text-center">
+                    {{-- ICON --}}
+                    <div class="mb-4">
+                        <div class="avatar-xl mx-auto">
+                            <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
+                                <lord-icon src="https://cdn.lordicon.com/fjvfsqea.json"
+                                    trigger="loop" colors="primary:#405189,secondary:#0ab39c"
+                                    style="width:70px;height:70px">
+                                </lord-icon>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- TITLE --}}
+                    <div class="mb-2">
+                        <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill mb-3">
+                            Konfirmasi Export
+                        </span>
+
+                        <h3 class="fw-bold mb-2" id="exportRecordLabel">
+                            Export Detail Tagihan {{ $nama_tagihan ?? 'Tagihan' }}?
+                        </h3>
+
+                        <p class="text-muted mb-0 lh-lg px-lg-4">
+                            Data yang diekspor akan mengikuti filter dan tabel yang
+                            sedang ditampilkan, sehingga hasil export sesuai dengan
+                            data yang Anda lihat saat ini.
+                        </p>
+
+                    </div>
+
+                    {{-- INFORMATION --}}
+                    <div class="alert alert-light border rounded-4 text-start mt-4 mb-0">
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="flex-shrink-0">
+                                <i class="ri-information-line text-primary fs-20"></i>
+                            </div>
+
+                            <div>
+                                <h6 class="fw-semibold mb-1">
+                                    Informasi
+                                </h6>
+                                <p class="text-muted mb-0 fs-13">
+                                    Pastikan filter dan pencarian sudah sesuai sebelum melakukan export.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- FOOTER --}}
+                <div class="modal-footer border-0 pt-0 px-4 pb-4 justify-content-center">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">
+                        <i class="ri-close-line me-1"></i>
+                        Batal
+                    </button>
+
+                    <button type="button" class="btn btn-primary rounded-pill px-4"
+                        id="konfirmasiExporDetail" 
+                        data-tagihan="{{ $nama_tagihan ?? 'Tagihan' }}"
+                        data-bs-dismiss="modal">
+                        <i class="ri-download-2-line me-1"></i>
+                        Ya, Export
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script>
-        document.getElementById('exportExcelTagihanDetail').addEventListener('click', function () {
-            //   console.log("🔵 Tombol export diklik");
+        document.getElementById('konfirmasiExporDetail').addEventListener('click', function () {
             alertify.success("Menyiapkan Dokumen");
+            const namaTagihan = this.dataset.kelas;
 
             // Tambahkan delay 1 detik
             setTimeout(function () {
                 // Ambil elemen tabel berdasarkan ID
-                var table = document.getElementById("laporanTagihanDetail");
-                
+                var table = document.getElementById("DataDetailTagihan"); // ganti sesuai kebutuhan
+        
                 // Konversi tabel ke format Excel
                 var workbook = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
                 
                 // Simpan file Excel
-                XLSX.writeFile(workbook, "Laporan-Detail-Tagihan.xlsx");
+                XLSX.writeFile(
+                    workbook,
+                    `Administrasi-Tagihan-${namaTagihan}-{{ date('Y-m-d') }}.xlsx`
+                );
             }, 1000); // 1000 ms = 1 detik
         });
+
     </script>
 </div>

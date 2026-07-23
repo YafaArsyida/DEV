@@ -15,7 +15,7 @@ class Index extends Component
     protected $paginationTheme = 'bootstrap';
 
     public $search = ''; // Pencarian
-    public $perPage = 10;
+    public $perPage = 50;
 
     public $selectedJenjang = null;
     public $selectedTahunAjar = null;

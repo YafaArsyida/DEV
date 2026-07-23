@@ -57,7 +57,7 @@
                                 <div class="d-flex gap-2 flex-wrap">
 
                                     <button
-                                        wire:click="cetakPdfTagihan"
+                                        wire:click="DetailPdf"
                                         type="button"
                                         class="btn btn-danger rounded-pill px-4 d-inline-flex align-items-center gap-1"
                                         title="Cetak Laporan PDF">

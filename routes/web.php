@@ -162,8 +162,8 @@ Route::middleware(['auth', 'peran:SUPERADMIN,ADMINISTRASI'])->group(function () 
     Route::get('/keuangan/konfigurasi-tagihan-siswa',  [KonfigurasiTagihanSiswa::class, 'index'])->name('keuangan.konfigurasi-tagihan-siswa');
 
     Route::get('/keuangan/tagihan-siswa',  [TagihanSiswa::class, 'index'])->name('keuangan.tagihan-siswa');
-    Route::get('/keuangan/tagihan-siswa/pdf', [TagihanSiswa::class, 'cetakPDF'])
-        ->name('keuangan.tagihan-siswa.pdf');
+    Route::get('/keuangan/tagihan-siswa/pdf', [TagihanSiswa::class, 'cetakPDF'])->name('keuangan.tagihan-siswa.pdf');
+    Route::get('/keuangan/tagihan-siswa/detail-pdf', [TagihanSiswa::class, 'detailPDF'])->name('keuangan.tagihan-siswa.detail-pdf');
 
     Route::get('/keuangan/tagihan-jenis',  [TagihanJenis::class, 'index'])->name('keuangan.tagihan-jenis');
     Route::get('/keuangan/jenis-tagihan-siswa/pdf', [TagihanJenis::class, 'cetakPDF'])
