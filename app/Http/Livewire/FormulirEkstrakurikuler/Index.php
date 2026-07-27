@@ -200,6 +200,8 @@ class Index extends Component
 
             DB::commit();
 
+            $this->emit('ekstrakurikulerTerdaftar', $this->selectedEkstrakurikuler);
+
             // Ambil nama ekskul untuk kartu sukses
             $this->nama_ekstrakurikuler_terdaftar = $ekskul->nama_ekstrakurikuler;
 

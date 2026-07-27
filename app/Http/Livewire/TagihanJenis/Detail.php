@@ -49,6 +49,24 @@ class Detail extends Component
         $this->resetPage();
     }
 
+    public function DetailPdf()
+    {
+        if (!$this->ms_jenis_tagihan_siswa_id) {
+            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Jenis tagihan wajib dipilih']);
+            return;
+        }
+
+        $this->dispatchBrowserEvent('alertify-success', ['message' => 'laporan diproses.']);
+
+        $url = route('keuangan.tagihan-jenis.detail-pdf', [
+            'selectedJenisTagihan' => $this->ms_jenis_tagihan_siswa_id,
+            'selectedKelas' => $this->selectedKelas,
+            'search' => $this->search,
+        ]);
+
+        $this->emit('openNewTab', $url);
+    }
+
     public function render()
     {
         // Query untuk memilih kelas berdasarkan jenjang dan tahun ajar

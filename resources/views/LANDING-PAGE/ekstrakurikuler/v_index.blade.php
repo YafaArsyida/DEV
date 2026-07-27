@@ -223,7 +223,7 @@
 
         <!-- Informasi Kuota -->
         <section class="py-5 position-relative bg-light" id="kuota">
-            @livewire('ekstrakurikuler.informasi-kuota')
+            @livewire('landing.ekstrakurikuler.informasi-kuota')
         </section>
 
         <!-- end counter -->

@@ -168,6 +168,8 @@ Route::middleware(['auth', 'peran:SUPERADMIN,ADMINISTRASI'])->group(function () 
     Route::get('/keuangan/tagihan-jenis',  [TagihanJenis::class, 'index'])->name('keuangan.tagihan-jenis');
     Route::get('/keuangan/jenis-tagihan-siswa/pdf', [TagihanJenis::class, 'cetakPDF'])
         ->name('keuangan.jenis-tagihan-siswa.pdf');
+    Route::get('/keuangan/tagihan-jenis/detail-pdf', [TagihanJenis::class, 'detailPDF'])
+        ->name('keuangan.tagihan-jenis.detail-pdf');
 
     Route::get('/transaksi/tagihan-siswa',  [TransaksiTagihanSiswa::class, 'index'])->name('transaksi.tagihan-siswa');
     Route::get('/transaksi/tagihan-siswa/{transaksiId}', [TransaksiTagihanSiswa::class, 'kuitansiPDF'])->name('transaksi.tagihan-siswa.kuitansiPDF');

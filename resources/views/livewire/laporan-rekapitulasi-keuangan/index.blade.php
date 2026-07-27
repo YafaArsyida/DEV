@@ -1,25 +1,40 @@
 {{-- Stop trying to control. --}}
-<div class="card">
-    <div class="card-header border-0 pb-0">
-        <div class="d-flex align-items-center">
-            <div class="flex-grow-1">
-                <h5 class="card-title mb-0">
-                    @if ($jenisRekapitulasi === 'tagihan')
-                    Rekapitulasi Tagihan Siswa
-                    @elseif ($jenisRekapitulasi === 'pembayaran')
-                    Rekapitulasi Pembayaran Tagihan Siswa
-                    @elseif ($jenisRekapitulasi === 'kekurangan')
-                    Rekapitulasi Kekurangan Tagihan Siswa
-                    @else
-                    Rekapitulasi Keuangan Siswa
-                    @endif
-                </h5>                
-            </div>
-            <div class="flex-shrink-0">
-                <div class="d-flex gap-2 flex-wrap">
-                    <button data-bs-toggle="modal" data-bs-target="#ExportLaporan" class="btn btn-soft-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button>
-                    <button type="button" class="btn btn-info" data-bs-toggle="offcanvas" data-bs-target="#filterRekapitulasi" aria-controls="filterTabungan"><i class="ri-filter-3-line align-bottom me-1"></i> Fliters</button>
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card-header">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4">
+            {{-- TITLE --}}
+            <div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-sm">
+                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                            <i class="ri-calendar-event-line">
+                            </i>
+                        </div>
+                    </div>
+    
+                    <div>
+                        <h5 class="fw-bold mb-1">
+                            @if ($jenisRekapitulasi === 'tagihan')
+                            Rekapitulasi Tagihan Siswa
+                            @elseif ($jenisRekapitulasi === 'pembayaran')
+                            Rekapitulasi Pembayaran Tagihan Siswa
+                            @elseif ($jenisRekapitulasi === 'kekurangan')
+                            Rekapitulasi Kekurangan Tagihan Siswa
+                            @else
+                            Rekapitulasi Keuangan Siswa
+                            @endif
+                        </h5>
+                        {{-- <small>
+                            Kelola laporan kegiatan generus 
+                        </small> --}}
+                    </div>
                 </div>
+            </div>
+    
+            {{-- ACTION --}}
+            <div class="d-flex gap-2 flex-wrap">
+                <button data-bs-toggle="modal" data-bs-target="#ExportLaporan" class="btn btn-soft-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button>
+                <button type="button" class="btn btn-info rounded-pill px-4" data-bs-toggle="offcanvas" data-bs-target="#filterRekapitulasi" aria-controls="filterTabungan"><i class="ri-filter-3-line align-bottom me-1"></i> Fliters</button>
             </div>
         </div>
     </div>
@@ -36,11 +51,12 @@
             </div>
 
             <!-- Pencarian (tengah) -->
-            <div class="col-xxl-10 col-md-9">
-                <label for="searchRekap" class="form-label">Pencarian</label>
-                <div class="position-relative">
-                    <input type="text" id="searchRekap" class="form-control ps-4" wire:model.debounce.300ms="search" placeholder="Cari nama, deskripsi, atau lainnya...">
-                    <i class="ri-search-line position-absolute top-50 start-0 translate-middle-y ms-2 text-muted"></i>
+            <div class="col-xxl-10 col-sm-12">
+                <label for="searchData" class="form-label">Pencarian</label>
+                <div class="search-box">
+                    <input type="text" id="searchData" class="form-control search" wire:model.debounce.300ms="search"
+                        placeholder="Cari nama, deskripsi, atau lainnya...">
+                    <i class="ri-search-line search-icon"></i>
                 </div>
             </div>
         </div>
