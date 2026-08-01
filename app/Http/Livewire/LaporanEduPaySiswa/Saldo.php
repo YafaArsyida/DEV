@@ -17,12 +17,15 @@ class Saldo extends Component
 
     protected $paginationTheme = 'bootstrap'; // Menggunakan tema Bootstrap untuk paginasi
 
+    public $perPage = 50;
+
     public $search = '';
     public $totalSaldo = 0;
 
     public $selectedJenjang = null;
     public $selectedTahunAjar = null;
     public $selectedKelas = null;
+    public $namaKelas = '';
 
     // Listener untuk Livewire
     protected $listeners = [
@@ -47,9 +50,45 @@ class Saldo extends Component
         $this->resetPage(); // Reset pagination ketika pencarian berubah
     }
 
-    public function updatingSelectedKelas()
+    public function updatedSelectedKelas($value)
     {
-        $this->resetPage(); // Reset pagination ketika kelas berubah
+        $this->namaKelas = Kelas::where('ms_kelas_id', $value)
+            ->value('nama_kelas') ?? '';
+
+        $this->resetPage();
+    }
+
+
+    public function confirmWithdraw()
+    {
+        $this->emit('showWithdrawModal', [
+            'kelas'      => $this->selectedKelas,
+            'namaKelas'  => $this->namaKelas,
+            'jenjang'    => $this->selectedJenjang,
+            'tahunAjar'  => $this->selectedTahunAjar,
+        ]);
+    }
+
+    public function cetakSaldo()
+    {
+        if (!$this->selectedJenjang || !$this->selectedTahunAjar) {
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Jenjang dan Tahun Ajar wajib dipilih'
+            ]);
+            return;
+        }
+
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Laporan sedang diproses.'
+        ]);
+
+        $url = route('laporan.edupay-siswa.saldo.pdf', [
+            'jenjang' => $this->selectedJenjang,
+            'tahun'   => $this->selectedTahunAjar,
+            'kelas'   => $this->selectedKelas, // null jika tidak dipilih
+        ]);
+
+        $this->emit('openNewTab', $url);
     }
 
     public function render()
@@ -101,23 +140,12 @@ class Saldo extends Component
                 ->limit(1)
         );
 
-        $siswas = $query->get();
 
-        // =========================
-        // TOTAL SALDO
-        // =========================
-        $this->totalSaldo = $siswas->sum(function ($item) {
-            return $item->ms_siswa->ms_saldo_edupay->saldo_edupay ?? 0;
-        });
-
-        // =========================
-        // NOTIF
-        // =========================
-        if ($siswas->isEmpty()) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Data siswa tidak ditemukan.']);
-        } else {
-            $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui..']);
-        }
+         /** @var \Illuminate\Pagination\LengthAwarePaginator $siswas */
+        $siswas = $query->paginate($this->perPage);
+        $this->totalSaldo = $siswas->getCollection()
+            ->sum(fn($item) => $item->ms_siswa->ms_saldo_edupay->saldo_edupay ?? 0);
+            
         return view('livewire.laporan-edu-pay-siswa.saldo', [
             'select_kelas' => $select_kelas,
             'siswas' => $siswas,

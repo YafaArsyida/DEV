@@ -28,10 +28,10 @@ class Saldo extends Component
     // Listener untuk Livewire
     protected $listeners = [
         'parameterUpdated' => 'updateParameters',
-        'refreshSaldoTabunganSiswa'
+        'refreshSaldoTabungan'
     ];
 
-    public function refreshSaldoTabunganSiswa()
+    public function refreshSaldoTabungan()
     {
         $this->emitSelf('$refresh'); //ringan
     }
