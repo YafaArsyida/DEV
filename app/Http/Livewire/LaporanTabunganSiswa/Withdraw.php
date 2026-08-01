@@ -13,7 +13,10 @@ use App\Models\TransaksiTabungan;
 
 class Withdraw extends Component
 {
-    protected $listeners = ['withdrawTabunganSiswa'];
+    protected $listeners = [
+        'withdrawTabungan' => 'withdrawTabungan',
+        'withdrawTabunganSiswa' => 'withdrawTabungan',
+    ];
 
     public $selectedKelas; // Untuk menyimpan data kelas yang diterima
     public $siswa;
@@ -23,8 +26,10 @@ class Withdraw extends Component
     public $selectedJenjang = null;
     public $selectedTahunAjar = null;
 
-    public function withdrawTabunganSiswa($data)
+    public function withdrawTabungan($data = [])
     {
+        $data = is_array($data) ? $data : [];
+
         $this->selectedKelas = $data['selectedKelas'] ?? null;
         $this->selectedJenjang = $data['selectedJenjang'] ?? null;
         $this->selectedTahunAjar = $data['selectedTahunAjar'] ?? null;
@@ -98,7 +103,7 @@ class Withdraw extends Component
         DB::beginTransaction();
         try {
             foreach ($this->siswa as $student) {
-                $saldo = SaldoTabungan::getSaldo($this->ms_siswa->ms_siswa_id, 'siswa');
+                $saldo = $student->ms_siswa->saldo_tabungan_siswa();
 
                 // Cek jika saldo positif
                 if ($saldo > 0) {
@@ -116,6 +121,7 @@ class Withdraw extends Component
                         'ms_tahun_ajaran_id' => $student->ms_tahun_ajar_id,
                         'ms_jenjang_id' => $student->ms_jenjang_id,
                         'ms_departemen_id' => 'SEKOLAH',
+                        'is_canceled' => 'active',
                         'deskripsi' => "Penarikan Tunai tabungan Rp {$saldo} siswa {$student->ms_siswa->nama_siswa} akhir tahun ajaran",
                     ];
                     $jurnalDebitId = AkuntansiJurnalDetail::create($jurnalDebit)->akuntansi_jurnal_detail_id;
@@ -130,6 +136,7 @@ class Withdraw extends Component
                         'ms_tahun_ajaran_id' => $student->ms_tahun_ajar_id,
                         'ms_jenjang_id' => $student->ms_jenjang_id,
                         'ms_departemen_id' => 'SEKOLAH',
+                        'is_canceled' => 'active',
                         'deskripsi' => "Penarikan Tunai tabungan Rp {$saldo} siswa {$student->ms_siswa->nama_siswa} akhir tahun ajaran",
                     ];
                     $jurnalKreditId = AkuntansiJurnalDetail::create($jurnalKredit)->akuntansi_jurnal_detail_id;

@@ -106,15 +106,6 @@ class Saldo extends Component
         $this->totalSaldo = $siswas->getCollection()
             ->sum(fn($item) => $item->ms_siswa->ms_saldo_tabungan->saldo_tabungan ?? 0);
 
-        // =========================
-        // NOTIF
-        // =========================
-        if ($siswas->isEmpty()) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Data siswa tidak ditemukan.']);
-        } else {
-            $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui..']);
-        }
-
         return view('livewire.laporan-tabungan-siswa.saldo', [
             'select_kelas' => $select_kelas,
             'siswas' => $siswas,

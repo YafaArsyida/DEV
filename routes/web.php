@@ -213,6 +213,7 @@ Route::middleware(['auth', 'peran:SUPERADMIN,ADMINISTRASI'])->group(function () 
     // LAPORAN TABUNGAN SISWA 
     Route::get('/laporan/tabungan-siswa',  [LaporanTabunganSiswa::class, 'index'])->name('laporan.tabungan-siswa');
     Route::get('/laporan/tabungan-siswa/pdf',  [LaporanTabunganSiswa::class, 'cetakPDF'])->name('laporan.tabungan-siswa.pdf');
+    Route::get('/laporan/tabungan-siswa/saldo/pdf',  [LaporanTabunganSiswa::class, 'cetakSaldoPDF'])->name('laporan.tabungan-siswa.saldo.pdf');
     // END LAPORAN TABUNGAN SISWA
 
     // LAPORAN EDUPAY SISWA

@@ -31,7 +31,7 @@
                 </button>
                 @endif
                 <button data-bs-toggle="offcanvas" id="create-btn" data-bs-target="#offcanvasAddTagihan" wire:click.prevent="$emit('showCreateTagihan', {{ $selectedJenjang }}, {{ $selectedTahunAjar }})" class="btn rounded-pill px-4 btn-primary"><i class="ri-play-list-add-line"></i> Tagihan Baru</button>
-                <button data-bs-toggle="modal" data-bs-target="#ModalIndexTagihan" class="btn rounded-pill px-4 btn-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button>
+                <button data-bs-toggle="modal" data-bs-target="#ModalIndex" class="btn rounded-pill px-4 btn-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button>
             </div>
         </div>
     </div>
@@ -263,7 +263,7 @@
         {{-- end data --}}
     </div>
     {{-- MODAL --}}
-    <div class="modal fade zoomIn" id="ModalIndexTagihan" tabindex="-1" aria-labelledby="exportRecordLabel" aria-hidden="true">
+    <div class="modal fade zoomIn" id="ModalIndex" tabindex="-1" aria-labelledby="exportRecordLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
                 {{-- CLOSE BUTTON --}}

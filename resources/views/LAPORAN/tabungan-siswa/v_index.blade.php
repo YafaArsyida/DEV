@@ -18,7 +18,6 @@
             <div class="col-xxl-4">
                 @livewire('laporan-tabungan-siswa.overview')  
                 @livewire('laporan-tabungan-siswa.saldo')   
-                
             </div>  
             <div class="col-xxl-8">
                 @livewire('parameter.filter-tabungan')   

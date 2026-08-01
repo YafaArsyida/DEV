@@ -104,6 +104,7 @@ class DataPegawai extends Component
             'ms_pengguna_id' => $ms_pengguna_id,
             'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
             'ms_jenjang_id' => $this->ms_jenjang_id,
+            'ms_departemen_id' => 'SEKOLAH',
             'is_canceled' => 'active',
             'deskripsi' => $deskripsiJurnal
         ])->akuntansi_jurnal_detail_id;
@@ -117,6 +118,7 @@ class DataPegawai extends Component
             'ms_pengguna_id' => $ms_pengguna_id,
             'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
             'ms_jenjang_id' => $this->ms_jenjang_id,
+            'ms_departemen_id' => 'SEKOLAH',
             'is_canceled' => 'active',
             'deskripsi' => $deskripsiJurnal
         ])->akuntansi_jurnal_detail_id;
@@ -155,6 +157,7 @@ class DataPegawai extends Component
             'ms_pengguna_id' => $ms_pengguna_id,
             'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
             'ms_jenjang_id' => $this->ms_jenjang_id,
+            'ms_departemen_id' => 'SEKOLAH',
             'is_canceled' => 'active',
             'deskripsi' => $deskripsiJurnal,
         ])->akuntansi_jurnal_detail_id;
@@ -167,6 +170,7 @@ class DataPegawai extends Component
             'ms_pengguna_id' => $ms_pengguna_id,
             'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
             'ms_jenjang_id' => $this->ms_jenjang_id,
+            'ms_departemen_id' => 'SEKOLAH',
             'is_canceled' => 'active',
             'deskripsi' => $deskripsiJurnal,
         ])->akuntansi_jurnal_detail_id;
@@ -227,7 +231,9 @@ class DataPegawai extends Component
             if (!$this->ms_pegawai_id) {
                 throw new \Exception('Pegawai tidak ditemukan!');
             }
+
             $saldo = SaldoTabungan::where('user_id', $this->ms_pegawai_id)
+                ->where('user_type', 'pegawai')
                 ->lockForUpdate()
                 ->first();
 
@@ -271,6 +277,7 @@ class DataPegawai extends Component
             }
 
             $saldo = SaldoTabungan::where('user_id', $this->ms_pegawai_id)
+                ->where('user_type', 'pegawai')
                 ->lockForUpdate()
                 ->first();
 

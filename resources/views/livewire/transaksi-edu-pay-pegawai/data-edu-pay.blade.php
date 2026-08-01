@@ -23,9 +23,9 @@
             </div>
             {{-- Tombol Export & Cetak --}}
             <div class="d-flex gap-2 flex-wrap">
-                <button data-bs-toggle="modal" data-bs-target="#ExportLaporan" class="btn rounded-pill px-4 btn-soft-success">
+                {{-- <button data-bs-toggle="modal" data-bs-target="#ExportLaporan" class="btn rounded-pill px-4 btn-soft-success">
                     <i class="ri-file-excel-2-line pb-0"></i> Export
-                </button>
+                </button> --}}
                 {{-- <button wire:click="cetakLaporan" class="btn btn-danger d-inline-flex align-items-center gap-1">
                     <i class="ri-printer-line align-bottom"></i>
                     <span>Cetak Laporan</span>

@@ -16,9 +16,7 @@
         </div>
         <div class="row">
             <div class="col-xxl-4">
-                <div class="sticky-side-div">
-                    @livewire('laporan-pembayaran-tagihan-siswa.overview')   
-                </div>
+                @livewire('laporan-pembayaran-tagihan-siswa.overview')   
             </div>  
             <div class="col-xxl-8">
                 @livewire('parameter.filter-laporan-pembayaran')   

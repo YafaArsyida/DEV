@@ -66,7 +66,7 @@
             <div class="col-4 col-sm-12">
                 <div class="p-3 border border-dashed border-end-0">
                     <h5 class="mb-1">
-                        <span class="fw-semibold fs-12 text-primary">
+                        <span class="fw-semibold fs-12">
                             Rp{{ number_format($totalSaldo, 0, ',', '.') }}
                         </span>
                     </h5>

@@ -35,6 +35,11 @@ class Index extends Component
         'clearFilters' => 'clearFilters',
     ];
 
+    public function updatedPerPage()
+    {
+        $this->resetPage();
+    }
+
     public function updateParameters($jenjang, $tahunAjar)
     {
         // Update nilai selectedJenjang dan selectedTahunAjar
@@ -53,6 +58,7 @@ class Index extends Component
         $this->dispatchBrowserEvent('alertify-success', [
             'message' => 'Periode mulai diperbarui'
         ]);
+        $this->resetPage(); // Reset pagination ketika pencarian berubah
     }
 
     public function updatedEndDate()
@@ -60,12 +66,14 @@ class Index extends Component
         $this->dispatchBrowserEvent('alertify-success', [
             'message' => 'Periode selesai diperbarui'
         ]);
+        $this->resetPage(); // Reset pagination ketika pencarian berubah
     }
 
     public function resetTanggal()
     {
         $this->startDate = now()->startOfMonth()->format('Y-m-d');
         $this->endDate   = now()->format('Y-m-d');
+        $this->resetPage(); // Reset pagination ketika pencarian berubah
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
     }
 

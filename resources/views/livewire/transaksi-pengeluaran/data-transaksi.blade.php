@@ -20,13 +20,13 @@
                 </div>
             </div>
             <div class="d-flex gap-2 flex-wrap">
-                <button data-bs-toggle="modal" data-bs-target="#ExportLaporan" class="btn rounded-pill px-4 btn-soft-success">
+                {{-- <button data-bs-toggle="modal" data-bs-target="#ExportLaporan" class="btn rounded-pill px-4 btn-soft-success">
                     <i class="ri-file-excel-2-line pb-0"></i> Export
                 </button>
                 <button wire:click="cetakLaporan" class="btn rounded-pill px-4 btn-danger">
                     <i class="ri-printer-line align-bottom"></i>
                     <span>Cetak Laporan</span>
-                </button>
+                </button> --}}
             </div>
             <div class="d-flex align-items-center gap-2">
                 <input type="date" class="form-control" wire:model="startDate">

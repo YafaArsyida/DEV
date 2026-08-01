@@ -241,10 +241,17 @@
                     let bootstrapModal = bootstrap.Modal.getInstance(modal);
                     if (bootstrapModal) {
                         bootstrapModal.hide();
-                        }
                     }
                 }
-            );
+            });
+            window.addEventListener('show-modal', (event) => {
+                let modalId = event.detail.modalId;
+                let modal = document.getElementById(modalId);
+                if (modal) {
+                    let bootstrapModal = new bootstrap.Modal(modal);
+                    bootstrapModal.show();
+                }
+            });
             // modal
             Livewire.on('openNewTab', (url) => {
                 setTimeout(function() {

@@ -83,7 +83,7 @@
                     </button> --}}
 
                     <button type="button"
-                        class="btn rounded-pill px-4 btn-info d-inline-flex align-items-center gap-1"
+                        class="btn rounded-pill px-4 btn-primary d-inline-flex align-items-center gap-1"
                         data-bs-toggle="offcanvas"
                         data-bs-target="#filterTagihan"
                         aria-controls="filterTagihan">
