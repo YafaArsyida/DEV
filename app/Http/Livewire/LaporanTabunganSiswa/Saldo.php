@@ -15,7 +15,7 @@ class Saldo extends Component
 
     protected $paginationTheme = 'bootstrap'; // Menggunakan tema Bootstrap untuk paginasi
 
-    public $perPage = 40;
+    public $perPage = 50;
 
     public $search = '';
     public $totalSaldo = 0;
@@ -56,6 +56,37 @@ class Saldo extends Component
         $this->resetPage();
     }
 
+    public function confirmWithdraw()
+    {
+        $this->emit('showWithdrawModal', [
+            'kelas'      => $this->selectedKelas,
+            'namaKelas'  => $this->namaKelas,
+            'jenjang'    => $this->selectedJenjang,
+            'tahunAjar'  => $this->selectedTahunAjar,
+        ]);
+    }
+
+    public function cetakSaldo()
+    {
+        if (!$this->selectedJenjang || !$this->selectedTahunAjar) {
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Jenjang dan Tahun Ajar wajib dipilih'
+            ]);
+            return;
+        }
+
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Laporan sedang diproses.'
+        ]);
+
+        $url = route('laporan.tabungan-siswa.saldo.pdf', [
+            'jenjang' => $this->selectedJenjang,
+            'tahun'   => $this->selectedTahunAjar,
+            'kelas'   => $this->selectedKelas, // null jika tidak dipilih
+        ]);
+
+        $this->emit('openNewTab', $url);
+    }
     public function render()
     {
         // Dropdown kelas
@@ -70,7 +101,6 @@ class Saldo extends Component
         // QUERY UTAMA
         // =========================
         $query = PenempatanSiswa::with([
-            'ms_siswa.ms_educard',
             'ms_siswa.ms_saldo_tabungan',
             'ms_kelas'
         ])
@@ -83,10 +113,7 @@ class Saldo extends Component
 
         if ($this->search) {
             $query->whereHas('ms_siswa', function ($q) {
-                $q->where('nama_siswa', 'like', '%' . trim($this->search) . '%')
-                ->orWhereHas('ms_educard', function ($q2) {
-                    $q2->where('kode_kartu', 'like', '%' . trim($this->search) . '%');
-                });
+                $q->where('nama_siswa', 'like', '%' . trim($this->search) . '%');
             });
         }
 

@@ -49,7 +49,7 @@
 
                 <button
                     type="button"
-                    class="btn btn-info rounded-pill px-4 d-inline-flex align-items-center gap-1"
+                    class="btn btn-primary rounded-pill px-4 d-inline-flex align-items-center gap-1"
                     data-bs-toggle="offcanvas"
                     data-bs-target="#filterTabungan"
                     aria-controls="filterTabungan">
@@ -159,7 +159,7 @@
                             </tr>
                         @endforelse
                     </tbody>
-                    <tfoot class="fw-semibold">
+                    {{-- <tfoot class="fw-semibold">
                         <tr class="">
                             <td></td>
                             <td class="text-uppercase">Total Kredit</td>
@@ -187,7 +187,7 @@
                                 </span>
                             </td>
                         </tr>
-                    </tfoot>
+                    </tfoot> --}}
                 </table>
                 <div class="mt-3">
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">

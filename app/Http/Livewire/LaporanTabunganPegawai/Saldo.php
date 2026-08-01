@@ -60,7 +60,7 @@ class Saldo extends Component
             'ms_jenjang',
             'ms_saldo_tabungan'
         ])
-            ->where('ms_jenjang_id', $this->selectedJenjang);
+        ->where('ms_jenjang_id', $this->selectedJenjang);
 
         // Filter jabatan
         if ($this->selectedJabatan) {

@@ -16,7 +16,7 @@ class Overview extends Component
     public $selectedKelas = null;
 
     protected $listeners = [
-        'parameterUpdated' => 'updateParameters'
+        'parameterUpdated' => 'updateParameters',
     ];
 
     public function updateParameters($jenjang, $tahunAjar)

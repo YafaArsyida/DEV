@@ -181,7 +181,7 @@
                                     @foreach ($laporan['rincian_tagihan'] as $r)
                                         <span class="badge bg-light text-body border px-3 py-2">
                                             {{ $r['nama_jenis_tagihan_siswa'] }}
-                                            <strong class="text-danger">
+                                            <strong class="">
                                                 Rp{{ number_format($r['jumlah_kekurangan'],0,',','.') }}
                                             </strong>
                                         </span>

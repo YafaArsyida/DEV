@@ -1,7 +1,4 @@
-<div class="modal fade zoomIn" id="WithdrawTabungan"
-    tabindex="-1"
-    aria-labelledby="withdrawTabunganLabel"
-    aria-hidden="true">
+<div wire:ignore.self class="modal fade zoomIn" id="WithdrawTabungan" tabindex="-1" aria-labelledby="withdrawTabunganLabel" aria-hidden="true">
 
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
@@ -41,14 +38,15 @@
                     </span>
 
                     <h3 class="fw-bold mb-2" id="withdrawTabunganLabel">
-                        Kosongkan Saldo Tabungan Siswa?
+                        Kosongkan Saldo Tabungan
+                        {{ $namaKelas ? 'Kelas '.$namaKelas : 'Seluruh Siswa' }}?
                     </h3>
 
                     <p class="text-muted mb-0 lh-lg px-lg-4">
-                        Seluruh saldo Tabungan Siswa akan dikosongkan melalui
-                        proses withdraw. Pastikan dana telah disiapkan untuk
-                        diserahkan kepada wali murid sesuai dengan saldo yang
-                        tercatat.
+                        Tindakan ini akan melakukan <strong>withdraw seluruh saldo tabungan</strong>
+                        {{ $namaKelas ? 'kelas '.$namaKelas : 'semua siswa' }}.
+                        Setelah diproses, saldo seluruh siswa menjadi <strong>Rp0</strong> dan
+                        proses ini tidak dapat dibatalkan.
                     </p>
 
                 </div>
@@ -65,13 +63,11 @@
                                 Perhatian
                             </h6>
 
-                            <p class="text-muted mb-0 fs-13">
-                                Sebelum melakukan withdraw, pastikan Anda
-                                telah mengunduh laporan Tabungan Siswa sebagai
-                                arsip. Setelah proses ini dilakukan, saldo
-                                akan menjadi <strong>Rp0</strong> dan dana
-                                harus diserahkan kepada wali murid.
-                            </p>
+                            <ul class="mb-0 ps-3 text-muted">
+                                <li>Unduh laporan saldo sebagai arsip.</li>
+                                <li>Pastikan dana telah disiapkan untuk wali murid.</li>
+                                <li>Proses ini tidak dapat dibatalkan.</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -79,26 +75,75 @@
             </div>
 
             {{-- FOOTER --}}
-            <div class="modal-footer border-0 pt-0 px-4 pb-4 justify-content-center">
+            <div class="modal-footer border-0 pt-0 px-4 pb-4 flex-column">
 
-                <button type="button"
-                    class="btn btn-light rounded-pill px-4"
-                    data-bs-dismiss="modal">
-                    <i class="ri-close-line me-1"></i>
-                    Batal
-                </button>
+                {{-- Download --}}
+                <div class="w-100 mb-3">
 
-                <button type="button"
-                    class="btn btn-danger rounded-pill px-4"
-                    wire:click="confirmWithdraw"
-                    data-bs-dismiss="modal">
+                    <button
+                        type="button"
+                        class="btn btn-outline-primary w-100 rounded-pill"
+                        wire:click="cetakSaldo">
 
-                    <i class="ri-delete-bin-6-line me-1"></i>
-                    Ya, Kosongkan Saldo
-                </button>
+                        <i class="ri-download-cloud-2-line me-1"></i>
+                        Unduh Laporan Saldo Terlebih Dahulu
+
+                    </button>
+
+                </div>
+
+                {{-- Checklist --}}
+                <div class="form-check w-100 mb-3">
+
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="arsipDownloaded"
+                        wire:model="arsipDownloaded">
+
+                    <label class="form-check-label text-muted" for="arsipDownloaded">
+                        Saya telah mengunduh laporan dan siap melakukan proses withdraw.
+                    </label>
+
+                </div>
+
+                {{-- Action --}}
+                <div class="d-flex justify-content-center gap-2 w-100">
+
+                    <button
+                        type="button"
+                        class="btn btn-light rounded-pill px-4"
+                        data-bs-dismiss="modal">
+
+                        <i class="ri-close-line me-1"></i>
+                        Batal
+
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn btn-danger rounded-pill px-4"
+                        wire:click="withdrawTabunganSiswa"
+                        @disabled(!$arsipDownloaded)>
+
+                        <i class="ri-delete-bin-6-line me-1"></i>
+                        Ya, Kosongkan Saldo
+
+                    </button>
+
+                </div>
 
             </div>
 
         </div>
     </div>
+    <script>
+        window.addEventListener('show-withdraw-modal', () => {
+            const modal = new bootstrap.Modal(
+                document.getElementById('WithdrawTabungan')
+            );
+
+            modal.show();
+        });
+    </script>
 </div>

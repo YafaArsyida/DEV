@@ -117,7 +117,7 @@
                                 <td class="text-center">{{ $item->ms_transaksi_tagihan_siswa->ms_pengguna->nama ?? '-' }}</td>
                                 <td class="text-center">{{ $item->ms_transaksi_tagihan_siswa->metode_pembayaran }}</td>
                                 <td class="text-start">
-                                    <span class="fs-12 fw-medium text-success">
+                                    <span class="fs-12 fw-medium">
                                         RP{{ number_format($item->jumlah_bayar, 0, ',', '.') }}
                                     </span>
                                 </td>
@@ -147,7 +147,7 @@
                             <td></td>
                             <td class="text-start"><strong>TOTAL</strong></td>
                             <td class="text-start">
-                                <span class="fs-12 text-success">RP{{ number_format($totalPembayaran, 0, ',', '.') }}</span>
+                                <span class="fs-12">RP{{ number_format($totalPembayaran, 0, ',', '.') }}</span>
                             </td>
                         </tr>
                     </tfoot>

@@ -13,107 +13,97 @@ use App\Models\TransaksiTabungan;
 
 class Withdraw extends Component
 {
+    public $arsipDownloaded = false;
+
+    public $selectedKelas;
+    public $namaKelas;
+
+    public $selectedJenjang;
+    public $selectedTahunAjar;
+
     protected $listeners = [
-        'withdrawTabungan' => 'withdrawTabungan',
-        'withdrawTabunganSiswa' => 'withdrawTabungan',
+        'showWithdrawModal',
     ];
 
-    public $selectedKelas; // Untuk menyimpan data kelas yang diterima
-    public $siswa;
-    public $saldoKas;
-    public $totalSaldoTabungan;
-
-    public $selectedJenjang = null;
-    public $selectedTahunAjar = null;
-
-    public function withdrawTabungan($data = [])
+    public function showWithdrawModal($data)
     {
-        $data = is_array($data) ? $data : [];
+        $this->selectedKelas      = $data['kelas'];
+        $this->namaKelas          = $data['namaKelas'];
+        $this->selectedJenjang    = $data['jenjang'];
+        $this->selectedTahunAjar  = $data['tahunAjar'];
 
-        $this->selectedKelas = $data['selectedKelas'] ?? null;
-        $this->selectedJenjang = $data['selectedJenjang'] ?? null;
-        $this->selectedTahunAjar = $data['selectedTahunAjar'] ?? null;
+        $this->arsipDownloaded = false;
 
-        // Lakukan validasi atau proses berdasarkan parameter
-        if (!$this->selectedKelas || !$this->selectedJenjang || !$this->selectedTahunAjar) {
-            $this->dispatchBrowserEvent('alertify-error', [
-                'message' => 'Data kelas, jenjang, atau tahun ajar tidak valid.'
-            ]);
-            return;
-        }
-
-        // Ambil siswa berdasarkan kelas
-        $this->siswa = PenempatanSiswa::where('ms_kelas_id', $this->selectedKelas)
-            ->whereHas('ms_siswa.ms_transaksi_tabungan', function (Builder $query) {
-                $query->where('jenis_transaksi', '!=', 'penarikan') // Pastikan transaksi bukan penarikan
-                    ->where('nominal', '>', 0); // Pastikan saldo positif
-            })
-            ->with(['ms_siswa'])
-            ->get();
-
-        // Jika tidak ada siswa dengan saldo
-        if ($this->siswa->isEmpty()) {
-            $this->dispatchBrowserEvent('alertify-error', [
-                'message' => 'Tidak ada saldo siswa di kelas ini.'
-            ]);
-            return;
-        }
-
-        // Hitung total saldo yang akan ditarik menggunakan saldo_tabungan_siswa
-        $this->totalSaldoTabungan = $this->siswa->reduce(function ($carry, $siswa) {
-            return $carry + $siswa->ms_siswa->saldo_tabungan_siswa();
-        }, 0);
-
-        // Cek saldo kas
-        $this->saldoKas = AkuntansiJurnalDetail::where('kode_rekening', 11001) // Rekening kas
-            ->where('posisi', 'debit') // Saldo masuk
-            ->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
-            ->where('ms_jenjang_id', $this->selectedJenjang)
-            ->sum('nominal') - AkuntansiJurnalDetail::where('kode_rekening', 11001) // Rekening kas
-            ->where('posisi', 'kredit') // Saldo keluar
-            ->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
-            ->where('ms_jenjang_id', $this->selectedJenjang)
-            ->sum('nominal');
-
-        if ($this->saldoKas < $this->totalSaldoTabungan) {
-            $this->dispatchBrowserEvent('alertify-error', [
-                'message' => 'Saldo kas tidak mencukupi untuk penarikan.'
-            ]);
-            return;
-        }
-
-        // Jika saldo mencukupi, lanjutkan dengan proses penarikan
-        $this->dispatchBrowserEvent('alertify-success', [
-            'message' => "Saldo siswa tersedia. Total penarikan: Rp " . number_format($this->totalSaldoTabungan, 0, ',', '.') . "."
-        ]);
+        $this->dispatchBrowserEvent('show-withdraw-modal');
     }
 
-    public function confirmWithdraw()
+    public function cetakSaldo()
     {
-        if ($this->saldoKas < $this->totalSaldoTabungan) {
-            $this->dispatchBrowserEvent('alertify-error', [
-                'message' => 'Saldo kas tidak mencukupi untuk penarikan.'
-            ]);
-            return;
-        }
-        if (!$this->siswa || $this->siswa->isEmpty()) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Tidak ada siswa untuk diproses.']);
-            return;
-        }
-        DB::beginTransaction();
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Laporan sedang diproses.'
+        ]);
+
+        $url = route('laporan.tabungan-siswa.saldo.pdf', [
+            'jenjang' => $this->selectedJenjang,
+            'tahun'   => $this->selectedTahunAjar,
+            'kelas'   => $this->selectedKelas,
+        ]);
+
+        $this->arsipDownloaded = true;
+
+        $this->emit('openNewTab', $url);
+    }
+
+    public function withdrawTabunganSiswa()
+    {
         try {
-            foreach ($this->siswa as $student) {
-                $saldo = $student->ms_siswa->saldo_tabungan_siswa();
 
-                // Cek jika saldo positif
-                if ($saldo > 0) {
-                    // jurnal ges
-                    $kode_kas = 11001;
-                    $kode_saldo_tabungan_siswa = 22001;
+            DB::transaction(function () {
 
-                    // Data untuk jurnal debit
-                    $jurnalDebit = [
-                        'kode_rekening' => $kode_saldo_tabungan_siswa,
+                $query = PenempatanSiswa::with([
+                    'ms_siswa'
+                ])
+                ->where('ms_jenjang_id', $this->selectedJenjang)
+                ->where('ms_tahun_ajar_id', $this->selectedTahunAjar);
+
+                if ($this->selectedKelas) {
+                    $query->where('ms_kelas_id', $this->selectedKelas);
+                }
+
+                $students = $query->get();
+
+                $kodeKas = 11001;
+                $kodeSaldoTabungan = 22001;
+
+                $berhasil = 0;
+
+                foreach ($students as $student) {
+
+                    $saldoTabungan = SaldoTabungan::siswa()
+                        ->lockForUpdate()
+                        ->firstOrCreate(
+                            [
+                                'user_id'   => $student->ms_siswa_id,
+                                'user_type' => 'siswa',
+                            ],
+                            [
+                                'saldo_tabungan' => 0,
+                            ]
+                        );
+
+                    $saldo = $saldoTabungan->saldo_tabungan;
+
+                    if ($saldo <= 0) {
+                        continue;
+                    }
+
+                    $deskripsi = sprintf(
+                        'Withdraw saldo tabungan akhir tahun ajaran - %s',
+                        $student->ms_siswa->nama_siswa
+                    );
+
+                    $debit = AkuntansiJurnalDetail::create([
+                        'kode_rekening' => $kodeSaldoTabungan,
                         'posisi' => 'debit',
                         'nominal' => $saldo,
                         'tanggal_transaksi' => now(),
@@ -122,13 +112,11 @@ class Withdraw extends Component
                         'ms_jenjang_id' => $student->ms_jenjang_id,
                         'ms_departemen_id' => 'SEKOLAH',
                         'is_canceled' => 'active',
-                        'deskripsi' => "Penarikan Tunai tabungan Rp {$saldo} siswa {$student->ms_siswa->nama_siswa} akhir tahun ajaran",
-                    ];
-                    $jurnalDebitId = AkuntansiJurnalDetail::create($jurnalDebit)->akuntansi_jurnal_detail_id;
+                        'deskripsi' => $deskripsi,
+                    ]);
 
-                    // Data untuk jurnal kredit
-                    $jurnalKredit = [
-                        'kode_rekening' => $kode_kas,
+                    $kredit = AkuntansiJurnalDetail::create([
+                        'kode_rekening' => $kodeKas,
                         'posisi' => 'kredit',
                         'nominal' => $saldo,
                         'tanggal_transaksi' => now(),
@@ -137,34 +125,51 @@ class Withdraw extends Component
                         'ms_jenjang_id' => $student->ms_jenjang_id,
                         'ms_departemen_id' => 'SEKOLAH',
                         'is_canceled' => 'active',
-                        'deskripsi' => "Penarikan Tunai tabungan Rp {$saldo} siswa {$student->ms_siswa->nama_siswa} akhir tahun ajaran",
-                    ];
-                    $jurnalKreditId = AkuntansiJurnalDetail::create($jurnalKredit)->akuntansi_jurnal_detail_id;
+                        'deskripsi' => $deskripsi,
+                    ]);
 
-                    // Simpan transaksi penarikan ke tabel ms_tabungan_siswa
                     TransaksiTabungan::create([
                         'user_type' => 'siswa',
-                        'user_id' => $student->ms_siswa->ms_siswa_id,
+                        'user_id' => $student->ms_siswa_id,
                         'ms_penempatan_siswa_id' => $student->ms_penempatan_siswa_id,
-                        'ms_pengguna_id' => auth()->id(), // ID pengguna saat ini
+                        'ms_pengguna_id' => auth()->id(),
                         'jenis_transaksi' => 'penarikan',
                         'nominal' => $saldo,
                         'tanggal' => now(),
-                        'deskripsi' => "Penarikan Tunai tabungan Rp {$saldo} siswa {$student->ms_siswa->nama_siswa} akhir tahun ajaran",
-                        'akuntansi_jurnal_detail_debit_id' => $jurnalDebitId,
-                        'akuntansi_jurnal_detail_kredit_id' => $jurnalKreditId,
+                        'deskripsi' => $deskripsi,
+                        'akuntansi_jurnal_detail_debit_id' => $debit->akuntansi_jurnal_detail_id,
+                        'akuntansi_jurnal_detail_kredit_id' => $kredit->akuntansi_jurnal_detail_id,
                     ]);
+
+                    $saldoTabungan->update([
+                        'saldo_tabungan' => 0
+                    ]);
+
+                    $berhasil++;
                 }
-            }
-            DB::commit();
+
+                $this->dispatchBrowserEvent('hide-modal', [
+                    'modalId' => 'WithdrawTabungan'
+                ]);
+
+                $this->dispatchBrowserEvent('alertify-success', [
+                    'message' => "{$berhasil} siswa berhasil diproses."
+                ]);
+
+            });
 
             $this->emit('refreshSaldo');
-            $this->emit('refreshSaldoTabunganSiswa'); // Emit event ke komponen Livewire terkait
-            $this->dispatchBrowserEvent('alertify-success', ['message' => 'Saldo berhasil dikosongkan untuk semua siswa.']);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            // Notifikasi error
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+            $this->emit('refreshIndex');
+            $this->emit('refreshOverview');
+
+        } catch (\Throwable $e) {
+
+            report($e);
+
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Terjadi kesalahan saat melakukan withdraw.'
+            ]);
+
         }
     }
 
