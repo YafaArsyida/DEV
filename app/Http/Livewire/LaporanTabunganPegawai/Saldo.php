@@ -14,6 +14,8 @@ class Saldo extends Component
 
     protected $paginationTheme = 'bootstrap'; // Menggunakan tema Bootstrap untuk paginasi
 
+    public $perPage = 50;
+
     public $search = '';
     public $totalSaldo = 0;
 
@@ -21,13 +23,14 @@ class Saldo extends Component
     public $selectedTahunAjar = null;
     public $selectedJabatan = null;
 
+    public $namaJabatan = '';
     // Listener untuk Livewire
     protected $listeners = [
         'parameterUpdated' => 'updateParameters',
-        'refreshSaldoTabunganPegawai'
+        'refreshSaldoTabungan'
     ];
 
-    public function refreshSaldoTabunganPegawai()
+    public function refreshSaldoTabungan()
     {
         $this->emitSelf('$refresh'); //ringan
     }
@@ -46,8 +49,12 @@ class Saldo extends Component
 
     public function updatingSelectedJabatan()
     {
+        $this->namaJabatan = Jabatan::where('ms_jabatan_id', $this->selectedJabatan)
+            ->value('nama_jabatan') ?? '';
+
         $this->resetPage(); // Reset pagination ketika kelas berubah
     }
+
     public function render()
     {
         $select_jabatan = Jabatan::get();
@@ -85,27 +92,10 @@ class Saldo extends Component
                 ->limit(1)
         );
 
-        $pegawai = $query->get();
-
-        // =========================
-        // TOTAL SALDO
-        // =========================
-        // $this->totalSaldo = SaldoTabungan::pegawai()
-        //     ->whereIn('user_id', $pegawai->pluck('ms_pegawai_id'))
-        //     ->sum('saldo_tabungan');
-
-        $this->totalSaldo = $pegawai->sum(function ($item) {
-            return $item->ms_saldo_tabungan->saldo_tabungan ?? 0;
-        });
-
-        // =========================
-        // NOTIF
-        // =========================
-        if ($pegawai->isEmpty()) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Data tidak ditemukan.']);
-        } else {
-            $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui..']);
-        }
+         /** @var \Illuminate\Pagination\LengthAwarePaginator $pegawai */
+        $pegawai = $query->paginate($this->perPage);
+        $this->totalSaldo = $pegawai->getCollection()
+            ->sum(fn($item) => $item->ms_saldo_tabungan->saldo_tabungan ?? 0);
 
         return view('livewire.laporan-tabungan-pegawai.saldo', [
             'select_jabatan' => $select_jabatan,

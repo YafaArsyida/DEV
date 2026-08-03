@@ -117,13 +117,14 @@ class PenempatanSiswa extends Model
 
     public function total_tagihan_siswa()
     {
-        return $this->ms_tagihan_siswa()->sum('jumlah_tagihan_siswa');
+        return $this->ms_tagihan_siswa->sum('jumlah_tagihan_siswa');
     }
 
     public function total_dibayarkan()
     {
-        // 🔥 sekarang pakai relasi langsung (lebih optimal)
-        return $this->dt_transaksi_tagihan_siswa()->sum('jumlah_bayar');
+        return $this->ms_tagihan_siswa->sum(function ($tagihan) {
+            return $tagihan->jumlah_sudah_dibayar ?? 0;
+        });
     }
 
     public function total_kekurangan()

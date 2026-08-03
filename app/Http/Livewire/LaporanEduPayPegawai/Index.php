@@ -13,6 +13,8 @@ class Index extends Component
     use WithPagination;
     protected $paginationTheme = 'bootstrap'; // Menggunakan tema Bootstrap untuk paginasi
 
+    public $perPage = 50;
+
     public $selectedJenjang = null;
     public $selectedTahunAjar = null;
     public $selectedJabatan = null;
@@ -30,8 +32,6 @@ class Index extends Component
         'parameterUpdated' => 'updateParameters',
         'applyFilters' => 'applyFilters',
         'clearFilters' => 'clearFilters',
-
-        'refreshSaldoEduPay'
     ];
 
     public function updateParameters($jenjang, $tahunAjar)
@@ -40,7 +40,6 @@ class Index extends Component
         $this->selectedJenjang = $jenjang;
         $this->selectedTahunAjar = $tahunAjar;
     }
-
 
     public function mount()
     {
@@ -53,6 +52,7 @@ class Index extends Component
         $this->dispatchBrowserEvent('alertify-success', [
             'message' => 'Periode mulai diperbarui'
         ]);
+        $this->resetPage(); // Reset pagination ketika pencarian berubah
     }
 
     public function updatedEndDate()
@@ -60,18 +60,15 @@ class Index extends Component
         $this->dispatchBrowserEvent('alertify-success', [
             'message' => 'Periode selesai diperbarui'
         ]);
+        $this->resetPage(); // Reset pagination ketika pencarian berubah
     }
 
     public function resetTanggal()
     {
         $this->startDate = now()->startOfMonth()->format('Y-m-d');
         $this->endDate   = now()->format('Y-m-d');
+        $this->resetPage(); // Reset pagination ketika pencarian berubah
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
-    }
-
-    public function refreshSaldoEduPay()
-    {
-        $this->resetPage(); // Reset paginasi saat pencarian berubah
     }
 
     public function applyFilters($filters)
@@ -166,19 +163,19 @@ class Index extends Component
         }
 
         // Hitung total pemasukan
-        $totalPemasukan = (clone $query)
+        $totalPemasukan = $query->clone()
             ->whereIn('jenis_transaksi', $pemasukanJenis)
             ->sum('nominal');
 
         // Hitung total pengeluaran
-        $totalPengeluaran = (clone $query)
+        $totalPengeluaran = $query->clone()
             ->whereIn('jenis_transaksi', $pengeluaranJenis)
             ->sum('nominal');
 
         $totalSaldo = $totalPemasukan - $totalPengeluaran;
 
         // Ambil data transaksi yang telah difilter
-        $laporan = $query->paginate(100);
+        $laporan = $query->paginate($this->perPage);
 
         return view('livewire.laporan-edu-pay-pegawai.index', [
             'select_jabatan' => $select_jabatan,

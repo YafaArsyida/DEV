@@ -1,126 +1,218 @@
-{{-- If you look to others for fulfillment, you will never truly be fulfilled. --}}
-<div class="card-header border-0">
-    <div class="row g-4 align-items-center">
-        <div class="col-xxl-12 col-sm-12">
-            <div wire:ignore.self class="offcanvas offcanvas-end" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="filterRekapitulasi" aria-labelledby="filterTabunganLabel">
-                <div class="offcanvas-header border-bottom">
-                    <h5 class="offcanvas-title" id="filterTabunganLabel">Filter</h5>
-                    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                </div>
-                <div class="offcanvas-body">
-                    <div class="mb-4">
-                        <p class="text-muted text-uppercase fs-12 fw-medium mb-2">Kelas</p>
-                        <select id="PilihKelas" style="cursor: pointer" wire:model="selectedKelas" class="form-select" multiple="multiple">
-                            @foreach ($select_kelas as $item)
-                                <option value="{{ $item->ms_kelas_id }}">
-                                    {{ $item->nama_kelas }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
+<div wire:ignore.self
+     class="offcanvas offcanvas-end bg-light"
+     data-bs-scroll="true"
+     data-bs-backdrop="false"
+     tabindex="-1"
+     id="filterRekapitulasi"
+     aria-labelledby="filterRekapitulasiLabel">
 
-                    <div class="mb-4">
-                        <div class="d-flex align-items-center mb-2">
-                            <p class="text-muted text-uppercase fs-12 fw-medium mb-0 me-1">Kategori Tagihan</p>
-                            <i class="mdi mdi-information-outline fs-14 text-primary" 
-                            style="cursor: pointer;" 
-                            data-bs-toggle="tooltip" 
-                            data-bs-placement="top" 
-                            title="Pilih Kategori tagihan terlebih dahulu. Jenis tagihan akan tampil otomatis menyesuaikan dengan kategori yang Anda pilih.">
-                            </i>
-                        </div>
-                        <select id="PilihKategoriTagihan" style="cursor: pointer" wire:model="selectedKategoriTagihanSiswa" class="form-select" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Kategori"  multiple="multiple">
-                            {{-- <option value="">Semua Kategori</option> --}}
-                            @foreach ($select_kategori_tagihan as $item)    
-                            <option value="{{ $item->ms_kategori_tagihan_siswa_id }}">{{ $item->nama_kategori_tagihan_siswa }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+    {{-- HEADER --}}
+    <div class="offcanvas-header border-bottom px-4 py-3 shadow-sm">
+        <div class="d-flex justify-content-between align-items-start w-100">
 
-                    @if ($showJenisTagihan)
-                    <div class="mb-4">
-                        <p class="text-muted text-uppercase fs-12 fw-medium mb-2">Jenis Tagihan</p>
-                        <select id="PilihJenisTagihan" style="cursor: pointer" wire:model="selectedJenisTagihanSiswa" class="form-select" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Tagihan" multiple="multiple">
-                            @foreach ($select_jenis_tagihan as $item)    
-                            <option value="{{ $item->ms_jenis_tagihan_siswa_id }}">
-                                {{ $item->nama_jenis_tagihan_siswa }} - <i>{{ $item->ms_kategori_tagihan_siswa->nama_kategori_tagihan_siswa }}</i>
-                            </option>
-                            @endforeach
-                        </select>
+            {{-- Kiri --}}
+            <div class="d-flex align-items-center gap-3">
+                <div class="avatar-sm">
+                    <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-18">
+                        <i class="ri-file-chart-line"></i>
                     </div>
-                    @endif
                 </div>
-                <div class="offcanvas-footer border-top p-3 text-center hstack gap-2">
-                    <button id="ClearFilter" class="btn btn-light w-100" data-bs-dismiss="offcanvas">Clear Filter</button>
-                    <button id="ApplyFilter" class="btn btn-primary w-100" data-bs-dismiss="offcanvas">Filters</button>
+
+                <div>
+                    <h5 class="fw-bold mb-1" id="filterRekapitulasiLabel">
+                        Filter
+                    </h5>
+                    <small class="text-muted">
+                        Filter data rekapitulasi tagihan
+                    </small>
                 </div>
-                            
-                {{-- <div class="card mt-3">
-                    <div class="card-header">
-                        <h5>Debugging Filters</h5>
-                    </div>
+            </div>
+
+            {{-- Kanan --}}
+            <button
+                type="button"
+                class="btn btn-light btn-icon rounded-circle shadow-none"
+                data-bs-dismiss="offcanvas"
+                aria-label="Close">
+
+                <i class="ri-close-line fs-18"></i>
+            </button>
+
+        </div>
+    </div>
+
+    {{-- BODY --}}
+    <div class="offcanvas-body">
+
+        <div class="row g-3 mb-3">
+            <div class="col-12">
+
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
                     <div class="card-body">
-                        <p><strong>Selected Kelas:</strong> 
-                            {{ count($selectedKelas) > 0 ? implode(', ', $selectedKelas) : 'Tidak ada kelas yang dipilih' }}
-                        </p>
-                        <p><strong>Selected Kategori:</strong> 
-                            {{ count($selectedKategoriTagihanSiswa) > 0 ? implode(', ', $selectedKategoriTagihanSiswa) : 'Tidak kategori tagihan yang dipilih' }}
-                        </p>
-                        <p><strong>Selected Jenis Tagihan:</strong> 
-                            {{ count($selectedJenisTagihanSiswa) > 0 ? implode(', ', $selectedJenisTagihanSiswa) : 'Tidak ada jenis tagihan yang dipilih' }}
-                        </p>
+
+                        {{-- KELAS --}}
+                        <div class="mb-4">
+                            <p class="text-uppercase fw-semibold mb-2">
+                                Kelas
+                            </p>
+
+                            <select
+                                id="PilihKelas"
+                                wire:model="selectedKelas"
+                                class="form-select"
+                                style="cursor:pointer"
+                                multiple="multiple"
+                                title="Pilih Kelas">
+
+                                @foreach ($select_kelas as $item)
+                                    <option value="{{ $item->ms_kelas_id }}">
+                                        {{ $item->nama_kelas }}
+                                    </option>
+                                @endforeach
+
+                            </select>
+                        </div>
+
+                        {{-- KATEGORI TAGIHAN --}}
+                        <div class="mb-4">
+
+                            <div class="d-flex align-items-center mb-2">
+                                <p class="text-uppercase fw-semibold mb-0 me-2">
+                                    Kategori Tagihan
+                                </p>
+
+                                <i
+                                    class="mdi mdi-information-outline fs-14 text-primary"
+                                    style="cursor:pointer"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    title="Pilih Kategori Tagihan terlebih dahulu. Jenis Tagihan akan tampil otomatis menyesuaikan kategori yang Anda pilih.">
+                                </i>
+                            </div>
+
+                            <select
+                                id="PilihKategoriTagihan"
+                                wire:model="selectedKategoriTagihanSiswa"
+                                class="form-select"
+                                style="cursor:pointer"
+                                multiple="multiple"
+                                title="Pilih Kategori">
+
+                                @foreach ($select_kategori_tagihan as $item)
+                                    <option value="{{ $item->ms_kategori_tagihan_siswa_id }}">
+                                        {{ $item->nama_kategori_tagihan_siswa }}
+                                    </option>
+                                @endforeach
+
+                            </select>
+
+                        </div>
+
+                        {{-- JENIS TAGIHAN --}}
+                        @if ($showJenisTagihan)
+
+                            <div class="mb-4">
+                                <p class="text-uppercase fw-semibold mb-2">
+                                    Jenis Tagihan
+                                </p>
+
+                                <select
+                                    id="PilihJenisTagihan"
+                                    wire:model="selectedJenisTagihanSiswa"
+                                    class="form-select"
+                                    style="cursor:pointer"
+                                    multiple="multiple"
+                                    title="Pilih Tagihan">
+
+                                    @foreach ($select_jenis_tagihan as $item)
+                                        <option value="{{ $item->ms_jenis_tagihan_siswa_id }}">
+                                            {{ $item->nama_jenis_tagihan_siswa }}
+                                            - {{ $item->ms_kategori_tagihan_siswa->nama_kategori_tagihan_siswa }}
+                                        </option>
+                                    @endforeach
+
+                                </select>
+                            </div>
+
+                        @endif
+
                     </div>
-                </div> --}}
+                </div>
 
             </div>
         </div>
+
     </div>
-    
-    <script>
-        // Select2 handler
-        function initSelect2() {
-            $('#PilihKelas').select2(); // Terapkan Select2 pada elemen ini
-            $('#PilihKategoriTagihan').select2(); // Terapkan Select2 pada elemen ini
-            $('#PilihJenisTagihan').select2(); // Terapkan Select2 pada elemen ini
-        }
 
-        // Clear filter hanya didaftarkan sekali
-        document.getElementById("ClearFilter").addEventListener("click", function () {
-            // Reset semua select dan input ke nilai default
-            $('#PilihKelas').val(null).trigger('change');
-            $('#PilihKategoriTagihan').val(null).trigger('change');
-            $('#PilihJenisTagihan').val(null).trigger('change');
+    {{-- FOOTER --}}
+    <div class="offcanvas-footer border-top p-3 bg-light-subtle">
+        <div class="hstack gap-2">
 
-            // Emit event ke Livewire untuk clear filter
-            Livewire.emit("clearFilters");
-            alertify.success("Memperbarui...");
-        });
+            <button
+                id="ClearFilter"
+                class="btn btn-light rounded-pill w-100"
+                data-bs-dismiss="offcanvas">
 
-        // Fungsi untuk mengirim data filter hanya didaftarkan sekali
-        document.getElementById("ApplyFilter").addEventListener("click", function () {
-            const filters = {
-                selectedKelas: $("#PilihKelas").val(),
-                selectedKategoriTagihanSiswa: $("#PilihKategoriTagihan").val(),
-                selectedJenisTagihanSiswa: $("#PilihJenisTagihan").val(),
-            };
+                <i class="ri-refresh-line me-1"></i>
+                Clear Filter
+            </button>
 
-            // Emit filters ke Livewire
-            Livewire.emit("applyFilters", filters);
+            <button
+                id="ApplyFilter"
+                class="btn btn-primary rounded-pill w-100"
+                data-bs-dismiss="offcanvas">
 
-            // Tampilkan notifikasi sukses menggunakan alertify
-            alertify.success("Memperbarui...");
-        });
+                <i class="ri-filter-3-line me-1"></i>
+                Terapkan Filter
+            </button>
 
-        // Inisialisasi Select2 dan hook Livewire
-        document.addEventListener("DOMContentLoaded", function () {
-            // Inisialisasi awal Select2
-            initSelect2();
+        </div>
+    </div>
 
-            // Re-inisialisasi Select2 setiap kali Livewire memperbarui DOM tanpa mendaftarkan listener ulang
-            Livewire.hook('message.processed', (message, component) => {
-                initSelect2(); // Pastikan Select2 tetap bekerja setelah Livewire update
-            });
-        });
-
-    </script>
 </div>
+
+<script>
+    // Select2 handler
+    function initSelect2() {
+        $('#PilihKelas').select2();
+        $('#PilihKategoriTagihan').select2();
+        $('#PilihJenisTagihan').select2();
+    }
+
+    // Clear filter
+    document.getElementById("ClearFilter").addEventListener("click", function () {
+
+        $('#PilihKelas').val(null).trigger('change');
+        $('#PilihKategoriTagihan').val(null).trigger('change');
+        $('#PilihJenisTagihan').val(null).trigger('change');
+
+        Livewire.emit("clearFilters");
+
+        alertify.success("Memperbarui...");
+    });
+
+    // Apply filter
+    document.getElementById("ApplyFilter").addEventListener("click", function () {
+
+        const filters = {
+            selectedKelas: $("#PilihKelas").val(),
+            selectedKategoriTagihanSiswa: $("#PilihKategoriTagihan").val(),
+            selectedJenisTagihanSiswa: $("#PilihJenisTagihan").val(),
+        };
+
+        Livewire.emit("applyFilters", filters);
+
+        alertify.success("Memperbarui...");
+    });
+
+    // Inisialisasi Select2
+    document.addEventListener("DOMContentLoaded", function () {
+
+        initSelect2();
+
+        Livewire.hook('message.processed', (message, component) => {
+            initSelect2();
+        });
+
+    });
+</script>

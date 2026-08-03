@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Jabatan;
 use App\Models\Jenjang;
+use App\Models\Pegawai;
+use App\Models\SaldoEduPay;
 use App\Models\TahunAjar;
 use App\Models\TransaksiEduPay;
 use Elibyy\TCPDF\Facades\TCPDF;
@@ -148,5 +151,140 @@ class LaporanEduPayPegawai extends Controller
 
         $pdf::writeHTML($html, true, false, true, false, '');
         $pdf::Output('laporan_edupay_pegawai.pdf', 'I');
+    }
+ 
+    public function cetakSaldoPDF(Request $request)
+    {
+        $selectedJenjang = $request->jenjang;
+        $selectedJabatan = $request->jabatan;
+
+        // Validasi parameter wajib
+        if (!$selectedJenjang) {
+            return response()->json([
+                'error' => 'Jenjang wajib dipilih'
+            ], 400);
+        }
+
+        $jenjang = Jenjang::find($selectedJenjang);
+        $jabatan = $selectedJabatan ? Jabatan::find($selectedJabatan): null;
+
+        // Query pegawai
+        $query = Pegawai::with([
+            'ms_jabatan',
+            'ms_jenjang',
+            'ms_saldo_edupay',
+        ])
+            ->where('ms_jenjang_id', $selectedJenjang);
+
+        // Filter jabatan
+        if ($selectedJabatan) {
+            $query->where('ms_jabatan_id', $selectedJabatan);
+        }
+
+        // Hanya pegawai yang memiliki saldo EduPay != 0
+        $query->whereHas('ms_saldo_edupay', function ($q) {
+            $q->where('saldo_edupay', '!=', 0)
+            ->where('user_type', 'pegawai');
+        });
+
+        // Urutkan berdasarkan saldo terbesar
+        $query->orderByDesc(
+            SaldoEduPay::select('saldo_edupay')
+                ->whereColumn(
+                    'user_id',
+                    'ms_pegawai.ms_pegawai_id'
+                )
+                ->where('user_type', 'pegawai')
+                ->limit(1)
+        );
+
+        $laporan = $query->get();
+
+        // Hitung total seluruh saldo
+        $totalSaldo = $laporan->sum(function ($item) {
+            return $item->ms_saldo_edupay->saldo_edupay ?? 0;
+        });
+
+        $judul = 'Laporan Saldo EduPay Pegawai';
+
+        $unit = 'Unit ' . ($jenjang->nama_jenjang ?? '-');
+
+        // Jika jabatan dipilih, tambahkan nama jabatan
+        if ($jabatan) {
+            $unit .= ' - ' . ($jabatan->nama_jabatan ?? '-');
+        }
+
+        // Mulai PDF
+        $pdf = new TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
+
+        $pdf::SetTitle($judul);
+        $pdf::AddPage('P');
+
+        // Judul
+        $pdf::SetFont('times', 'B', 12);
+        $pdf::Cell(0, 5, $judul, 0, 1, 'C');
+
+        // Unit / filter
+        $pdf::SetFont('times', '', 11);
+        $pdf::Cell(0, 5, $unit, 0, 1, 'C');
+
+        $pdf::Ln(3);
+
+        $pdf::SetFont('times', '', 10);
+        $pdf::setCellHeightRatio(1.2);
+
+        $html = '
+        <table border="0.5" cellpadding="4">
+            <thead>
+                <tr style="background-color:#f2f2f2;">
+                    <th width="6%">No</th>
+                    <th width="44%">Pegawai</th>
+                    <th width="25%">Jabatan</th>
+                    <th width="25%">Saldo EduPay</th>
+                </tr>
+            </thead>
+            <tbody>';
+
+        $no = 1;
+
+        foreach ($laporan as $item) {
+
+            $saldo = $item->ms_saldo_edupay->saldo_edupay ?? 0;
+
+            $html .= '
+                <tr>
+                    <td width="6%" align="center">' . $no++ . '</td>
+                    <td width="44%">
+                        ' . htmlspecialchars(
+                            $item->nama_pegawai ?? '-',
+                            ENT_QUOTES,
+                            'UTF-8'
+                        ) . '
+                    </td>
+
+                    <td width="25%">
+                        ' . htmlspecialchars(
+                            $item->ms_jabatan->nama_jabatan ?? '-',
+                            ENT_QUOTES,
+                            'UTF-8'
+                        ) . '
+                    </td>
+                    <td width="25%" align="right">RP' . number_format($saldo, 0, ',', '.') . '</td>
+                </tr>';
+        }
+
+        // Total
+        $html .= '<tr style="background-color:#d9edf7;">
+                <td colspan="3" align="right"><b>Total Saldo</b></td>
+                <td align="right"><b>RP' . number_format($totalSaldo, 0, ',', '.') . '</b></td>
+            </tr>';
+
+        $html .= '
+            </tbody>
+        </table>';
+
+        $pdf::writeHTML($html, true, false, true, false, '');
+
+        $pdf::Output('laporan_saldo_edupay_pegawai.pdf', 'I');
     }
 }

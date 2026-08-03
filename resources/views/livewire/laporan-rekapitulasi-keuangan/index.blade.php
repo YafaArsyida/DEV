@@ -33,8 +33,8 @@
     
             {{-- ACTION --}}
             <div class="d-flex gap-2 flex-wrap">
-                <button data-bs-toggle="modal" data-bs-target="#ExportLaporan" class="btn btn-soft-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button>
-                <button type="button" class="btn btn-info rounded-pill px-4" data-bs-toggle="offcanvas" data-bs-target="#filterRekapitulasi" aria-controls="filterTabungan"><i class="ri-filter-3-line align-bottom me-1"></i> Fliters</button>
+                <button data-bs-toggle="modal" data-bs-target="#ExportLaporan" class="btn btn-success rounded-pill px-4"><i class="ri-file-excel-2-line pb-0"></i> Export</button>
+                <button type="button" class="btn btn-primary rounded-pill px-4" data-bs-toggle="offcanvas" data-bs-target="#filterRekapitulasi" aria-controls="filterTabungan"><i class="ri-filter-3-line align-bottom me-1"></i> Fliters</button>
             </div>
         </div>
     </div>
@@ -74,21 +74,22 @@
                 </div>
             @else
             <div class="table-responsive">
-                <table class="table table-bordered table-hover table-nowrap align-middle" style="width:100%">
-                    <tr class="table-active">
-                        <th class="text-uppercase">No</th>
-                        <th style="white-space: nowrap;" class="text-uppercase">Siswa</th>
-                        <th style="white-space: nowrap;" class="text-uppercase">Kelas</th>
-                        @foreach($jenisTagihan as $jenis)
-                            <th style="white-space: nowrap;" class="">{{ $jenis->nama_jenis_tagihan_siswa }}</th>
-                        @endforeach
-                        <th class="text-uppercase">Total</th>
-                    </tr>
+                <table id="tabelRekap" class="table table-hover table-nowrap align-middle" style="width:100%">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="text-uppercase">No</th>
+                            <th class="text-uppercase">Siswa</th>
+                            <th class="text-uppercase">Kelas</th>
+                            @foreach($jenisTagihan as $jenis)
+                                <th class="">{{ $jenis->nama_jenis_tagihan_siswa }}</th>
+                            @endforeach
+                            <th class="text-uppercase">Total</th>
+                        </tr>
+                    </thead>
                     <tbody>
                         @forelse ($siswas as $key => $item)
                             <tr>
-                                {{-- <td>{{ $siswas->firstItem() + $key }}.</td> --}}
-                                <td>{{ $loop->iteration }}.</td>
+                                <td>{{ $siswas->firstItem() + $key }}.</td>
                                 <td>{{ $item->ms_siswa->nama_siswa }}</td>
                                 <td>{{ $item->ms_kelas->nama_kelas }}</td>
                                 @foreach ($jenisTagihan as $jenis)
@@ -101,35 +102,33 @@
                                                 if ($jenisRekapitulasi === 'tagihan') {
                                                     $value = $tagihanItem->jumlah_tagihan_siswa;
                                                 } elseif ($jenisRekapitulasi === 'pembayaran') {
-                                                    $value = $tagihanItem->jumlah_sudah_dibayar();
+                                                    $value = $tagihanItem->jumlah_sudah_dibayar ?? 0;
                                                 } elseif ($jenisRekapitulasi === 'kekurangan') {
-                                                    $value = $tagihanItem->jumlah_kekurangan();
+                                                    $value = $tagihanItem->jumlah_tagihan_siswa - ($tagihanItem->jumlah_sudah_dibayar ?? 0);
                                                 }
                                             }
                                         @endphp
 
-                                        {{ $value !== null ? 'RP' . number_format($value, 0, ',', '.') : '-' }}
+                                        {{ $value !== null ? 'Rp' . number_format($value, 0, ',', '.') : '-' }}
                                     </td>
                                 @endforeach
                                 <td>
                                     @php
-                                        $total = 0;
-
                                         if ($jenisRekapitulasi === 'tagihan') {
                                             $total = $item->total_tagihan_siswa();
                                         } elseif ($jenisRekapitulasi === 'pembayaran') {
                                             $total = $item->total_dibayarkan();
-                                        } elseif ($jenisRekapitulasi === 'kekurangan') {
+                                        } else {
                                             $total = $item->total_kekurangan();
                                         }
                                     @endphp
 
-                                    RP{{ number_format($total, 0, ',', '.') }}
+                                    Rp{{ number_format($total, 0, ',', '.') }}
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="{{ 3 + count($jenisTagihan) }}"> <!-- Tambahkan jumlah kolom dinamis -->
+                                <td colspan="{{ 4 + count($jenisTagihan) }}"> <!-- Tambahkan jumlah kolom dinamis -->
                                     <div class="noresult text-center py-3">
                                         <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop"
                                             colors="primary:#405189,secondary:#08a88a"
@@ -143,63 +142,218 @@
                         @endforelse
                     </tbody>
                     <tfoot>
-                        <tr>
-                            <td colspan="3" class="text-uppercase">TOTAL</td>
+
+                        {{-- Subtotal halaman --}}
+                        <tr class="table-light">
+                            <td colspan="3">
+                                <strong>SUBTOTAL HALAMAN</strong>
+                            </td>
+
                             @foreach ($jenisTagihan as $jenis)
                                 <td>
-                                    RP{{ number_format($this->total[$jenis->ms_jenis_tagihan_siswa_id] ?? 0, 0, ',', '.') }}
+                                    Rp{{ number_format($pageTotal[$jenis->ms_jenis_tagihan_siswa_id] ?? 0, 0, ',', '.') }}
                                 </td>
                             @endforeach
+
                             <td>
-                                RP{{ number_format($this->grandTotal, 0, ',', '.') }}
+                                <strong>
+                                    Rp{{ number_format($pageGrandTotal, 0, ',', '.') }}
+                                </strong>
                             </td>
                         </tr>
-                    </tfoot>                    
+
+                        {{-- Grand total --}}
+                        <tr class="table-secondary fw-bold">
+                            <td colspan="3">
+                                GRAND TOTAL
+                                <br>
+                                <small>Seluruh data sesuai filter</small>
+                            </td>
+
+                            @foreach ($jenisTagihan as $jenis)
+                                <td>
+                                    Rp{{ number_format($overallTotal[$jenis->ms_jenis_tagihan_siswa_id] ?? 0, 0, ',', '.') }}
+                                </td>
+                            @endforeach
+
+                            <td>
+                                Rp{{ number_format($overallGrandTotal, 0, ',', '.') }}
+                            </td>
+                        </tr>
+
+                    </tfoot>            
                 </table>
-                {{-- {{ $siswas->links() }} --}}
+                <div class="mt-3">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div class="text-muted fs-13">
+                            Menampilkan
+                            <span class="fw-semibold">
+                                {{ $siswas->firstItem() ?? 0 }}
+                            </span>
+                            -
+                            <span class="fw-semibold">
+                                {{ $siswas->lastItem() ?? 0 }}
+                            </span>
+                            dari
+                            <span class="fw-semibold">
+                                {{ $siswas->total() }}
+                            </span>
+                            data
+                        </div>
+                        <div>
+                            {{ $siswas->links() }}
+                        </div>
+                    </div>
+                </div>
             </div>
             @endif
         </div>
     </div>
     {{-- MODAL --}}
-    <div class="modal fade zoomIn" id="ExportLaporan" tabindex="-1" aria-labelledby="exportRecordLabel" aria-hidden="true" wire:ignore.self>
+    <div class="modal fade zoomIn"
+        id="ExportLaporan"
+        tabindex="-1"
+        aria-labelledby="exportRecordLabel"
+        aria-hidden="true"
+        wire:ignore.self>
+
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+
+                {{-- HEADER --}}
+                <div class="modal-header border-0 pb-0">
+
+                    <button
+                        type="button"
+                        class="btn btn-light btn-icon rounded-circle ms-auto"
+                        data-bs-dismiss="modal">
+
+                        <i class="ri-close-line fs-18"></i>
+
+                    </button>
+
                 </div>
-                <div class="modal-body p-5 text-center">
-                    <lord-icon src="https://cdn.lordicon.com/fjvfsqea.json" trigger="loop" colors="primary:#405189,secondary:#f06548" style="width:90px;height:90px"></lord-icon>
-                    <div class="mt-4 text-center">
-                        <h4 class="fs-semibold">Konfirmasi Export</h4>
-                        <p class="text-muted fs-14 mb-4 pt-1">
-                            Apakah Anda yakin ingin mengekspor laporan Rekapitulasi? Data yang diekspor akan sesuai dengan tabel yang ditampilkan.
-                        </p>
-                        <div class="hstack gap-2 justify-content-center remove">
-                            <button class="btn btn-link link-success fw-medium text-decoration-none shadow-none" data-bs-dismiss="modal">
-                                <i class="ri-close-line me-1 align-middle"></i> Batal
-                            </button>
-                            <button class="btn btn-primary" id="konfirmasiExportLaporan" data-bs-dismiss="modal">Ya, Export!</button>
+
+                {{-- BODY --}}
+                <div class="modal-body px-4 pb-5 pt-2 text-center">
+
+                    <div class="mb-4">
+
+                        <div class="avatar-xl mx-auto">
+
+                            <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
+
+                                <lord-icon
+                                    src="https://cdn.lordicon.com/fjvfsqea.json"
+                                    trigger="loop"
+                                    colors="primary:#405189,secondary:#0ab39c"
+                                    style="width:70px;height:70px">
+                                </lord-icon>
+
+                            </div>
+
                         </div>
+
                     </div>
+
+                    <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill mb-3">
+                        Konfirmasi Export
+                    </span>
+
+                    <h3 class="fw-bold mb-2">
+                        Export Laporan Rekapitulasi?
+                    </h3>
+
+                    <p class="text-muted mb-0 lh-lg px-lg-4">
+                        Data yang diekspor akan mengikuti tabel yang sedang
+                        ditampilkan sehingga hasil export sesuai dengan filter
+                        dan jenis rekapitulasi yang dipilih.
+                    </p>
+
+                    <div class="alert alert-light border rounded-4 text-start mt-4 mb-0">
+
+                        <div class="d-flex gap-3">
+
+                            <i class="ri-information-line text-primary fs-20"></i>
+
+                            <div>
+
+                                <h6 class="fw-semibold mb-1">
+                                    Informasi
+                                </h6>
+
+                                <p class="text-muted mb-0 fs-13">
+                                    Pastikan data yang tampil sudah sesuai sebelum
+                                    melakukan export Excel.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
                 </div>
+
+                {{-- FOOTER --}}
+                <div class="modal-footer border-0 pt-0 px-4 pb-4 justify-content-center">
+
+                    <button
+                        class="btn btn-light rounded-pill px-4"
+                        data-bs-dismiss="modal">
+
+                        <i class="ri-close-line me-1"></i>
+                        Batal
+
+                    </button>
+
+                    <button
+                        class="btn btn-primary rounded-pill px-4"
+                        id="konfirmasiExportLaporan"
+                        data-bs-dismiss="modal">
+
+                        <i class="ri-download-2-line me-1"></i>
+                        Ya, Export
+
+                    </button>
+
+                </div>
+
             </div>
+
         </div>
+
     </div>
     <script>
         document.getElementById('konfirmasiExportLaporan').addEventListener('click', function () {
+
             alertify.success("Menyiapkan Dokumen");
-            // Tambahkan delay 1 detik
+
             setTimeout(function () {
-                // Ambil elemen tabel berdasarkan ID
-                var table = document.querySelector("table");
-                
-                // Konversi tabel ke format Excel
-                var workbook = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
-                
-                // Simpan file Excel
-                XLSX.writeFile(workbook, "Laporan-Rekapitulasi.xlsx");
-            }, 1000); // 1000 ms = 1 detik
+
+                const table = document.getElementById("tabelRekap");
+
+                const workbook = XLSX.utils.table_to_book(table, {
+                    sheet: "Rekapitulasi"
+                });
+
+                // Ambil nilai Livewire
+                let jenis = @this.get('jenisRekapitulasi');
+
+                let namaJenis = {
+                    tagihan: "Estimasi",
+                    pembayaran: "Dibayarkan",
+                    kekurangan: "Kekurangan"
+                };
+
+                let fileName =
+                    `Laporan-Rekapitulasi-${namaJenis[jenis] || "Rekapitulasi"}-{{ date('Y-m-d') }}.xlsx`;
+
+                XLSX.writeFile(workbook, fileName);
+
+            }, 1000);
+
         });
-    </script>
+        </script>
 </div>

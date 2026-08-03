@@ -246,44 +246,159 @@
         </div>
     </div>
     {{-- MODAL --}}
-    <div class="modal fade zoomIn" id="ExportLaporanExcel" tabindex="-1" aria-labelledby="exportRecordLabel" aria-hidden="true" wire:ignore.self>
+    <div class="modal fade zoomIn"
+        id="ExportLaporanExcel"
+        tabindex="-1"
+        aria-labelledby="exportRecordLabel"
+        aria-hidden="true"
+        wire:ignore.self>
+
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+
+                {{-- CLOSE BUTTON --}}
+                <div class="modal-header border-0 pb-0">
+
+                    <button
+                        type="button"
+                        class="btn btn-light btn-icon rounded-circle ms-auto"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+
+                        <i class="ri-close-line fs-18"></i>
+
+                    </button>
+
                 </div>
-                <div class="modal-body p-5 text-center">
-                    <lord-icon src="https://cdn.lordicon.com/fjvfsqea.json" trigger="loop" colors="primary:#405189,secondary:#f06548" style="width:90px;height:90px"></lord-icon>
-                    <div class="mt-4 text-center">
-                        <h4 class="fs-semibold">Konfirmasi Export</h4>
-                        <p class="text-muted fs-14 mb-4 pt-1">
-                            Apakah Anda yakin ingin mengekspor laporan Edupay Siswa? Data yang diekspor akan sesuai dengan tabel yang ditampilkan.
-                        </p>
-                        <div class="hstack gap-2 justify-content-center remove">
-                            <button class="btn btn-link link-success fw-medium text-decoration-none shadow-none" data-bs-dismiss="modal">
-                                <i class="ri-close-line me-1 align-middle"></i> Batal
-                            </button>
-                            <button class="btn btn-primary" id="konfirmasiExportLaporan" data-bs-dismiss="modal">Ya, Export!</button>
+
+                {{-- BODY --}}
+                <div class="modal-body px-4 pb-5 pt-2 text-center">
+
+                    {{-- ICON --}}
+                    <div class="mb-4">
+
+                        <div class="avatar-xl mx-auto">
+
+                            <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
+
+                                <lord-icon
+                                    src="https://cdn.lordicon.com/fjvfsqea.json"
+                                    trigger="loop"
+                                    colors="primary:#405189,secondary:#0ab39c"
+                                    style="width:70px;height:70px">
+                                </lord-icon>
+
+                            </div>
+
                         </div>
+
                     </div>
+
+                    {{-- TITLE --}}
+                    <div class="mb-2">
+
+                        <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill mb-3">
+                            Konfirmasi Export
+                        </span>
+
+                        <h3 class="fw-bold mb-2" id="exportRecordLabel">
+                            Export Laporan EduPay Siswa?
+                        </h3>
+
+                        <p class="text-muted mb-0 lh-lg px-lg-4">
+                            Data laporan EduPay Siswa yang diekspor akan mengikuti
+                            data pada tabel yang sedang ditampilkan,
+                            sehingga hasil export sesuai dengan data yang Anda lihat
+                            saat ini.
+                        </p>
+
+                    </div>
+
+                    {{-- INFORMATION --}}
+                    <div class="alert alert-light border rounded-4 text-start mt-4 mb-0">
+
+                        <div class="d-flex align-items-start gap-3">
+
+                            <div class="flex-shrink-0">
+                                <i class="ri-information-line text-primary fs-20"></i>
+                            </div>
+
+                            <div>
+
+                                <h6 class="fw-semibold mb-1">
+                                    Informasi
+                                </h6>
+
+                                <p class="text-muted mb-0 fs-13">
+                                    Pastikan data laporan EduPay Siswa yang
+                                    ditampilkan sudah sesuai sebelum melakukan
+                                    export laporan.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
                 </div>
+
+                {{-- FOOTER --}}
+                <div class="modal-footer border-0 pt-0 px-4 pb-4 justify-content-center">
+
+                    <button
+                        type="button"
+                        class="btn btn-light rounded-pill px-4"
+                        data-bs-dismiss="modal">
+
+                        <i class="ri-close-line me-1"></i>
+                        Batal
+
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn btn-primary rounded-pill px-4"
+                        id="konfirmasiExportLaporan"
+                        data-bs-dismiss="modal">
+
+                        <i class="ri-download-2-line me-1"></i>
+                        Ya, Export
+
+                    </button>
+
+                </div>
+
             </div>
+
         </div>
+
     </div>
+
     <script>
         document.getElementById('konfirmasiExportLaporan').addEventListener('click', function () {
+
             alertify.success("Menyiapkan Dokumen");
-            // Tambahkan delay 1 detik
+
             setTimeout(function () {
-                // Ambil elemen tabel berdasarkan ID
-                var table = document.getElementById("tabelEduPay"); // ganti sesuai kebutuhan
-        
-                // Konversi tabel ke format Excel
-                var workbook = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
-                
-                // Simpan file Excel
-                XLSX.writeFile(workbook, "Laporan-EduPay-Siswa.xlsx");
-            }, 1000); // 1000 ms = 1 detik
+
+                // Ambil tabel EduPay
+                var table = document.getElementById("tabelEduPay");
+
+                // Konversi tabel menjadi workbook Excel
+                var workbook = XLSX.utils.table_to_book(table, {
+                    sheet: "Sheet1"
+                });
+
+                // Nama file export
+                let fileName = `Laporan-EduPay-Siswa-{{ date('Y-m-d') }}.xlsx`;
+
+                // Download file Excel
+                XLSX.writeFile(workbook, fileName);
+
+            }, 1000);
+
         });
     </script>
 </div>

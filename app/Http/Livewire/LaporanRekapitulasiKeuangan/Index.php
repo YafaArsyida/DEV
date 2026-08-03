@@ -13,10 +13,12 @@ class Index extends Component
     use WithPagination;
     protected $paginationTheme = 'bootstrap'; // Menggunakan tema Bootstrap untuk paginasi
 
+    public $perPage = 50;
+
     public $jenisTagihan;
     public $jenisRekapitulasi = 'tagihan';
-    public $total;
-    public $grandTotal;
+    // public $total;
+    // public $grandTotal;
 
     public $selectedJenjang = null;
     public $selectedTahunAjar = null;
@@ -26,6 +28,14 @@ class Index extends Component
     public $selectedJenisTagihanSiswa = [];
 
     public $search = '';
+
+    // Per halaman
+    public $pageTotal = [];
+    public $pageGrandTotal = 0;
+
+    // Seluruh data
+    public $overallTotal = [];
+    public $overallGrandTotal = 0;
 
     // Listener untuk Livewire
     protected $listeners = [
@@ -77,39 +87,50 @@ class Index extends Component
             ->orderBy('ms_kategori_tagihan_siswa_id')
             ->get();
 
-
         // QUERY SISWA
-        $query = PenempatanSiswa::with([
-            'ms_siswa.ms_educard',
-            'ms_kelas',
-            'ms_tagihan_siswa' => function ($q) {
-                $q->with([
-                    'ms_jenis_tagihan_siswa'
-                ])
-                    ->withSum('dt_transaksi_tagihan_siswa as jumlah_sudah_dibayar', 'jumlah_bayar');
-            }
-        ])
+        $baseQuery = PenempatanSiswa::with([
+                'ms_siswa.ms_educard',
+                'ms_kelas',
+                'ms_tagihan_siswa' => function ($q) {
+                    $q->with('ms_jenis_tagihan_siswa')
+                        ->withSum('dt_transaksi_tagihan_siswa as jumlah_sudah_dibayar', 'jumlah_bayar')
+                        ->when(!empty($this->selectedKategoriTagihanSiswa), function ($q) {
+                            $q->whereHas('ms_jenis_tagihan_siswa', function ($q) {
+                                $q->whereIn('ms_kategori_tagihan_siswa_id', $this->selectedKategoriTagihanSiswa);
+                            });
+                        })
+                        ->when(!empty($this->selectedJenisTagihanSiswa), function ($q) {
+                            $q->whereIn('ms_jenis_tagihan_siswa_id', $this->selectedJenisTagihanSiswa);
+                        });
+                }
+            ])
             ->where('ms_jenjang_id', $this->selectedJenjang)
             ->where('ms_tahun_ajar_id', $this->selectedTahunAjar);
 
         if (!empty($this->selectedKelas)) {
-            $query->whereIn('ms_kelas_id', $this->selectedKelas);
+            $baseQuery->whereIn('ms_kelas_id', $this->selectedKelas);
         }
 
         if (!empty($this->selectedKategoriTagihanSiswa)) {
-            $query->whereHas('ms_tagihan_siswa.ms_jenis_tagihan_siswa', function ($q) {
-                $q->whereIn('ms_kategori_tagihan_siswa_id', $this->selectedKategoriTagihanSiswa);
+            $baseQuery->whereHas('ms_tagihan_siswa.ms_jenis_tagihan_siswa', function ($q) {
+                $q->whereIn(
+                    'ms_kategori_tagihan_siswa_id',
+                    $this->selectedKategoriTagihanSiswa
+                );
             });
         }
 
         if (!empty($this->selectedJenisTagihanSiswa)) {
-            $query->whereHas('ms_tagihan_siswa.ms_jenis_tagihan_siswa', function ($q) {
-                $q->whereIn('ms_jenis_tagihan_siswa_id', $this->selectedJenisTagihanSiswa);
+            $baseQuery->whereHas('ms_tagihan_siswa.ms_jenis_tagihan_siswa', function ($q) {
+                $q->whereIn(
+                    'ms_jenis_tagihan_siswa_id',
+                    $this->selectedJenisTagihanSiswa
+                );
             });
         }
 
         if ($this->search) {
-            $query->whereHas('ms_siswa', function ($q) {
+            $baseQuery->whereHas('ms_siswa', function ($q) {
                 $q->where('nama_siswa', 'like', "%{$this->search}%")
                     ->orWhereHas('ms_educard', function ($qr) {
                         $qr->where('kode_kartu', 'like', "%{$this->search}%");
@@ -117,49 +138,115 @@ class Index extends Component
             });
         }
 
-        $siswas = $query->orderBy('ms_kelas_id')->orderBy(
-            fn($q) => $q->select('nama_siswa')
-                ->from('ms_siswa')
-                ->whereColumn('ms_siswa.ms_siswa_id', 'ms_penempatan_siswa.ms_siswa_id')
-        )->get();
+        // Sorting cukup sekali
+        $baseQuery
+            ->orderBy('ms_kelas_id')
+            ->orderBy(
+                fn($q) => $q->select('nama_siswa')
+                    ->from('ms_siswa')
+                    ->whereColumn(
+                        'ms_siswa.ms_siswa_id',
+                        'ms_penempatan_siswa.ms_siswa_id'
+                    )
+            );
+
+        $rekapQuery = clone $baseQuery;
+        $listQuery  = clone $baseQuery;
 
         // ===============================
-        //   REKAP PER JENIS TAGIHAN
+        // GRAND TOTAL (SEMUA DATA)
         // ===============================
-        $this->total = [];
-        $this->grandTotal = 0;
+        $rekapSiswas = $rekapQuery->get();
+
+        $this->overallTotal = [];
+        $this->overallGrandTotal = 0;
 
         foreach ($this->jenisTagihan as $jenis) {
-            $jenisId = $jenis->ms_jenis_tagihan_siswa_id;
+
+            $sum = 0;
+
+            foreach ($rekapSiswas as $siswa) {
+
+                $tagihan = $siswa->ms_tagihan_siswa
+                    ->firstWhere(
+                        'ms_jenis_tagihan_siswa_id',
+                        $jenis->ms_jenis_tagihan_siswa_id
+                    );
+
+                if (!$tagihan) {
+                    continue;
+                }
+
+                $dibayar = $tagihan->jumlah_sudah_dibayar ?? 0;
+                $nominal = $tagihan->jumlah_tagihan_siswa;
+                $kekurangan = $nominal - $dibayar;
+
+                switch ($this->jenisRekapitulasi) {
+                    case 'tagihan':
+                        $sum += $nominal;
+                        break;
+
+                    case 'pembayaran':
+                        $sum += $dibayar;
+                        break;
+
+                    default:
+                        $sum += $kekurangan;
+                }
+            }
+
+            $this->overallTotal[$jenis->ms_jenis_tagihan_siswa_id] = $sum;
+            $this->overallGrandTotal += $sum;
+        }
+
+        // ===============================
+        // DATA TABEL (PER PAGE)
+        // ===============================
+        $siswas = $listQuery->paginate($this->perPage);
+
+        $this->pageTotal = [];
+        $this->pageGrandTotal = 0;
+
+        foreach ($this->jenisTagihan as $jenis) {
+
             $sum = 0;
 
             foreach ($siswas as $siswa) {
 
                 $tagihan = $siswa->ms_tagihan_siswa
-                    ->firstWhere('ms_jenis_tagihan_siswa_id', $jenisId);
+                    ->firstWhere(
+                        'ms_jenis_tagihan_siswa_id',
+                        $jenis->ms_jenis_tagihan_siswa_id
+                    );
 
-                if (!$tagihan) continue;
+                if (!$tagihan) {
+                    continue;
+                }
 
                 $dibayar = $tagihan->jumlah_sudah_dibayar ?? 0;
-                $tagihanNominal = $tagihan->jumlah_tagihan_siswa;
-                $kekurangan = $tagihanNominal - $dibayar;
+                $nominal = $tagihan->jumlah_tagihan_siswa;
+                $kekurangan = $nominal - $dibayar;
 
-                if ($this->jenisRekapitulasi === 'tagihan') {
-                    $sum += $tagihanNominal;
-                } elseif ($this->jenisRekapitulasi === 'pembayaran') {
-                    $sum += $dibayar;
-                } else {
-                    $sum += $kekurangan;
+                switch ($this->jenisRekapitulasi) {
+                    case 'tagihan':
+                        $sum += $nominal;
+                        break;
+
+                    case 'pembayaran':
+                        $sum += $dibayar;
+                        break;
+
+                    default:
+                        $sum += $kekurangan;
                 }
             }
 
-            $this->total[$jenisId] = $sum;
-            $this->grandTotal += $sum;
+            $this->pageTotal[$jenis->ms_jenis_tagihan_siswa_id] = $sum;
+            $this->pageGrandTotal += $sum;
         }
-        
-        return view('livewire.laporan-rekapitulasi-keuangan.index', [
-            // 'select_kelas' => $select_kelas,
-            'siswas' => $siswas,
-        ]);
+
+        return view('livewire.laporan-rekapitulasi-keuangan.index',
+            compact('siswas')
+        );
     }
 }

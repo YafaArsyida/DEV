@@ -4,6 +4,7 @@ namespace App\Http\Livewire\LaporanEduPaySiswa;
 
 use App\Models\AkuntansiJurnalDetail;
 use App\Models\PenempatanSiswa;
+use App\Models\SaldoEduPay;
 use App\Models\TransaksiEduPay;
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
@@ -11,155 +12,170 @@ use Illuminate\Database\Eloquent\Builder;
 
 class Withdraw extends Component
 {
-    protected $listeners = ['withdrawEduPay'];
+    public $arsipDownloaded = false;
 
-    public $selectedKelas; // Untuk menyimpan data kelas yang diterima
-    public $siswa;
-    public $saldoKas;
-    public $totalSaldoPenarikan;
+    public $selectedKelas;
+    public $namaKelas;
 
-    public $selectedJenjang = null;
-    public $selectedTahunAjar = null;
+    public $selectedJenjang;
+    public $selectedTahunAjar;
 
-    public function withdrawEduPay($data)
+    protected $listeners = [
+        'showWithdrawModal',
+    ];
+
+    public function showWithdrawModal($data)
     {
-        $this->selectedKelas = $data['selectedKelas'] ?? null;
-        $this->selectedJenjang = $data['selectedJenjang'] ?? null;
-        $this->selectedTahunAjar = $data['selectedTahunAjar'] ?? null;
+        $this->selectedKelas      = $data['kelas'];
+        $this->namaKelas          = $data['namaKelas'];
+        $this->selectedJenjang    = $data['jenjang'];
+        $this->selectedTahunAjar  = $data['tahunAjar'];
 
-        // Lakukan validasi atau proses berdasarkan parameter
-        if (!$this->selectedKelas || !$this->selectedJenjang || !$this->selectedTahunAjar) {
-            $this->dispatchBrowserEvent('alertify-error', [
-                'message' => 'Data kelas, jenjang, atau tahun ajar tidak valid.'
-            ]);
-            return;
-        }
+        $this->arsipDownloaded = false;
 
-        // Ambil siswa berdasarkan kelas
-        $this->siswa = PenempatanSiswa::where('ms_kelas_id', $this->selectedKelas)
-            ->whereHas('ms_siswa.ms_transaksi_edupay', function (Builder $query) {
-                $query->where('jenis_transaksi', '!=', 'penarikan') // Pastikan transaksi bukan penarikan
-                    ->where('nominal', '>', 0); // Pastikan saldo positif
-            })
-            ->with(['ms_siswa'])
-            ->get();
-
-        // Jika tidak ada siswa dengan saldo
-        if ($this->siswa->isEmpty()) {
-            $this->dispatchBrowserEvent('alertify-error', [
-                'message' => 'Tidak ada saldo siswa di kelas ini.'
-            ]);
-            return;
-        }
-
-        // Hitung total saldo yang akan ditarik menggunakan saldo_edupay_siswa
-        $this->totalSaldoPenarikan = $this->siswa->reduce(function ($carry, $siswa) {
-            return $carry + $siswa->ms_siswa->saldo_edupay_siswa();
-        }, 0);
-
-        // Cek saldo kas
-        $this->saldoKas = AkuntansiJurnalDetail::where('kode_rekening', 11001) // Rekening kas
-            ->where('posisi', 'debit') // Saldo masuk
-            ->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
-            ->where('ms_jenjang_id', $this->selectedJenjang)
-            ->sum('nominal') - AkuntansiJurnalDetail::where('kode_rekening', 11001) // Rekening kas
-            ->where('posisi', 'kredit') // Saldo keluar
-            ->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
-            ->where('ms_jenjang_id', $this->selectedJenjang)
-            ->sum('nominal');
-
-        if ($this->saldoKas < $this->totalSaldoPenarikan) {
-            $this->dispatchBrowserEvent('alertify-error', [
-                'message' => 'Saldo kas tidak mencukupi untuk penarikan.'
-            ]);
-            return;
-        }
-
-        // Jika saldo mencukupi, lanjutkan dengan proses penarikan
-        $this->dispatchBrowserEvent('alertify-success', [
-            'message' => "Saldo siswa tersedia. Total penarikan: Rp " . number_format($this->totalSaldoPenarikan, 0, ',', '.') . "."
-        ]);
+        $this->dispatchBrowserEvent('show-withdraw-modal');
     }
-    public function confirmWithdraw()
+
+    public function cetakSaldo()
     {
-        if ($this->saldoKas < $this->totalSaldoPenarikan) {
-            $this->dispatchBrowserEvent('alertify-error', [
-                'message' => 'Saldo kas tidak mencukupi untuk penarikan.'
-            ]);
-            return;
-        }
-        if (!$this->siswa || $this->siswa->isEmpty()) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Tidak ada siswa untuk diproses.']);
-            return;
-        }
-        DB::beginTransaction();
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Laporan sedang diproses.'
+        ]);
+
+        $url = route('laporan.edupay-siswa.saldo.pdf', [
+            'jenjang' => $this->selectedJenjang,
+            'tahun'   => $this->selectedTahunAjar,
+            'kelas'   => $this->selectedKelas,
+        ]);
+
+        $this->arsipDownloaded = true;
+
+        $this->emit('openNewTab', $url);
+    }
+
+    public function withdrawEduPaySiswa()
+    {
         try {
-            foreach ($this->siswa as $student) {
-                $saldoSekarang = $student->ms_siswa->saldo_edupay_siswa();
 
-                // Cek jika saldo positif
-                if ($saldoSekarang > 0) {
-                    // jurnal ges
-                    $kode_kas = 11001;
-                    $kode_saldo_edupay_siswa = 22002;
+            DB::transaction(function () {
 
-                    // Data untuk jurnal debit
-                    $jurnalDebit = [
-                        'kode_rekening' => $kode_saldo_edupay_siswa,
+                $query = PenempatanSiswa::with([
+                    'ms_siswa'
+                ])
+                ->where('ms_jenjang_id', $this->selectedJenjang)
+                ->where('ms_tahun_ajar_id', $this->selectedTahunAjar);
+
+                if ($this->selectedKelas) {
+                    $query->where('ms_kelas_id', $this->selectedKelas);
+                }
+
+                $students = $query->get();
+
+                $kodeKas = 11001;
+                $kodeSaldoEduPay = 22002;
+
+                $berhasil = 0;
+
+                foreach ($students as $student) {
+
+                    $saldoEduPay = SaldoEduPay::siswa()
+                        ->lockForUpdate()
+                        ->firstOrCreate(
+                            [
+                                'user_id'   => $student->ms_siswa_id,
+                                'user_type' => 'siswa',
+                            ],
+                            [
+                                'saldo_edupay' => 0,
+                            ]
+                        );
+
+                    $saldo = $saldoEduPay->saldo_edupay;
+
+                    if ($saldo <= 0) {
+                        continue;
+                    }
+
+                    $deskripsi = sprintf(
+                        'Withdraw saldo EduPay akhir tahun ajaran - %s',
+                        $student->ms_siswa->nama_siswa
+                    );
+
+                    // Jurnal Debit
+                    $debit = AkuntansiJurnalDetail::create([
+                        'kode_rekening' => $kodeSaldoEduPay,
                         'posisi' => 'debit',
-                        'nominal' => $saldoSekarang,
+                        'nominal' => $saldo,
                         'tanggal_transaksi' => now(),
                         'ms_pengguna_id' => auth()->id(),
                         'ms_tahun_ajaran_id' => $student->ms_tahun_ajar_id,
                         'ms_jenjang_id' => $student->ms_jenjang_id,
+                        'ms_departemen_id' => 'SEKOLAH',
                         'is_canceled' => 'active',
-                        'deskripsi' => "Penarikan Tunai EduPay Rp {$saldoSekarang} siswa {$student->ms_siswa->nama_siswa} akhir tahun ajaran",
-                    ];
-                    $jurnalDebitId = AkuntansiJurnalDetail::create($jurnalDebit)->akuntansi_jurnal_detail_id;
+                        'deskripsi' => $deskripsi,
+                    ]);
 
-                    // Data untuk jurnal kredit
-                    $jurnalKredit = [
-                        'kode_rekening' => $kode_kas,
+                    // Jurnal Kredit
+                    $kredit = AkuntansiJurnalDetail::create([
+                        'kode_rekening' => $kodeKas,
                         'posisi' => 'kredit',
-                        'nominal' => $saldoSekarang,
+                        'nominal' => $saldo,
                         'tanggal_transaksi' => now(),
                         'ms_pengguna_id' => auth()->id(),
                         'ms_tahun_ajaran_id' => $student->ms_tahun_ajar_id,
                         'ms_jenjang_id' => $student->ms_jenjang_id,
+                        'ms_departemen_id' => 'SEKOLAH',
                         'is_canceled' => 'active',
-                        'deskripsi' => "Penarikan Tunai EduPay Rp {$saldoSekarang} siswa {$student->ms_siswa->nama_siswa} akhir tahun ajaran",
-                    ];
-                    $jurnalKreditId = AkuntansiJurnalDetail::create($jurnalKredit)->akuntansi_jurnal_detail_id;
+                        'deskripsi' => $deskripsi,
+                    ]);
 
-                    // Simpan transaksi penarikan ke tabel ms_edupay_siswa
+                    // Simpan transaksi penarikan EduPay
                     TransaksiEduPay::create([
                         'user_type' => 'siswa',
-                        'user_id' => $student->ms_siswa->ms_siswa_id,
+                        'user_id' => $student->ms_siswa_id,
                         'ms_penempatan_siswa_id' => $student->ms_penempatan_siswa_id,
-                        'ms_pengguna_id' => auth()->id(), // ID pengguna saat ini
+                        'ms_pengguna_id' => auth()->id(),
                         'jenis_transaksi' => 'penarikan',
-                        'nominal' => $saldoSekarang,
+                        'nominal' => $saldo,
                         'tanggal' => now(),
-                        'deskripsi' => "Penarikan Tunai EduPay Rp {$saldoSekarang} siswa {$student->ms_siswa->nama_siswa} akhir tahun ajaran",
-                        'akuntansi_jurnal_detail_debit_id' => $jurnalDebitId,
-                        'akuntansi_jurnal_detail_kredit_id' => $jurnalKreditId,
+                        'deskripsi' => $deskripsi,
+                        'akuntansi_jurnal_detail_debit_id' => $debit->akuntansi_jurnal_detail_id,
+                        'akuntansi_jurnal_detail_kredit_id' => $kredit->akuntansi_jurnal_detail_id,
                     ]);
+
+                    $saldoEduPay->update([
+                            'saldo_edupay' => 0
+                        ]);
+
+                    $berhasil++;
                 }
-            }
 
-            DB::commit();
+                $this->dispatchBrowserEvent('hide-modal', [
+                    'modalId' => 'WithdrawEduPay'
+                ]);
 
-            $this->emit('refreshSaldoEduPay'); // Emit event ke komponen Livewire terkait
+                $this->dispatchBrowserEvent('alertify-success', [
+                    'message' => "{$berhasil} siswa berhasil diproses."
+                ]);
+
+            });
+
+            // Refresh komponen Livewire
             $this->emit('refreshSaldo');
-            $this->dispatchBrowserEvent('alertify-success', ['message' => 'Saldo berhasil dikosongkan untuk semua siswa.']);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            // Notifikasi error
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+            $this->emit('refreshIndex');
+            $this->emit('refreshOverview');
+
+        } catch (\Throwable $e) {
+
+            report($e);
+
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Terjadi kesalahan saat melakukan withdraw EduPay.'
+            ]);
+
         }
     }
-
-
+    
     public function render()
     {
         return view('livewire.laporan-edu-pay-siswa.withdraw');

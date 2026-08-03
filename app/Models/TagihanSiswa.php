@@ -115,8 +115,12 @@ class TagihanSiswa extends Model
     
     public function jumlah_kekurangan()
     {
-        return $this->jumlah_tagihan_siswa - $this->jumlah_sudah_dibayar();
+        return $this->jumlah_tagihan_siswa - ($this->jumlah_sudah_dibayar ?? 0);
     }
+    // public function jumlah_kekurangan()
+    // {
+    //     return $this->jumlah_tagihan_siswa - $this->jumlah_sudah_dibayar();
+    // }
 
     // Relasi ke jurnal debit
     public function jurnalDebit()

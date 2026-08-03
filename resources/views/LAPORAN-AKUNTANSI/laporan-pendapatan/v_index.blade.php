@@ -14,7 +14,11 @@
             </div>
             <!--end col-->
         </div>
-        @livewire('akuntansi-laporan-pendapatan.index')   
+        <div class="row justify-content-center">
+            <div class="col-xxl-12">
+                @livewire('akuntansi-laporan-pendapatan.index')   
+            </div>
+        </div>
     </div>
 </div>
 @endsection

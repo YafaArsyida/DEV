@@ -14,7 +14,6 @@ class Overview extends Component
 
     protected $listeners = [
         'parameterUpdated' => 'updateParameters',
-        'refreshSaldoEduPay'
     ];
 
     public function updateParameters($jenjang, $tahunAjar)
@@ -24,10 +23,6 @@ class Overview extends Component
         $this->selectedTahunAjar = $tahunAjar;
     }
 
-    public function refreshSaldoEduPay()
-    {
-        $this->emitSelf('$refresh'); //ringan
-    }
     public function render()
     {
         $select_jabatan = Jabatan::get();

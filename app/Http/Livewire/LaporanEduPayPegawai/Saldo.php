@@ -14,12 +14,15 @@ class Saldo extends Component
 
     protected $paginationTheme = 'bootstrap'; // Menggunakan tema Bootstrap untuk paginasi
 
+    public $perPage = 50;
+
     public $search = '';
     public $totalSaldo = 0;
 
     public $selectedJenjang = null;
     public $selectedTahunAjar = null;
     public $selectedJabatan = null;
+    public $namaJabatan = '';
 
     // Listener untuk Livewire
     protected $listeners = [
@@ -44,9 +47,34 @@ class Saldo extends Component
         $this->resetPage(); // Reset pagination ketika pencarian berubah
     }
 
-    public function updatingSelectedJabatan()
+    public function updatedSelectedJabatan()
     {
+        $this->namaJabatan = Jabatan::where('ms_jabatan_id', $this->selectedJabatan)
+            ->value('nama_jabatan') ?? '';
+
         $this->resetPage(); // Reset pagination ketika kelas berubah
+    }
+
+    public function cetakSaldo()
+    {
+        if (!$this->selectedJenjang || !$this->selectedTahunAjar) {
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Jenjang dan Tahun Ajar wajib dipilih'
+            ]);
+            return;
+        }
+
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Laporan sedang diproses.'
+        ]);
+
+        $url = route('laporan.edupay-pegawai.saldo.pdf', [
+            'jenjang' => $this->selectedJenjang,
+            'tahun'   => $this->selectedTahunAjar,
+            'jabatan' => $this->selectedJabatan, // null jika tidak dipilih
+        ]);
+
+        $this->emit('openNewTab', $url);
     }
 
     public function render()
@@ -87,27 +115,10 @@ class Saldo extends Component
                 ->limit(1)
         );
 
-        $pegawai = $query->get();
-
-        // =========================
-        // TOTAL SALDO
-        // =========================
-        // $this->totalSaldo = SaldoTabungan::pegawai()
-        //     ->whereIn('user_id', $pegawai->pluck('ms_pegawai_id'))
-        //     ->sum('saldo_edupay');
-
-        $this->totalSaldo = $pegawai->sum(function ($item) {
-            return $item->ms_saldo_edupay->saldo_edupay ?? 0;
-        });
-
-        // =========================
-        // NOTIF
-        // =========================
-        if ($pegawai->isEmpty()) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Data tidak ditemukan.']);
-        } else {
-            $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui..']);
-        }
+         /** @var \Illuminate\Pagination\LengthAwarePaginator $pegawai */
+        $pegawai = $query->paginate($this->perPage);
+        $this->totalSaldo = $pegawai->getCollection()
+            ->sum(fn($item) => $item->ms_saldo_edupay->saldo_edupay ?? 0);
 
         return view('livewire.laporan-edu-pay-pegawai.saldo', [
             'select_jabatan' => $select_jabatan,

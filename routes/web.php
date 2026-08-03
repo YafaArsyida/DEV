@@ -219,6 +219,7 @@ Route::middleware(['auth', 'peran:SUPERADMIN,ADMINISTRASI'])->group(function () 
     // LAPORAN EDUPAY SISWA
     Route::get('/laporan/edupay-siswa',  [LaporanEduPaySiswa::class, 'index'])->name('laporan.edupay-siswa');
     Route::get('/laporan/edupay-siswa/pdf',  [LaporanEduPaySiswa::class, 'cetakPDF'])->name('laporan.edupay-siswa.pdf');
+    Route::get('/laporan/edupay-siswa/saldo/pdf',  [LaporanEduPaySiswa::class, 'cetakSaldoPDF'])->name('laporan.edupay-siswa.saldo.pdf');
     // END LAPORAN EDUPAY SISWA
 
     Route::get('/laporan/rekapitulasi-keuangan',  [LaporanRekapitulasiKeuangan::class, 'index'])->name('laporan.rekapitulasi-keuangan');
@@ -226,11 +227,13 @@ Route::middleware(['auth', 'peran:SUPERADMIN,ADMINISTRASI'])->group(function () 
     // LAPORAN TABUNGAN PEGAWAI
     Route::get('/laporan/tabungan-pegawai',  [LaporanTabunganPegawai::class, 'index'])->name('laporan.tabungan-pegawai');
     Route::get('/laporan/tabungan-pegawai/pdf',  [LaporanTabunganPegawai::class, 'cetakPDF'])->name('laporan.tabungan-pegawai.pdf');
+    Route::get('/laporan/tabungan-pegawai/saldo/pdf',  [LaporanTabunganPegawai::class, 'cetakSaldoPDF'])->name('laporan.tabungan-pegawai.saldo.pdf');
     // END LAPORAN TABUNGAN PEGAWAI
 
     // LAPORAN EDUPAY PEGAWAI
     Route::get('/laporan/edupay-pegawai',  [LaporanEduPayPegawai::class, 'index'])->name('laporan.edupay-pegawai');
     Route::get('/laporan/edupay-pegawai/pdf',  [LaporanEduPayPegawai::class, 'cetakPDF'])->name('laporan.edupay-pegawai.pdf');
+    Route::get('/laporan/edupay-pegawai/saldo/pdf',  [LaporanEduPayPegawai::class, 'cetakSaldoPDF'])->name('laporan.edupay-pegawai.saldo.pdf');
     // END LAPORAN EDUPAY PEGAWAI
 
     Route::get('/akuntansi/konfigurasi',  [AkuntansiKonfigurasi::class, 'index'])->name('akuntansi.konfigurasi');

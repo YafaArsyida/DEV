@@ -1,23 +1,46 @@
 {{-- Stop trying to control. --}}
-<div class="card">
-    <div class="card-header border-0 pb-0">
-        <div class="d-flex align-items-center">
-            <div class="flex-grow-1">
-                <h5 class="card-title mb-0">Laporan Transaksi Tabungan Pegawai</h5>
-                {{-- <p class="mb-0">Transaksi akan ditampilkan dari semua petugas untuk memastikan penghitungan yang akurat dan terkini.</p> --}}
-            </div>
-            <div class="flex-shrink-0">
-                <div class="d-flex gap-2 flex-wrap">
-                    {{-- @if ($selectedJabatan)
-                        <button wire:click="cetakLaporan" class="btn btn-danger d-inline-flex align-items-center gap-1">
-                            <i class="ri-printer-line align-bottom"></i>
-                            <span>Cetak Laporan</span>
-                        </button>
-                    @endif --}}
-                    <button data-bs-toggle="modal" data-bs-target="#ExportLaporanExcel" class="btn btn-soft-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button>
-                    {{-- <button data-bs-toggle="modal" data-bs-target="#ExportTabunganSiswa" wire:click.prevent="showExportTabunganSiswa" class="btn btn-soft-success"><i class="ri-file-excel-2-line"></i> Export</button> --}}
-                    <button type="button" class="btn btn-info" data-bs-toggle="offcanvas" data-bs-target="#filterTabungan" aria-controls="filterTabungan"><i class="ri-filter-3-line align-bottom me-1"></i> Fliters</button>
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    {{-- HEADER --}}
+    <div class="card-header">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4">
+
+            {{-- TITLE --}}
+            <div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-sm">
+                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                            <i class="ri-history-line"></i>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h5 class="fw-bold mb-1">
+                            Riwayat Transaksi Tabungan Pegawai
+                        </h5>
+                        <small class="text-muted">
+                            Lihat riwayat transaksi tabungan pegawai berdasarkan filter yang dipilih.
+                        </small>
+                    </div>
                 </div>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                {{-- @if ($selectedJabatan)
+                    <button wire:click="cetakLaporan" class="btn btn-danger d-inline-flex align-items-center gap-1">
+                        <i class="ri-printer-line align-bottom"></i>
+                        <span>Cetak Laporan</span>
+                    </button>
+                @endif --}}
+                <button
+                    type="button"
+                    class="btn btn-success rounded-pill px-4 d-inline-flex align-items-center gap-1"
+                    data-bs-toggle="modal"
+                    data-bs-target="#ExportIndex">
+
+                    <i class="ri-file-excel-2-line"></i>
+                    <span>Excel</span>
+                </button>
+                {{-- <button data-bs-toggle="modal" data-bs-target="#ExportTabunganSiswa" wire:click.prevent="showExportTabunganSiswa" class="btn btn-soft-success"><i class="ri-file-excel-2-line"></i> Export</button> --}}
+                <button type="button" class="btn btn-primary rounded-pill px-4" data-bs-toggle="offcanvas" data-bs-target="#filterTabungan" aria-controls="filterTabungan"><i class="ri-filter-3-line align-bottom me-1"></i> Fliters</button>
             </div>
         </div>
     </div>
@@ -37,27 +60,24 @@
                 </select>
             </div>
             <!-- Input Pencarian -->
-            <div class="col-xxl-6 col-sm-6">
-                <label for="searchInput" class="form-label">Pencarian</label>
-                <div class="position-relative">
-                    <input type="text" id="searchInput" class="form-control ps-4" 
-                        wire:model.debounce.300ms="search" 
+            <div class="col-xxl-4 col-sm-6">
+                <label for="searchData" class="form-label">Pencarian</label>
+                <div class="search-box">
+                    <input type="text" id="searchData" class="form-control search" wire:model.debounce.300ms="search"
                         placeholder="Cari nama, deskripsi, atau lainnya...">
-                    <i class="ri-search-line position-absolute top-50 start-0 translate-middle-y ms-2 text-muted"></i>
+                    <i class="ri-search-line search-icon"></i>
                 </div>
             </div>
             <!-- Filter Periode -->
-            <div class="col-xxl-4">
+            <div class="col-xxl-6">
                 <label class="form-label fw-semibold">Periode</label>
                 <div class="d-flex align-items-center gap-2">
-                    <input type="date" id="startDate" class="form-control" wire:model="startDate" value="{{ $startDate }}">
+                    <input type="date" class="form-control" wire:model="startDate">
                     <span class="text-muted">–</span>
-                    <input type="date" id="endDate" class="form-control" wire:model="endDate" value="{{ $endDate }}">
-                    <div class="col-auto">
-                        <button type="button" class="btn btn-soft-secondary btn-icon rounded-circle" wire:click="resetTanggal" title="Reset Tanggal">
-                            <i class="ri-refresh-line fs-16"></i>
-                        </button>    
-                    </div>
+                    <input type="date" class="form-control" wire:model="endDate">
+                    <button type="button" class="btn btn-soft-secondary" wire:click="resetTanggal" title="Reset Tanggal">
+                        <i class="ri-refresh-line"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -65,12 +85,13 @@
         {{-- DATA --}}
         <div class="live-preview">
             <div class="table-responsive">
-                <table id="tabelTabungan" class="table table-hover nowrap align-middle" style="width:100%">
+                <table id="indexTabungan" class="table table-hover table-nowrap align-middle" style="width:100%">
                     <thead class="table-light">
                         <tr>
                             <th class="text-uppercase">No</th>
-                            <th class="text-uppercase text start" scope="col" style="width: 200px;">Tanggal</th>
+                            <th class="text-uppercase text start" scope="col">Tanggal</th>
                             <th class="text-uppercase">Pegawai</th>
+                            <th class="text-uppercase">Jabatan</th>
                             <th class="text-uppercase" scope="col">Transaksi</th>
                             <th class="text-uppercase text-center">Petugas</th>
                             <th class="text-uppercase text-center">Kredit</th>
@@ -78,39 +99,36 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($laporan as $item)
+                        @forelse ($laporan as $key => $item)
                             <tr class="text-center">
-                                <td class="text-start">{{ $loop->iteration }}.</td>
+                                <td class="text-start">{{ $laporan->firstItem() + $key }}.</td>
                                 <td class="text-uppercase text-start">
-                                    {{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($item->tanggal) }}
-                                </td>
-                                <td class="text-start" style="white-space: nowrap;">
-                                    {{ ucfirst($item->ms_pegawai->nama_pegawai ?? '-') }}
-                                    <p class="fs-12 mb-0 text-muted">
-                                        {{ $item->ms_pegawai->ms_jabatan->nama_jabatan ?? '' }}
-                                    </p>
+                                    {{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($item->tanggal, 'd F Y') }}
                                 </td>
                                 <td class="text-start">
-                                    <span class="fs-14">
-                                        {!! 'RP' . number_format($item->nominal, 0, ',', '.') . ' - <i>' . ucfirst($item->jenis_transaksi) . '</i>' !!}
-                                    </span>
-                                    <p class="text-muted mb-0">{{ $item->deskripsi ?? '' }}</p>
+                                    {{ ucfirst($item->ms_pegawai->nama_pegawai ?? '-') }}
                                 </td>
-                                <td style="white-space: nowrap;">{{ $item->ms_pengguna->nama ?? '-' }}</td>
+                                <td class="text-start">
+                                    {{ $item->ms_pegawai->ms_jabatan->nama_jabatan ?? ''}}
+                                </td>
+                                <td class="text-start fs-12 fw-medium">
+                                    {!! 'Rp' . number_format($item->nominal, 0, ',', '.') . ' - <i>' . ucfirst($item->jenis_transaksi) . '</i>' !!}
+                                </td>
+                                <td>{{ $item->ms_pengguna->nama ?? '-' }}</td>
                                 <td>
-                                    <span class="fs-14 text-success">
-                                        {{ $item->jenis_transaksi === 'setoran' ? 'RP' . number_format($item->nominal, 0, ',', '.') : '-' }}
+                                    <span class="fs-12 fw-medium text-success">
+                                        {{ $item->jenis_transaksi === 'setoran' ? 'Rp' . number_format($item->nominal, 0, ',', '.') : '-' }}
                                     </span>
                                 </td>
                                 <td>
-                                    <span class="fs-14 text-danger">
-                                        {{ $item->jenis_transaksi === 'penarikan' ? 'RP' . number_format($item->nominal, 0, ',', '.') : '-' }}
+                                    <span class="fs-12 fw-medium text-danger">
+                                        {{ $item->jenis_transaksi === 'penarikan' ? 'Rp' . number_format($item->nominal, 0, ',', '.') : '-' }}
                                     </span>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7">
+                                <td colspan="8">
                                     <div class="noresult text-center py-3">
                                         <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop"
                                             colors="primary:#405189,secondary:#08a88a"
@@ -123,7 +141,7 @@
                             </tr>
                         @endforelse
                     </tbody>
-                    <tfoot>
+                    {{-- <tfoot>
                         <tr class="">
                             <td></td>
                             <td class="text-uppercase">Total Kredit</td>
@@ -151,33 +169,129 @@
                                 </span>
                             </td>
                         </tr>
-                    </tfoot>
+                    </tfoot> --}}
                 </table>
+                <div class="mt-3">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div class="text-muted fs-13">
+                            Menampilkan
+                            <span class="fw-semibold">
+                                {{ $laporan->firstItem() ?? 0 }}
+                            </span>
+                            -
+                            <span class="fw-semibold">
+                                {{ $laporan->lastItem() ?? 0 }}
+                            </span>
+                            dari
+                            <span class="fw-semibold">
+                                {{ $laporan->total() }}
+                            </span>
+                            data
+                        </div>
+                        <div>
+                            {{ $laporan->links() }}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
     {{-- MODAL --}}
-    <div class="modal fade zoomIn" id="ExportLaporanExcel" tabindex="-1" aria-labelledby="exportRecordLabel" aria-hidden="true" wire:ignore.self>
+    <div class="modal fade zoomIn" id="ExportIndex" tabindex="-1"
+    aria-labelledby="exportIndexLabel" aria-hidden="true" wire:ignore.self>
+
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+
+                {{-- CLOSE BUTTON --}}
+                <div class="modal-header border-0 pb-0">
+                    <button type="button"
+                        class="btn btn-light btn-icon rounded-circle ms-auto"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                        <i class="ri-close-line fs-18"></i>
+                    </button>
                 </div>
-                <div class="modal-body p-5 text-center">
-                    <lord-icon src="https://cdn.lordicon.com/fjvfsqea.json" trigger="loop" colors="primary:#405189,secondary:#f06548" style="width:90px;height:90px"></lord-icon>
-                    <div class="mt-4 text-center">
-                        <h4 class="fs-semibold">Konfirmasi Export</h4>
-                        <p class="text-muted fs-14 mb-4 pt-1">
-                            Apakah Anda yakin ingin mengekspor laporan Tabungan Pegawai? Data yang diekspor akan sesuai dengan tabel yang ditampilkan.
-                        </p>
-                        <div class="hstack gap-2 justify-content-center remove">
-                            <button class="btn btn-link link-success fw-medium text-decoration-none shadow-none" data-bs-dismiss="modal">
-                                <i class="ri-close-line me-1 align-middle"></i> Batal
-                            </button>
-                            <button class="btn btn-primary" id="konfirmasiExportLaporan" data-bs-dismiss="modal">Ya, Export!</button>
+
+                {{-- BODY --}}
+                <div class="modal-body px-4 pb-5 pt-2 text-center">
+
+                    {{-- ICON --}}
+                    <div class="mb-4">
+                        <div class="avatar-xl mx-auto">
+                            <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
+                                <lord-icon
+                                    src="https://cdn.lordicon.com/fjvfsqea.json"
+                                    trigger="loop"
+                                    colors="primary:#405189,secondary:#0ab39c"
+                                    style="width:70px;height:70px">
+                                </lord-icon>
+                            </div>
                         </div>
                     </div>
+
+                    {{-- TITLE --}}
+                    <div class="mb-2">
+
+                        <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill mb-3">
+                            Konfirmasi Export
+                        </span>
+
+                        <h3 class="fw-bold mb-2" id="exportIndexLabel">
+                            Export Laporan Tabungan Pegawai?
+                        </h3>
+
+                        <p class="text-muted mb-0 lh-lg px-lg-4">
+                            Data laporan Tabungan Pegawai yang diekspor akan mengikuti
+                            data pada tabel yang sedang ditampilkan, sehingga hasil
+                            export sesuai dengan data yang Anda lihat saat ini.
+                        </p>
+
+                    </div>
+
+                    {{-- INFORMATION --}}
+                    <div class="alert alert-light border rounded-4 text-start mt-4 mb-0">
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="flex-shrink-0">
+                                <i class="ri-information-line text-primary fs-20"></i>
+                            </div>
+
+                            <div>
+                                <h6 class="fw-semibold mb-1">
+                                    Informasi
+                                </h6>
+
+                                <p class="text-muted mb-0 fs-13">
+                                    Pastikan data laporan Tabungan Pegawai yang
+                                    ditampilkan sudah sesuai sebelum melakukan
+                                    export laporan.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
+
+                {{-- FOOTER --}}
+                <div class="modal-footer border-0 pt-0 px-4 pb-4 justify-content-center">
+
+                    <button type="button"
+                        class="btn btn-light rounded-pill px-4"
+                        data-bs-dismiss="modal">
+                        <i class="ri-close-line me-1"></i>
+                        Batal
+                    </button>
+
+                    <button type="button"
+                        class="btn btn-primary rounded-pill px-4"
+                        id="konfirmasiExportLaporan"
+                        data-bs-dismiss="modal">
+                        <i class="ri-download-2-line me-1"></i>
+                        Ya, Export
+                    </button>
+
+                </div>
+
             </div>
         </div>
     </div>
@@ -187,7 +301,7 @@
             // Tambahkan delay 1 detik
             setTimeout(function () {
                 // Ambil elemen tabel berdasarkan ID
-                var table = document.getElementById("tabelTabungan"); // ganti sesuai kebutuhan
+                var table = document.getElementById("indexTabungan"); // ganti sesuai kebutuhan
         
                 // Konversi tabel ke format Excel
                 var workbook = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });

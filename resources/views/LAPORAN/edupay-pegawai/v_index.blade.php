@@ -16,11 +16,9 @@
         </div>
         <div class="row">
             <div class="col-xxl-4">
-                @livewire('laporan-edu-pay-pegawai.overview')   
-                <div class="sticky-side-div">
-                    @livewire('laporan-edu-pay-pegawai.saldo')   
-                </div>
-                @livewire('laporan-edu-pay-pegawai.withdraw')   
+                @livewire('laporan-edu-pay-pegawai.overview') 
+                @livewire('laporan-edu-pay-pegawai.saldo')   
+                {{-- @livewire('laporan-edu-pay-pegawai.withdraw')    --}}
             </div>  
             <div class="col-xxl-8">
                 @livewire('parameter.filter-laporan-edu-pay')   
