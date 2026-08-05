@@ -12,29 +12,39 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('akuntansi_jurnal_detail', function (Blueprint $table) {
-            $table->id('akuntansi_jurnal_detail_id'); // Primary Key
+            $table->id('akuntansi_jurnal_detail_id');
 
-            // Relasi ke transaksi di aplikasi (misal pembayaran SPP)
-            $table->unsignedBigInteger('ms_transaksi_id'); // FK ke tabel transaksi aplikasi
+            // Relasi ke jurnal header
+            $table->unsignedBigInteger('akuntansi_jurnal_id');
 
-            // Relasi ke akun yang digunakan (misal: Kas, Pendapatan SPP)
-            $table->unsignedBigInteger('akuntansi_rekening_id');
+            // Rekening akuntansi
+            $table->string('kode_rekening', 50);
 
-            // Posisi entri jurnal (bukan posisi normal akun)
-            $table->enum('posisi', ['debit', 'kredit']);
+            // Posisi transaksi
+            $table->enum('posisi', [
+                'debit',
+                'kredit'
+            ]);
 
-            // Nilai transaksi
+            // Nominal transaksi
             $table->decimal('nominal', 15, 2);
 
-            // Keterangan tambahan
-            $table->text('deskripsi')->nullable();
-
-            // Metadata pendukung laporan
-            $table->date('tanggal_transaksi'); // Tanggal transaksi
-            $table->unsignedBigInteger('tahun_ajaran_id')->nullable(); // Opsional
-            $table->unsignedBigInteger('jenjang_id')->nullable();      // Opsional
-
             $table->timestamps();
+            $table->softDeletes();
+
+            // Foreign key
+            $table->foreign('akuntansi_jurnal_id')
+                ->references('akuntansi_jurnal_id')
+                ->on('akuntansi_jurnal')
+                ->cascadeOnDelete();
+
+            // Index
+            $table->index('kode_rekening');
+            $table->index('posisi');
+            $table->index([
+                'akuntansi_jurnal_id',
+                'kode_rekening'
+            ]);
         });
     }
 

@@ -83,7 +83,6 @@ class Index extends Component
 
         $url = route('akuntansi.laporan-pengeluaran.pdf', [
             'jenjang' => $this->selectedJenjang,
-            // 'tahun' => $this->selectedTahunAjar,
             'start_date' => $this->startDate,
             'end_date' => $this->endDate,
         ]);
@@ -96,6 +95,7 @@ class Index extends Component
         $bebanPerBulan = AkuntansiJurnalDetail::with('akuntansi_rekening')
             ->where('ms_jenjang_id', $this->selectedJenjang)
             ->where('posisi', 'debit') // beban = debit
+            ->where('ms_departemen_id', 'SEKOLAH')
 
             ->when($this->startDate && $this->endDate, fn($q) => $q->whereBetween('tanggal_transaksi', [
                 $this->startDate . ' 00:00:00',

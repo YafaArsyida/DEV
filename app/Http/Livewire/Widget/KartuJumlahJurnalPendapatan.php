@@ -82,19 +82,26 @@ class KartuJumlahJurnalPendapatan extends Component
 
     public function hitungPendapatan()
     {
-        if ($this->selectedJenjang && $this->selectedTahunAjar) {
-            $this->totalPendapatan = AkuntansiJurnalDetail::with('akuntansi_rekening')
-                ->where('ms_jenjang_id', $this->selectedJenjang)
-                ->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
-                ->where('posisi', 'kredit')
-                ->whereBetween('tanggal_transaksi', [$this->startDate, $this->endDate])
-                ->whereHas('akuntansi_rekening', function ($query) {
-                    $query->where('kode_rekening', 'like', '4%');
-                })
-                ->sum('nominal');
-        } else {
+        if (!$this->selectedJenjang || !$this->selectedTahunAjar) {
             $this->totalPendapatan = 0;
+            return;
         }
+        
+        $this->totalPendapatan = AkuntansiJurnalDetail::where('posisi', 'kredit')
+            ->whereHas('akuntansi_rekening', function ($query) {
+                $query->where('kode_rekening', 'like', '4%');
+            })
+            ->whereHas('akuntansi_jurnal', function ($query) {
+                $query->where('ms_jenjang_id', $this->selectedJenjang)
+                    ->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
+                    ->where('ms_departemen_id', 'SEKOLAH')
+                    ->where('status', 'active')
+                    ->whereBetween('tanggal_transaksi', [
+                        $this->startDate,
+                        $this->endDate
+                    ]);
+            })
+            ->sum('nominal');
     }
 
     public function render()

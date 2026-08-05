@@ -8,6 +8,7 @@ use App\Models\KategoriTagihanSiswa;
 use App\Models\KeranjangTagihanSiswa;
 use App\Models\PenempatanSiswa;
 use App\Models\TagihanSiswa;
+use App\Services\AccountingService;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\DB;
@@ -112,19 +113,18 @@ class Manage extends Component
                         continue;
                     }
 
-                    // Dapatkan ID jurnal terkait
-                    $jurnalIds = [
-                        $tagihan->akuntansi_jurnal_detail_debit_id,
-                        $tagihan->akuntansi_jurnal_detail_kredit_id,
-                    ];
-
-                    // Validasi dan soft delete jurnal
-                    AkuntansiJurnalDetail::whereIn('akuntansi_jurnal_detail_id', $jurnalIds)->get()->each(function ($jurnal) {
-                        $jurnal->delete();
-                    });
+                    // Hapus akuntansi
+                    AccountingService::delete(
+                        $tagihan->akuntansi_jurnal_id
+                    );
 
                     $tagihan->ms_pengguna_id = auth()->user()->ms_pengguna_id; // Set pengguna yang menghapus
-                    $tagihan->deskripsi = "Tagihan dihapus oleh petugas {$this->nama_petugas}"; // Set deskripsi
+                    
+                    $tagihan->deskripsi = sprintf(
+                        'Tagihan %s dihapus oleh %s',
+                        $tagihan->ms_jenis_tagihan_siswa->nama_jenis_tagihan_siswa,
+                        $this->nama_petugas
+                    );
                     $tagihan->save();
 
                     // Soft delete tagihan
@@ -184,9 +184,20 @@ class Manage extends Component
             // Loop untuk memperbarui tagihan yang dipilih
             foreach ($this->TagihanSelected as $ms_tagihan_siswa_id) {
                 $tagihan = TagihanSiswa::find($ms_tagihan_siswa_id);
-
                 if ($tagihan) {
                     $dataToUpdate = [];
+
+                    $tagihan->load([
+                        'ms_penempatan_siswa.ms_siswa',
+                        'ms_jenis_tagihan_siswa',
+                    ]);
+
+                    $namaSiswa = $tagihan->ms_penempatan_siswa->ms_siswa->nama_siswa;
+
+                    $namaJenis = $tagihan->ms_jenis_tagihan_siswa->nama_jenis_tagihan_siswa;
+
+                    $deskripsiJurnal = sprintf('Tagihan %s siswa %s', $namaJenis, $namaSiswa);
+
                     // Ambil jumlah yang sudah dibayarkan
                     $jumlahSudahDibayar = $tagihan->jumlah_sudah_dibayar();
 
@@ -208,24 +219,38 @@ class Manage extends Component
                             $dataToUpdate['status'] = 'Lunas';
                         }
 
-                        // Update jurnal detail
-                        $debitJurnal = AkuntansiJurnalDetail::find($tagihan->akuntansi_jurnal_detail_debit_id);
-                        $kreditJurnal = AkuntansiJurnalDetail::find($tagihan->akuntansi_jurnal_detail_kredit_id);
+                        // Update jurnal 
+                        AccountingService::update(
+                            $tagihan->akuntansi_jurnal_id,
+                            [
+                                'tanggal' => $tagihan->created_at,
 
-                        if ($debitJurnal && $kreditJurnal) {
-                            $debitJurnal->update([
-                                'nominal' => $this->jumlahTagihan,
-                            ]);
+                                'deskripsi' => $deskripsiJurnal,
 
-                            $kreditJurnal->update([
-                                'nominal' => $this->jumlahTagihan,
-                            ]);
-                        }
+                                'detail' => [
+
+                                    [
+                                        'kode_rekening' => 12001,
+                                        'posisi' => 'debit',
+                                        'nominal' => $this->jumlahTagihan,
+                                    ],
+
+                                    [
+                                        'kode_rekening' => 41001,
+                                        'posisi' => 'kredit',
+                                        'nominal' => $this->jumlahTagihan,
+                                    ],
+                                ]
+                            ]
+                        );
                     }
 
-                    // Perbarui deskripsi
-                    $dataToUpdate['deskripsi'] = "Tagihan diubah oleh {$this->nama_petugas} menjadi nominal " . number_format($this->jumlahTagihan);
-
+                    $dataToUpdate['deskripsi'] = sprintf(
+                        'Nominal tagihan diubah dari Rp%s menjadi Rp%s oleh %s',
+                        number_format($tagihan->getOriginal('jumlah_tagihan_siswa'), 0, ',', '.'),
+                        number_format($this->jumlahTagihan, 0, ',', '.'),
+                        $this->nama_petugas
+                    );
                     // Lakukan pembaruan data tagihan
                     if (!empty($dataToUpdate)) {
                         $tagihan->update($dataToUpdate);

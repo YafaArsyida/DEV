@@ -21,44 +21,54 @@
                 <table class="table table-centered table-hover align-middle table-nowrap mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th class="">No</th>
-                            <th class="text-start" style="width: 200px;">Tanggal</th>
+                            <th class="text-start">Tanggal</th>
+                            <th class="">Nomor Jurnal</th>
+                            <th class="text-start">Deskripsi</th>
                             <th class="text-start">Petugas</th>
-                            <th class="text-start" style="min-width: 500px;">Deskripsi Transaksi</th>
-                            {{-- <th class="text-center">Akun Debit</th> --}}
-                            {{-- <th class="text-center">Akun Kredit</th> --}}
                             <th class="text-center">Nominal</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @php
-                            $nomorUrut = 1; // Inisialisasi nomor urut
-                        @endphp
+                        @forelse ($transaksiJurnal as $jurnal)
+                            <tr>
+                                <td>
+                                    {{ $jurnal->tanggal_transaksi
+                                        ? \Carbon\Carbon::parse($jurnal->tanggal_transaksi)
+                                            ->format('d/m/Y')
+                                        : '-' }}
+                                </td>
+                                <td>
+                                    {{ $jurnal->nomor_jurnal }}
+                                </td>
 
-                        @foreach ($transaksiJurnal as $deskripsi => $transaksiByNominal)
-                            @foreach ($transaksiByNominal as $nominal => $transaksi)
+                                <td>
+                                    {{ $jurnal->deskripsi }}
+                                </td>
+
+                                <td>
+                                    {{ $jurnal->ms_pengguna->nama ?? '-' }}
+                                </td>
                                 @php
-                                    $debit = $transaksi->where('posisi', 'debit')->first();
-                                    $kredit = $transaksi->where('posisi', 'kredit')->first();
-                                    $tanggal = $transaksi->first()->tanggal_transaksi ?? null;
+                                    $nominal = optional(
+                                        $jurnal->akuntansi_jurnal_detail->firstWhere('posisi', 'debit')
+                                    )->nominal ?? 0;
                                 @endphp
-                                <tr>
-                                    <td class="text-start">{{ $nomorUrut++ }}.</td>
-                                    <td class="text-start">
-                                        {{ $tanggal ? \App\Http\Controllers\HelperController::formatTanggalIndonesia($tanggal, 'd F Y H:i:s') : '-' }}
-                                    </td>
-                                    <td class="text-start">{{ $debit ? $debit->ms_pengguna->nama : ($kredit ? $kredit->ms_pengguna->nama : '-') }}</td>
-                                    <td>{{ $deskripsi }}</td>
-                                    {{-- <td style="white-space: nowrap;" class="text-center">{{ $debit ? $debit->akuntansi_rekening->nama_rekening : '-' }}</td> --}}
-                                    {{-- <td style="white-space: nowrap;" class="text-center">{{ $kredit ? $kredit->akuntansi_rekening->nama_rekening : '-' }}</td> --}}
-                                    <td class="text-center">
-                                        <span class="fs-14 text-info">
-                                            RP{{ number_format($nominal, 0, ',', '.') }}
-                                        </span>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        @endforeach
+
+                                <td class="text-center">
+                                    <span class="fs-12 fw-medium">
+                                        RP{{ number_format($nominal, 0, ',', '.') }}
+                                    </span>
+                                </td>
+                            </tr>
+                        @empty
+
+                            <tr>
+                                <td colspan="5" class="text-center py-4">
+                                    Tidak ada data jurnal.
+                                </td>
+                            </tr>
+
+                        @endforelse
                     </tbody>
                 </table>
             </div>

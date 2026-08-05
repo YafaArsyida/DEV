@@ -121,7 +121,7 @@
                         </tr>
                         @empty
                             <tr>
-                                <td colspan="7">
+                                <td colspan="8">
                                     <div class="noresult text-center py-3">
                                         <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop" 
                                                 colors="primary:#405189,secondary:#08a88a" 

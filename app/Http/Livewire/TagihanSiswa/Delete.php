@@ -6,6 +6,7 @@ use App\Models\AkuntansiJurnalDetail;
 use App\Models\DetailTransaksiTagihanSiswa;
 use App\Models\KeranjangTagihanSiswa;
 use App\Models\TagihanSiswa;
+use App\Services\AccountingService;
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
 
@@ -57,6 +58,14 @@ class Delete extends Component
             // 🔥 Lock row biar aman dari race condition
             $tagihan = TagihanSiswa::with([
                 'ms_penempatan_siswa.ms_siswa',
+                'ms_jenis_tagihan_siswa',
+                'akuntansi_jurnal',
+            ])
+                ->lockForUpdate()
+                ->find($this->ms_tagihan_siswa_id);
+                
+            $tagihan = TagihanSiswa::with([
+                'ms_penempatan_siswa.ms_siswa',
                 'ms_jenis_tagihan_siswa'
             ])
                 ->lockForUpdate()
@@ -82,21 +91,22 @@ class Delete extends Component
                 throw new \Exception('Tidak dapat dihapus, terdapat riwayat pembayaran.');
             }
 
+            // hapus akuntansi
+            if ($tagihan->akuntansi_jurnal_id) {
+                AccountingService::delete(
+                    $tagihan->akuntansi_jurnal_id
+                );
+            }
+
             // 🔥 Update metadata sebelum delete
             $tagihan->update([
-                'ms_pengguna_id' => auth()->id(),
-                'deskripsi' => "Tagihan dihapus oleh petugas {$this->nama_petugas}",
+                'deskripsi' => sprintf(
+                    'Tagihan %s dihapus oleh %s',
+                    $tagihan->ms_jenis_tagihan_siswa->nama_jenis_tagihan_siswa,
+                    $this->nama_petugas
+                ),
             ]);
 
-            // 🔥 Delete jurnal langsung (tanpa get()->each())
-            $jurnalIds = array_filter([
-                $tagihan->akuntansi_jurnal_detail_debit_id,
-                $tagihan->akuntansi_jurnal_detail_kredit_id,
-            ]);
-
-            if (!empty($jurnalIds)) {
-                AkuntansiJurnalDetail::whereIn('akuntansi_jurnal_detail_id', $jurnalIds)->delete();
-            }
 
             // 🔥 Delete tagihan
             $tagihan->delete();

@@ -20,8 +20,7 @@ class TagihanSiswa extends Model
         'jumlah_tagihan_siswa',
         'status',       // Belum Dibayar, Masih Dicicil, Lunas
         'deskripsi',
-        'akuntansi_jurnal_detail_debit_id',
-        'akuntansi_jurnal_detail_kredit_id',
+        'akuntansi_jurnal_id',
     ];
 
     /**
@@ -123,14 +122,8 @@ class TagihanSiswa extends Model
     // }
 
     // Relasi ke jurnal debit
-    public function jurnalDebit()
+    public function akuntansi_jurnal()
     {
-        return $this->belongsTo(AkuntansiJurnalDetail::class, 'akuntansi_jurnal_detail_debit_id', 'akuntansi_jurnal_detail_id');
-    }
-
-    // Relasi ke jurnal kredit
-    public function jurnalKredit()
-    {
-        return $this->belongsTo(AkuntansiJurnalDetail::class, 'akuntansi_jurnal_detail_kredit_id', 'akuntansi_jurnal_detail_id');
+        return $this->belongsTo(AkuntansiJurnal::class, 'akuntansi_jurnal_id', 'akuntansi_jurnal_id');
     }
 }

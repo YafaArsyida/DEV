@@ -2,16 +2,22 @@
 
 namespace App\Http\Livewire\AkuntansiLaporanJurnalUmum;
 
+use App\Models\AkuntansiJurnal;
 use App\Models\AkuntansiJurnalDetail;
 use App\Models\TahunAjar;
 use Carbon\Carbon;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class Index extends Component
 {
+    use WithPagination;
+    protected $paginationTheme = 'bootstrap'; // Menggunakan tema Bootstrap untuk paginasi
+
+    public $perPage = 50;
+
     public $selectedJenjang = null;
     public $selectedTahunAjar = null;
-    public $selectedBulan = null;
     public $startDate = null;
     public $endDate = null;
 
@@ -39,15 +45,17 @@ class Index extends Component
     public function updatedStartDate()
     {
         $this->dispatchBrowserEvent('alertify-success', [
-            'message' => 'Periode mulai diperbarui'
+            'message' => 'Periode diperbarui'
         ]);
+        $this->resetPage(); // Reset paginasi saat pencarian berubah
     }
 
     public function updatedEndDate()
     {
         $this->dispatchBrowserEvent('alertify-success', [
-            'message' => 'Periode selesai diperbarui'
+            'message' => 'Periode diperbarui'
         ]);
+        $this->resetPage(); // Reset paginasi saat pencarian berubah
     }
 
     public function resetTanggal()
@@ -55,17 +63,13 @@ class Index extends Component
         // $this->startDate = now()->format('Y-m-d');
         $this->startDate = now()->startOfMonth()->format('Y-m-d');
         $this->endDate   = now()->format('Y-m-d');
+        $this->resetPage(); // Reset paginasi saat pencarian berubah
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
     }
 
     public function updatingSearch()
     {
-        $this->emitSelf('$refresh'); //ringan
-    }
-
-    public function updateBulan($bulan)
-    {
-        $this->selectedBulan = $bulan;
+        $this->resetPage(); // Reset paginasi saat pencarian berubah
     }
 
     public function cetakLaporan()
@@ -90,21 +94,68 @@ class Index extends Component
 
     public function render()
     {
-        $transaksiJurnal = AkuntansiJurnalDetail::with('akuntansi_rekening', 'ms_pengguna')
-            ->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
-            ->where('ms_jenjang_id', $this->selectedJenjang)
-            ->when($this->startDate && $this->endDate, function ($query) {
-                $startDate = Carbon::parse($this->startDate)->startOfDay();
-                $endDate   = Carbon::parse($this->endDate)->endOfDay();
+        $query = AkuntansiJurnal::with([
+            'akuntansi_jurnal_detail.akuntansi_rekening',
+            'ms_pengguna',
+        ])
+        ->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
+        ->where('ms_jenjang_id', $this->selectedJenjang)
+        ->where('ms_departemen_id', 'SEKOLAH')
+        // ->where('status', 'active')
+        ->when(
+            $this->startDate && $this->endDate,
+            function ($query) {
+                $startDate = Carbon::parse($this->startDate)
+                    ->startOfDay();
 
-                $query->whereBetween('tanggal_transaksi', [$startDate, $endDate]);
-            })
-            ->when($this->search, function ($query) {
-                $query->where('deskripsi', 'like', '%' . $this->search . '%');
-            })
-            ->orderBy('tanggal_transaksi')
-            ->get()
-            ->groupBy(['deskripsi', 'nominal']);
+                $endDate = Carbon::parse($this->endDate)
+                    ->endOfDay();
+
+                $query->whereBetween('tanggal_transaksi', [
+                    $startDate,
+                    $endDate
+                ]);
+            }
+        )
+        ->when(
+            $this->search,
+            function ($query) {
+                $search = trim($this->search);
+
+                $query->where(function ($query) use ($search) {
+
+                    // Cari berdasarkan deskripsi header
+                    $query->where(
+                        'deskripsi',
+                        'like',
+                        "%{$search}%"
+                    )
+
+                    // Atau cari berdasarkan nomor jurnal
+                    ->orWhere(
+                        'nomor_jurnal',
+                        'like',
+                        "%{$search}%"
+                    )
+
+                    // Atau cari berdasarkan kode rekening
+                    ->orWhereHas(
+                        'akuntansi_jurnal_detail',
+                        function ($query) use ($search) {
+                            $query->where(
+                                'kode_rekening',
+                                'like',
+                                "%{$search}%"
+                            );
+                        }
+                    );
+                });
+            }
+        )
+        ->orderBy('tanggal_transaksi', 'asc')
+        ->orderBy('akuntansi_jurnal_id', 'asc');
+
+        $transaksiJurnal = $query->paginate($this->perPage);
 
         return view('livewire.akuntansi-laporan-jurnal-umum.index', [
             // 'select_bulan' => $select_bulan,

@@ -58,19 +58,32 @@ class JenjangTahunAjar extends Component
 
     private function calculateSaldo($kodeRekening)
     {
-        $debit = AkuntansiJurnalDetail::where('kode_rekening', $kodeRekening)
-            ->where('posisi', 'debit')
-            ->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
-            ->where('ms_jenjang_id', $this->selectedJenjang)
-            ->sum('nominal');
+        $saldo = AkuntansiJurnalDetail::where('kode_rekening', $kodeRekening)
+            ->whereHas('akuntansi_jurnal', function ($query) {
+                $query->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
+                    ->where('ms_jenjang_id', $this->selectedJenjang)
+                    ->where('ms_departemen_id', 'SEKOLAH')
+                    ->where('status', 'active');
+            })
+            ->selectRaw("
+                SUM(
+                    CASE
+                        WHEN posisi = 'debit'
+                        THEN nominal
+                        ELSE 0
+                    END
+                ) -
+                SUM(
+                    CASE
+                        WHEN posisi = 'kredit'
+                        THEN nominal
+                        ELSE 0
+                    END
+                ) AS saldo
+            ")
+            ->value('saldo');
 
-        $kredit = AkuntansiJurnalDetail::where('kode_rekening', $kodeRekening)
-            ->where('posisi', 'kredit')
-            ->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
-            ->where('ms_jenjang_id', $this->selectedJenjang)
-            ->sum('nominal');
-
-        return $debit - $kredit;
+        return $saldo ?? 0;
     }
 
     public function refreshParameters()

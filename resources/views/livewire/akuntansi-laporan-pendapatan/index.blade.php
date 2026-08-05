@@ -104,50 +104,36 @@
         wire:ignore.self>
 
         <div class="modal-dialog modal-dialog-centered">
-
             <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-
                 {{-- HEADER --}}
                 <div class="modal-header border-0 pb-0">
-
                     <button
                         type="button"
                         class="btn btn-light btn-icon rounded-circle ms-auto"
                         data-bs-dismiss="modal"
                         aria-label="Close">
-
                         <i class="ri-close-line fs-18"></i>
-
                     </button>
-
                 </div>
 
                 {{-- BODY --}}
                 <div class="modal-body px-4 pb-5 pt-2 text-center">
-
                     {{-- ICON --}}
                     <div class="mb-4">
-
                         <div class="avatar-xl mx-auto">
-
                             <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
-
                                 <lord-icon
                                     src="https://cdn.lordicon.com/fjvfsqea.json"
                                     trigger="loop"
                                     colors="primary:#405189,secondary:#0ab39c"
                                     style="width:70px;height:70px">
                                 </lord-icon>
-
                             </div>
-
                         </div>
-
                     </div>
 
                     {{-- TITLE --}}
                     <div class="mb-2">
-
                         <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill mb-3">
                             Konfirmasi Export
                         </span>
@@ -161,20 +147,16 @@
                             pada tabel yang sedang ditampilkan sehingga hasil export
                             sesuai dengan informasi yang Anda lihat saat ini.
                         </p>
-
                     </div>
 
                     {{-- INFORMATION --}}
                     <div class="alert alert-light border rounded-4 text-start mt-4 mb-0">
-
                         <div class="d-flex align-items-start gap-3">
-
                             <div class="flex-shrink-0">
                                 <i class="ri-information-line text-primary fs-20"></i>
                             </div>
 
                             <div>
-
                                 <h6 class="fw-semibold mb-1">
                                     Informasi
                                 </h6>
@@ -183,13 +165,9 @@
                                     Pastikan data laporan Pendapatan yang ditampilkan
                                     sudah sesuai sebelum melakukan export Excel.
                                 </p>
-
                             </div>
-
                         </div>
-
                     </div>
-
                 </div>
 
                 {{-- FOOTER --}}
@@ -215,38 +193,32 @@
                         Ya, Export
 
                     </button>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
 
     <script>
-    document.getElementById('konfirmasiExportLaporan').addEventListener('click', function () {
+        document.getElementById('konfirmasiExportLaporan').addEventListener('click', function () {
+            alertify.success("Menyiapkan Dokumen");
+            setTimeout(function () {
 
-        alertify.success("Menyiapkan Dokumen");
+                // Ambil tabel berdasarkan ID (lebih aman daripada querySelector)
+                var table = document.getElementById("tabelPendapatan");
 
-        setTimeout(function () {
+                // Konversi tabel menjadi workbook Excel
+                var workbook = XLSX.utils.table_to_book(table, {
+                    sheet: "Pendapatan"
+                });
 
-            // Ambil tabel berdasarkan ID (lebih aman daripada querySelector)
-            var table = document.getElementById("tabelPendapatan");
+                // Nama file
+                let fileName = `Laporan-Pendapatan-Sekolah-{{ date('Y-m-d') }}.xlsx`;
 
-            // Konversi tabel menjadi workbook Excel
-            var workbook = XLSX.utils.table_to_book(table, {
-                sheet: "Pendapatan"
-            });
+                // Download Excel
+                XLSX.writeFile(workbook, fileName);
 
-            // Nama file
-            let fileName = `Laporan-Pendapatan-Sekolah-{{ date('Y-m-d') }}.xlsx`;
+            }, 1000);
 
-            // Download Excel
-            XLSX.writeFile(workbook, fileName);
-
-        }, 1000);
-
-    });
+        });
     </script>
 </div>

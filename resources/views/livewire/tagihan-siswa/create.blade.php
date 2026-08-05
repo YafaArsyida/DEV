@@ -113,11 +113,11 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @forelse ($siswas as $item)
+                                            @forelse ($siswas as $key => $item)
                                                 <tr>
                                                     <th scope="col" style="width: 50px;">
                                                         <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox" wire:key="siswa-{{ $item->ms_penempatan_siswa_id }}" wire:model="siswaSelected" value="{{ $item->ms_penempatan_siswa_id }}">
+                                                            <input class="form-check-input" type="checkbox" wire:key="siswa-{{ $item->ms_penempatan_siswa_id }}" wire:model.live="siswaSelected" value="{{ $item->ms_penempatan_siswa_id }}">
                                                         </div>
                                                     </th>
                                                     <td>{{ $item->ms_siswa->nama_siswa }}</td>
@@ -139,6 +139,28 @@
                                             @endforelse
                                         </tbody>
                                     </table>
+                                    <div class="mt-3">
+                                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                            <div class="text-muted fs-13">
+                                                Menampilkan
+                                                <span class="fw-semibold">
+                                                    {{ $siswas->firstItem() ?? 0 }}
+                                                </span>
+                                                -
+                                                <span class="fw-semibold">
+                                                    {{ $siswas->lastItem() ?? 0 }}
+                                                </span>
+                                                dari
+                                                <span class="fw-semibold">
+                                                    {{ $siswas->total() }}
+                                                </span>
+                                                data siswa
+                                            </div>
+                                            <div>
+                                                {{ $siswas->links() }}
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             @endif
                         </div>

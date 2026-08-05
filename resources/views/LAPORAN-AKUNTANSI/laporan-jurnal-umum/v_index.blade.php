@@ -14,7 +14,11 @@
             </div>
             <!--end col-->
         </div>
-        @livewire('akuntansi-laporan-jurnal-umum.index')   
+        <div class="row">
+            <div class="col-xxl-12">
+                @livewire('akuntansi-laporan-jurnal-umum.index')   
+            </div>
+        </div>
     </div>
 </div>
 @endsection

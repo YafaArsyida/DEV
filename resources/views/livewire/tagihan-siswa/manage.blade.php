@@ -164,18 +164,18 @@
                                                 <td>{{ $item->ms_jenis_tagihan_siswa->nama_jenis_tagihan_siswa }}</td>
                                                 <td>{{ $item->ms_jenis_tagihan_siswa->ms_kategori_tagihan_siswa->nama_kategori_tagihan_siswa }}</td>
                                                 <td class="text-center">
-                                                    <span class="fs-12 fw-medium text-primary">
-                                                    RP{{ number_format($item->jumlah_tagihan_siswa, 0, ',', '.') }}
+                                                    <span class="fs-12 fw-medium">
+                                                    Rp{{ number_format($item->jumlah_tagihan_siswa, 0, ',', '.') }}
                                                 </td>
                                                 <td class="text-center">
                                                     <span class="fs-12 fw-medium text-success">
-                                                    RP{{ number_format($item->total_bayar ?? 0, 0, ',', '.') }}
+                                                    Rp{{ number_format($item->total_bayar ?? 0, 0, ',', '.') }}
                                                     </span>
                                                 </td>
                                                 </td>
                                                 <td class="text-center">
                                                     <span class="fs-12 fw-medium text-danger">
-                                                    RP{{ number_format($item->jumlah_tagihan_siswa - ($item->total_bayar ?? 0), 0, ',', '.') }}
+                                                    Rp{{ number_format($item->jumlah_tagihan_siswa - ($item->total_bayar ?? 0), 0, ',', '.') }}
                                                     </span>
                                                 </td>
                                                 <td class="text-center">{{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($item->ms_jenis_tagihan_siswa->tanggal_jatuh_tempo, 'd F Y') }}</td>
@@ -209,18 +209,18 @@
                                             <tr>
                                                 <td colspan="7" class="text-end">TOTAL</td>
                                                 <td class="text-center">
-                                                    <span class="fs-12 fw-medium text-primary">
-                                                        RP{{ number_format($totalEstimasi, 0, ',', '.') }}
+                                                    <span class="fs-12 fw-medium">
+                                                        Rp{{ number_format($totalEstimasi, 0, ',', '.') }}
                                                     </span>
                                                 </td>
                                                 <td class="text-center">
                                                     <span class="fs-12 fw-medium text-success">
-                                                        RP{{ number_format($totalDibayarkan, 0, ',', '.') }}
+                                                        Rp{{ number_format($totalDibayarkan, 0, ',', '.') }}
                                                     </span>
                                                 </td>
                                                 <td class="text-center">
                                                     <span class="fs-12 fw-medium text-danger">
-                                                        RP{{ number_format($totalKekurangan, 0, ',', '.') }}
+                                                        Rp{{ number_format($totalKekurangan, 0, ',', '.') }}
                                                     </span>
                                                 </td>
                                             </tr>
@@ -281,57 +281,107 @@
         wire:ignore.self>
 
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
+            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
 
-                <div class="modal-header">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                {{-- HEADER --}}
+                <div class="modal-header border-0 pb-0">
+                    <button
+                        type="button"
+                        class="btn btn-light btn-icon rounded-circle ms-auto"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                        <i class="ri-close-line fs-18"></i>
+                    </button>
                 </div>
 
-                <div class="modal-body p-5 text-center">
+                {{-- BODY --}}
+                <div class="modal-body px-4 pb-5 pt-2 text-center">
 
-                    <lord-icon
-                        src="https://cdn.lordicon.com/gsqxdxog.json"
-                        trigger="loop"
-                        colors="primary:#405189,secondary:#f06548"
-                        style="width:90px;height:90px">
-                    </lord-icon>
+                    {{-- ICON --}}
+                    <div class="mb-4">
+                        <div class="avatar-xl mx-auto">
+                            <div class="avatar-title bg-danger-subtle text-danger rounded-circle">
+                                <lord-icon
+                                    src="https://cdn.lordicon.com/gsqxdxog.json"
+                                    trigger="loop"
+                                    colors="primary:#dc3545,secondary:#f06548"
+                                    style="width:70px;height:70px">
+                                </lord-icon>
+                            </div>
+                        </div>
+                    </div>
 
-                    <div class="mt-4">
-                        <h4 class="fs-medium">
+                    {{-- TITLE --}}
+                    <div class="mb-2">
+
+                        <span class="badge bg-danger-subtle text-danger px-3 py-2 rounded-pill mb-3">
+                            Konfirmasi Hapus
+                        </span>
+
+                        <h3 class="fw-bold mb-2">
                             Hapus {{ count($TagihanSelected) }} Tagihan?
-                        </h4>
+                        </h3>
 
-                        <p class="text-muted fs-14 mb-4 pt-1">
+                        <p class="text-muted mb-0 lh-lg px-lg-4">
                             Anda akan menghapus
                             <strong>{{ count($TagihanSelected) }}</strong>
                             tagihan yang dipilih.
-                            <br>
-                            Tindakan ini tidak dapat dibatalkan.
+                            Tindakan ini bersifat permanen dan tidak dapat dibatalkan.
                         </p>
 
-                        <div class="alert alert-warning text-start">
-                            <i class="ri-error-warning-line me-1"></i>
-                            Pastikan tagihan yang dipilih sudah benar sebelum melanjutkan.
-                        </div>
-
-                        <div class="hstack gap-2 justify-content-center">
-
-                            <button
-                                class="btn btn-link link-success fw-medium text-decoration-none"
-                                data-bs-dismiss="modal">
-                                <i class="ri-close-line me-1"></i>
-                                Batal
-                            </button>
-
-                            <button
-                                class="btn btn-danger"
-                                wire:click="HapusTagihan">
-                                <i class="ri-delete-bin-2-line me-1"></i>
-                                Ya, Hapus Semua
-                            </button>
-                        </div>
                     </div>
+
+                    {{-- INFORMATION --}}
+                    <div class="alert alert-warning border rounded-4 text-start mt-4 mb-0">
+
+                        <div class="d-flex align-items-start gap-3">
+
+                            <div class="flex-shrink-0">
+                                <i class="ri-error-warning-line text-warning fs-20"></i>
+                            </div>
+
+                            <div>
+                                <h6 class="fw-semibold mb-1">
+                                    Perhatian
+                                </h6>
+
+                                <p class="text-muted mb-0 fs-13">
+                                    Pastikan tagihan yang dipilih sudah benar sebelum
+                                    melanjutkan proses penghapusan.
+                                </p>
+                            </div>
+
+                        </div>
+
+                    </div>
+
                 </div>
+
+                {{-- FOOTER --}}
+                <div class="modal-footer border-0 pt-0 px-4 pb-4 justify-content-center">
+
+                    <button
+                        type="button"
+                        class="btn btn-light rounded-pill px-4"
+                        data-bs-dismiss="modal">
+
+                        <i class="ri-close-line me-1"></i>
+                        Batal
+
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn btn-danger rounded-pill px-4"
+                        wire:click="HapusTagihan">
+
+                        <i class="ri-delete-bin-2-line me-1"></i>
+                        Ya, Hapus Semua
+
+                    </button>
+
+                </div>
+
             </div>
         </div>
     </div>

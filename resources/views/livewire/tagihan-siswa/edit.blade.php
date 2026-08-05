@@ -30,37 +30,43 @@
                     <tbody>
                         @if($tagihan)
                         <tr>
-                            <th scope="row" style="width: 150px;">Tagihan</th>
+                            <th scope="row" style="width: 150px;">Nama Siswa</th>
                             <td>
-                                <span class="fw-medium">{{ $tagihan->ms_jenis_tagihan_siswa->nama_jenis_tagihan_siswa }}
-                                    - <i>{{ $tagihan->nama_kategori_tagihan_siswa() }}</i></span>
-                                <p class="text-mute mb-0">RP{{ number_format($tagihan->jumlah_tagihan_siswa, 0, ',',
-                                    '.') }}</p>
+                                {{ $nama_siswa }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row" style="width: 150px;">Jenis Tagihan</th>
+                            <td>
+                                {{ $tagihan->ms_jenis_tagihan_siswa->nama_jenis_tagihan_siswa }} - <i>{{ $tagihan->nama_kategori_tagihan_siswa() }}</i>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Nominal Tagihan</th>
+                            <td>
+                                <div class="fw-medium fs-12">Rp{{ number_format($tagihan->jumlah_tagihan_siswa, 0, ',', '.') }}</div>
                             </td>
                         </tr>
                         <tr>
                             <th scope="row">Dibayarkan</th>
                             <td>
-                                <span class="fw-medium text-success">
-                                    RP{{ number_format($tagihan->jumlah_sudah_dibayar(), 0, ',', '.') }}
-                                </span>
+                                <div class="fw-medium fs-12 text-success">Rp{{ number_format($tagihan->jumlah_sudah_dibayar(), 0, ',', '.') }}</div>
                             </td>
                         </tr>
                         <tr>
                             <th scope="row">Kekurangan</th>
                             <td>
-                                <span class="fw-medium text-danger">
-                                    RP{{ number_format($tagihan->jumlah_tagihan_siswa -
-                                    $tagihan->jumlah_sudah_dibayar(), 0, ',', '.') }}
-                                </span>
+                                <div class="fw-medium fs-12 text-danger">
+                                    Rp{{ number_format($tagihan->jumlah_tagihan_siswa - $tagihan->jumlah_sudah_dibayar(), 0, ',', '.') }}
+                                </div>
                             </td>
                         </tr>
                         <tr>
                             <th scope="row">Perubahan Tagihan</th>
                             <td>
                                 <div class="input-group input-group-sm">
-                                    <span class="input-group-text">RP</span>
-                                    <input class="form-control @error('jumlah_perubahan_tagihan') is-invalid @enderror"
+                                    <span class="input-group-text">Rp</span>
+                                    <input class="form-control fw-medium fs-12 @error('jumlah_perubahan_tagihan') is-invalid @enderror"
                                         id="jumlah_perubahan_tagihan"
                                         type="text"
                                         wire:model.defer="jumlah_perubahan_tagihan"

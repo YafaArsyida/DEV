@@ -8,24 +8,27 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class AkuntansiJurnalDetail extends Model
 {
-    use HasFactory, SoftDeletes;
+    use SoftDeletes;
 
-    protected $table = 'akuntansi_jurnal_detail'; // Nama tabel
-    protected $primaryKey = 'akuntansi_jurnal_detail_id'; // Nama kolom primary key
+    protected $table = 'akuntansi_jurnal_detail';
+
+    protected $primaryKey = 'akuntansi_jurnal_detail_id';
 
     protected $fillable = [
-        'akuntansi_jurnal_detail_id',
+        'akuntansi_jurnal_id',
         'kode_rekening',
         'posisi',
         'nominal',
-        'tanggal_transaksi',
-        'ms_pengguna_id',
-        'ms_tahun_ajaran_id',
-        'ms_jenjang_id',
-        'is_canceled',
-        'deskripsi',
-        'ms_departemen_id',
     ];
+
+    public function akuntansi_jurnal()
+    {
+        return $this->belongsTo(
+            AkuntansiJurnal::class,
+            'akuntansi_jurnal_id',
+            'akuntansi_jurnal_id'
+        );
+    }
     /**
      * Relasi ke model Rekening
      */

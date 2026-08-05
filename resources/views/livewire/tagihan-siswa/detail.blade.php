@@ -89,7 +89,7 @@
                                 <!-- Pencarian -->
                                 <div class="col-lg-10">
                                     <label class="form-label small text-muted text-uppercase fw-medium mb-2">
-                                    Cari Tagihan
+                                    Pencarian
                                     </label>
                                     <div class="search-box">
                                         <input type="text"
@@ -147,18 +147,18 @@
                                                 <td>{{ $item->ms_jenis_tagihan_siswa->ms_kategori_tagihan_siswa->nama_kategori_tagihan_siswa }}</td>
                                                 <td>{{ $item->ms_jenis_tagihan_siswa->cicilan_status }}</td>
                                                 <td class="text-center">
-                                                    <span class="fs-12 fw-medium text-primary">
-                                                    RP{{ number_format($item->jumlah_tagihan_siswa, 0, ',', '.') }}
+                                                    <span class="fs-12 fw-medium">
+                                                    Rp{{ number_format($item->jumlah_tagihan_siswa, 0, ',', '.') }}
                                                     </span>
                                                 </td>
                                                 <td class="text-center">
                                                     <span class="fs-12 fw-medium text-success">
-                                                    RP{{ number_format($item->total_bayar ?? 0, 0, ',', '.') }}
+                                                    Rp{{ number_format($item->total_bayar ?? 0, 0, ',', '.') }}
                                                     </span>
                                                 </td>
                                                 <td class="text-center">
                                                     <span class="fs-12 fw-medium text-danger">
-                                                    RP{{ number_format($item->jumlah_tagihan_siswa - ($item->total_bayar ?? 0), 0, ',', '.') }}
+                                                    Rp{{ number_format($item->jumlah_tagihan_siswa - ($item->total_bayar ?? 0), 0, ',', '.') }}
                                                     </span>
                                                 </td>
                                                 <td class="text-center">
@@ -193,14 +193,14 @@
                                         <tfoot>
                                             <tr class="fw-bold text-center">
                                                 <td colspan="6" class="text-end">TOTAL</td>
-                                                <td class="fs-12 fw-medium text-primary">
-                                                    RP{{ number_format($totalEstimasi, 0, ',', '.') }}
+                                                <td class="fs-12 fw-medium">
+                                                    Rp{{ number_format($totalEstimasi, 0, ',', '.') }}
                                                 </td>
                                                 <td class="fs-12 fw-medium text-success">
-                                                    RP{{ number_format($totalDibayarkan, 0, ',', '.') }}
+                                                    Rp{{ number_format($totalDibayarkan, 0, ',', '.') }}
                                                 </td>
                                                 <td class="fs-12 fw-medium text-danger">
-                                                    RP{{ number_format($totalKekurangan, 0, ',', '.') }}
+                                                    Rp{{ number_format($totalKekurangan, 0, ',', '.') }}
                                                 </td>
                                                 <td colspan="2"></td>
                                             </tr>

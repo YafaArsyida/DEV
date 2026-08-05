@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AkuntansiJurnalDetail;
 use App\Models\Jenjang;
 use App\Models\TahunAjar;
+use Carbon\Carbon;
 use Elibyy\TCPDF\Facades\TCPDF;
 use Illuminate\Http\Request;
 
@@ -19,31 +20,34 @@ class AkuntansiLaporanPengeluaran extends Controller
     public function cetakPDF(Request $request)
     {
         $selectedJenjang = $request->jenjang;
-        $selectedTahunAjar = $request->tahun;
         $startDate = $request->start_date;
         $endDate = $request->end_date;
 
         $jenjang = Jenjang::find($selectedJenjang);
-        $tahunAjar = TahunAjar::find($selectedTahunAjar);
-
-        if (!$selectedJenjang || !$selectedTahunAjar) {
-            return response()->json(['error' => 'Jenjang dan Tahun Ajar wajib dipilih'], 400);
+        if (!$selectedJenjang) {
+            return response()->json(['error' => 'Jenjang wajib dipilih'], 400);
         }
+
 
         $pengeluaranPerBulan = AkuntansiJurnalDetail::with('akuntansi_rekening')
             ->where('ms_jenjang_id', $selectedJenjang)
-            ->where('ms_tahun_ajaran_id', $selectedTahunAjar)
             ->where('posisi', 'debit')
+            ->where('ms_departemen_id', 'SEKOLAH')
+
             ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
-                $query->whereBetween('tanggal_transaksi', [$startDate, $endDate]);
+                $query->whereBetween('tanggal_transaksi', [
+                    $startDate . ' 00:00:00',
+                    $endDate . ' 23:59:59'
+                ]);
             })
+
             ->whereHas('akuntansi_rekening', function ($query) {
                 $query->where('kode_rekening', 'like', '5%');
             })
             ->get()
             ->groupBy([
                 fn($item) => $item->akuntansi_rekening->nama_rekening,
-                fn($item) => \Carbon\Carbon::parse($item->tanggal_transaksi)->format('Y-m'),
+                fn($item) => Carbon::parse($item->tanggal_transaksi)->format('Y-m'),
             ]);
 
         // Ambil bulan unik
@@ -55,7 +59,7 @@ class AkuntansiLaporanPengeluaran extends Controller
             return [$bulan => \App\Http\Controllers\HelperController::formatTanggalIndonesia($bulan . '-01', 'F Y')];
         });
 
-        $judul = 'Laporan Pengeluaran';
+        $judul = 'Laporan Pengeluaran Sekolah';
         $yayasan = 'Yayasan Drul Khukama Unit ' . ($jenjang->nama_jenjang ?? '-');
 
         if ($request->start_date && $request->end_date) {
