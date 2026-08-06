@@ -12,12 +12,15 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Kelas;
 use App\Models\KeranjangTagihanSiswa;
 use App\Models\TagihanSiswa;
+use App\Services\AccountingService;
 
 class Manage extends Component
 {
     use WithPagination;
 
     protected $paginationTheme = 'bootstrap';
+
+    public $perPage = 50;
 
     public $ms_jenis_tagihan_siswa_id; // Parameter jenis
 
@@ -48,12 +51,22 @@ class Manage extends Component
 
     public function updatingSearch()
     {
-        $this->emitSelf('$refresh');
+        $this->resetPage();
     }
 
     public function updatingSelectedKelas()
     {
-        $this->emitSelf('$refresh');
+        $this->resetPage();
+    }
+
+    public function updatingSelectedJenjang()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingSelectedTahunAjar()
+    {
+        $this->resetPage();
     }
 
     public function manageTagihan($id)
@@ -91,45 +104,63 @@ class Manage extends Component
 
         try {
             $anyTagihanDeleted = false;
+
             foreach ($this->TagihanSelected as $ms_tagihan_siswa_id) {
+
                 $tagihan = TagihanSiswa::find($ms_tagihan_siswa_id);
 
-                if ($tagihan) {
-                    // Cek apakah tagihan sudah pernah dibayar
-                    $isInDetailTransaksi = DetailTransaksiTagihanSiswa::where('ms_tagihan_siswa_id', $ms_tagihan_siswa_id)->exists();
-
-                    if ($isInDetailTransaksi) {
-                        // Jika sudah pernah dibayar, tampilkan pesan error dan lewati proses penghapusan
-                        $this->dispatchBrowserEvent('alertify-error', ['message' => "Tidak dapat dihapus, terdapat pembayaran"]);
-                        continue;
-                    }
-
-                    $isInKeranjang = KeranjangTagihanSiswa::where('ms_tagihan_siswa_id', $tagihan->ms_tagihan_siswa_id)->first();
-                    if ($isInKeranjang) {
-                        $this->dispatchBrowserEvent('alertify-error', ['message' => "Tagihan tidak dapat dihapus karena masuk keranjang"]);
-                        continue;
-                    }
-
-                    // Dapatkan ID jurnal terkait
-                    $jurnalIds = [
-                        $tagihan->akuntansi_jurnal_detail_debit_id,
-                        $tagihan->akuntansi_jurnal_detail_kredit_id,
-                    ];
-
-                    // Validasi dan soft delete jurnal
-                    AkuntansiJurnalDetail::whereIn('akuntansi_jurnal_detail_id', $jurnalIds)->get()->each(function ($jurnal) {
-                        $jurnal->delete();
-                    });
-
-                    // Jika belum pernah dibayar, lanjutkan proses penghapusan
-                    $tagihan->ms_pengguna_id = auth()->user()->ms_pengguna_id; // Set pengguna yang menghapus
-                    $tagihan->deskripsi = "tagihan dihapus petugas {$this->nama_petugas}"; // Set deskripsi
-                    $tagihan->save();
-
-                    // Soft delete tagihan
-                    $tagihan->delete();
-                    $anyTagihanDeleted = true;
+                if (!$tagihan) {
+                    continue;
                 }
+
+                // Cek apakah tagihan sudah pernah dibayar
+                $isInDetailTransaksi = DetailTransaksiTagihanSiswa::where(
+                    'ms_tagihan_siswa_id',
+                    $ms_tagihan_siswa_id
+                )->exists();
+
+                if ($isInDetailTransaksi) {
+                    $this->dispatchBrowserEvent('alertify-error', [
+                        'message' => 'Tagihan tidak dapat dihapus karena memiliki riwayat pembayaran.'
+                    ]);
+                    continue;
+                }
+
+                // Cek apakah masih berada di keranjang
+                $isInKeranjang = KeranjangTagihanSiswa::where(
+                    'ms_tagihan_siswa_id',
+                    $tagihan->ms_tagihan_siswa_id
+                )->exists();
+
+                if ($isInKeranjang) {
+                    $this->dispatchBrowserEvent('alertify-error', [
+                        'message' => 'Tagihan tidak dapat dihapus karena masuk keranjang.'
+                    ]);
+                    continue;
+                }
+
+                // Hapus jurnal melalui AccountingService
+                if ($tagihan->akuntansi_jurnal_id) {
+                    AccountingService::delete(
+                        $tagihan->akuntansi_jurnal_id
+                    );
+                }
+
+                // Simpan informasi penghapusan
+                $tagihan->ms_pengguna_id = auth()->user()->ms_pengguna_id;
+
+                $tagihan->deskripsi = sprintf(
+                    'Tagihan %s dihapus oleh %s',
+                    $tagihan->ms_jenis_tagihan_siswa->nama_jenis_tagihan_siswa,
+                    $this->nama_petugas
+                );
+
+                $tagihan->save();
+
+                // Soft delete tagihan
+                $tagihan->delete();
+
+                $anyTagihanDeleted = true;
             }
 
             // Commit transaksi jika berhasil
@@ -182,52 +213,79 @@ class Manage extends Component
 
             // Loop untuk memperbarui tagihan yang dipilih
             foreach ($this->TagihanSelected as $ms_tagihan_siswa_id) {
+
                 $tagihan = TagihanSiswa::find($ms_tagihan_siswa_id);
 
-                if ($tagihan) {
-                    $dataToUpdate = [];
-                    // Ambil jumlah yang sudah dibayarkan
-                    $jumlahSudahDibayar = $tagihan->jumlah_sudah_dibayar();
+                if (!$tagihan) {
+                    continue;
+                }
 
-                    // Cek validasi jumlah tagihan
-                    if ($this->jumlahTagihan !== null) {
-                        if ($this->jumlahTagihan < $jumlahSudahDibayar) {
-                            throw new \Exception('Jumlah tagihan tidak boleh kurang dari jumlah yang sudah dibayarkan (' . number_format($jumlahSudahDibayar) . ').');
-                        }
+                $dataToUpdate = [];
 
-                        // Update jumlah tagihan
-                        $dataToUpdate['jumlah_tagihan_siswa'] = $this->jumlahTagihan;
+                $tagihan->load([
+                    'ms_penempatan_siswa.ms_siswa',
+                    'ms_jenis_tagihan_siswa',
+                ]);
 
-                        // Tentukan status berdasarkan jumlah tagihan dan jumlah yang sudah dibayarkan
-                        if ($jumlahSudahDibayar == 0) {
-                            $dataToUpdate['status'] = 'Belum Dibayar';
-                        } elseif ($this->jumlahTagihan > $jumlahSudahDibayar) {
-                            $dataToUpdate['status'] = 'Masih Dicicil';
-                        } else {
-                            $dataToUpdate['status'] = 'Lunas';
-                        }
+                $namaSiswa = $tagihan->ms_penempatan_siswa->ms_siswa->nama_siswa;
+                $namaJenis = $tagihan->ms_jenis_tagihan_siswa->nama_jenis_tagihan_siswa;
 
-                        // Update jurnal detail
-                        $debitJurnal = AkuntansiJurnalDetail::find($tagihan->akuntansi_jurnal_detail_debit_id);
-                        $kreditJurnal = AkuntansiJurnalDetail::find($tagihan->akuntansi_jurnal_detail_kredit_id);
+                $deskripsiJurnal = sprintf('Tagihan %s siswa %s', $namaJenis, $namaSiswa);
 
-                        if ($debitJurnal && $kreditJurnal) {
-                            $debitJurnal->update([
-                                'nominal' => $this->jumlahTagihan,
-                            ]);
+                // Jumlah yang sudah dibayar
+                $jumlahSudahDibayar = $tagihan->jumlah_sudah_dibayar();
 
-                            $kreditJurnal->update([
-                                'nominal' => $this->jumlahTagihan,
-                            ]);
-                        }
+                if ($this->jumlahTagihan !== null) {
+
+                    if ($this->jumlahTagihan < $jumlahSudahDibayar) {
+                        throw new \Exception(
+                            'Jumlah tagihan tidak boleh kurang dari jumlah yang sudah dibayarkan (' . number_format($jumlahSudahDibayar) . ').'
+                        );
                     }
 
-                    $dataToUpdate['deskripsi'] = "Tagihan diubah oleh petugas {$this->nama_petugas} menjadi RP " . number_format($this->jumlahTagihan);
+                    // Update nominal tagihan
+                    $dataToUpdate['jumlah_tagihan_siswa'] = $this->jumlahTagihan;
 
-                    // Lakukan pembaruan data tagihan
-                    if (!empty($dataToUpdate)) {
-                        $tagihan->update($dataToUpdate);
+                    // Tentukan status
+                    if ($jumlahSudahDibayar == 0) {
+                        $dataToUpdate['status'] = 'Belum Dibayar';
+                    } elseif ($this->jumlahTagihan > $jumlahSudahDibayar) {
+                        $dataToUpdate['status'] = 'Masih Dicicil';
+                    } else {
+                        $dataToUpdate['status'] = 'Lunas';
                     }
+
+                    // Update jurnal melalui AccountingService
+                    AccountingService::update(
+                        $tagihan->akuntansi_jurnal_id,
+                        [
+                            'tanggal'   => $tagihan->created_at,
+                            'deskripsi' => $deskripsiJurnal,
+                            'detail'    => [
+                                [
+                                    'kode_rekening' => 12001,
+                                    'posisi'        => 'debit',
+                                    'nominal'       => $this->jumlahTagihan,
+                                ],
+                                [
+                                    'kode_rekening' => 41001,
+                                    'posisi'        => 'kredit',
+                                    'nominal'       => $this->jumlahTagihan,
+                                ],
+                            ],
+                        ]
+                    );
+                }
+
+                $dataToUpdate['deskripsi'] = sprintf(
+                    'Nominal tagihan diubah dari Rp%s menjadi Rp%s oleh %s',
+                    number_format($tagihan->getOriginal('jumlah_tagihan_siswa'), 0, ',', '.'),
+                    number_format($this->jumlahTagihan, 0, ',', '.'),
+                    $this->nama_petugas
+                );
+
+                if (!empty($dataToUpdate)) {
+                    $tagihan->update($dataToUpdate);
                 }
             }
 
@@ -291,14 +349,14 @@ class Manage extends Component
         $tagihans = $query
             ->orderBy('ms_kelas.nama_kelas')
             ->orderBy('ms_siswa.nama_siswa')
-            ->get();
+            ->paginate($this->perPage);
 
         // TOTAL
         $totalEstimasi = $tagihans->sum('jumlah_tagihan_siswa');
         $totalDibayarkan = $tagihans->sum(fn($t) => $t->total_bayar ?? 0);
         $totalKekurangan = $totalEstimasi - $totalDibayarkan;
         
-        $this->tagihanOnPage = $tagihans;
+        $this->tagihanOnPage = $tagihans->items();
 
         return view('livewire.tagihan-jenis.manage', compact(
             'select_kelas',

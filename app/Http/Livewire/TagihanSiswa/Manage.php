@@ -18,6 +18,8 @@ class Manage extends Component
     use WithPagination;
 
     protected $paginationTheme = 'bootstrap';
+    
+    public $perPage = 50;
 
     public $ms_jenjang_id = null;
     public $ms_tahun_ajar_id = null;
@@ -51,12 +53,22 @@ class Manage extends Component
 
     public function updatingSearch()
     {
-        $this->emitSelf('$refresh');
+        $this->resetPage();
     }
 
     public function updatingselectedKategori()
     {
-        $this->emitSelf('$refresh');
+        $this->resetPage();
+    }
+
+    public function updatingSelectedJenjang()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingSelectedTahunAjar()
+    {
+        $this->resetPage();
     }
 
     public function manageTagihan($id)
@@ -94,6 +106,7 @@ class Manage extends Component
 
         try {
             $anyTagihanDeleted = false;
+
             foreach ($this->TagihanSelected as $ms_tagihan_siswa_id) {
                 $tagihan = TagihanSiswa::find($ms_tagihan_siswa_id);
 
@@ -114,9 +127,12 @@ class Manage extends Component
                     }
 
                     // Hapus akuntansi
-                    AccountingService::delete(
-                        $tagihan->akuntansi_jurnal_id
-                    );
+                    if ($tagihan->akuntansi_jurnal_id) {
+                        AccountingService::delete(
+                            $tagihan->akuntansi_jurnal_id
+                        );
+                    }
+
 
                     $tagihan->ms_pengguna_id = auth()->user()->ms_pengguna_id; // Set pengguna yang menghapus
                     
@@ -183,7 +199,9 @@ class Manage extends Component
 
             // Loop untuk memperbarui tagihan yang dipilih
             foreach ($this->TagihanSelected as $ms_tagihan_siswa_id) {
+
                 $tagihan = TagihanSiswa::find($ms_tagihan_siswa_id);
+
                 if ($tagihan) {
                     $dataToUpdate = [];
 
@@ -193,7 +211,6 @@ class Manage extends Component
                     ]);
 
                     $namaSiswa = $tagihan->ms_penempatan_siswa->ms_siswa->nama_siswa;
-
                     $namaJenis = $tagihan->ms_jenis_tagihan_siswa->nama_jenis_tagihan_siswa;
 
                     $deskripsiJurnal = sprintf('Tagihan %s siswa %s', $namaJenis, $namaSiswa);
@@ -204,7 +221,9 @@ class Manage extends Component
                     // Cek validasi dan pembaruan jumlah tagihan
                     if ($this->jumlahTagihan !== null) {
                         if ($this->jumlahTagihan < $jumlahSudahDibayar) {
-                            throw new \Exception('Jumlah tagihan tidak boleh kurang dari jumlah yang sudah dibayarkan (' . number_format($jumlahSudahDibayar) . ').');
+                            throw new \Exception(
+                                'Jumlah tagihan tidak boleh kurang dari jumlah yang sudah dibayarkan (' . number_format($jumlahSudahDibayar) . ').'
+                            );
                         }
 
                         // Update jumlah tagihan
@@ -224,17 +243,13 @@ class Manage extends Component
                             $tagihan->akuntansi_jurnal_id,
                             [
                                 'tanggal' => $tagihan->created_at,
-
                                 'deskripsi' => $deskripsiJurnal,
-
                                 'detail' => [
-
                                     [
                                         'kode_rekening' => 12001,
                                         'posisi' => 'debit',
                                         'nominal' => $this->jumlahTagihan,
                                     ],
-
                                     [
                                         'kode_rekening' => 41001,
                                         'posisi' => 'kredit',
@@ -320,13 +335,14 @@ class Manage extends Component
 
         $tagihans = $query
             ->orderBy('ms_jenis_tagihan_siswa_id')
-            ->get();
+            ->paginate($this->perPage);
 
         // Simpan data tagihan dari halaman aktif
-        $this->tagihanOnPage = $tagihans;
         $totalEstimasi = $tagihans->sum('jumlah_tagihan_siswa');
         $totalDibayarkan = $tagihans->sum(fn($t) => $t->total_bayar ?? 0);
         $totalKekurangan = $totalEstimasi - $totalDibayarkan;
+
+        $this->tagihanOnPage = $tagihans->items();
 
         return view('livewire.tagihan-siswa.manage', [
             'select_kategori' => $select_kategori,

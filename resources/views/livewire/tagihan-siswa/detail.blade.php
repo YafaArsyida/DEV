@@ -113,9 +113,9 @@
                                 </div>
                                 @else
                                 <div class="table-responsive">
-                                    <table id="DataDetailTagihan" class="table table-hover nowrap align-middle" style="width:100%">
+                                    <table id="DataDetailTagihan" class="table table-hover table-nowrap align-middle" style="width:100%">
                                         <thead class="table-light">
-                                            <tr class="text-uppercase" style="white-space: nowrap;">
+                                            <tr class="text-uppercase">
                                                 <th style="width: 50px;">NO</th>
                                                 <th>Siswa</th>
                                                 <th>Kelas</th>
@@ -130,9 +130,9 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @forelse ($tagihans as $item)
-                                            <tr style="white-space: nowrap;">
-                                                <td style="width: 50px">{{ $loop->iteration }}.</td>
+                                            @forelse ($tagihans as $key => $item)
+                                            <tr>
+                                                <td>{{ $tagihans->firstItem() + $key }}.</td>   
                                                 <td class="text-start">
                                                     <span class="fw-medium">
                                                     {{ $item->ms_penempatan_siswa->ms_siswa->nama_siswa }}
@@ -206,6 +206,28 @@
                                             </tr>
                                         </tfoot>
                                     </table>
+                                    <div class="mt-3">
+                                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                            <div class="text-muted fs-13">
+                                                Menampilkan
+                                                <span class="fw-medium">
+                                                    {{ $tagihans->firstItem() ?? 0 }}
+                                                </span>
+                                                -
+                                                <span class="fw-medium">
+                                                    {{ $tagihans->lastItem() ?? 0 }}
+                                                </span>
+                                                dari
+                                                <span class="fw-medium">
+                                                    {{ $tagihans->total() }}
+                                                </span>
+                                                data tagihan
+                                            </div>
+                                            <div>
+                                                {{ $tagihans->links() }}
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 @endif
                             </div>

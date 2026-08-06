@@ -9,6 +9,12 @@ use Livewire\Component;
 
 class Detail extends Component
 {
+    use WithPagination;
+
+    protected $paginationTheme = 'bootstrap';
+
+    public $perPage = 50;
+
     public $ms_penempatan_siswa_id;
 
     public $selectedJenjang = null;
@@ -27,16 +33,22 @@ class Detail extends Component
 
     public function updatingSearch()
     {
-        $this->dispatchBrowserEvent('alertify-success', [
-            'message' => 'Memperbarui'
-        ]);
+        $this->resetPage();
     }
 
     public function updatingselectedKategori()
     {
-        $this->dispatchBrowserEvent('alertify-success', [
-            'message' => 'Memperbarui'
-        ]);
+        $this->resetPage();
+    }
+
+    public function updatingSelectedJenjang()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingSelectedTahunAjar()
+    {
+        $this->resetPage();
     }
 
     public function showDetailTagihan($params)
@@ -109,7 +121,7 @@ class Detail extends Component
 
         $tagihans = $query
             ->orderBy('ms_jenis_tagihan_siswa_id')
-            ->get();
+            ->paginate($this->perPage);
 
         $totalEstimasi = $tagihans->sum('jumlah_tagihan_siswa');
         $totalDibayarkan = $tagihans->sum(fn($t) => $t->total_bayar ?? 0);

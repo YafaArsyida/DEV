@@ -16,6 +16,8 @@ class Detail extends Component
 
     protected $paginationTheme = 'bootstrap';
 
+    public $perPage = 50;
+
     public $ms_jenis_tagihan_siswa_id;
 
     public $selectedJenjang = null;
@@ -36,6 +38,16 @@ class Detail extends Component
     }
 
     public function updatingSelectedKelas()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingSelectedJenjang()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingSelectedTahunAjar()
     {
         $this->resetPage();
     }
@@ -104,8 +116,7 @@ class Detail extends Component
         $tagihans = $query
             ->orderBy('ms_kelas.nama_kelas')
             ->orderBy('ms_siswa.nama_siswa')
-            // ->paginate(100);
-            ->get();
+            ->paginate($this->perPage);
 
         // TOTAL
         $totalEstimasi = $tagihans->sum('jumlah_tagihan_siswa');

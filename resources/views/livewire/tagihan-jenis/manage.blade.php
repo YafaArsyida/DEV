@@ -115,9 +115,9 @@
                                 </div>
                                 @else
                                 <div class="table-responsive">
-                                    <table class="table table-hover nowrap align-middle" style="width:100%">
+                                    <table class="table table-hover table-nowrap align-middle" style="width:100%">
                                         <thead class="table-light">
-                                            <tr class="text-uppercase" style="white-space: nowrap;">
+                                            <tr class="text-uppercase">
                                                 <th scope="col" style="width: 50px;">
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="checkbox" id="checkAll"
@@ -139,8 +139,8 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @forelse ($tagihans as $item)
-                                            <tr style="white-space: nowrap;">
+                                            @forelse ($tagihans as $key => $item)
+                                            <tr>
                                                 <th scope="row">
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="checkbox"
@@ -156,7 +156,7 @@
                                                         <i class="ri-delete-bin-5-fill fs-14"></i>
                                                     </a>
                                                 </td>
-                                                <td>{{ $loop->iteration }}. </td>
+                                                <td>{{ $tagihans->firstItem() + $key }}.</td>   
                                                 <td class="text-start">
                                                     <span class="fw-medium">
                                                         {{ $item->ms_penempatan_siswa->ms_siswa->nama_siswa }}
@@ -181,19 +181,19 @@
     
                                                 <td class="text-center">
                                                     <span class="fs-12 fw-medium text-primary">
-                                                        RP{{ number_format($item->jumlah_tagihan_siswa, 0, ',', '.') }}
+                                                        Rp{{ number_format($item->jumlah_tagihan_siswa, 0, ',', '.') }}
                                                     </span>
                                                 </td>
     
                                                 <td class="text-center">
                                                     <span class="fs-12 fw-medium text-success">
-                                                        RP{{ number_format($item->total_bayar ?? 0, 0, ',', '.') }}
+                                                        Rp{{ number_format($item->total_bayar ?? 0, 0, ',', '.') }}
                                                     </span>
                                                 </td>
     
                                                 <td class="text-center">
                                                     <span class="fs-12 fw-medium text-danger">
-                                                        RP{{ number_format(($item->jumlah_tagihan_siswa -
+                                                        Rp{{ number_format(($item->jumlah_tagihan_siswa -
                                                         ($item->total_bayar ?? 0)), 0, ',', '.') }}
                                                     </span>
                                                 </td>
@@ -254,7 +254,28 @@
                                             </tr>
                                         </tfoot>
                                     </table>
-                                    {{-- {{ $tagihans->links() }} --}}
+                                    <div class="mt-3">
+                                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                            <div class="text-muted fs-13">
+                                                Menampilkan
+                                                <span class="fw-medium">
+                                                    {{ $tagihans->firstItem() ?? 0 }}
+                                                </span>
+                                                -
+                                                <span class="fw-medium">
+                                                    {{ $tagihans->lastItem() ?? 0 }}
+                                                </span>
+                                                dari
+                                                <span class="fw-medium">
+                                                    {{ $tagihans->total() }}
+                                                </span>
+                                                data tagihan
+                                            </div>
+                                            <div>
+                                                {{ $tagihans->links() }}
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 @endif
                             </div>
@@ -309,57 +330,107 @@
         wire:ignore.self>
 
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
+            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
 
-                <div class="modal-header">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                {{-- HEADER --}}
+                <div class="modal-header border-0 pb-0">
+                    <button
+                        type="button"
+                        class="btn btn-light btn-icon rounded-circle ms-auto"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                        <i class="ri-close-line fs-18"></i>
+                    </button>
                 </div>
 
-                <div class="modal-body p-5 text-center">
+                {{-- BODY --}}
+                <div class="modal-body px-4 pb-5 pt-2 text-center">
 
-                    <lord-icon
-                        src="https://cdn.lordicon.com/gsqxdxog.json"
-                        trigger="loop"
-                        colors="primary:#405189,secondary:#f06548"
-                        style="width:90px;height:90px">
-                    </lord-icon>
+                    {{-- ICON --}}
+                    <div class="mb-4">
+                        <div class="avatar-xl mx-auto">
+                            <div class="avatar-title bg-danger-subtle text-danger rounded-circle">
+                                <lord-icon
+                                    src="https://cdn.lordicon.com/gsqxdxog.json"
+                                    trigger="loop"
+                                    colors="primary:#dc3545,secondary:#f06548"
+                                    style="width:70px;height:70px">
+                                </lord-icon>
+                            </div>
+                        </div>
+                    </div>
 
-                    <div class="mt-4">
-                        <h4 class="fs-medium">
+                    {{-- TITLE --}}
+                    <div class="mb-2">
+
+                        <span class="badge bg-danger-subtle text-danger px-3 py-2 rounded-pill mb-3">
+                            Konfirmasi Hapus
+                        </span>
+
+                        <h3 class="fw-bold mb-2">
                             Hapus {{ count($TagihanSelected) }} Tagihan?
-                        </h4>
+                        </h3>
 
-                        <p class="text-muted fs-14 mb-4 pt-1">
+                        <p class="text-muted mb-0 lh-lg px-lg-4">
                             Anda akan menghapus
                             <strong>{{ count($TagihanSelected) }}</strong>
                             tagihan yang dipilih.
-                            <br>
-                            Tindakan ini tidak dapat dibatalkan.
+                            Tindakan ini bersifat permanen dan tidak dapat dibatalkan.
                         </p>
 
-                        <div class="alert alert-warning text-start">
-                            <i class="ri-error-warning-line me-1"></i>
-                            Pastikan tagihan yang dipilih sudah benar sebelum melanjutkan.
-                        </div>
-
-                        <div class="hstack gap-2 justify-content-center">
-
-                            <button
-                                class="btn btn-link link-success fw-medium text-decoration-none"
-                                data-bs-dismiss="modal">
-                                <i class="ri-close-line me-1"></i>
-                                Batal
-                            </button>
-
-                            <button
-                                class="btn btn-danger"
-                                wire:click="HapusTagihan">
-                                <i class="ri-delete-bin-2-line me-1"></i>
-                                Ya, Hapus Semua
-                            </button>
-                        </div>
                     </div>
+
+                    {{-- INFORMATION --}}
+                    <div class="alert alert-warning border rounded-4 text-start mt-4 mb-0">
+
+                        <div class="d-flex align-items-start gap-3">
+
+                            <div class="flex-shrink-0">
+                                <i class="ri-error-warning-line text-warning fs-20"></i>
+                            </div>
+
+                            <div>
+                                <h6 class="fw-semibold mb-1">
+                                    Perhatian
+                                </h6>
+
+                                <p class="text-muted mb-0 fs-13">
+                                    Pastikan tagihan yang dipilih sudah benar sebelum
+                                    melanjutkan proses penghapusan.
+                                </p>
+                            </div>
+
+                        </div>
+
+                    </div>
+
                 </div>
+
+                {{-- FOOTER --}}
+                <div class="modal-footer border-0 pt-0 px-4 pb-4 justify-content-center">
+
+                    <button
+                        type="button"
+                        class="btn btn-light rounded-pill px-4"
+                        data-bs-dismiss="modal">
+
+                        <i class="ri-close-line me-1"></i>
+                        Batal
+
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn btn-danger rounded-pill px-4"
+                        wire:click="HapusTagihan">
+
+                        <i class="ri-delete-bin-2-line me-1"></i>
+                        Ya, Hapus Semua
+
+                    </button>
+
+                </div>
+
             </div>
         </div>
     </div>

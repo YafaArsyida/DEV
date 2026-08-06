@@ -137,7 +137,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @forelse ($tagihans as $item)
+                                            @forelse ($tagihans as $key => $item)
                                             <tr>
                                                 <th scope="row">
                                                     <div class="form-check">
@@ -154,7 +154,7 @@
                                                         <i class="ri-delete-bin-5-fill fs-14"></i>
                                                     </a>
                                                 </td>
-                                                <td>{{ $loop->iteration }}.</td>
+                                                <td>{{ $tagihans->firstItem() + $key }}.</td>   
                                                 <td class="text-start">
                                                     <span class="fw-medium">
                                                     {{ $item->ms_penempatan_siswa->ms_siswa->nama_siswa }}
@@ -226,7 +226,29 @@
                                             </tr>
                                         </tfoot>
                                     </table>
-                                    {{-- {{ $tagihans->links() }} --}}
+                                    {{-- PAGINATION --}}
+                                    <div class="mt-3">
+                                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                            <div class="text-muted fs-13">
+                                                Menampilkan
+                                                <span class="fw-medium">
+                                                    {{ $tagihans->firstItem() ?? 0 }}
+                                                </span>
+                                                -
+                                                <span class="fw-medium">
+                                                    {{ $tagihans->lastItem() ?? 0 }}
+                                                </span>
+                                                dari
+                                                <span class="fw-medium">
+                                                    {{ $tagihans->total() }}
+                                                </span>
+                                                data tagihan
+                                            </div>
+                                            <div>
+                                                {{ $tagihans->links() }}
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 @endif
                             </div>
