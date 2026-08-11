@@ -4,6 +4,7 @@ namespace App\Http\Livewire\TransaksiPengeluaran;
 
 use App\Models\AkuntansiRekening;
 use App\Models\Pengeluaran;
+use App\Models\TransaksiPengeluaran;
 use Carbon\Carbon;
 use Livewire\Component;
 
@@ -21,7 +22,7 @@ class DataTransaksi extends Component
 
     protected $listeners = [
         'parameterUpdated',
-        'refreshTransaksiPengeluaran' => '$refresh'
+        'refreshTransaksi' => '$refresh'
     ];
 
     public function mount()
@@ -88,7 +89,7 @@ class DataTransaksi extends Component
         // ======================
         // ✅ BASE QUERY (INLINE)
         // ======================
-        $base = Pengeluaran::query()
+        $base = TransaksiPengeluaran::query()
             ->with(['akuntansi_rekening', 'ms_pengguna'])
             ->where('ms_jenjang_id', $this->selectedJenjang);
 

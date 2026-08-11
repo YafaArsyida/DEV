@@ -64,9 +64,9 @@
                             <i class="ri-wallet-3-line me-1"></i>
                             Saldo Sebelum Periode
                         </td>
-                        <td class="fs-12 text-success">RP{{ number_format($totalMasukSebelum, 0, ',', '.') }}</td>
-                        <td class="fs-12 text-danger">RP{{ number_format($totalKeluarSebelum, 0, ',', '.') }}</td>
-                        <td class="fs-12 text-primary">RP{{ number_format($saldoAwal, 0, ',', '.') }}</td>
+                        <td class="fs-12 text-success">Rp{{ number_format($totalMasukSebelum, 0, ',', '.') }}</td>
+                        <td class="fs-12 text-danger">Rp{{ number_format($totalKeluarSebelum, 0, ',', '.') }}</td>
+                        <td class="fs-12">Rp{{ number_format($saldoAwal, 0, ',', '.') }}</td>
                         <td></td>
                     </tr>
                     @forelse ($transaksiEduPay as $item)
@@ -99,24 +99,24 @@
                         </td>
                         <td>
                             <span class="fs-12 fw-medium">
-                                {!! 'RP' . number_format($item->nominal, 0, ',', '.') . ' - <i>' . ucfirst($item->jenis_transaksi) . '</i>' !!}
+                                {!! 'Rp' . number_format($item->nominal, 0, ',', '.') . ' - <i>' . ucfirst($item->jenis_transaksi) . '</i>' !!}
                             </span>
                             <p class="text-muted mb-0">{{ $item->deskripsi ?? '' }}</p>
                         </td>
                         <td class="text-center">{{ $item->ms_pengguna->nama }}</td>
                         <td class="text-center">
                             <span class="fs-12 fw-medium text-success">
-                                {{ in_array($item->jenis_transaksi, ['topup tunai', 'topup online', 'pengembalian dana']) ? 'RP' . number_format($item->nominal, 0, ',', '.') : '-' }}
+                                {{ in_array($item->jenis_transaksi, ['topup tunai', 'topup online', 'pengembalian dana']) ? 'Rp' . number_format($item->nominal, 0, ',', '.') : '-' }}
                             </span>
                         </td>
                         <td class="text-center">
                             <span class="fs-12 fw-medium text-danger">
-                                {{ in_array($item->jenis_transaksi, ['penarikan', 'pembayaran','kantin']) ? 'RP' . number_format($item->nominal, 0, ',', '.') : '-' }}
+                                {{ in_array($item->jenis_transaksi, ['penarikan', 'pembayaran','kantin']) ? 'Rp' . number_format($item->nominal, 0, ',', '.') : '-' }}
                             </span>
                         </td>
                         <td class="text-center">
-                            <span class="fs-12 fw-medium text-primary">
-                                RP{{ number_format($item->saldo, 0, ',', '.') }}
+                            <span class="fs-12 fw-medium">
+                                Rp{{ number_format($item->saldo, 0, ',', '.') }}
                             </span>
                         </td>
 

@@ -3,7 +3,7 @@
 namespace App\Http\Livewire\TransaksiPendapatanLainnya;
 
 use App\Models\AkuntansiRekening;
-use App\Models\PendapatanLainnya;
+use App\Models\TransaksiPendapatanLainnya;
 use Carbon\Carbon;
 use Livewire\Component;
 
@@ -89,7 +89,7 @@ class DataTransaksi extends Component
         // ======================
         // ✅ BASE QUERY (INLINE)
         // ======================
-        $base = PendapatanLainnya::query()
+        $base = TransaksiPendapatanLainnya::query()
             ->with(['akuntansi_rekening', 'ms_pengguna'])
             ->where('ms_jenjang_id', $this->selectedJenjang);
 

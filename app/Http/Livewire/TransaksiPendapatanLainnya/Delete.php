@@ -2,14 +2,14 @@
 
 namespace App\Http\Livewire\TransaksiPendapatanLainnya;
 
-use App\Models\AkuntansiJurnalDetail;
-use App\Models\Infaq;
-use App\Models\PendapatanLainnya;
+use App\Models\TransaksiPendapatanLainnya;
+use App\Services\AccountingService;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class Delete extends Component
 {
-    public $ms_pendapatan_lainnya_id;
+    public $transaksi_pendapatan_lainnya_id;
     public $ms_jenjang_id;
     public $ms_tahun_ajar_id;
 
@@ -24,58 +24,90 @@ class Delete extends Component
         'confirmDeletePendapatanLainnya'
     ];
 
-    public function confirmDeletePendapatanLainnya($ms_pendapatan_lainnya_id)
+    public function confirmDeletePendapatanLainnya($transaksi_pendapatan_lainnya_id)
     {
-        $transaksi = PendapatanLainnya::findOrFail($ms_pendapatan_lainnya_id);
+        $transaksi = TransaksiPendapatanLainnya::findOrFail($transaksi_pendapatan_lainnya_id);
 
         $this->ms_jenjang_id = $transaksi->ms_jenjang_id ?? null;
         $this->ms_tahun_ajar_id = $transaksi->ms_tahun_ajar_id ?? null;
 
-        $this->ms_pendapatan_lainnya_id = $ms_pendapatan_lainnya_id;
+        $this->transaksi_pendapatan_lainnya_id = $transaksi_pendapatan_lainnya_id;
     }
 
     public function deletePendapatanLainnya()
     {
+        DB::beginTransaction();
+
         try {
-            // Validasi apakah ID ada
-            if (!$this->ms_pendapatan_lainnya_id) {
-                $this->dispatchBrowserEvent('alertify-error', ['message' => 'Transaksi tidak ditemukan.']);
-                return;
+            // ==========================================
+            // VALIDASI ID
+            // ==========================================
+            if (!$this->transaksi_pendapatan_lainnya_id) {
+                throw new \Exception('Transaksi tidak ditemukan.');
             }
 
-            // Ambil data transaksi berdasarkan ID
-            $transaksi = PendapatanLainnya::find($this->ms_pendapatan_lainnya_id);
+            // ==========================================
+            // AMBIL TRANSAKSI
+            // ==========================================
+            $transaksi = TransaksiPendapatanLainnya::lockForUpdate()
+                ->find($this->transaksi_pendapatan_lainnya_id);
 
             if (!$transaksi) {
-                $this->dispatchBrowserEvent('alertify-error', ['message' => 'Transaksi tidak ditemukan.']);
-                return;
+                throw new \Exception('Transaksi tidak ditemukan.');
             }
 
-            $transaksi->deskripsi = $transaksi->deskripsi . " (Dihapus oleh petugas {$this->nama_petugas})";
-            $transaksi->save();
+            // ==========================================
+            // AUDIT TRANSAKSI
+            // ==========================================
+            $transaksi->update([
+                'deskripsi' => $transaksi->deskripsi .
+                    " (Dihapus oleh petugas {$this->nama_petugas})",
+            ]);
 
-            // Dapatkan ID jurnal terkait
-            $jurnalIds = [
-                $transaksi->akuntansi_jurnal_detail_debit_id,
-                $transaksi->akuntansi_jurnal_detail_kredit_id,
-            ];
+            // ==========================================
+            // HAPUS JURNAL
+            // ==========================================
+            if ($transaksi->akuntansi_jurnal_id) {
+                AccountingService::delete(
+                    $transaksi->akuntansi_jurnal_id
+                );
+            }
 
-            // Validasi dan soft delete jurnal
-            AkuntansiJurnalDetail::whereIn('akuntansi_jurnal_detail_id', $jurnalIds)->get()->each(function ($jurnal) {
-                $jurnal->delete();
-            });
-
-            // Hapus transaksi
+            // ==========================================
+            // SOFT DELETE TRANSAKSI
+            // ==========================================
             $transaksi->delete();
 
-            // Emit event untuk memperbarui data di tabel
-            $this->emit('refreshTransaksiPendapatanLainnya');
+            // ==========================================
+            // COMMIT
+            // ==========================================
+            DB::commit();
+
+            // ==========================================
+            // REFRESH UI
+            // ==========================================
+            $this->emit('refreshTransaksi');
             $this->emit('refreshSaldo');
-            $this->dispatchBrowserEvent('hide-delete-modal', ['modalId' => 'deletePendapatanLainnya']);
-            $this->dispatchBrowserEvent('alertify-success', ['message' => 'Transaksi berhasil dihapus.']);
-        } catch (\Exception $e) {
-            // Notifikasi error jika terjadi kesalahan
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+
+            $this->dispatchBrowserEvent(
+                'hide-modal', ['modalId' => 'deletePendapatanLainnya']
+            );
+
+            $this->dispatchBrowserEvent(
+                'alertify-success',
+                ['message' => 'Transaksi berhasil dihapus.']
+            );
+
+        } catch (\Throwable $e) {
+
+            DB::rollBack();
+
+            $this->dispatchBrowserEvent(
+                'alertify-error',
+                [
+                    'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+                ]
+            );
         }
     }
 

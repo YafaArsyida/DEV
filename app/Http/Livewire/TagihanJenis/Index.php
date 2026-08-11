@@ -28,7 +28,7 @@ class Index extends Component
     public $totalPersen = 0;
 
     protected $listeners = [
-        'refreshTagihans' => '$refresh',
+        'refreshTagihanSiswa' => '$refresh',
         'parameterUpdated' => 'updateParameters',
     ];
 

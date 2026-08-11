@@ -5,7 +5,7 @@ namespace App\Http\Livewire\TransaksiTabunganSiswa;
 use App\Models\AkuntansiJurnalDetail;
 use App\Models\SaldoTabungan;
 use App\Models\TransaksiTabungan;
-
+use App\Services\AccountingService;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
@@ -47,20 +47,25 @@ class Delete extends Component
 
     protected function processDelete($transaksi, $saldo)
     {
-        // update saldo dulu
+        // KEMBALIKAN SALDO TABUNGAN
         if ($transaksi->jenis_transaksi === 'setoran') {
+            
+            // Setoran dihapus → saldo dikurangi
             $saldo->decrement('saldo_tabungan', $transaksi->nominal);
         } else {
+
+            // Penarikan dihapus → saldo dikembalikan
             $saldo->increment('saldo_tabungan', $transaksi->nominal);
         }
 
-        // soft delete jurnal (1 query)
-        AkuntansiJurnalDetail::whereIn('akuntansi_jurnal_detail_id', [
-            $transaksi->akuntansi_jurnal_detail_debit_id,
-            $transaksi->akuntansi_jurnal_detail_kredit_id,
-        ])->delete();
+        // HAPUS JURNAL
+        if ($transaksi->akuntansi_jurnal_id) {
+            AccountingService::delete(
+                $transaksi->akuntansi_jurnal_id
+            );
+        }
 
-        // delete transaksi
+        // SOFT DELETE TRANSAKSI
         $transaksi->delete();
     }
 

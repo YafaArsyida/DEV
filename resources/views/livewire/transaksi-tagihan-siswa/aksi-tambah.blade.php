@@ -44,25 +44,33 @@
 
                                     <div>
                                         <h5 class="fw-bold mb-1">
-                                            Daftar Tagihan
+                                            Daftar Jenis Tagihan
                                         </h5>
                                         <small class="text-muted">
-                                            Pilih tagihan dan isikan jumlah tagihan untuk siswa.
+                                            Tentukan jenis tagihan dan nominal untuk setiap pilihan.
                                         </small>
                                     </div>
                                 </div>
                             </div>
 
                             {{-- ACTION --}}
-                            <div class="d-flex gap-2 flex-wrap align-items-center">
-                                
+                            <div class="d-flex align-items-center">
+                                <div class="border rounded-pill px-3 py-2 bg-light">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="ri-check-double-line text-success fs-5"></i>
+                                        <span class="text-muted">Dipilih</span>
+                                        <span class="badge bg-success rounded-pill px-3">
+                                            {{ $tagihanSelected ? count($tagihanSelected) : 0 }}
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
-
                         </div>
                     </div><!-- end card header -->
                     <div class="card-body">
-                        <div class="row g-3 mb-3">
+                        <div class="row g-3 mb-4">
                             <div class="col-xxl-2 col-sm-6"> 
+                                <label for="filterKategoriTagihan" class="form-label small text-muted text-uppercase fw-semibold mb-2">Kategori</label>
                                 <select wire:model.live="selectedKategoriTagihan" style="cursor: pointer" class="form-select" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Kelas">
                                     <option value="">Semua Kategori</option>
                                     @foreach ($select_kategori as $kategori)
@@ -71,6 +79,7 @@
                                 </select>
                             </div>
                             <div class="col-xxl-10 col-sm-6">
+                                <label for="searchJenisTagihan" class="form-label small text-muted text-uppercase fw-semibold mb-2">Pencarian</label>
                                 <div class="search-box">
                                     <input type="text" class="form-control search" wire:model.live.debounce.300ms="searchJenisTagihan" placeholder="cari nama, deskripsi atau lainnya...">
                                     <i class="ri-search-line search-icon"></i>
@@ -90,17 +99,17 @@
                             </div>
                             @else
                             <div class="table-responsive">
-                                <table class="table table-hover nowrap align-middle" style="width:100%">
+                                <table class="table table-hover table-nowrap align-middle" style="width:100%">
                                     <thead class="table-light">
                                         <tr>
                                             <th scope="col" style="width: 50px;">
-                                                <div class="form-check">
+                                                {{-- <div class="form-check">
                                                     <input class="form-check-input" type="checkbox" wire:model="selectAllTagihan">
-                                                </div>
+                                                </div> --}}
                                             </th>
                                             <th class="text-uppercase">Jenis Tagihan</th>
                                             <th class="text-uppercase">Kategori</th>
-                                            <th class="text-uppercase">tagihan</th>
+                                            <th class="text-uppercase">nominal tagihan</th>
                                             <th class="text-uppercase">Jatuh Tempo</th>
                                             <th class="text-uppercase text-center">Cicilan</th>
                                             <th class="text-uppercase text-center">Status</th>
@@ -128,7 +137,7 @@
                                             <td>
                                                 @if($item['sudah_ditetapkan'])
                                                     <span class="fs-12 fw-medium">
-                                                        RP{{ number_format($item['jumlah_tagihan_siswa'] ?? 0, 0, ',', '.') }}
+                                                        Rp{{ number_format($item['jumlah_tagihan_siswa'] ?? 0, 0, ',', '.') }}
                                                     </span>
                                                 @else
                                                     <div class="input-group input-group-sm">

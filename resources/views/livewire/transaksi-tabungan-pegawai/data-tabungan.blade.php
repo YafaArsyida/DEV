@@ -73,7 +73,7 @@
                             Rp{{ number_format($totalPenarikanSebelum, 0, ',', '.') }}
                         </td>
 
-                        <td class="fs-12 text-primary">
+                        <td class="fs-12">
                             Rp{{ number_format($saldoAwal, 0, ',', '.') }}
                         </td>
 
@@ -95,7 +95,7 @@
                         </td>
                         <td>
                             <span class="fs-12 fw-medium">
-                                {!! 'RP' . number_format($item->nominal, 0, ',', '.') . ' - <i>' .
+                                {!! 'Rp' . number_format($item->nominal, 0, ',', '.') . ' - <i>' .
                                     ucfirst($item->jenis_transaksi) . '</i>' !!}
                             </span>
                             <p class="text-muted mb-0">{{ $item->deskripsi ?? '' }}</p>
@@ -104,20 +104,20 @@
                         <td class="text-center">{{ $item->ms_pengguna->nama }}</td>
                         <td class="text-center">
                             <span class="fs-12 fw-medium text-success">
-                                {{ $item->jenis_transaksi === 'setoran' ? 'RP' . number_format($item->nominal, 0, ',',
+                                {{ $item->jenis_transaksi === 'setoran' ? 'Rp' . number_format($item->nominal, 0, ',',
                                 '.') : '-' }}
                             </span>
                         </td>
                         <td class="text-center">
                             <span class="fs-12 fw-medium text-danger">
-                                {{ $item->jenis_transaksi === 'penarikan' ? 'RP' . number_format($item->nominal, 0, ',',
+                                {{ $item->jenis_transaksi === 'penarikan' ? 'Rp' . number_format($item->nominal, 0, ',',
                                 '.') : '-' }}
                             </span>
                         </td>
 
                         <td class="text-center">
-                            <span class="fs-12 fw-medium text-primary">
-                                RP{{ number_format($item->saldo, 0, ',', '.') }}
+                            <span class="fs-12 fw-medium">
+                                Rp{{ number_format($item->saldo, 0, ',', '.') }}
                             </span>
                         </td>
                         <td class="text-start">

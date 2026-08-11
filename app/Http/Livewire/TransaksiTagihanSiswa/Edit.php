@@ -2,8 +2,10 @@
 
 namespace App\Http\Livewire\TransaksiTagihanSiswa;
 
+use App\Models\AkuntansiJurnal;
 use App\Models\AkuntansiJurnalDetail;
 use App\Models\TransaksiTagihanSiswa;
+use App\Services\AccountingService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
@@ -75,27 +77,42 @@ class Edit extends Component
             'deskripsi' => $this->deskripsi,
         ];
 
-        if ($this->tanggalTransaksi) {
-            $old = Carbon::parse($this->transaksi->tanggal_transaksi);
-            $new = Carbon::parse($this->tanggalTransaksi);
+        $tanggalJurnal = null;
 
-            // gabungkan tanggal baru + jam lama
+        if ($this->tanggalTransaksi) {
+
+            $old = Carbon::parse(
+                $this->transaksi->tanggal_transaksi
+            );
+
+            $new = Carbon::parse(
+                $this->tanggalTransaksi
+            );
+
+            // Gabungkan tanggal baru dengan jam lama
             $newTanggal = $new->setTimeFrom($old);
 
             if (!$newTanggal->equalTo($old)) {
 
                 $data['tanggal_transaksi'] = $newTanggal->format('Y-m-d H:i:s');
 
-                AkuntansiJurnalDetail::whereIn('akuntansi_jurnal_detail_id', [
-                    $this->transaksi->akuntansi_jurnal_detail_debit_id,
-                    $this->transaksi->akuntansi_jurnal_detail_kredit_id,
-                ])->update([
-                    'tanggal_transaksi' => $data['tanggal_transaksi']
-                ]);
+                $tanggalJurnal = $data['tanggal_transaksi'];
             }
         }
 
+        // Update transaksi utama
         $this->transaksi->update($data);
+
+        // Update header jurnal
+        if ($this->transaksi->akuntansi_jurnal_id && $tanggalJurnal) {
+
+            AkuntansiJurnal::where(
+                'akuntansi_jurnal_id',
+                $this->transaksi->akuntansi_jurnal_id
+            )->update([
+                'tanggal_transaksi' => $tanggalJurnal,
+            ]);
+        }
     }
 
     public function updateTransaksi()

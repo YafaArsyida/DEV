@@ -42,7 +42,7 @@
         <div class="row g-3 align-items-end mb-3">
             <!-- Dropdown Transaksi -->
             <div class="col-xxl-4 col-md-6">
-                <label for="selectRekening" class="form-label">Jenis Transaksi</label>
+                <label for="selectRekening" class="form-label small text-muted text-uppercase fw-medium mb-2">Jenis Transaksi</label>
                 <select id="selectRekening" wire:model="selectedRekening" class="form-select" data-bs-toggle="tooltip"
                     data-bs-trigger="hover" data-bs-placement="top" title="Pilih Jenis Transaksi">
                     <option value="">Semua Transaksi</option>
@@ -54,11 +54,11 @@
 
             <!-- Input Pencarian -->
             <div class="col-xxl-8 col-md-6">
-                <label for="searchInput" class="form-label">Pencarian</label>
-                <div class="position-relative">
-                    <input type="text" id="searchInput" class="form-control ps-4" wire:model.debounce.300ms="search"
+                <label class="form-label small text-muted text-uppercase fw-medium mb-2">Pencarian</label>
+                <div class="search-box">
+                    <input type="text" id="searchData" class="form-control search" wire:model.debounce.300ms="search"
                         placeholder="Cari nama, deskripsi, atau lainnya...">
-                    <i class="ri-search-line position-absolute top-50 start-0 translate-middle-y ms-2 text-muted"></i>
+                    <i class="ri-search-line search-icon"></i>
                 </div>
             </div>
         </div>
@@ -71,6 +71,7 @@
                         <th class="text-start">tanggal</th>
                         <th class="text-start">transaksi</th>
                         <th>petugas</th>
+                        <th>metode</th>
                         <th>nominal</th>
                         <th>total</th>
                         <th class="text-start">aksi</th>
@@ -78,16 +79,15 @@
                 </thead>
                 <tbody>
                     <tr class="table-secondary fw-medium text-center">
-                        <td colspan="5">
+                        <td colspan="6">
                             <i class="ri-wallet-3-line me-1"></i>
                             Pendapatan Sebelum Periode
                         </td>
 
                         <td class="text-center text-success">-</td>
-
                         <td>
-                            <span class="fs-12 text-primary">
-                                RP{{ number_format($saldoAwal, 0, ',', '.') }}
+                            <span class="fs-12">
+                                Rp{{ number_format($saldoAwal, 0, ',', '.') }}
                             </span>
                         </td>
 
@@ -100,7 +100,7 @@
                         <!-- Kolom hapus -->
                         <td>
                             <a href="#deletePendapatanLainnya" data-bs-toggle="modal" class="text-danger d-inline-block remove-item-btn" 
-                            wire:click.prevent="$emit('confirmDeletePendapatanLainnya', {{ $item->ms_pendapatan_lainnya_id }})" data-bs-trigger="hover" data-bs-placement="top" title="Hapus Transaksi">
+                            wire:click.prevent="$emit('confirmDeletePendapatanLainnya', {{ $item->transaksi_pendapatan_lainnya_id }})" data-bs-trigger="hover" data-bs-placement="top" title="Hapus Transaksi">
                                 <i class="ri-delete-bin-5-fill fs-14"></i>
                             </a>
                         </td>
@@ -111,33 +111,33 @@
                         </td>
                         <td class="text-start">
                             <span class="fs-12 fw-medium">
-                                {!! 'RP' . number_format($item->nominal, 0, ',', '.') . ' - <i>' .
+                                {!! 'Rp' . number_format($item->nominal, 0, ',', '.') . ' - <i>' .
                                     ucfirst($item->akuntansi_rekening->nama_rekening) . '</i>' !!}
                             </span>
                             <p class="text-muted mb-0">{{ $item->deskripsi ?? '' }}</p>
                         </td>
                         <td>
-                            <span class="fs-12">
-                                {{ $item->metode_pembayaran }}
-                            </span>
-                            <p class="text-muted mb-0">{{ $item->ms_pengguna->nama ?? 'Tidak Diketahui' }}</p>
+                            {{ $item->ms_pengguna->nama ?? 'Tidak Diketahui' }}
+                        </td>
+                        <td>
+                            {{ $item->metode_pembayaran }}
                         </td>
                         <!-- Kolom nominal pendapatan -->
                         <td class="text-center">
                             <span class="fs-12 fw-medium text-success">
-                                RP{{ number_format($item->nominal, 0, ',', '.') }}
+                                Rp{{ number_format($item->nominal, 0, ',', '.') }}
                             </span>
                         </td>
                         <td>
-                            <span class="fs-12 fw-medium text-primary">
-                                RP{{ number_format($item->saldo, 0, ',', '.') }}
+                            <span class="fs-12 fw-medium">
+                                Rp{{ number_format($item->saldo, 0, ',', '.') }}
                             </span>
                         </td>
                         <!-- Kolom aksi -->
                         <td class="text-start">
                             <a href="#editPendapatanLainnya" 
                                 data-bs-toggle="modal" 
-                                wire:click.prevent="$emit('editPendapatanLainnya', {{ $item->ms_pendapatan_lainnya_id }})" 
+                                wire:click.prevent="$emit('editPendapatanLainnya', {{ $item->transaksi_pendapatan_lainnya_id }})" 
                                 class="btn btn-primary btn-sm rounded-pill px-3">
                                 <i class="ri-mark-pen-line me-1"></i>
                                 <span>Edit</span>
@@ -146,7 +146,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="8">
+                        <td colspan="9">
                             <div class="noresult text-center py-3">
                                 <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop"
                                     colors="primary:#405189,secondary:#08a88a" style="width:75px;height:75px">

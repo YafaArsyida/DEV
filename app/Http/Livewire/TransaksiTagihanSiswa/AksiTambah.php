@@ -7,6 +7,7 @@ use App\Models\JenisTagihanSiswa;
 use App\Models\KategoriTagihanSiswa;
 use App\Models\PenempatanSiswa;
 use App\Models\TagihanSiswa;
+use App\Services\AccountingService;
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
 
@@ -222,16 +223,17 @@ class AksiTambah extends Component
             $kode_rekening_pendapatan = 41001;
 
             foreach ($this->tagihanSelected as $id) {
-
                 if (in_array($id, $existing)) {
                     $existingIds[] = $id;
                     continue;
                 }
 
-                $jumlah = $this->normalizeAmount($this->jumlahTagihan[$id] ?? null);
+                $jumlah = $this->normalizeAmount(
+                    $this->jumlahTagihan[$id] ?? null
+                );
 
                 if ($jumlah <= 0) {
-                    throw new \Exception("Jumlah tagihan tidak valid.");
+                    throw new \Exception("Jumlah tidak valid.");
                 }
 
                 $jenis = $jenisTagihans[$id] ?? null;
@@ -240,36 +242,45 @@ class AksiTambah extends Component
                     throw new \Exception("Jenis tagihan tidak ditemukan.");
                 }
 
-                $deskripsiJurnal = "Tagihan {$jenis->nama_jenis_tagihan_siswa} siswa {$penempatan->ms_siswa->nama_siswa}";
+                $deskripsiJurnal = sprintf(
+                    'Tagihan %s siswa %s',
+                    $jenis->nama_jenis_tagihan_siswa,
+                    $penempatan->ms_siswa->nama_siswa
+                );
 
-                // 🔥 jurnal debit
-                $debitId = AkuntansiJurnalDetail::create([
-                    'kode_rekening' => $kode_rekening_piutang,
-                    'posisi' => 'debit',
-                    'nominal' => $jumlah,
-                    'tanggal_transaksi' => now(),
+                // =========================================================
+                // BUAT JURNAL
+                // =========================================================
+                $jurnal = AccountingService::create([
+                    'tanggal' => now(),
+                    'deskripsi' => $deskripsiJurnal,
                     'ms_pengguna_id' => $ms_pengguna_id,
                     'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
                     'ms_jenjang_id' => $this->ms_jenjang_id,
                     'ms_departemen_id' => 'SEKOLAH',
-                    'is_canceled' => 'active',
-                    'deskripsi' => $deskripsiJurnal,
-                ])->akuntansi_jurnal_detail_id;
 
-                // 🔥 jurnal kredit
-                $kreditId = AkuntansiJurnalDetail::create([
-                    'kode_rekening' => $kode_rekening_pendapatan,
-                    'posisi' => 'kredit',
-                    'nominal' => $jumlah,
-                    'tanggal_transaksi' => now(),
-                    'ms_pengguna_id' => $ms_pengguna_id,
-                    'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
-                    'ms_jenjang_id' => $this->ms_jenjang_id,
-                    'ms_departemen_id' => 'SEKOLAH',
-                    'is_canceled' => 'active',
-                    'deskripsi' => $deskripsiJurnal,
-                ])->akuntansi_jurnal_detail_id;
+                    'detail' => [
 
+                        // Debit Piutang
+                        [
+                            'kode_rekening' => $kode_rekening_piutang,
+                            'posisi' => 'debit',
+                            'nominal' => $jumlah,
+                        ],
+
+                        // Kredit Pendapatan
+                        [
+                            'kode_rekening' => $kode_rekening_pendapatan,
+                            'posisi' => 'kredit',
+                            'nominal' => $jumlah,
+                        ],
+
+                    ],
+                ]);
+
+                // =========================================================
+                // DATA TAGIHAN
+                // =========================================================
                 $insertData[] = [
                     'ms_penempatan_siswa_id' => $this->ms_penempatan_siswa_id,
                     'ms_jenis_tagihan_siswa_id' => $id,
@@ -277,14 +288,15 @@ class AksiTambah extends Component
                     'jumlah_tagihan_siswa' => $jumlah,
                     'status' => 'Belum Dibayar',
                     'deskripsi' => 'Tagihan baru',
-                    'akuntansi_jurnal_detail_debit_id' => $debitId,
-                    'akuntansi_jurnal_detail_kredit_id' => $kreditId,
+                    'akuntansi_jurnal_id' => $jurnal->akuntansi_jurnal_id,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
             }
 
-            // 🔥 Bulk insert (1x query)
+            // =============================================================
+            // BULK INSERT TAGIHAN
+            // =============================================================
             if (!empty($insertData)) {
                 TagihanSiswa::insert($insertData);
             }

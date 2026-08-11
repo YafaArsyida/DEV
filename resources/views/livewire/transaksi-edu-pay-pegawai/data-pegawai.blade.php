@@ -112,7 +112,7 @@
                         <label class="form-label">Nominal</label>
                         <div class="input-group">
                             <span class="input-group-text">Rp</span>
-                            <input type="number" class="form-control" placeholder="Nominal penarikan"
+                            <input type="text" class="form-control" placeholder="Nominal penarikan"
                                 wire:model.defer="nominal_penarikan"
                                 onkeyup="formatTagihan(this)">
                         </div>

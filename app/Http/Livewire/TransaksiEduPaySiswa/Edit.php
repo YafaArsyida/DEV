@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\TransaksiEduPaySiswa;
 
+use App\Models\AkuntansiJurnal;
 use App\Models\AkuntansiJurnalDetail;
 use App\Models\TransaksiEduPay;
 
@@ -69,28 +70,45 @@ class Edit extends Component
             'deskripsi' => $this->deskripsi,
         ];
 
-        if ($this->tanggal) {
-            $old = Carbon::parse($this->transaksi->tanggal);
-            $new = Carbon::parse($this->tanggal);
+        $tanggalJurnal = null;
 
-            // gabungkan tanggal baru + jam lama
+        if ($this->tanggal) {
+
+            $old = Carbon::parse(
+                $this->transaksi->tanggal
+            );
+
+            $new = Carbon::parse(
+                $this->tanggal
+            );
+
+            // Gabungkan tanggal baru + jam lama
             $newTanggal = $new->setTimeFrom($old);
 
             if (!$newTanggal->equalTo($old)) {
+                $tanggalJurnal = $newTanggal->format('Y-m-d H:i:s');
 
-                $data['tanggal'] = $newTanggal->format('Y-m-d H:i:s');
-
-                AkuntansiJurnalDetail::whereIn('akuntansi_jurnal_detail_id', [
-                    $this->transaksi->akuntansi_jurnal_detail_debit_id,
-                    $this->transaksi->akuntansi_jurnal_detail_kredit_id,
-                ])->update([
-                    'tanggal_transaksi' => $data['tanggal']
-                ]);
+                $data['tanggal'] = $tanggalJurnal;
             }
         }
 
+        // Update transaksi EduPay
         $this->transaksi->update($data);
+
+        // Update tanggal jurnal saja
+        if (
+            $this->transaksi->akuntansi_jurnal_id &&
+            $tanggalJurnal
+        ) {
+
+            AkuntansiJurnal::where(
+                'akuntansi_jurnal_id', $this->transaksi->akuntansi_jurnal_id
+            )->update([
+                'tanggal_transaksi' => $tanggalJurnal,
+            ]);
+        }
     }
+    
     protected function afterUpdateSuccess()
     {
         $this->emit('successTransaksiEduPay');

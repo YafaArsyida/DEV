@@ -2,8 +2,9 @@
 
 namespace App\Http\Livewire\TransaksiPengeluaran;
 
+use App\Models\AkuntansiJurnal;
 use App\Models\AkuntansiJurnalDetail;
-use App\Models\Pengeluaran;
+use App\Models\TransaksiPengeluaran;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
@@ -16,16 +17,16 @@ class Edit extends Component
     public $transaksi;
 
     public $tanggal; // Tanggal transaksi yang akan diedit
-    public $nominal; // Tanggal transaksi yang akan diedit
+    public $nominal; // Nominal transaksi yang akan diedit
     public $deskripsi;
 
     protected $listeners = [
         'editPengeluaran',
     ];
 
-    public function editPengeluaran($ms_pengeluaran_id)
+    public function editPengeluaran($transaksi_pengeluaran_id)
     {
-        $transaksi = Pengeluaran::findOrFail($ms_pengeluaran_id);
+        $transaksi = TransaksiPengeluaran::findOrFail($transaksi_pengeluaran_id);
 
         if (!$transaksi) {
             $this->dispatchBrowserEvent('alertify-error', ['message' => 'Transaksi tidak ditemukan.']);
@@ -59,16 +60,30 @@ class Edit extends Component
     {
         $data = [];
 
-        // Deskripsi
-        if (!empty($this->deskripsi) && $this->deskripsi !== $this->transaksi->deskripsi) {
+        // ==============================
+        // UPDATE DESKRIPSI TRANSAKSI
+        // ==============================
+        if (
+            !empty($this->deskripsi) &&
+            $this->deskripsi !== $this->transaksi->deskripsi
+        ) {
             $data['deskripsi'] = $this->deskripsi;
         }
 
-        // Tanggal (pertahankan jam lama)
+        // ==============================
+        // UPDATE TANGGAL TRANSAKSI
+        // ==============================
         if ($this->tanggal) {
-            $old = Carbon::parse($this->transaksi->tanggal);
-            $new = Carbon::parse($this->tanggal);
 
+            $old = Carbon::parse(
+                $this->transaksi->tanggal
+            );
+
+            $new = Carbon::parse(
+                $this->tanggal
+            );
+
+            // Gunakan jam transaksi lama
             $newTanggal = $new->setTimeFrom($old);
 
             if (!$newTanggal->equalTo($old)) {
@@ -76,29 +91,39 @@ class Edit extends Component
             }
         }
 
-        // Tidak ada perubahan
+        // ==============================
+        // TIDAK ADA PERUBAHAN
+        // ==============================
         if (empty($data)) {
             return;
         }
 
+        // ==============================
+        // UPDATE TRANSAKSI
+        // ==============================
         $this->transaksi->update($data);
 
-        // Sinkronkan jurnal
-        $updateJurnal = [];
+        // ==============================
+        // UPDATE HEADER JURNAL
+        // ==============================
+        if ($this->transaksi->akuntansi_jurnal_id) {
 
-        if (isset($data['tanggal'])) {
-            $updateJurnal['tanggal_transaksi'] = $data['tanggal'];
-        }
+            $jurnalData = [];
 
-        if (isset($data['deskripsi'])) {
-            $updateJurnal['deskripsi'] = $data['deskripsi'];
-        }
+            if (isset($data['deskripsi'])) {
+                $jurnalData['deskripsi'] = $data['deskripsi'];
+            }
 
-        if (!empty($updateJurnal)) {
-            AkuntansiJurnalDetail::whereIn('akuntansi_jurnal_detail_id', [
-                $this->transaksi->akuntansi_jurnal_detail_debit_id,
-                $this->transaksi->akuntansi_jurnal_detail_kredit_id,
-            ])->update($updateJurnal);
+            if (isset($data['tanggal'])) {
+                $jurnalData['tanggal_transaksi'] = $data['tanggal'];
+            }
+
+            if (!empty($jurnalData)) {
+                AkuntansiJurnal::where(
+                    'akuntansi_jurnal_id',
+                    $this->transaksi->akuntansi_jurnal_id
+                )->update($jurnalData);
+            }
         }
     }
 
@@ -114,8 +139,8 @@ class Edit extends Component
             }
 
             // Ambil ulang data + lock
-            $transaksi = Pengeluaran::lockForUpdate()
-                ->find($this->transaksi->ms_pengeluaran_id);
+            $transaksi = TransaksiPengeluaran::lockForUpdate()
+                ->find($this->transaksi->transaksi_pengeluaran_id);
 
             if (!$transaksi) {
                 throw new \Exception('Transaksi tidak ditemukan.');
@@ -131,7 +156,7 @@ class Edit extends Component
 
             $this->deskripsi = '';
 
-            $this->emit('refreshTransaksiPengeluaran');
+            $this->emit('refreshTransaksi');
 
             $this->dispatchBrowserEvent('alertify-success', [
                 'message' => 'Transaksi berhasil diperbarui.'

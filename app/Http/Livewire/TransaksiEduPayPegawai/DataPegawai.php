@@ -6,6 +6,7 @@ use App\Models\AkuntansiJurnalDetail;
 use App\Models\Pegawai;
 use App\Models\SaldoEduPay;
 use App\Models\TransaksiEduPay;
+use App\Services\AccountingService;
 use Exception;
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
@@ -91,7 +92,7 @@ class DataPegawai extends Component
 
     private function processTopUp($saldo)
     {
-        $ms_pengguna_id = Auth::id();
+        $ms_pengguna_id = auth()->user()->ms_pengguna_id;
 
         $kode_rekening_kas = 11001;
         $kode_rekening_bank = 11002;
@@ -100,106 +101,157 @@ class DataPegawai extends Component
         $debitAkunId = match ($this->jenis_transaksi_topup) {
             'topup tunai' => $kode_rekening_kas,
             'topup online' => $kode_rekening_bank,
-            default => throw new \Exception('Metode pembayaran tidak valid.')
+            default => throw new \Exception('Metode pembayaran tidak valid.'),
         };
 
-        $deskripsiJurnal = "{$this->jenis_transaksi_topup} EduPay Rp {$this->nominal_topup} pegawai {$this->nama_pegawai}";
+        $deskripsiJurnal = sprintf(
+            '%s EduPay Rp %s pegawai %s',
+            $this->jenis_transaksi_topup,
+            number_format($this->nominal_topup, 0, ',', '.'),
+            $this->nama_pegawai
+        );
 
-        $jurnalDebitId = AkuntansiJurnalDetail::create([
-            'kode_rekening' => $debitAkunId,
-            'posisi' => 'debit',
-            'nominal' => $this->nominal_topup,
-            'tanggal_transaksi' => now(),
-            'ms_pengguna_id' => $ms_pengguna_id,
-            'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
-            'ms_jenjang_id' => $this->ms_jenjang_id,
-            'ms_departemen_id' => 'SEKOLAH',
-            'is_canceled' => 'active',
+        // =========================================================
+        // BUAT JURNAL
+        // =========================================================
+        $jurnal = AccountingService::create([
+            'tanggal' => now(),
+
             'deskripsi' => $deskripsiJurnal,
-        ])->akuntansi_jurnal_detail_id;
 
-        $jurnalKreditId = AkuntansiJurnalDetail::create([
-            'kode_rekening' => $kode_rekening_edupay,
-            'posisi' => 'kredit',
-            'nominal' => $this->nominal_topup,
-            'tanggal_transaksi' => now(),
             'ms_pengguna_id' => $ms_pengguna_id,
-            'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
-            'ms_jenjang_id' => $this->ms_jenjang_id,
-            'ms_departemen_id' => 'SEKOLAH',
-            'is_canceled' => 'active',
-            'deskripsi' => $deskripsiJurnal,
-        ])->akuntansi_jurnal_detail_id;
 
+            'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
+
+            'ms_jenjang_id' => $this->ms_jenjang_id,
+
+            'ms_departemen_id' => 'SEKOLAH',
+
+            'detail' => [
+                // Debit Kas / Bank
+                [
+                    'kode_rekening' => $debitAkunId,
+                    'posisi' => 'debit',
+                    'nominal' => $this->nominal_topup,
+                ],
+
+                // Kredit Saldo EduPay
+                [
+                    'kode_rekening' => $kode_rekening_edupay,
+                    'posisi' => 'kredit',
+                    'nominal' => $this->nominal_topup,
+                ],
+
+            ],
+        ]);
+
+        // =========================================================
+        // SIMPAN TRANSAKSI EDUPAY PEGAWAI
+        // =========================================================
         TransaksiEduPay::create([
             'user_type' => 'pegawai',
+
             'user_id' => $this->ms_pegawai_id,
+
             'ms_pengguna_id' => $ms_pengguna_id,
+
             'jenis_transaksi' => $this->jenis_transaksi_topup,
+
             'nominal' => $this->nominal_topup,
+
             'tanggal' => now(),
-            'akuntansi_jurnal_detail_debit_id' => $jurnalDebitId,
-            'akuntansi_jurnal_detail_kredit_id' => $jurnalKreditId,
+
+            'akuntansi_jurnal_id' => $jurnal->akuntansi_jurnal_id,
+
             'deskripsi' => $this->deskripsi_topup,
         ]);
 
-        $saldo->increment('saldo_edupay', $this->nominal_topup);
+        // =========================================================
+        // UPDATE SALDO EDUPAY PEGAWAI
+        // =========================================================
+        $saldo->increment(
+            'saldo_edupay',
+            $this->nominal_topup
+        );
     }
 
     protected function processPenarikan($saldo)
     {
-        $ms_pengguna_id = Auth::id();
+        $ms_pengguna_id = auth()->user()->ms_pengguna_id;
 
-        // kode rekening
         $kode_rekening_kas = 11001;
         $kode_rekening_edupay = 22002;
 
-        $deskripsiJurnal = "Penarikan Tunai EduPay Rp {$this->nominal_penarikan} pegawai {$this->nama_pegawai}";
+        $deskripsiJurnal = sprintf(
+            'Penarikan Tunai EduPay Rp %s pegawai %s',
+            number_format($this->nominal_penarikan, 0, ',', '.'),
+            $this->nama_pegawai
+        );
 
-        // JURNAL DEBIT (EdupAy berkurang)
-        $jurnalDebitId = AkuntansiJurnalDetail::create([
-            'kode_rekening' => $kode_rekening_edupay,
-            'posisi' => 'debit',
-            'nominal' => $this->nominal_penarikan,
-            'tanggal_transaksi' => now(),
-            'ms_pengguna_id' => $ms_pengguna_id,
-            'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
-            'ms_jenjang_id' => $this->ms_jenjang_id,
-            'ms_departemen_id' => 'SEKOLAH',
-            'is_canceled' => 'active',
+        // =========================================================
+        // BUAT JURNAL
+        // =========================================================
+        $jurnal = AccountingService::create([
+            'tanggal' => now(),
+
             'deskripsi' => $deskripsiJurnal,
-        ])->akuntansi_jurnal_detail_id;
 
-        // JURNAL KREDIT (Kas keluar)
-        $jurnalKreditId = AkuntansiJurnalDetail::create([
-            'kode_rekening' => $kode_rekening_kas,
-            'posisi' => 'kredit',
-            'nominal' => $this->nominal_penarikan,
-            'tanggal_transaksi' => now(),
             'ms_pengguna_id' => $ms_pengguna_id,
-            'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
-            'ms_jenjang_id' => $this->ms_jenjang_id,
-            'ms_departemen_id' => 'SEKOLAH',
-            'is_canceled' => 'active',
-            'deskripsi' => $deskripsiJurnal,
-        ])->akuntansi_jurnal_detail_id;
 
-        // SIMPAN TRANSAKSI
+            'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
+
+            'ms_jenjang_id' => $this->ms_jenjang_id,
+
+            'ms_departemen_id' => 'SEKOLAH',
+
+            'detail' => [
+
+                // Debit EduPay
+                [
+                    'kode_rekening' => $kode_rekening_edupay,
+                    'posisi' => 'debit',
+                    'nominal' => $this->nominal_penarikan,
+                ],
+
+                // Kredit Kas
+                [
+                    'kode_rekening' => $kode_rekening_kas,
+                    'posisi' => 'kredit',
+                    'nominal' => $this->nominal_penarikan,
+                ],
+
+            ],
+        ]);
+
+        // =========================================================
+        // SIMPAN TRANSAKSI EDUPAY PEGAWAI
+        // =========================================================
         TransaksiEduPay::create([
             'user_type' => 'pegawai',
+
             'user_id' => $this->ms_pegawai_id,
+
             'ms_pengguna_id' => $ms_pengguna_id,
+
             'jenis_transaksi' => 'penarikan',
+
             'nominal' => $this->nominal_penarikan,
+
             'tanggal' => now(),
-            'akuntansi_jurnal_detail_debit_id' => $jurnalDebitId,
-            'akuntansi_jurnal_detail_kredit_id' => $jurnalKreditId,
+
+            'akuntansi_jurnal_id' => $jurnal->akuntansi_jurnal_id,
+
             'deskripsi' => $this->deskripsi_penarikan,
         ]);
-        // 🔥 penting: pakai object yang sama (anti race condition ringan)
-        $saldo->decrement('saldo_edupay', $this->nominal_penarikan);
-    }
 
+        // =========================================================
+        // KURANGI SALDO EDUPAY
+        // =========================================================
+        $saldo->decrement(
+            'saldo_edupay',
+            $this->nominal_penarikan
+        );
+    }
     protected function afterSuccess()
     {
         $this->reset([

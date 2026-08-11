@@ -59,12 +59,7 @@ class Manage extends Component
         $this->resetPage();
     }
 
-    public function updatingSelectedJenjang()
-    {
-        $this->resetPage();
-    }
-
-    public function updatingSelectedTahunAjar()
+     public function updatedPerPage()
     {
         $this->resetPage();
     }
@@ -182,7 +177,7 @@ class Manage extends Component
         $this->TagihanSelected = [];
 
         $this->emitSelf('$refresh');
-        $this->emit('refreshTagihans');
+        $this->emit('refreshTagihanSiswa');
     }
 
     // EDIT TAGIHAN

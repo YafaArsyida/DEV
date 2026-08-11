@@ -75,7 +75,7 @@
                             
                                 <!-- Filter Kelas -->
                                 <div class="col-xl-2 col-md-4 col-sm-6">
-                                    <label for="filterKelas" class="form-label">Kelas</label>
+                                    <label for="filterKelas" class="form-label small text-muted text-uppercase fw-medium mb-2">Kelas</label>
                                     <select id="filterKelas" wire:model="selectedKelas" class="form-select" style="cursor:pointer"
                                         data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Kelas">
                             
@@ -92,7 +92,7 @@
                             
                                 <!-- Pencarian -->
                                 <div class="col-xl-10 col-md-8 col-sm-6">
-                                    <label for="searchData" class="form-label">Pencarian</label>
+                                    <label for="searchData" class="form-label small text-muted text-uppercase fw-medium mb-2">Pencarian</label>
                                     <div class="search-box">
                                         <input type="text" id="searchData" class="form-control search" wire:model.debounce.300ms="search"
                                             placeholder="Cari nama siswa, kelas, atau lainnya...">
@@ -159,20 +159,20 @@
                                                 </td>
                                                 
                                                 <td class="text-center">
-                                                    <span class="fs-12 fw-medium text-primary">
-                                                        RP{{ number_format($item->jumlah_tagihan_siswa, 0, ',', '.') }}
+                                                    <span class="fs-12 fw-medium">
+                                                        Rp{{ number_format($item->jumlah_tagihan_siswa, 0, ',', '.') }}
                                                     </span>
                                                 </td>
                                                 
                                                 <td class="text-center">
                                                     <span class="fs-12 fw-medium text-success">
-                                                        RP{{ number_format($item->total_bayar ?? 0, 0, ',', '.') }}
+                                                        Rp{{ number_format($item->total_bayar ?? 0, 0, ',', '.') }}
                                                     </span>
                                                 </td>
                                                 
                                                 <td class="text-center">
                                                     <span class="fs-12 fw-medium text-danger">
-                                                        RP{{ number_format(($item->jumlah_tagihan_siswa - ($item->total_bayar ?? 0)), 0, ',', '.') }}
+                                                        Rp{{ number_format(($item->jumlah_tagihan_siswa - ($item->total_bayar ?? 0)), 0, ',', '.') }}
                                                     </span>
                                                 </td>
                                                 <td class="text-center">
@@ -204,14 +204,14 @@
                                         <tfoot>
                                             <tr class="fw-bold text-center">
                                                 <td colspan="6" class="text-end">TOTAL</td>
-                                                <td class="fs-12 fw-medium text-primary">
-                                                    RP{{ number_format($totalEstimasi, 0, ',', '.') }}
+                                                <td class="fs-12 fw-medium">
+                                                    Rp{{ number_format($totalEstimasi, 0, ',', '.') }}
                                                 </td>
                                                 <td class="fs-12 fw-medium text-success">
-                                                    RP{{ number_format($totalDibayarkan, 0, ',', '.') }}
+                                                    Rp{{ number_format($totalDibayarkan, 0, ',', '.') }}
                                                 </td>
                                                 <td class="fs-12 fw-medium text-danger">
-                                                    RP{{ number_format($totalKekurangan, 0, ',', '.') }}
+                                                    Rp{{ number_format($totalKekurangan, 0, ',', '.') }}
                                                 </td>
                                                 <td colspan="2"></td>
                                             </tr>

@@ -241,7 +241,7 @@
                                 </div>
                             @else
                                 <div class="table-responsive">
-                                    <table class="table table-hover nowrap align-middle" style="width:100%">
+                                    <table class="table table-hover table-nowrap align-middle" style="width:100%">
                                         <thead class="table-light">
                                             <tr>
                                                 <th scope="col" style="width: 50px;">

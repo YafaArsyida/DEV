@@ -60,7 +60,7 @@
                 <label class="form-label">Nominal</label>
                 <div class="input-group">
                     <span class="input-group-text">Rp</span>
-                    <input type="number" class="form-control" placeholder="Minimal Rp 1.000" 
+                    <input type="text" class="form-control" placeholder="Minimal Rp 1.000" 
                         wire:model.defer="nominal"
                         onkeyup="formatTagihan(this)">
                 </div>

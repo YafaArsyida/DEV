@@ -10,6 +10,7 @@ use App\Models\SaldoEduPay;
 use App\Models\TagihanSiswa;
 use App\Models\TransaksiEduPay;
 use App\Models\TransaksiTagihanSiswa;
+use App\Services\AccountingService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
@@ -164,7 +165,7 @@ class DataKeranjang extends Component
 
             $totalBayar = $keranjang->sum('jumlah_bayar');
 
-            // 🔥 Validasi metode pembayaran
+            // VALIDASI METODE PEMBAYARAN
             $mapAkun = [
                 'Teller Tunai' => 11001,
                 'Transfer ke Rekening Sekolah' => 11002,
@@ -178,43 +179,26 @@ class DataKeranjang extends Component
             $debitAkunId = $mapAkun[$this->metode_pembayaran];
             $kode_rekening_piutang = 12001;
 
-            // 🔥 Deskripsi
+            // DESKRIPSI JURNAL
             $detailTagihan = $keranjang->map(function ($item) {
-                return $item->ms_tagihan_siswa->ms_jenis_tagihan_siswa->nama_jenis_tagihan_siswa ?? '-';
+                return $item->ms_tagihan_siswa
+                    ->ms_jenis_tagihan_siswa
+                    ->nama_jenis_tagihan_siswa ?? '-';
             })->join(', ');
 
-            $deskripsiJurnal = "Pembayaran tagihan {$this->nama_siswa}, {$this->metode_pembayaran}: {$detailTagihan}";
+            $deskripsiJurnal = sprintf(
+                'Pembayaran tagihan %s, %s: %s',
+                $this->nama_siswa,
+                $this->metode_pembayaran,
+                $detailTagihan
+            );
 
-            // 🔥 Insert jurnal
-            $jurnalDebit = AkuntansiJurnalDetail::create([
-                'kode_rekening' => $debitAkunId,
-                'posisi' => 'debit',
-                'nominal' => $totalBayar,
-                'tanggal_transaksi' => now(),
-                'ms_pengguna_id' => $ms_pengguna_id,
-                'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
-                'ms_jenjang_id' => $this->ms_jenjang_id,
-                'ms_departemen_id' => 'SEKOLAH',
-                'is_canceled' => 'active',
-                'deskripsi' => $deskripsiJurnal,
-            ]);
-
-            $jurnalKredit = AkuntansiJurnalDetail::create([
-                'kode_rekening' => $kode_rekening_piutang,
-                'posisi' => 'kredit',
-                'nominal' => $totalBayar,
-                'tanggal_transaksi' => now(),
-                'ms_pengguna_id' => $ms_pengguna_id,
-                'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
-                'ms_jenjang_id' => $this->ms_jenjang_id,
-                'ms_departemen_id' => 'SEKOLAH',
-                'is_canceled' => 'active',
-                'deskripsi' => $deskripsiJurnal,
-            ]);
-
-            // 🔥 EduPay validation (WAJIB throw, bukan return)
+            // VALIDASI EDUPAY
+            // Lakukan SEBELUM membuat jurnal
             if ($this->metode_pembayaran === 'EduPay') {
-                $penempatan = PenempatanSiswa::lockForUpdate()->find($this->ms_penempatan_siswa_id);
+
+                $penempatan = PenempatanSiswa::lockForUpdate()
+                    ->find($this->ms_penempatan_siswa_id);
 
                 if (!$penempatan) {
                     throw new \Exception('Penempatan siswa tidak ditemukan.');
@@ -232,7 +216,42 @@ class DataKeranjang extends Component
                 if ($saldo->saldo_edupay < $totalBayar) {
                     throw new \Exception('Saldo EduPay tidak cukup.');
                 }
+            }
 
+            // =========================================================
+            // BUAT JURNAL PEMBAYARAN
+            // =========================================================
+            $jurnal = AccountingService::create([
+                'tanggal' => now(),
+                'deskripsi' => $deskripsiJurnal,
+                'ms_pengguna_id' => $ms_pengguna_id,
+                'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
+                'ms_jenjang_id' => $this->ms_jenjang_id,
+                'ms_departemen_id' => 'SEKOLAH',
+
+                'detail' => [
+
+                    // Debit Kas / Bank / EduPay
+                    [
+                        'kode_rekening' => $debitAkunId,
+                        'posisi' => 'debit',
+                        'nominal' => $totalBayar,
+                    ],
+
+                    // Kredit Piutang Siswa
+                    [
+                        'kode_rekening' => $kode_rekening_piutang,
+                        'posisi' => 'kredit',
+                        'nominal' => $totalBayar,
+                    ],
+
+                ],
+            ]);
+
+            // =========================================================
+            // SIMPAN TRANSAKSI EDUPAY
+            // =========================================================
+            if ($this->metode_pembayaran === 'EduPay') {
                 TransaksiEduPay::create([
                     'user_type' => 'siswa',
                     'user_id' => $penempatan->ms_siswa_id,
@@ -241,40 +260,55 @@ class DataKeranjang extends Component
                     'jenis_transaksi' => 'pembayaran',
                     'nominal' => $totalBayar,
                     'tanggal' => now(),
-                    'akuntansi_jurnal_detail_debit_id' => $jurnalDebit->akuntansi_jurnal_detail_id,
-                    'akuntansi_jurnal_detail_kredit_id' => $jurnalKredit->akuntansi_jurnal_detail_id,
+                    'akuntansi_jurnal_id' => $jurnal->akuntansi_jurnal_id,
                     'deskripsi' => $deskripsiJurnal,
                 ]);
 
                 $saldo->decrement('saldo_edupay', $totalBayar);
+
                 $this->emit('successTransaksiEduPay');
             }
 
-            // 🔥 Simpan transaksi utama
+            // =========================================================
+            // SIMPAN TRANSAKSI UTAMA
+            // =========================================================
             $transaksi = TransaksiTagihanSiswa::create([
                 'ms_penempatan_siswa_id' => $this->ms_penempatan_siswa_id,
                 'ms_pengguna_id' => $ms_pengguna_id,
                 'tanggal_transaksi' => now(),
                 'metode_pembayaran' => $this->metode_pembayaran,
                 'deskripsi' => $this->deskripsi,
-                'akuntansi_jurnal_detail_debit_id' => $jurnalDebit->akuntansi_jurnal_detail_id,
-                'akuntansi_jurnal_detail_kredit_id' => $jurnalKredit->akuntansi_jurnal_detail_id,
+                'akuntansi_jurnal_id' => $jurnal->akuntansi_jurnal_id,
             ]);
 
-            // 🔥 Loop TANPA query tambahan
+            // =========================================================
+            // DETAIL TRANSAKSI
+            // =========================================================
             foreach ($keranjang as $item) {
+
                 $tagihan = $item->ms_tagihan_siswa;
 
                 $sudah = $tagihan->jumlah_sudah_dibayar ?? 0;
-                $sisa = $tagihan->jumlah_tagihan_siswa - ($sudah + $item->jumlah_bayar);
 
-                $status = $sisa > 0 ? 'Masih Dicicil' : 'Lunas';
+                $sisa = $tagihan->jumlah_tagihan_siswa
+                    - ($sudah + $item->jumlah_bayar);
+
+                $status = $sisa > 0
+                    ? 'Masih Dicicil'
+                    : 'Lunas';
 
                 DetailTransaksiTagihanSiswa::create([
-                    'ms_transaksi_tagihan_siswa_id' => $transaksi->ms_transaksi_tagihan_siswa_id,
-                    'ms_tagihan_siswa_id' => $item->ms_tagihan_siswa_id,
-                    'jumlah_bayar' => $item->jumlah_bayar,
-                    'deskripsi' => $status,
+                    'ms_transaksi_tagihan_siswa_id' =>
+                        $transaksi->ms_transaksi_tagihan_siswa_id,
+
+                    'ms_tagihan_siswa_id' =>
+                        $item->ms_tagihan_siswa_id,
+
+                    'jumlah_bayar' =>
+                        $item->jumlah_bayar,
+
+                    'deskripsi' =>
+                        $status,
                 ]);
 
                 $tagihan->update([
@@ -282,10 +316,13 @@ class DataKeranjang extends Component
                 ]);
             }
 
-            // 🔥 Hapus keranjang
-            KeranjangTagihanSiswa::where('ms_penempatan_siswa_id', $this->ms_penempatan_siswa_id)
-                // ->where('ms_pengguna_id', $ms_pengguna_id)
-                ->delete();
+            // =========================================================
+            // HAPUS KERANJANG
+            // =========================================================
+            KeranjangTagihanSiswa::where(
+                'ms_penempatan_siswa_id',
+                $this->ms_penempatan_siswa_id
+            )->delete();
 
             $this->currentTransaksiId = $transaksi->ms_transaksi_tagihan_siswa_id;
 

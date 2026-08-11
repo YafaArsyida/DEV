@@ -38,7 +38,7 @@
                             <th scope="row">Nominal</th>
                             <td>
                                 <span class="text-danger fs-12 fw-medium ">
-                                    RP{{ number_format($transaksi->nominal, 0, ',', '.') }} - {{ $transaksi->metode_pembayaran }}
+                                    Rp{{ number_format($transaksi->nominal, 0, ',', '.') }} - {{ $transaksi->metode_pembayaran }}
                                 </span>
                             </td>
                         </tr>

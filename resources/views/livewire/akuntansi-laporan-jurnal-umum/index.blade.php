@@ -94,7 +94,7 @@
                                     </td>
 
                                     <td>
-                                        {{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($jurnal->tanggal, 'd F Y') }}
+                                        {{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($jurnal->tanggal_transaksi, 'd F Y') }}
                                     </td>
 
                                     <td>

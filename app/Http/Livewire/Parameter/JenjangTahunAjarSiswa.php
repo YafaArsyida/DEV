@@ -34,14 +34,18 @@ class JenjangTahunAjarSiswa extends Component
     {
         $debit = AkuntansiJurnalDetail::where('kode_rekening', $kodeRekening)
             ->where('posisi', 'debit')
-            ->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
-            ->where('ms_jenjang_id', $this->selectedJenjang)
+            ->whereHas('akuntansi_jurnal', function ($query) {
+                $query->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
+                    ->where('ms_jenjang_id', $this->selectedJenjang);
+            })
             ->sum('nominal');
 
         $kredit = AkuntansiJurnalDetail::where('kode_rekening', $kodeRekening)
             ->where('posisi', 'kredit')
-            ->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
-            ->where('ms_jenjang_id', $this->selectedJenjang)
+            ->whereHas('akuntansi_jurnal', function ($query) {
+                $query->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
+                    ->where('ms_jenjang_id', $this->selectedJenjang);
+            })
             ->sum('nominal');
 
         return $debit - $kredit;
@@ -49,8 +53,8 @@ class JenjangTahunAjarSiswa extends Component
 
     public function refreshSaldo()
     {
-        $this->saldoKas = $this->calculateSaldo(11001); // Rekening kas
-        $this->saldoBank = $this->calculateSaldo(11002); // Rekening bank
+        $this->saldoKas = $this->calculateSaldo(11001);
+        $this->saldoBank = $this->calculateSaldo(11002);
     }
 
     public function handleRefreshSiswas()

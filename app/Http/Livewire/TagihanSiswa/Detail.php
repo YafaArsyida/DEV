@@ -41,12 +41,7 @@ class Detail extends Component
         $this->resetPage();
     }
 
-    public function updatingSelectedJenjang()
-    {
-        $this->resetPage();
-    }
-
-    public function updatingSelectedTahunAjar()
+    public function updatedPerPage()
     {
         $this->resetPage();
     }

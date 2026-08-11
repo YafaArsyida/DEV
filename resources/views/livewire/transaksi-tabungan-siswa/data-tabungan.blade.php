@@ -73,7 +73,7 @@
                             Rp{{ number_format($totalPenarikanSebelum, 0, ',', '.') }}
                         </td>
                     
-                        <td class="fs-12 fw-medium text-primary">
+                        <td class="fs-12 fw-medium">
                             Rp{{ number_format($saldoAwal, 0, ',', '.') }}
                         </td>
                     
@@ -112,7 +112,7 @@
                             </td>
 
                             <td class="text-center">
-                                <span class="fs-12 fw-medium text-primary">
+                                <span class="fs-12 fw-medium">
                                     Rp{{ number_format($item->saldo, 0, ',', '.') }}
                                 </span>
                             </td>

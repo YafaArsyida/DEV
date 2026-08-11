@@ -94,7 +94,7 @@
                             </div>
 
                             <h5 class="mb-0">
-                                RP{{ number_format($totalKekurangan, 0, ',', '.') }}
+                                Rp{{ number_format($totalKekurangan, 0, ',', '.') }}
                             </h5>
                         </div>
                     </div>
@@ -128,7 +128,7 @@
                             </div>
 
                             <h5 class="mb-0">
-                                RP{{ number_format($totalDibayarkan, 0, ',', '.') }}
+                                Rp{{ number_format($totalDibayarkan, 0, ',', '.') }}
                             </h5>
                         </div>
                     </div>
@@ -158,7 +158,7 @@
                             </div>
 
                             <h5 class="mb-0">
-                                RP{{ number_format($saldoTabunganSiswa, 0, ',', '.') }}
+                                Rp{{ number_format($saldoTabunganSiswa, 0, ',', '.') }}
                             </h5>
                         </div>
                     </div>
@@ -191,7 +191,7 @@
                             </div>
 
                             <h5 class="mb-0">
-                                RP{{ number_format($saldoEduPaySiswa, 0, ',', '.') }}
+                                Rp{{ number_format($saldoEduPaySiswa, 0, ',', '.') }}
                             </h5>
                         </div>
                     </div>
@@ -280,18 +280,18 @@
                         <td class="text-start">{{ $item['nama_jenis'] }}</td>
                         <td class="text-start">{{ $item['nama_kategori'] }}</td>
                         <td class="text-center">
-                            <span class="fw-medium fs-12 text-primary">
-                                RP{{ number_format($item['jumlah_tagihan_siswa'], 0, ',', '.') }}
+                            <span class="fw-medium fs-12">
+                                Rp{{ number_format($item['jumlah_tagihan_siswa'], 0, ',', '.') }}
                             </span>
                         </td>
                         <td class="text-center">
                             <span class="fw-medium fs-12 text-success">
-                                RP{{ number_format($item['total_bayar'], 0, ',', '.') }}
+                                Rp{{ number_format($item['total_bayar'], 0, ',', '.') }}
                             </span>
                         </td>
                         <td class="text-center">
                             <span class="fw-medium fs-12 text-danger">
-                                RP{{ number_format($item['kekurangan'], 0, ',', '.') }}
+                                Rp{{ number_format($item['kekurangan'], 0, ',', '.') }}
                             </span>
                         </td>
                         <td>
@@ -387,18 +387,18 @@
                         <td></td>
                         <td class="text-start fw-medium">TOTAL</td>
                         <td class="text-center">
-                            <span class="fw-medium fs-12 text-primary">
-                                RP{{ number_format($totalEstimasi, 0, ',', '.') }}
+                            <span class="fw-medium fs-12">
+                                Rp{{ number_format($totalEstimasi, 0, ',', '.') }}
                             </span>
                         </td>
                         <td class="text-center">
                             <span class="fw-medium fs-12 text-success">
-                                RP{{ number_format($totalDibayarkan, 0, ',', '.') }}
+                                Rp{{ number_format($totalDibayarkan, 0, ',', '.') }}
                             </span>
                         </td>
                         <td class="text-center">
                             <span class="fw-medium fs-12 text-danger">
-                                RP{{ number_format($totalKekurangan, 0, ',', '.') }}
+                                Rp{{ number_format($totalKekurangan, 0, ',', '.') }}
                             </span>
                         </td>
                         <td colspan="2"></td>

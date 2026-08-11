@@ -6,6 +6,7 @@ use App\Models\AkuntansiJurnalDetail;
 use App\Models\Pegawai;
 use App\Models\SaldoTabungan;
 use App\Models\TransaksiTabungan;
+use App\Services\AccountingService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
@@ -37,7 +38,7 @@ class DataPegawai extends Component
 
         'pegawaiSelected',
         
-        'refreshTabungans'
+        'successTransaksiTabungan'
     ];
 
     public function updateParameters($jenjang, $tahunAjar)
@@ -56,7 +57,7 @@ class DataPegawai extends Component
         $this->alamat_pegawai = $pegawai->alamat ?? null;
     }
 
-    public function refreshTabungans()
+    public function successTransaksiTabungan()
     {
         if ($this->ms_pegawai_id) {
             $this->updateSaldoTabungan();
@@ -88,107 +89,158 @@ class DataPegawai extends Component
 
     protected function processKredit($saldo)
     {
-        $ms_pengguna_id = Auth::id();
+        $ms_pengguna_id = auth()->user()->ms_pengguna_id;
 
         $kode_rekening_kas = 11001;
         $rekening_tabungan_pegawai = 22004;
 
-        $deskripsiJurnal = "Setoran Tunai Tabungan Rp {$this->nominal_kredit} pegawai {$this->nama_pegawai}";
+        $deskripsiJurnal = sprintf(
+            'Setoran Tunai Tabungan Rp %s pegawai %s',
+            number_format($this->nominal_kredit, 0, ',', '.'),
+            $this->nama_pegawai
+        );
 
-        // Debit (Kas)
-        $jurnalDebitId = AkuntansiJurnalDetail::create([
-            'kode_rekening' => $kode_rekening_kas,
-            'posisi' => 'debit',
-            'nominal' => $this->nominal_kredit,
-            'tanggal_transaksi' => now(),
-            'ms_pengguna_id' => $ms_pengguna_id,
-            'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
-            'ms_jenjang_id' => $this->ms_jenjang_id,
-            'ms_departemen_id' => 'SEKOLAH',
-            'is_canceled' => 'active',
-            'deskripsi' => $deskripsiJurnal
-        ])->akuntansi_jurnal_detail_id;
-
-        // Kredit (Tabungan)
-        $jurnalKreditId = AkuntansiJurnalDetail::create([
-            'kode_rekening' => $rekening_tabungan_pegawai,
-            'posisi' => 'kredit',
-            'nominal' => $this->nominal_kredit,
-            'tanggal_transaksi' => now(),
-            'ms_pengguna_id' => $ms_pengguna_id,
-            'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
-            'ms_jenjang_id' => $this->ms_jenjang_id,
-            'ms_departemen_id' => 'SEKOLAH',
-            'is_canceled' => 'active',
-            'deskripsi' => $deskripsiJurnal
-        ])->akuntansi_jurnal_detail_id;
-
-        // Simpan transaksi
-        TransaksiTabungan::create([
-            'user_type' => 'pegawai',
-            'user_id' => $this->ms_pegawai_id,
-            'ms_pengguna_id' => $ms_pengguna_id,
-            'jenis_transaksi' => 'setoran',
-            'nominal' => $this->nominal_kredit,
+        // =========================================================
+        // BUAT JURNAL
+        // =========================================================
+        $jurnal = AccountingService::create([
             'tanggal' => now(),
-            'deskripsi' => $this->deskripsi_kredit,
-            'akuntansi_jurnal_detail_debit_id' => $jurnalDebitId,
-            'akuntansi_jurnal_detail_kredit_id' => $jurnalKreditId,
+
+            'deskripsi' => $deskripsiJurnal,
+
+            'ms_pengguna_id' => $ms_pengguna_id,
+
+            'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
+
+            'ms_jenjang_id' => $this->ms_jenjang_id,
+
+            'ms_departemen_id' => 'SEKOLAH',
+
+            'detail' => [
+
+                // Debit Kas
+                [
+                    'kode_rekening' => $kode_rekening_kas,
+                    'posisi' => 'debit',
+                    'nominal' => $this->nominal_kredit,
+                ],
+
+                // Kredit Tabungan Pegawai
+                [
+                    'kode_rekening' => $rekening_tabungan_pegawai,
+                    'posisi' => 'kredit',
+                    'nominal' => $this->nominal_kredit,
+                ],
+
+            ],
         ]);
 
-        // 🔥 update saldo (pakai object yg sama)
-        $saldo->increment('saldo_tabungan', $this->nominal_kredit);
+        // =========================================================
+        // SIMPAN TRANSAKSI TABUNGAN PEGAWAI
+        // =========================================================
+        TransaksiTabungan::create([
+            'user_type' => 'pegawai',
+
+            'user_id' => $this->ms_pegawai_id,
+
+            'ms_pengguna_id' => $ms_pengguna_id,
+
+            'jenis_transaksi' => 'setoran',
+
+            'nominal' => $this->nominal_kredit,
+
+            'tanggal' => now(),
+
+            'deskripsi' => $this->deskripsi_kredit,
+
+            'akuntansi_jurnal_id' => $jurnal->akuntansi_jurnal_id,
+        ]);
+
+        // =========================================================
+        // UPDATE SALDO TABUNGAN PEGAWAI
+        // =========================================================
+        $saldo->increment(
+            'saldo_tabungan',
+            $this->nominal_kredit
+        );
     }
 
     protected function processDebit($saldo)
     {
-        $ms_pengguna_id = Auth::id();
+        $ms_pengguna_id = auth()->user()->ms_pengguna_id;
 
         $kode_rekening_kas = 11001;
         $rekening_tabungan_pegawai = 22004;
 
-        $deskripsiJurnal = "Penarikan Tunai Tabungan Rp {$this->nominal_debit} pegawai {$this->nama_pegawai}";
+        $deskripsiJurnal = sprintf(
+            'Penarikan Tunai Tabungan Rp %s pegawai %s',
+            number_format($this->nominal_debit, 0, ',', '.'),
+            $this->nama_pegawai
+        );
 
-        $jurnalDebitId = AkuntansiJurnalDetail::create([
-            'kode_rekening' => $rekening_tabungan_pegawai,
-            'posisi' => 'debit',
-            'nominal' => $this->nominal_debit,
-            'tanggal_transaksi' => now(),
-            'ms_pengguna_id' => $ms_pengguna_id,
-            'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
-            'ms_jenjang_id' => $this->ms_jenjang_id,
-            'ms_departemen_id' => 'SEKOLAH',
-            'is_canceled' => 'active',
-            'deskripsi' => $deskripsiJurnal,
-        ])->akuntansi_jurnal_detail_id;
-
-        $jurnalKreditId = AkuntansiJurnalDetail::create([
-            'kode_rekening' => $kode_rekening_kas,
-            'posisi' => 'kredit',
-            'nominal' => $this->nominal_debit,
-            'tanggal_transaksi' => now(),
-            'ms_pengguna_id' => $ms_pengguna_id,
-            'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
-            'ms_jenjang_id' => $this->ms_jenjang_id,
-            'ms_departemen_id' => 'SEKOLAH',
-            'is_canceled' => 'active',
-            'deskripsi' => $deskripsiJurnal,
-        ])->akuntansi_jurnal_detail_id;
-
-        TransaksiTabungan::create([
-            'user_type' => 'pegawai',
-            'user_id' => $this->ms_pegawai_id,
-            'ms_pengguna_id' => $ms_pengguna_id,
-            'jenis_transaksi' => 'penarikan',
-            'nominal' => $this->nominal_debit,
+        // =========================================================
+        // BUAT JURNAL
+        // =========================================================
+        $jurnal = AccountingService::create([
             'tanggal' => now(),
-            'deskripsi' => $this->deskripsi_debit,
-            'akuntansi_jurnal_detail_debit_id' => $jurnalDebitId,
-            'akuntansi_jurnal_detail_kredit_id' => $jurnalKreditId,
+
+            'deskripsi' => $deskripsiJurnal,
+
+            'ms_pengguna_id' => $ms_pengguna_id,
+
+            'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
+
+            'ms_jenjang_id' => $this->ms_jenjang_id,
+
+            'ms_departemen_id' => 'SEKOLAH',
+
+            'detail' => [
+
+                // Debit Tabungan Pegawai
+                [
+                    'kode_rekening' => $rekening_tabungan_pegawai,
+                    'posisi' => 'debit',
+                    'nominal' => $this->nominal_debit,
+                ],
+
+                // Kredit Kas
+                [
+                    'kode_rekening' => $kode_rekening_kas,
+                    'posisi' => 'kredit',
+                    'nominal' => $this->nominal_debit,
+                ],
+
+            ],
         ]);
 
-        // 🔥 penting: pakai object yang sama (anti race condition ringan)
-        $saldo->decrement('saldo_tabungan', $this->nominal_debit);
+        // =========================================================
+        // SIMPAN TRANSAKSI
+        // =========================================================
+        TransaksiTabungan::create([
+            'user_type' => 'pegawai',
+
+            'user_id' => $this->ms_pegawai_id,
+
+            'ms_pengguna_id' => $ms_pengguna_id,
+
+            'jenis_transaksi' => 'penarikan',
+
+            'nominal' => $this->nominal_debit,
+
+            'tanggal' => now(),
+
+            'deskripsi' => $this->deskripsi_debit,
+
+            'akuntansi_jurnal_id' => $jurnal->akuntansi_jurnal_id,
+        ]);
+
+        // =========================================================
+        // KURANGI SALDO TABUNGAN
+        // =========================================================
+        $saldo->decrement(
+            'saldo_tabungan',
+            $this->nominal_debit
+        );
     }
 
     protected function afterSuccess()

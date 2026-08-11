@@ -5,6 +5,7 @@ namespace App\Http\Livewire\TransaksiEduPaySiswa;
 use App\Models\AkuntansiJurnalDetail;
 use App\Models\SaldoEduPay;
 use App\Models\TransaksiEduPay;
+use App\Services\AccountingService;
 use Livewire\Component;
 
 use Illuminate\Support\Facades\DB;
@@ -54,24 +55,54 @@ class Delete extends Component
 
     protected function processDelete($transaksi, $saldo)
     {
-        // 1. Update saldo dulu (biar aman secara data)
-        if (in_array($transaksi->jenis_transaksi, ['topup tunai', 'topup online', 'pengembalian dana'])) {
-            $saldo->decrement('saldo_edupay', $transaksi->nominal);
-        } elseif (in_array($transaksi->jenis_transaksi, ['penarikan', 'pembayaran', 'kantin'])) {
-            $saldo->increment('saldo_edupay', $transaksi->nominal);
+        // =========================================================
+        // 1. KEMBALIKAN SALDO EDUPAY
+        // =========================================================
+        if (in_array($transaksi->jenis_transaksi, [
+            'topup tunai',
+            'topup online',
+            'pengembalian dana',
+        ])) {
+
+            // Transaksi yang sebelumnya menambah saldo
+            // ketika dihapus → saldo dikurangi
+            $saldo->decrement(
+                'saldo_edupay',
+                $transaksi->nominal
+            );
+
+        } elseif (in_array($transaksi->jenis_transaksi, [
+            'penarikan',
+            'pembayaran',
+            'kantin',
+        ])) {
+
+            // Transaksi yang sebelumnya mengurangi saldo
+            // ketika dihapus → saldo dikembalikan
+            $saldo->increment(
+                'saldo_edupay',
+                $transaksi->nominal
+            );
         }
 
-        // 2. Tambahkan jejak audit (lebih aman setelah saldo berhasil)
+        // =========================================================
+        // 2. AUDIT TRANSAKSI
+        // =========================================================
         $transaksi->deskripsi .= " (Dihapus oleh {$this->nama_petugas})";
+
         $transaksi->save();
 
-        // Soft delete jurnal (1 query, efisien)
-        AkuntansiJurnalDetail::whereIn('akuntansi_jurnal_detail_id', [
-            $transaksi->akuntansi_jurnal_detail_debit_id,
-            $transaksi->akuntansi_jurnal_detail_kredit_id,
-        ])->delete();
+        // =========================================================
+        // 3. HAPUS JURNAL
+        // =========================================================
+        if ($transaksi->akuntansi_jurnal_id) {
 
-        // Delete transaksi
+            AccountingService::delete(
+                $transaksi->akuntansi_jurnal_id
+            );
+        }
+
+        // 4. SOFT DELETE TRANSAKSI
         $transaksi->delete();
     }
 

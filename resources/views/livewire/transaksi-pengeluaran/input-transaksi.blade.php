@@ -45,7 +45,7 @@
 
             <!-- Metode -->
             <div class="col-lg-6">
-                <label class="form-label">Metode Penerimaan</label>
+                <label class="form-label">Metode Pengeluaran</label>
                 <select wire:model.defer="metode_pembayaran" class="form-select">
                     <option value="tunai">Kas Tunai</option>
                     <option value="bank">Transfer ke Rekening Sekolah</option>
@@ -60,7 +60,7 @@
                 <label class="form-label">Nominal</label>
                 <div class="input-group">
                     <span class="input-group-text">Rp</span>
-                    <input type="number" class="form-control" placeholder="Minimal Rp 1.000" 
+                    <input type="text" class="form-control" placeholder="Minimal Rp 1.000" 
                         wire:model.defer="nominal"
                         onkeyup="formatTagihan(this)">
                 </div>

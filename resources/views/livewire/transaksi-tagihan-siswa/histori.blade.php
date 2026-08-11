@@ -66,7 +66,7 @@
                         
                                                         @if ($transaksi->infaq > 0)
                                                         <div class="text-success small">
-                                                            Infaq: RP{{ number_format($transaksi->infaq, 0, ',', '.') }}
+                                                            Infaq: Rp{{ number_format($transaksi->infaq, 0, ',', '.') }}
                                                         </div>
                                                         @endif
                                                     </div>
@@ -156,14 +156,14 @@
                                                                 </td>
                                                                 <td>{{ $transaksi->metode_pembayaran }}</td>
                                                                 {{-- <td>{{ $transaksi->ms_pengguna->nama }}</td> --}}
-                                                                <td class="text-end text-success fs-12 fw-medium">
-                                                                    RP{{ number_format($detail->jumlah_bayar, 0, ',', '.') }}
+                                                                <td class="text-end fs-12 fw-medium">
+                                                                    Rp{{ number_format($detail->jumlah_bayar, 0, ',', '.') }}
                                                                 </td>
                                                             </tr>
                                                             @endforeach
                                                             <tr>
                                                                 <td colspan="3" class="text-end fs-12 fw-medium"> Total </td>
-                                                                <td class="text-end fs-12 fw-medium text-success"> RP{{
+                                                                <td class="text-end fs-12 fw-medium"> Rp{{
                                                                     number_format($transaksi->total_jumlah_dibayarkan, 0, ',',
                                                                     '.') }} </td>
                                                             </tr>

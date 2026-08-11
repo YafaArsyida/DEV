@@ -180,7 +180,7 @@
                                                 </td>
     
                                                 <td class="text-center">
-                                                    <span class="fs-12 fw-medium text-primary">
+                                                    <span class="fs-12 fw-medium">
                                                         Rp{{ number_format($item->jumlah_tagihan_siswa, 0, ',', '.') }}
                                                     </span>
                                                 </td>
@@ -237,7 +237,7 @@
                                             <tr>
                                                 <td colspan="7" class="text-end">TOTAL</td>
                                                 <td class="text-center">
-                                                    <span class="fs-12 fw-medium text-primary">
+                                                    <span class="fs-12 fw-medium">
                                                         Rp{{ number_format($totalEstimasi, 0, ',', '.') }}
                                                     </span>
                                                 </td>

@@ -49,14 +49,14 @@
                                 <td>
                                     <span class="fw-medium">{{ $item->ms_tagihan_siswa->ms_jenis_tagihan_siswa->nama_jenis_tagihan_siswa ?? '-'  }}</span>
                                     <p class="text-muted mb-0">
-                                        RP{{ number_format($item->ms_tagihan_siswa->jumlah_tagihan_siswa ?? 0, 0, ',', '.') }}
+                                        Rp{{ number_format($item->ms_tagihan_siswa->jumlah_tagihan_siswa ?? 0, 0, ',', '.') }}
                                     </p>
                                 </td>
                         
                                 {{-- Dibayar Sekarang (di keranjang) --}}
                                 <td class="text-end">
                                     <span class="fw-medium fs-12">
-                                        RP{{ number_format($item->jumlah_bayar, 0, ',', '.') }}
+                                        Rp{{ number_format($item->jumlah_bayar, 0, ',', '.') }}
                                     </span>
                                 </td>
                             </tr>
@@ -78,7 +78,7 @@
                 <tbody>
                     <tr class="border-top border-top-dashed fs-14">
                         <th scope="row">TOTAL</th>
-                        <th class="text-end">RP{{ number_format($totalKeranjang, 0, ',', '.') }}</th>
+                        <th class="text-end">Rp{{ number_format($totalKeranjang, 0, ',', '.') }}</th>
                     </tr>
                 </tbody>
             </table>

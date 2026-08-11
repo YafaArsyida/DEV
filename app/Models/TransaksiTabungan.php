@@ -21,8 +21,7 @@ class TransaksiTabungan extends Model
         'nominal',
         'tanggal',
         'deskripsi',
-        'akuntansi_jurnal_detail_debit_id',
-        'akuntansi_jurnal_detail_kredit_id',
+        'akuntansi_jurnal_id',
     ];
 
     protected $casts = [
@@ -52,5 +51,10 @@ class TransaksiTabungan extends Model
     {
         return $this->belongsTo(Pegawai::class, 'user_id', 'ms_pegawai_id');
         // ->where('user_type', 'pegawai');
+    }
+
+    public function akuntansi_jurnal()
+    {
+        return $this->belongsTo(AkuntansiJurnal::class, 'akuntansi_jurnal_id', 'akuntansi_jurnal_id');
     }
 }

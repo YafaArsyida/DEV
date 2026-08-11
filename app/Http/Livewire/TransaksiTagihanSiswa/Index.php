@@ -116,6 +116,7 @@ class Index extends Component
     public function refreshTagihanSiswa()
     {
         $this->updateTagihan();
+        $this->loadTagihan();
     }
 
     public function successTransaksiEduPay()

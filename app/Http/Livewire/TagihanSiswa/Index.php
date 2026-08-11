@@ -35,7 +35,6 @@ class Index extends Component
     // Listener untuk Livewire
     protected $listeners = [
         'refreshTagihanSiswa' => '$refresh',
-
         'parameterUpdated' => 'updateParameters',
     ];
 
@@ -52,6 +51,16 @@ class Index extends Component
     }
 
     public function updatedPerPage()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingSelectedJenjang()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingSelectedTahunAjar()
     {
         $this->resetPage();
     }

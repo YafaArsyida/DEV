@@ -42,7 +42,7 @@
         <div class="row g-3 align-items-end mb-4">
             <!-- Jenis Rekapitulasi (paling kiri) -->
             <div class="col-xxl-2 col-md-3">
-                <label for="rekapSelect" class="form-label">Jenis Rekapitulasi</label>
+                <label for="rekapSelect" class="form-label small text-muted text-uppercase fw-medium mb-2">Jenis Rekapitulasi</label>
                 <select id="rekapSelect" wire:model="jenisRekapitulasi" class="form-select" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Jenis Rekapitulasi">
                     <option value="tagihan">Estimasi</option>
                     <option value="pembayaran">Dibayarkan</option>
@@ -52,7 +52,7 @@
 
             <!-- Pencarian (tengah) -->
             <div class="col-xxl-10 col-sm-12">
-                <label for="searchData" class="form-label">Pencarian</label>
+                <label for="searchData" class="form-label small text-muted text-uppercase fw-medium mb-2">Pencarian</label>
                 <div class="search-box">
                     <input type="text" id="searchData" class="form-control search" wire:model.debounce.300ms="search"
                         placeholder="Cari nama, deskripsi, atau lainnya...">

@@ -66,7 +66,7 @@
                         </td>
                         <td class="fs-12 text-success">Rp{{ number_format($totalMasukSebelum, 0, ',', '.') }}</td>
                         <td class="fs-12 text-danger">Rp{{ number_format($totalKeluarSebelum, 0, ',', '.') }}</td>
-                        <td class="fs-12 text-primary">Rp{{ number_format($saldoAwal, 0, ',', '.') }}</td>
+                        <td class="fs-12">Rp{{ number_format($saldoAwal, 0, ',', '.') }}</td>
                         <td></td>
                     </tr>
                     @forelse ($transaksiEduPay as $item)
@@ -115,7 +115,7 @@
                             </span>
                         </td>
                         <td class="text-center">
-                            <span class="fs-12 fw-medium text-primary">
+                            <span class="fs-12 fw-medium">
                                 Rp{{ number_format($item->saldo, 0, ',', '.') }}
                             </span>
                         </td>

@@ -2,8 +2,8 @@
 
 namespace App\Http\Livewire\TransaksiPendapatanLainnya;
 
-use App\Models\AkuntansiJurnalDetail;
-use App\Models\PendapatanLainnya;
+use App\Models\AkuntansiJurnal;
+use App\Models\TransaksiPendapatanLainnya;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
@@ -23,9 +23,9 @@ class Edit extends Component
         'editPendapatanLainnya',
     ];
 
-    public function editPendapatanLainnya($ms_pendapatan_lainnya_id)
+    public function editPendapatanLainnya($transaksi_pendapatan_lainnya_id)
     {
-        $transaksi = PendapatanLainnya::findOrFail($ms_pendapatan_lainnya_id);
+        $transaksi = TransaksiPendapatanLainnya::findOrFail($transaksi_pendapatan_lainnya_id);
 
         if (!$transaksi) {
             $this->dispatchBrowserEvent('alertify-error', ['message' => 'Transaksi tidak ditemukan.']);
@@ -54,21 +54,34 @@ class Edit extends Component
         'deskripsi.max' => 'Deskripsi maksimal 255 karakter',
     ];
     
-    protected function processUpdateTransaksi()
+   protected function processUpdateTransaksi()
     {
         $data = [];
 
-        // Deskripsi
-        if (!empty($this->deskripsi) && $this->deskripsi !== $this->transaksi->deskripsi) {
+        // ==============================
+        // UPDATE DESKRIPSI TRANSAKSI
+        // ==============================
+        if (
+            !empty($this->deskripsi) &&
+            $this->deskripsi !== $this->transaksi->deskripsi
+        ) {
             $data['deskripsi'] = $this->deskripsi;
         }
 
-        // Tanggal
+        // ==============================
+        // UPDATE TANGGAL TRANSAKSI
+        // ==============================
         if ($this->tanggal) {
-            $old = Carbon::parse($this->transaksi->tanggal);
-            $new = Carbon::parse($this->tanggal);
 
-            // gunakan jam lama
+            $old = Carbon::parse(
+                $this->transaksi->tanggal
+            );
+
+            $new = Carbon::parse(
+                $this->tanggal
+            );
+
+            // Gunakan jam transaksi lama
             $newTanggal = $new->setTimeFrom($old);
 
             if (!$newTanggal->equalTo($old)) {
@@ -76,32 +89,41 @@ class Edit extends Component
             }
         }
 
-        // Tidak ada perubahan
+        // ==============================
+        // TIDAK ADA PERUBAHAN
+        // ==============================
         if (empty($data)) {
             return;
         }
 
+        // ==============================
+        // UPDATE TRANSAKSI
+        // ==============================
         $this->transaksi->update($data);
 
-        // Update jurnal terkait
-        $updateJurnal = [];
+        // ==============================
+        // UPDATE HEADER JURNAL
+        // ==============================
+        if ($this->transaksi->akuntansi_jurnal_id) {
 
-        if (isset($data['tanggal'])) {
-            $updateJurnal['tanggal_transaksi'] = $data['tanggal'];
-        }
+            $jurnalData = [];
 
-        if (isset($data['deskripsi'])) {
-            $updateJurnal['deskripsi'] = $data['deskripsi'];
-        }
+            if (isset($data['deskripsi'])) {
+                $jurnalData['deskripsi'] = $data['deskripsi'];
+            }
 
-        if (!empty($updateJurnal)) {
-            AkuntansiJurnalDetail::whereIn('akuntansi_jurnal_detail_id', [
-                $this->transaksi->akuntansi_jurnal_detail_debit_id,
-                $this->transaksi->akuntansi_jurnal_detail_kredit_id,
-            ])->update($updateJurnal);
+            if (isset($data['tanggal'])) {
+                $jurnalData['tanggal_transaksi'] = $data['tanggal'];
+            }
+
+            if (!empty($jurnalData)) {
+                AkuntansiJurnal::where(
+                    'akuntansi_jurnal_id',
+                    $this->transaksi->akuntansi_jurnal_id
+                )->update($jurnalData);
+            }
         }
     }
-
     public function updateTransaksi()
     {
         DB::beginTransaction();
@@ -114,8 +136,8 @@ class Edit extends Component
             }
 
             // Ambil ulang data + lock
-            $transaksi = PendapatanLainnya::lockForUpdate()
-                ->find($this->transaksi->ms_pendapatan_lainnya_id);
+            $transaksi = TransaksiPendapatanLainnya::lockForUpdate()
+                ->find($this->transaksi->transaksi_pendapatan_lainnya_id);
 
             if (!$transaksi) {
                 throw new \Exception('Transaksi tidak ditemukan.');

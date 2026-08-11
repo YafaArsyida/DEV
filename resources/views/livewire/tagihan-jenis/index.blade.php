@@ -42,7 +42,7 @@
         <div class="row g-3 align-items-end mb-3">
             <!-- Pencarian -->
             <div class="col-6 col-lg-6">
-                <label for="searchTagihan" class="form-label">Pencarian</label>
+                <label for="searchTagihan" class="form-label small text-muted text-uppercase fw-medium mb-2">Pencarian</label>
                 <div class="search-box">
                     <input type="text" id="searchTagihan" class="form-control search" wire:model.debounce.300ms="search"
                         placeholder="Cari nama tagihan, kategori, atau deskripsi...">
@@ -51,7 +51,7 @@
             </div>
             <!-- Filter Kategori -->
             <div class="col-6 col-lg-3">
-                <label for="filterKategoriTagihan" class="form-label">Kategori</label>
+                <label for="filterKategoriTagihan" class="form-label small text-muted text-uppercase fw-medium mb-2">Kategori</label>
                 <select id="filterKategoriTagihan" wire:model="selectedKategoriTagihan" style="cursor: pointer"
                     class="form-select" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top"
                     title="Pilih Kategori">
@@ -64,7 +64,7 @@
                 </select>
             </div>
             <div class="col-6 col-lg-3">
-                <label for="peRpage" class="form-label">Tampilkan</label>
+                <label for="peRpage" class="form-label small text-muted text-uppercase fw-medium mb-2">Tampilkan</label>
                 <select id="peRpage" wire:model="peRpage" class="form-select" style="cursor: pointer;">
                     <option value="10">10 Data</option>
                     <option value="20">20 Data</option>

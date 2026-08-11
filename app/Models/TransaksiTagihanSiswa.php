@@ -20,8 +20,7 @@ class TransaksiTagihanSiswa extends Model
         'tanggal_transaksi',
         'metode_pembayaran',
         'deskripsi',
-        'akuntansi_jurnal_detail_debit_id',
-        'akuntansi_jurnal_detail_kredit_id',
+        'akuntansi_jurnal_id',
     ];
     /**
      * Relasi ke model PenempatanSiswa
@@ -45,8 +44,8 @@ class TransaksiTagihanSiswa extends Model
         return $this->hasMany(DetailTransaksiTagihanSiswa::class, 'ms_transaksi_tagihan_siswa_id', 'ms_transaksi_tagihan_siswa_id');
     }
 
-    public function akuntansi_jurnal_detail()
+    public function akuntansi_jurnal()
     {
-        return $this->belongsTo(AkuntansiJurnalDetail::class, 'akuntansi_jurnal_detail_id', 'akuntansi_jurnal_detail_id');
+        return $this->belongsTo(AkuntansiJurnal::class, 'akuntansi_jurnal_id', 'akuntansi_jurnal_id');
     }
 }
