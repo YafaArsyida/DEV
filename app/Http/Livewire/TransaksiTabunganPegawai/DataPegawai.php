@@ -105,15 +105,10 @@ class DataPegawai extends Component
         // =========================================================
         $jurnal = AccountingService::create([
             'tanggal' => now(),
-
             'deskripsi' => $deskripsiJurnal,
-
             'ms_pengguna_id' => $ms_pengguna_id,
-
             'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
-
             'ms_jenjang_id' => $this->ms_jenjang_id,
-
             'ms_departemen_id' => 'SEKOLAH',
 
             'detail' => [
@@ -140,19 +135,12 @@ class DataPegawai extends Component
         // =========================================================
         TransaksiTabungan::create([
             'user_type' => 'pegawai',
-
             'user_id' => $this->ms_pegawai_id,
-
             'ms_pengguna_id' => $ms_pengguna_id,
-
             'jenis_transaksi' => 'setoran',
-
             'nominal' => $this->nominal_kredit,
-
             'tanggal' => now(),
-
             'deskripsi' => $this->deskripsi_kredit,
-
             'akuntansi_jurnal_id' => $jurnal->akuntansi_jurnal_id,
         ]);
 

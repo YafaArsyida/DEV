@@ -10,7 +10,7 @@
                     </div>
                     <div class="flex-grow-1">
                         <p class="text-muted mb-1">Total Pengeluaran :</p>
-                        <h5 class="mb-0">RP{{ number_format($totalPengeluaran, 0, ',', '.') }}</h5>
+                        <h5 class="mb-0">Rp{{ number_format($totalPengeluaran, 0, ',', '.') }}</h5>
                     </div>
                 </div>
             </div>
@@ -35,11 +35,15 @@
         <!-- Input Nominal -->
         <div class="col-lg-6 mb-3">
             <label for="nominal" class="form-label">Nominal</label>
-            <div class="input-group flex-nowrap">
-                <span class="input-group-text" id="addon-wrapping">RP</span>
-                <input type="number" id="nominal" class="form-control" placeholder="Masukkan nominal, minimal RP 1.000" wire:model.defer="nominal" aria-describedby="addon-wrapping">
-                @error('nominal') <span class="text-danger">{{ $message }}</span> @enderror
+            <div class="input-group">
+                <span class="input-group-text">Rp</span>
+                <input type="text" class="form-control" placeholder="Minimal Rp 1.000" 
+                    wire:model.defer="nominal"
+                    onkeyup="formatTagihan(this)">
             </div>
+            @error('nominal')
+            <small class="text-danger">{{ $message }}</small>
+            @enderror
         </div>
 
         <!-- Pilihan Akun Tujuan -->
@@ -64,3 +68,9 @@
         </div>
     </div>     
 </div>
+<script>
+    function formatTagihan(el) {
+        let angka = el.value.replace(/\D/g, '');
+        el.value = new Intl.NumberFormat('id-ID').format(angka);
+    }
+</script>

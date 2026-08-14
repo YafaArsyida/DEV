@@ -45,7 +45,7 @@
         <div class="card-body">
             <div class="row g-3 align-items-end mb-3">
                 <div class="col-xxl-4 col-sm-6">
-                    <label for="selectJabatan" class="form-label">Jabatan</label>
+                    <label for="selectJabatan" class="form-label small text-muted text-uppercase fw-medium mb-2">Jabatan</label>
                     <select id="selectJabatan" wire:model="selectedJabatan" class="form-select" style="cursor: pointer"
                         data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Jabatan">
                         <option value="">Semua Jabatan</option>
@@ -56,7 +56,7 @@
                 </div>
                 <!-- Input Pencarian -->
                 <div class="col-xxl-8 col-sm-6">
-                    <label for="searchData" class="form-label">Pencarian</label>
+                    <label for="searchData" class="form-label small text-muted text-uppercase fw-medium mb-2">Pencarian</label>
                     <div class="search-box">
                         <input type="text" id="searchData" class="form-control search" wire:model.debounce.300ms="search"
                             placeholder="Cari nama, deskripsi, atau lainnya...">

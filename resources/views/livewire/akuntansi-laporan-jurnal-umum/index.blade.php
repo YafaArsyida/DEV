@@ -38,7 +38,7 @@
             <div class="row g-3 align-items-end mb-3">
                 <!-- Input Pencarian -->
                 <div class="col-xxl-8 col-sm-6">
-                    <label for="searchEkstrakurikuler" class="form-label">Pencarian</label>
+                    <label for="searchEkstrakurikuler" class="form-label small text-muted text-uppercase fw-medium mb-2">Pencarian</label>
                     <div class="search-box">
                         <input type="text" id="searchEkstrakurikuler" class="form-control search" wire:model.debounce.300ms="search"
                             placeholder="Cari nama, deskripsi...">
@@ -48,7 +48,7 @@
 
                 <!-- Filter Periode -->
                 <div class="col-xxl-4">
-                    <label class="form-label fw-semibold">Periode</label>
+                    <label class="form-label small text-muted text-uppercase fw-medium mb-2">Periode</label>
                     <div class="d-flex align-items-center gap-2">
                         <input type="date" class="form-control" wire:model="startDate">
                         <span class="text-muted">–</span>

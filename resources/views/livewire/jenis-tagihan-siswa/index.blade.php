@@ -37,7 +37,7 @@
         <div class="row g-3 mb-3">
             <!-- Dropdown Kategori -->
             <div class="col-xxl-2 col-sm-6">
-                <label for="filterKategoriTagihan" class="form-label">Kategori</label>
+                <label for="filterKategoriTagihan" class="form-label small text-muted text-uppercase fw-medium mb-2">Kategori</label>
                 <select id="filterKategoriTagihan" wire:model="selectedKategoriTagihan" style="cursor: pointer" class="form-select"
                     data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Kategori">
                     <option value="">Semua Kategori</option>
@@ -51,7 +51,7 @@
             
             <!-- Input Pencarian -->
             <div class="col-xxl-10 col-sm-6">
-                <label for="searchTagihan" class="form-label">Pencarian</label>
+                <label for="searchTagihan" class="form-label small text-muted text-uppercase fw-medium mb-2">Pencarian</label>
                 <div class="search-box">
                     <input type="text" id="searchTagihan" class="form-control search" wire:model.debounce.300ms="search"
                         placeholder="Cari nama, kategori, atau deskripsi...">

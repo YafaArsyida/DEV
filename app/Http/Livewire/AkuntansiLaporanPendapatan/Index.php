@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\AkuntansiLaporanPendapatan;
 
 use App\Http\Controllers\HelperController;
+use App\Models\AkuntansiJurnal;
 use App\Models\AkuntansiJurnalDetail;
 use App\Models\Jenjang;
 use Carbon\Carbon;
@@ -92,37 +93,103 @@ class Index extends Component
 
     public function render()
     {
-        $pendapatanPerBulan = AkuntansiJurnalDetail::with('akuntansi_rekening')
+        $pendapatanPerBulan = AkuntansiJurnal::with([
+            'akuntansi_jurnal_detail.akuntansi_rekening',
+        ])
             ->where('ms_jenjang_id', $this->selectedJenjang)
-            ->where('posisi', 'kredit')
             ->where('ms_departemen_id', 'SEKOLAH')
 
-            ->when($this->startDate && $this->endDate, fn($q) => $q->whereBetween('tanggal_transaksi', [
-                $this->startDate . ' 00:00:00',
-                $this->endDate . ' 23:59:59'
-            ]))
+            // ==============================
+            // FILTER TANGGAL
+            // ==============================
+            ->when(
+                $this->startDate && $this->endDate,
+                fn ($q) => $q->whereBetween('tanggal_transaksi', [
+                    $this->startDate . ' 00:00:00',
+                    $this->endDate . ' 23:59:59',
+                ])
+            )
 
-            ->whereHas('akuntansi_rekening', function ($query) {
-                $query->where('kode_rekening', 'like', '4%');
+            // ==============================
+            // HANYA JURNAL PENDAPATAN
+            // ==============================
+            ->whereHas('akuntansi_jurnal_detail', function ($query) {
+                $query
+                    ->where('posisi', 'kredit')
+                    ->whereHas('akuntansi_rekening', function ($query) {
+                        $query->where('kode_rekening', 'like', '4%');
+                    });
             })
+
             ->get()
+
+            // ==============================
+            // FLATTEN DETAIL JURNAL
+            // ==============================
+            ->flatMap(function ($jurnal) {
+
+                return $jurnal->akuntansi_jurnal_detail
+                    ->filter(function ($detail) {
+                        return $detail->posisi === 'kredit'
+                            && str_starts_with(
+                                (string) $detail->akuntansi_rekening->kode_rekening,
+                                '4'
+                            );
+                    })
+                    ->map(function ($detail) use ($jurnal) {
+
+                        return [
+                            'nama_rekening' =>
+                                $detail->akuntansi_rekening->nama_rekening,
+
+                            'tanggal_transaksi' =>
+                                $jurnal->tanggal_transaksi,
+
+                            'nominal' =>
+                                $detail->nominal,
+                        ];
+                    });
+            })
+
+            // ==============================
+            // GROUP REKENING → BULAN
+            // ==============================
             ->groupBy([
-                fn($item) => $item->akuntansi_rekening->nama_rekening,
-                fn($item) => Carbon::parse($item->tanggal_transaksi)->format('Y-m') // per bulan
+                'nama_rekening',
+                fn ($item) =>
+                    Carbon::parse($item['tanggal_transaksi'])
+                        ->format('Y-m'),
             ]);
 
-        $bulanHeaders = collect($pendapatanPerBulan)->flatMap(function ($item) {
-            return collect($item)->keys()->all();
-        })->unique()->sort()->values();
+        // ==============================
+        // HEADER BULAN
+        // ==============================
+        $bulanHeaders = collect($pendapatanPerBulan)
+            ->flatMap(function ($item) {
+                return collect($item)->keys()->all();
+            })
+            ->unique()
+            ->sort()
+            ->values();
 
+        // ==============================
+        // FORMAT BULAN INDONESIA
+        // ==============================
         $bulanIndo = $bulanHeaders->mapWithKeys(function ($bulan) {
-            return [$bulan => HelperController::formatTanggalIndonesia($bulan . '-01', 'F Y')];
+            return [
+                $bulan =>
+                    HelperController::formatTanggalIndonesia(
+                        $bulan . '-01',
+                        'F Y'
+                    ),
+            ];
         });
 
         return view('livewire.akuntansi-laporan-pendapatan.index', [
-            'pendapatanPerBulan' => $pendapatanPerBulan,
-            'bulanHeaders' => $bulanHeaders,
-            'bulanIndo' => $bulanIndo,
-        ]);
+                'pendapatanPerBulan' => $pendapatanPerBulan,
+                'bulanHeaders' => $bulanHeaders,
+                'bulanIndo' => $bulanIndo,
+            ]
+        );
     }
 }

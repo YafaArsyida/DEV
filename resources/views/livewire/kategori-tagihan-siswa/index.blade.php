@@ -37,7 +37,7 @@
         <div class="row g-3 mb-3">
             <!-- Kotak Pencarian -->
             <div class="col-xxl-12 col-sm-12">
-                <label for="searchKategori" class="form-label">Pencarian</label>
+                <label for="searchKategori" class="form-label small text-muted text-uppercase fw-medium mb-2">Pencarian</label>
                 <div class="search-box">
                     <input type="text" id="searchKategori" class="form-control search" wire:model.debounce.300ms="search"
                         placeholder="Cari kategori...">

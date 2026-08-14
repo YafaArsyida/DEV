@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-
+use App\Models\AkuntansiJurnal;
 use App\Models\AkuntansiJurnalDetail;
 use App\Models\Jenjang;
 use App\Models\TahunAjar;
@@ -29,31 +29,99 @@ class AkuntansiLaporanPengeluaran extends Controller
         }
 
 
-        $pengeluaranPerBulan = AkuntansiJurnalDetail::with('akuntansi_rekening')
+        $bebanPerBulan = AkuntansiJurnal::with([
+            'akuntansi_jurnal_detail.akuntansi_rekening',
+        ])
+            // ==========================================
+            // FILTER HEADER JURNAL
+            // ==========================================
             ->where('ms_jenjang_id', $selectedJenjang)
-            ->where('posisi', 'debit')
             ->where('ms_departemen_id', 'SEKOLAH')
 
-            ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
-                $query->whereBetween('tanggal_transaksi', [
+            // ==========================================
+            // FILTER TANGGAL
+            // ==========================================
+            ->when(
+                $startDate && $endDate,
+                fn ($q) => $q->whereBetween('tanggal_transaksi', [
                     $startDate . ' 00:00:00',
-                    $endDate . ' 23:59:59'
-                ]);
+                    $endDate . ' 23:59:59',
+                ])
+            )
+
+            // ==========================================
+            // HANYA JURNAL BEBAN
+            // ==========================================
+            ->whereHas(
+                'akuntansi_jurnal_detail',
+                function ($query) {
+                    $query
+                        ->where('posisi', 'debit')
+                        ->whereHas(
+                            'akuntansi_rekening',
+                            function ($query) {
+                                $query->where('kode_rekening', 'like', '5%');
+                            }
+                        );
+                }
+            )
+
+            ->get()
+
+            // ==========================================
+            // FLATTEN DETAIL JURNAL
+            // ==========================================
+            ->flatMap(function ($jurnal) {
+
+                return $jurnal->akuntansi_jurnal_detail
+                    ->filter(function ($detail) {
+
+                        return $detail->posisi === 'debit'
+                            && str_starts_with(
+                                (string) $detail
+                                    ->akuntansi_rekening
+                                    ->kode_rekening,
+                                '5'
+                            );
+                    })
+                    ->map(function ($detail) use ($jurnal) {
+
+                        return [
+                            'nama_rekening' =>
+                                $detail->akuntansi_rekening
+                                    ->nama_rekening,
+
+                            'tanggal_transaksi' =>
+                                $jurnal->tanggal_transaksi,
+
+                            'nominal' =>
+                                $detail->nominal,
+                        ];
+                    });
             })
 
-            ->whereHas('akuntansi_rekening', function ($query) {
-                $query->where('kode_rekening', 'like', '5%');
-            })
-            ->get()
+            // ==========================================
+            // GROUP REKENING → BULAN
+            // ==========================================
             ->groupBy([
-                fn($item) => $item->akuntansi_rekening->nama_rekening,
-                fn($item) => Carbon::parse($item->tanggal_transaksi)->format('Y-m'),
+                'nama_rekening',
+                function ($item) {
+                    return Carbon::parse(
+                        $item['tanggal_transaksi']
+                    )->format('Y-m');
+                },
             ]);
 
-        // Ambil bulan unik
-        $bulanHeaders = collect($pengeluaranPerBulan)->flatMap(function ($item) {
-            return collect($item)->keys()->all();
-        })->unique()->sort()->values();
+        // ==========================================
+        // AMBIL BULAN
+        // ==========================================
+        $bulanHeaders = collect($bebanPerBulan)
+            ->flatMap(function ($item) {
+                return collect($item)->keys()->all();
+            })
+            ->unique()
+            ->sort()
+            ->values();
 
         $bulanIndo = $bulanHeaders->mapWithKeys(function ($bulan) {
             return [$bulan => \App\Http\Controllers\HelperController::formatTanggalIndonesia($bulan . '-01', 'F Y')];
@@ -96,7 +164,7 @@ class AkuntansiLaporanPengeluaran extends Controller
         $html .= '<th>Total</th></tr></thead><tbody>';
 
         // Body
-        foreach ($pengeluaranPerBulan as $namaRekening => $dataPerBulan) {
+        foreach ($bebanPerBulan as $namaRekening => $dataPerBulan) {
             $html .= '<tr><td>' . htmlspecialchars($namaRekening) . '</td>';
             $totalRekening = 0;
 
@@ -114,7 +182,7 @@ class AkuntansiLaporanPengeluaran extends Controller
         $grandTotal = 0;
 
         foreach ($bulanIndo as $key => $namaBulan) {
-            $totalBulan = $pengeluaranPerBulan->reduce(function ($carry, $dataPerBulan) use ($key) {
+            $totalBulan = $bebanPerBulan->reduce(function ($carry, $dataPerBulan) use ($key) {
                 return $carry + optional($dataPerBulan[$key] ?? null)->sum('nominal');
             }, 0);
 

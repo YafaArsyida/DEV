@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\PenempatanSiswa;
 use App\Models\SaldoTabungan;
 use App\Models\TransaksiTabungan;
+use App\Services\AccountingService;
 
 class Withdraw extends Component
 {
@@ -98,51 +99,66 @@ class Withdraw extends Component
                     }
 
                     $deskripsi = sprintf(
-                        'Withdraw saldo tabungan akhir tahun ajaran - %s',
+                        'Withdraw saldo tabungan siswa %s',
                         $student->ms_siswa->nama_siswa
                     );
 
-                    $debit = AkuntansiJurnalDetail::create([
-                        'kode_rekening' => $kodeSaldoTabungan,
-                        'posisi' => 'debit',
-                        'nominal' => $saldo,
-                        'tanggal_transaksi' => now(),
-                        'ms_pengguna_id' => auth()->id(),
-                        'ms_tahun_ajaran_id' => $student->ms_tahun_ajar_id,
-                        'ms_jenjang_id' => $student->ms_jenjang_id,
-                        'ms_departemen_id' => 'SEKOLAH',
-                        'is_canceled' => 'active',
-                        'deskripsi' => $deskripsi,
-                    ]);
-
-                    $kredit = AkuntansiJurnalDetail::create([
-                        'kode_rekening' => $kodeKas,
-                        'posisi' => 'kredit',
-                        'nominal' => $saldo,
-                        'tanggal_transaksi' => now(),
-                        'ms_pengguna_id' => auth()->id(),
-                        'ms_tahun_ajaran_id' => $student->ms_tahun_ajar_id,
-                        'ms_jenjang_id' => $student->ms_jenjang_id,
-                        'ms_departemen_id' => 'SEKOLAH',
-                        'is_canceled' => 'active',
-                        'deskripsi' => $deskripsi,
-                    ]);
-
-                    TransaksiTabungan::create([
-                        'user_type' => 'siswa',
-                        'user_id' => $student->ms_siswa_id,
-                        'ms_penempatan_siswa_id' => $student->ms_penempatan_siswa_id,
-                        'ms_pengguna_id' => auth()->id(),
-                        'jenis_transaksi' => 'penarikan',
-                        'nominal' => $saldo,
+                    // =====================================================
+                    // BUAT JURNAL
+                    // =====================================================
+                    $jurnal = AccountingService::create([
                         'tanggal' => now(),
                         'deskripsi' => $deskripsi,
-                        'akuntansi_jurnal_detail_debit_id' => $debit->akuntansi_jurnal_detail_id,
-                        'akuntansi_jurnal_detail_kredit_id' => $kredit->akuntansi_jurnal_detail_id,
+                        'ms_pengguna_id' => auth()->user()->ms_pengguna_id,
+                        'ms_tahun_ajaran_id' => $student->ms_tahun_ajar_id,
+                        'ms_jenjang_id' => $student->ms_jenjang_id,
+                        'ms_departemen_id' => 'SEKOLAH',
+
+                        'detail' => [
+                            // Debit Saldo Tabungan
+                            [
+                                'kode_rekening' => $kodeSaldoTabungan,
+                                'posisi' => 'debit',
+                                'nominal' => $saldo,
+                            ],
+
+                            // Kredit Kas
+                            [
+                                'kode_rekening' => $kodeKas,
+                                'posisi' => 'kredit',
+                                'nominal' => $saldo,
+                            ],
+                        ],
                     ]);
 
+                    // =====================================================
+                    // SIMPAN TRANSAKSI TABUNGAN
+                    // =====================================================
+                    TransaksiTabungan::create([
+                        'user_type' => 'siswa',
+
+                        'user_id' => $student->ms_siswa_id,
+
+                        'ms_penempatan_siswa_id' => $student->ms_penempatan_siswa_id,
+
+                        'ms_pengguna_id' => auth()->user()->ms_pengguna_id,
+
+                        'jenis_transaksi' => 'penarikan',
+
+                        'nominal' => $saldo,
+
+                        'tanggal' => now(),
+
+                        'deskripsi' => $deskripsi,
+
+                        'akuntansi_jurnal_id' => $jurnal->akuntansi_jurnal_id,
+                    ]);
+
+                    // =====================================================
+                    // KOSONGKAN SALDO TABUNGAN
+                    // =====================================================
                     $saldoTabungan->update([
-                        'saldo_tabungan' => 0
+                        'saldo_tabungan' => 0,
                     ]);
 
                     $berhasil++;

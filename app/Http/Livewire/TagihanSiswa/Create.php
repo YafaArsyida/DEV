@@ -174,7 +174,7 @@ class Create extends Component
             $this->validate([
                 'siswaSelected' => 'required|array|min:1',
                 'tagihanSelected' => 'required|array|min:1',
-                'jumlahTagihan.*' => 'required|numeric|min:1',
+                'jumlahTagihan.*' => 'required',
             ]);
 
             $ms_pengguna_id = auth()->id();

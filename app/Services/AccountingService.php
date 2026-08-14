@@ -52,6 +52,7 @@ class AccountingService
             return $jurnal->load('akuntansi_jurnal_detail');
         });
     }
+    
     public static function update(int $jurnalId, array $data): AkuntansiJurnal
     {
         self::validateDetail($data['detail']);

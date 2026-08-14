@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\AkuntansiJurnal;
 use App\Models\AkuntansiJurnalDetail;
 use App\Models\Jenjang;
 use App\Models\TahunAjar;
@@ -28,32 +29,84 @@ class AkuntansiLaporanPendapatan extends Controller
             return response()->json(['error' => 'Jenjang wajib dipilih'], 400);
         }
 
-        $pendapatanPerBulan = AkuntansiJurnalDetail::with('akuntansi_rekening')
+        $pendapatanPerBulan = AkuntansiJurnal::with([
+            'akuntansi_jurnal_detail.akuntansi_rekening',
+        ])
             ->where('ms_jenjang_id', $selectedJenjang)
-            ->where('posisi', 'kredit')
             ->where('ms_departemen_id', 'SEKOLAH')
 
-            ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
-                $query->whereBetween('tanggal_transaksi', [
+            // ==============================
+            // FILTER TANGGAL
+            // ==============================
+            ->when(
+                $startDate && $endDate,
+                fn ($q) => $q->whereBetween('tanggal_transaksi', [
                     $startDate . ' 00:00:00',
-                    $endDate . ' 23:59:59'
-                ]);
-            })
+                    $endDate . ' 23:59:59',
+                ])
+            )
 
-            ->whereHas('akuntansi_rekening', function ($query) {
-                $query->where('kode_rekening', 'like', '4%');
+            // ==============================
+            // HANYA JURNAL PENDAPATAN
+            // ==============================
+            ->whereHas('akuntansi_jurnal_detail', function ($query) {
+                $query
+                    ->where('posisi', 'kredit')
+                    ->whereHas('akuntansi_rekening', function ($query) {
+                        $query->where('kode_rekening', 'like', '4%');
+                    });
             })
 
             ->get()
+
+            // ==============================
+            // FLATTEN DETAIL JURNAL
+            // ==============================
+            ->flatMap(function ($jurnal) {
+
+                return $jurnal->akuntansi_jurnal_detail
+                    ->filter(function ($detail) {
+                        return $detail->posisi === 'kredit'
+                            && str_starts_with(
+                                (string) $detail->akuntansi_rekening->kode_rekening,
+                                '4'
+                            );
+                    })
+                    ->map(function ($detail) use ($jurnal) {
+
+                        return [
+                            'nama_rekening' =>
+                                $detail->akuntansi_rekening->nama_rekening,
+
+                            'tanggal_transaksi' =>
+                                $jurnal->tanggal_transaksi,
+
+                            'nominal' =>
+                                $detail->nominal,
+                        ];
+                    });
+            })
+
+            // ==============================
+            // GROUP REKENING → BULAN
+            // ==============================
             ->groupBy([
-                fn($item) => $item->akuntansi_rekening->nama_rekening,
-                fn($item) => Carbon::parse($item->tanggal_transaksi)->format('Y-m'),
+                'nama_rekening',
+                fn ($item) =>
+                    Carbon::parse($item['tanggal_transaksi'])
+                        ->format('Y-m'),
             ]);
 
-        // Ambil bulan unik
-        $bulanHeaders = collect($pendapatanPerBulan)->flatMap(function ($item) {
-            return collect($item)->keys()->all();
-        })->unique()->sort()->values();
+        // ==============================
+        // HEADER BULAN
+        // ==============================
+        $bulanHeaders = collect($pendapatanPerBulan)
+            ->flatMap(function ($item) {
+                return collect($item)->keys()->all();
+            })
+            ->unique()
+            ->sort()
+            ->values();
 
         $bulanIndo = $bulanHeaders->mapWithKeys(function ($bulan) {
             return [$bulan => \App\Http\Controllers\HelperController::formatTanggalIndonesia($bulan . '-01', 'F Y')];

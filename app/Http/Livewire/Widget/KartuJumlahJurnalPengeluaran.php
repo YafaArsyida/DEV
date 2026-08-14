@@ -11,7 +11,6 @@ use Carbon\Carbon;
 class KartuJumlahJurnalPengeluaran extends Component
 {
     public $selectedJenjang;
-    public $selectedTahunAjar;
     public $startDate;
     public $endDate;
 
@@ -35,7 +34,6 @@ class KartuJumlahJurnalPengeluaran extends Component
     public function updateParameters($jenjang, $tahunAjar, $start = null, $end = null)
     {
         $this->selectedJenjang = $jenjang;
-        $this->selectedTahunAjar = $tahunAjar;
 
         $this->startDate = $start ?? now()->startOfMonth()->toDateString();
         $this->endDate = $end ?? now()->endOfMonth()->toDateString();
@@ -82,7 +80,7 @@ class KartuJumlahJurnalPengeluaran extends Component
 
     public function hitungPengeluaran()
     {
-        if (!$this->selectedJenjang || !$this->selectedTahunAjar) {
+        if (!$this->selectedJenjang) {
             $this->totalPengeluaran = 0;
             return;
         }
@@ -93,7 +91,6 @@ class KartuJumlahJurnalPengeluaran extends Component
             })
             ->whereHas('akuntansi_jurnal', function ($query) {
                 $query->where('ms_jenjang_id', $this->selectedJenjang)
-                    ->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
                     ->where('ms_departemen_id', 'SEKOLAH')
                     ->where('status', 'active')
                     ->whereBetween('tanggal_transaksi', [

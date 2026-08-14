@@ -67,7 +67,7 @@
 
             <!-- Dropdown Kelas -->
             <div class="col-xxl-2 col-sm-6">
-                <label for="selectKelas" class="form-label">Kelas</label>
+                <label for="selectKelas" class="form-label small text-muted text-uppercase fw-medium mb-2">Kelas</label>
                 <select
                     id="selectKelas"
                     wire:model="selectedKelas"
@@ -89,7 +89,7 @@
 
             <!-- Input Pencarian -->
             <div class="col-xxl-4 col-sm-6">
-                <label for="searchData" class="form-label">Pencarian</label>
+                <label for="searchData" class="form-label small text-muted text-uppercase fw-medium mb-2">Pencarian</label>
                 <div class="search-box">
                     <input
                         type="text"
@@ -104,7 +104,7 @@
 
             <!-- Filter Periode -->
             <div class="col-xxl-6">
-                <label class="form-label fw-semibold">Periode</label>
+                <label class="form-label small text-muted text-uppercase fw-medium mb-2">Periode</label>
 
                 <div class="d-flex align-items-center gap-2">
                     <input type="date" class="form-control" wire:model="startDate">
@@ -163,14 +163,14 @@
                                 <td>
                                     <span class="fs-12 fw-medium text-success">
                                         {{ in_array($item->jenis_transaksi, ['topup tunai', 'topup online', 'pengembalian dana']) 
-                                            ? 'RP' . number_format($item->nominal, 0, ',', '.') 
+                                            ? 'Rp' . number_format($item->nominal, 0, ',', '.') 
                                             : '-' }}
                                     </span>
                                 </td>
                                 <td>
                                     <span class="fs-12 fw-medium text-danger">
                                         {{ in_array($item->jenis_transaksi, ['penarikan', 'pembayaran', 'kantin']) 
-                                            ? 'RP' . number_format($item->nominal, 0, ',', '.') 
+                                            ? 'Rp' . number_format($item->nominal, 0, ',', '.') 
                                             : '-' }}
                                     </span>
                                 </td>
@@ -196,7 +196,7 @@
                             <td class="text-uppercase">Total Pemasukan</td>
                             <td colspan="1" class="text-end">
                                 <span class="fs-14 text-success">
-                                    RP{{ number_format($totalPemasukan, 0, ',', '.') }}
+                                    Rp{{ number_format($totalPemasukan, 0, ',', '.') }}
                                 </span>
                             </td>
                         </tr>
@@ -205,7 +205,7 @@
                             <td class="text-uppercase">Total Pengeluaran</td>
                             <td colspan="1" class="text-end">
                                 <span class="fs-14 text-danger">
-                                    RP{{ number_format($totalPengeluaran, 0, ',', '.') }}
+                                    Rp{{ number_format($totalPengeluaran, 0, ',', '.') }}
                                 </span>
                             </td>
                         </tr>
@@ -214,7 +214,7 @@
                             <td class="text-uppercase">Total Saldo</td>
                             <td colspan="1" class="text-end">
                                 <span class="fs-14 text-info">
-                                    RP{{ number_format($totalSaldo, 0, ',', '.') }}
+                                    Rp{{ number_format($totalSaldo, 0, ',', '.') }}
                                 </span>
                             </td>
                         </tr>

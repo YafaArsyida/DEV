@@ -68,9 +68,9 @@
                                             $jumlah = optional($dataPerBulan[$key] ?? null)->sum('nominal');
                                             $totalRekening += $jumlah;
                                         @endphp
-                                        <td>RP{{ number_format($jumlah, 0, ',', '.') }}</td>
+                                        <td>Rp{{ number_format($jumlah, 0, ',', '.') }}</td>
                                     @endforeach
-                                    <td><strong>RP{{ number_format($totalRekening, 0, ',', '.') }}</strong></td>
+                                    <td><strong>Rp{{ number_format($totalRekening, 0, ',', '.') }}</strong></td>
                                 </tr>
                             @endforeach
                         </tbody>   
@@ -85,9 +85,9 @@
                                         }, 0);
                                         $grandTotal += $totalBulan;
                                     @endphp
-                                    <th>RP{{ number_format($totalBulan, 0, ',', '.') }}</th>
+                                    <th>Rp{{ number_format($totalBulan, 0, ',', '.') }}</th>
                                 @endforeach
-                                <th>RP{{ number_format($grandTotal, 0, ',', '.') }}</th>
+                                <th>Rp{{ number_format($grandTotal, 0, ',', '.') }}</th>
                             </tr>
                         </tfoot>                                                     
                     </table>

@@ -48,7 +48,7 @@
         <div class="row g-3 align-items-end mb-3">
             <!-- Dropdown Kelas -->
             <div class="col-xxl-2 col-sm-6">
-                <label for="selectJabatan" class="form-label">Jabatan</label>
+                <label for="selectJabatan" class="form-label small text-muted text-uppercase fw-medium mb-2">Jabatan</label>
                 <select id="selectJabatan" wire:model="selectedJabatan" 
                         class="form-select" style="cursor: pointer"
                         data-bs-toggle="tooltip" data-bs-trigger="hover" 
@@ -61,7 +61,7 @@
             </div>
             <!-- Input Pencarian -->
             <div class="col-xxl-4 col-sm-6">
-                <label for="searchData" class="form-label">Pencarian</label>
+                <label for="searchData" class="form-label small text-muted text-uppercase fw-medium mb-2">Pencarian</label>
                 <div class="search-box">
                     <input type="text" id="searchData" class="form-control search" wire:model.debounce.300ms="search"
                         placeholder="Cari nama, deskripsi, atau lainnya...">
@@ -70,7 +70,7 @@
             </div>
             <!-- Filter Periode -->
             <div class="col-xxl-6">
-                <label class="form-label fw-semibold">Periode</label>
+                <label class="form-label small text-muted text-uppercase fw-medium mb-2">Periode</label>
                 <div class="d-flex align-items-center gap-2">
                     <input type="date" class="form-control" wire:model="startDate">
                     <span class="text-muted">–</span>

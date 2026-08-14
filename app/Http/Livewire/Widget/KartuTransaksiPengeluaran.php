@@ -4,7 +4,8 @@ namespace App\Http\Livewire\Widget;
 
 use App\Models\AkuntansiJurnalDetail;
 use App\Models\AkuntansiRekening;
-use App\Models\Pengeluaran;
+use App\Models\TransaksiPengeluaran;
+use App\Services\AccountingService;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
@@ -42,7 +43,7 @@ class KartuTransaksiPengeluaran extends Component
 
     public function loadData()
     {
-        $this->totalPengeluaran = Pengeluaran::query()
+        $this->totalPengeluaran = TransaksiPengeluaran::query()
             ->where('ms_jenjang_id', $this->selectedJenjang)
             ->sum('nominal');
     }
@@ -52,6 +53,7 @@ class KartuTransaksiPengeluaran extends Component
         DB::beginTransaction();
 
         try {
+            $this->nominal = $this->normalizeAmount($this->nominal);
             $this->validate([
                 'kode_rekening' => 'required',
                 'nominal' => 'required|numeric|min:1000',
@@ -79,63 +81,80 @@ class KartuTransaksiPengeluaran extends Component
             // ======================
             // AMBIL NAMA TRANSAKSI
             // ======================
-            $namaTransaksi = AkuntansiRekening::where('kode_rekening', $this->kode_rekening)
-                ->value('nama_rekening');
+            $namaTransaksi = AkuntansiRekening::where(
+                'kode_rekening',
+                $this->kode_rekening
+            )->value('nama_rekening');
 
-            $deskripsi = trim("{$namaTransaksi} Rp {$this->nominal} {$this->deskripsi}");
+            $deskripsi = trim(
+                "{$namaTransaksi} Rp {$this->nominal} {$this->deskripsi}"
+            );
 
-            // ======================
-            // COMMON DATA
-            // ======================
-            $baseData = [
-                'nominal' => $this->nominal,
-                'tanggal_transaksi' => now(),
-                'ms_pengguna_id' => auth()->id(),
-                'ms_jenjang_id' => $this->selectedJenjang,
-                'ms_departemen_id' => 'SEKOLAH',
-                'deskripsi' => $deskripsi,
-            ];
-
-            // ======================
-            // JURNAL DEBIT
-            // ======================
-            $jurnalDebit = AkuntansiJurnalDetail::create(array_merge($baseData, [
-                'kode_rekening' => $this->kode_rekening,
-                'posisi' => 'debit',
-            ]));
-
-            // ======================
-            // JURNAL KREDIT
-            // ======================
-            $jurnalKredit = AkuntansiJurnalDetail::create(array_merge($baseData, [
-                'kode_rekening' => $kodeRekeningKredit,
-                'posisi' => 'kredit',
-            ]));
-
-            // ======================
-            // SIMPAN TRANSAKSI
-            // ======================
-            Pengeluaran::create([
-                'ms_pengguna_id' => auth()->id(),
-                'ms_jenjang_id' => $this->selectedJenjang,
-                'kode_rekening' => $this->kode_rekening,
-                'nominal' => $this->nominal,
-                'metode_pembayaran' => $this->metode_pembayaran,
+            // =====================================================
+            // BUAT JURNAL
+            // =====================================================
+            $jurnal = AccountingService::create([
                 'tanggal' => now(),
+
                 'deskripsi' => $deskripsi,
-                'akuntansi_jurnal_detail_debit_id' => $jurnalDebit->akuntansi_jurnal_detail_id,
-                'akuntansi_jurnal_detail_kredit_id' => $jurnalKredit->akuntansi_jurnal_detail_id,
+
+                'ms_pengguna_id' => auth()->user()->ms_pengguna_id,
+
+                'ms_tahun_ajaran_id' => null,
+
+                'ms_jenjang_id' => $this->selectedJenjang,
+
+                'ms_departemen_id' => 'SEKOLAH',
+
+                'detail' => [
+                    // Debit Pengeluaran
+                    [
+                        'kode_rekening' => $this->kode_rekening,
+                        'posisi' => 'debit',
+                        'nominal' => $this->nominal,
+                    ],
+
+                    // Kredit Kas / Bank
+                    [
+                        'kode_rekening' => $kodeRekeningKredit,
+                        'posisi' => 'kredit',
+                        'nominal' => $this->nominal,
+                    ],
+                ],
             ]);
 
-            // ======================
+            // =====================================================
+            // SIMPAN TRANSAKSI PENGELUARAN
+            // =====================================================
+            TransaksiPengeluaran::create([
+                'ms_pengguna_id' => auth()->user()->ms_pengguna_id,
+
+                'ms_jenjang_id' => $this->selectedJenjang,
+
+                'kode_rekening' => $this->kode_rekening,
+
+                'nominal' => $this->nominal,
+
+                'metode_pembayaran' => $this->metode_pembayaran,
+
+                'tanggal' => now(),
+
+                'deskripsi' => $deskripsi,
+
+                'akuntansi_jurnal_id' =>
+                    $jurnal->akuntansi_jurnal_id,
+            ]);
+
+            // =====================================================
             // COMMIT
-            // ======================
+            // =====================================================
             DB::commit();
 
             // ======================
             // RESET & FEEDBACK
             // ======================
-            $this->reset(['nominal', 'deskripsi']);
+            $this->reset(['deskripsi']);
+            $this->nominal = 0;
             $this->loadData();
 
             $this->emit('refreshJurnalHariIni');
@@ -154,5 +173,13 @@ class KartuTransaksiPengeluaran extends Component
     public function render()
     {
         return view('livewire.widget.kartu-transaksi-pengeluaran');
+    }
+     private function normalizeAmount($value)
+    {
+        if ($value === null || $value === '') {
+            return 0;
+        }
+
+        return (int) str_replace('.', '', $value);
     }
 }

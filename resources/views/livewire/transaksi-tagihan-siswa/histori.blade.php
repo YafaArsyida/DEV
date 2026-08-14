@@ -162,8 +162,8 @@
                                                             </tr>
                                                             @endforeach
                                                             <tr>
-                                                                <td colspan="3" class="text-end fs-12 fw-medium"> Total </td>
-                                                                <td class="text-end fs-12 fw-medium"> Rp{{
+                                                                <td colspan="3" class="text-end fs-12 fw-semibold"> Total </td>
+                                                                <td class="text-end fs-12 fw-semibold"> Rp{{
                                                                     number_format($transaksi->total_jumlah_dibayarkan, 0, ',',
                                                                     '.') }} </td>
                                                             </tr>

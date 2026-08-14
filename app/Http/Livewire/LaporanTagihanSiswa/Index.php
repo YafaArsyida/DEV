@@ -88,6 +88,7 @@ class Index extends Component
         // $this->endDate = $filters['endDate'] ?? null;
         $this->selectedKategoriTagihan = $filters['selectedKategoriTagihan'] ?? [];
         $this->selectedJenisTagihan = $filters['selectedJenisTagihan'] ?? [];
+        $this->resetPage(); // Reset paginasi saat pencarian berubah
     }
 
     public function clearFilters()
@@ -95,6 +96,7 @@ class Index extends Component
         // $this->endDate = Carbon::now()->endOfMonth()->toDateString();
         $this->selectedKategoriTagihan = [];
         $this->selectedJenisTagihan = [];
+        $this->resetPage(); // Reset paginasi saat pencarian berubah
     }
 
     public function kirimWhatsappTagihan($msPenempatanSiswaId)
@@ -242,8 +244,9 @@ class Index extends Component
     public function updatedEndDate()
     {
         $this->dispatchBrowserEvent('alertify-success', [
-            'message' => 'Tanggal diperbarui'
+            'message' => 'Jatuh tempo diperbarui'
         ]);
+        $this->resetPage(); // Reset paginasi saat pencarian berubah
     }
 
     public function resetTanggal()
@@ -251,6 +254,7 @@ class Index extends Component
         $this->endDate = Carbon::now()->endOfMonth()->toDateString();
 
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
+        $this->resetPage(); // Reset paginasi saat pencarian berubah
     }
 
     public function render()
@@ -269,7 +273,6 @@ class Index extends Component
                     ->withSum('dt_transaksi_tagihan_siswa as jumlah_sudah_dibayar', 'jumlah_bayar')
                     ->where('status', '!=', 'Lunas')
                     ->whereHas('ms_jenis_tagihan_siswa', function ($q2) use ($endDate) {
-
                         $q2->where('tanggal_jatuh_tempo', '<=', $endDate);
 
                         if (!empty($this->selectedKategoriTagihan)) {
@@ -295,6 +298,21 @@ class Index extends Component
             $penempatanQuery->where('ms_kelas_id', $this->selectedKelas);
         }
 
+        $penempatanQuery->whereHas('ms_tagihan_siswa', function ($q) use ($endDate) {
+            $q->where('status', '!=', 'Lunas')
+                ->whereHas('ms_jenis_tagihan_siswa', function ($q2) use ($endDate) {
+                    $q2->where('tanggal_jatuh_tempo', '<=', $endDate);
+
+                    if (!empty($this->selectedKategoriTagihan)) {
+                        $q2->whereIn('ms_kategori_tagihan_siswa_id', $this->selectedKategoriTagihan);
+                    }
+                });
+
+            if (!empty($this->selectedJenisTagihan)) {
+                $q->whereIn('ms_jenis_tagihan_siswa_id', $this->selectedJenisTagihan);
+            }
+        });
+
         $penempatans = $penempatanQuery
             ->paginate($this->perPage);
 
@@ -305,10 +323,7 @@ class Index extends Component
         $laporans = collect();
 
         foreach ($penempatans as $p) {
-
             $tagihan = $p->ms_tagihan_siswa;
-
-            if ($tagihan->isEmpty()) continue;
 
             $laporans->push([
                 'ms_penempatan_siswa_id' => $p->ms_penempatan_siswa_id,
@@ -324,7 +339,6 @@ class Index extends Component
                 'rincian_tagihan' => $tagihan
                     ->sortBy(fn($t) => $t->ms_jenis_tagihan_siswa->tanggal_jatuh_tempo)
                     ->map(function ($t) {
-
                         $dibayar = $t->jumlah_sudah_dibayar ?? 0;
 
                         return [

@@ -241,6 +241,7 @@ Route::middleware(['auth', 'peran:SUPERADMIN,ADMINISTRASI'])->group(function () 
 
     // laporan akuntansi
     Route::get('/akuntansi/laporan-buku-besar',  [AkuntansiLaporanBukuBesar::class, 'index'])->name('akuntansi.laporan-buku-besar');
+    Route::get('/akuntansi/laporan-buku-besar/pdf',  [AkuntansiLaporanBukuBesar::class, 'cetakPDF'])->name('akuntansi.laporan-buku-besar.pdf');
 
     // jurnal keuangan
     Route::get('/akuntansi/laporan-jurnal-umum',  [AkuntansiLaporanJurnalUmum::class, 'index'])->name('akuntansi.laporan-jurnal-umum');

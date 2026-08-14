@@ -17,7 +17,6 @@ class KartuJurnalDetail extends Component
     public $perPage = 50;
 
     public $selectedJenjang = null;
-    public $selectedTahunAjar = null;
 
     protected $listeners = [
         'parameterUpdated' => 'updateParameters',
@@ -38,7 +37,6 @@ class KartuJurnalDetail extends Component
     {
         // Update nilai selectedJenjang dan selectedTahunAjar
         $this->selectedJenjang = $jenjang;
-        $this->selectedTahunAjar = $tahunAjar;
     }
 
     public function render()
@@ -47,10 +45,8 @@ class KartuJurnalDetail extends Component
                 'akuntansi_jurnal_detail.akuntansi_rekening',
                 'ms_pengguna',
             ])
-            ->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
             ->where('ms_jenjang_id', $this->selectedJenjang)
             ->where('ms_departemen_id', 'SEKOLAH')
-            ->where('status', 'active')
             ->whereDate('tanggal_transaksi', Carbon::today())
 
             ->orderBy('tanggal_transaksi', 'asc')

@@ -2,13 +2,13 @@
 
 namespace App\Http\Livewire\LaporanEduPaySiswa;
 
-use App\Models\AkuntansiJurnalDetail;
 use App\Models\PenempatanSiswa;
 use App\Models\SaldoEduPay;
 use App\Models\TransaksiEduPay;
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Eloquent\Builder;
+
+use App\Services\AccountingService;
 
 class Withdraw extends Component
 {
@@ -101,51 +101,56 @@ class Withdraw extends Component
                         $student->ms_siswa->nama_siswa
                     );
 
-                    // Jurnal Debit
-                    $debit = AkuntansiJurnalDetail::create([
-                        'kode_rekening' => $kodeSaldoEduPay,
-                        'posisi' => 'debit',
-                        'nominal' => $saldo,
-                        'tanggal_transaksi' => now(),
-                        'ms_pengguna_id' => auth()->id(),
+                    // =====================================================
+                    // BUAT JURNAL
+                    // =====================================================
+                    $jurnal = AccountingService::create([
+                        'tanggal' => now(),
+                        'deskripsi' => $deskripsi,
+                        'ms_pengguna_id' => auth()->user()->ms_pengguna_id,
                         'ms_tahun_ajaran_id' => $student->ms_tahun_ajar_id,
                         'ms_jenjang_id' => $student->ms_jenjang_id,
                         'ms_departemen_id' => 'SEKOLAH',
-                        'is_canceled' => 'active',
-                        'deskripsi' => $deskripsi,
+
+                        'detail' => [
+
+                            // Debit Saldo EduPay
+                            [
+                                'kode_rekening' => $kodeSaldoEduPay,
+                                'posisi' => 'debit',
+                                'nominal' => $saldo,
+                            ],
+
+                            // Kredit Kas
+                            [
+                                'kode_rekening' => $kodeKas,
+                                'posisi' => 'kredit',
+                                'nominal' => $saldo,
+                            ],
+                        ],
                     ]);
 
-                    // Jurnal Kredit
-                    $kredit = AkuntansiJurnalDetail::create([
-                        'kode_rekening' => $kodeKas,
-                        'posisi' => 'kredit',
-                        'nominal' => $saldo,
-                        'tanggal_transaksi' => now(),
-                        'ms_pengguna_id' => auth()->id(),
-                        'ms_tahun_ajaran_id' => $student->ms_tahun_ajar_id,
-                        'ms_jenjang_id' => $student->ms_jenjang_id,
-                        'ms_departemen_id' => 'SEKOLAH',
-                        'is_canceled' => 'active',
-                        'deskripsi' => $deskripsi,
-                    ]);
-
-                    // Simpan transaksi penarikan EduPay
+                    // =====================================================
+                    // SIMPAN TRANSAKSI PENARIKAN EDUPAY
+                    // =====================================================
                     TransaksiEduPay::create([
                         'user_type' => 'siswa',
                         'user_id' => $student->ms_siswa_id,
                         'ms_penempatan_siswa_id' => $student->ms_penempatan_siswa_id,
-                        'ms_pengguna_id' => auth()->id(),
+                        'ms_pengguna_id' => auth()->user()->ms_pengguna_id,
                         'jenis_transaksi' => 'penarikan',
                         'nominal' => $saldo,
                         'tanggal' => now(),
                         'deskripsi' => $deskripsi,
-                        'akuntansi_jurnal_detail_debit_id' => $debit->akuntansi_jurnal_detail_id,
-                        'akuntansi_jurnal_detail_kredit_id' => $kredit->akuntansi_jurnal_detail_id,
+                        'akuntansi_jurnal_id' => $jurnal->akuntansi_jurnal_id,
                     ]);
 
+                    // =====================================================
+                    // KOSONGKAN SALDO EDUPAY
+                    // =====================================================
                     $saldoEduPay->update([
-                            'saldo_edupay' => 0
-                        ]);
+                        'saldo_edupay' => 0,
+                    ]);
 
                     $berhasil++;
                 }
