@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\AkuntansiJurnal;
 use App\Models\AkuntansiJurnalDetail;
 use App\Models\Jenjang;
 use App\Models\TahunAjar;
@@ -16,42 +17,122 @@ class AkuntansiLaporanJurnalUmum extends Controller
     {
         return view('LAPORAN-AKUNTANSI.laporan-jurnal-umum.v_index');
     }
+    
     public function cetakPDF(Request $request)
     {
         $selectedJenjang = $request->jenjang;
-        $selectedTahunAjar = $request->tahun;
-        $startDate = $request->start_date;
-        $endDate = $request->end_date;
-        $search = $request->search;
+        $startDate       = $request->start_date;
+        $endDate         = $request->end_date;
+        $search          = trim($request->search ?? '');
 
-        $jenjang = Jenjang::find($selectedJenjang);
-        $tahunAjar = TahunAjar::find($selectedTahunAjar);
-
-        if (!$selectedJenjang || !$selectedTahunAjar) {
-            return response()->json(['error' => 'Jenjang dan Tahun Ajar wajib dipilih'], 400);
+        if (!$selectedJenjang) {
+            return response()->json([
+                'error' => 'Jenjang wajib dipilih'
+            ], 400);
         }
 
-        $data = AkuntansiJurnalDetail::with('akuntansi_rekening', 'ms_pengguna')
+        $jenjang = Jenjang::find($selectedJenjang);
+
+        if (!$jenjang) {
+            return response()->json([
+                'error' => 'Jenjang tidak ditemukan'
+            ], 404);
+        }
+
+        $data = AkuntansiJurnal::with([
+            'akuntansi_jurnal_detail.akuntansi_rekening',
+            'ms_pengguna',
+        ])
             ->where('ms_jenjang_id', $selectedJenjang)
-            ->where('ms_tahun_ajaran_id', $selectedTahunAjar)
-            ->when($startDate && $endDate, function ($q) use ($startDate, $endDate) {
-                $start = Carbon::createFromFormat('Y-m-d', $startDate)->startOfDay();
-                $end   = Carbon::createFromFormat('Y-m-d', $endDate)->endOfDay();
+            ->where('ms_departemen_id', 'SEKOLAH')
 
-                $q->whereBetween('tanggal_transaksi', [$start, $end]);
-            })
-            ->when($search, fn($q) => $q->where('deskripsi', 'like', "%{$search}%"))
-            ->orderBy('tanggal_transaksi')
-            ->get()
-            ->groupBy(['deskripsi', 'nominal']);
+            // FILTER PERIODE
+            ->when(
+                $startDate && $endDate,
+                function ($query) use ($startDate, $endDate) {
 
+                    $start = Carbon::createFromFormat(
+                        'Y-m-d',
+                        $startDate
+                    )->startOfDay();
+
+                    $end = Carbon::createFromFormat(
+                        'Y-m-d',
+                        $endDate
+                    )->endOfDay();
+
+                    $query->whereBetween(
+                        'tanggal_transaksi',
+                        [$start, $end]
+                    );
+                }
+            )
+
+            // SEARCH
+            // Sama dengan halaman index
+            // ======================================
+            ->when(
+                $search,
+                function ($query) use ($search) {
+                    $query->where(function ($query) use ($search) {
+                        // Deskripsi jurnal
+                        $query->where(
+                            'deskripsi',
+                            'like',
+                            "%{$search}%"
+                        )
+                        // Nomor jurnal
+                        ->orWhere(
+                            'nomor_jurnal',
+                            'like',
+                            "%{$search}%"
+                        )
+
+                        // Kode rekening
+                        ->orWhereHas(
+                            'akuntansi_jurnal_detail',
+                            function ($query) use ($search) {
+                                $query->where(
+                                    'kode_rekening',
+                                    'like',
+                                    "%{$search}%"
+                                );
+                            }
+                        );
+                    });
+                }
+            )
+
+            // URUTAN JURNAL
+            ->orderBy('tanggal_transaksi', 'asc')
+            ->orderBy('akuntansi_jurnal_id', 'asc')
+
+            ->get();
+
+        // ==========================================
+        // JUDUL
+        // ==========================================
         $judul = 'Laporan Jurnal Keuangan';
-        $yayasan = 'Yayasan Drul Khukama Unit ' . ($jenjang->nama_jenjang ?? '-') . ' Tahun Ajaran ' . ($tahunAjar->nama_tahun_ajar ?? '-');
 
-        if ($request->start_date && $request->end_date) {
-            $periode = 'Periode ' . \App\Http\Controllers\HelperController::formatTanggalIndonesia($request->start_date, 'd F Y') .
-                ' sampai ' . \App\Http\Controllers\HelperController::formatTanggalIndonesia($request->end_date, 'd F Y');
+        $yayasan = 'Yayasan Drul Khukama Unit ' . ($jenjang->nama_jenjang ?? '-');
+
+        // PERIODE
+        // ==========================================
+        if ($startDate && $endDate) {
+            $periode =
+                'Periode ' .
+                \App\Http\Controllers\HelperController::formatTanggalIndonesia(
+                    $startDate,
+                    'd F Y'
+                ) .
+                ' sampai ' .
+                \App\Http\Controllers\HelperController::formatTanggalIndonesia(
+                    $endDate,
+                    'd F Y'
+                );
+
         } else {
+
             $periode = 'Semua Periode';
         }
 
@@ -72,40 +153,66 @@ class AkuntansiLaporanJurnalUmum extends Controller
         $pdf::setCellHeightRatio(1.2);
 
         $html = '<table border="0.5" cellspacing="0" style="width:100%;">
-        <thead>
-            <tr style="background-color: #f5f5f5;">
-                <th width="3%">No</th>
-                <th width="10%">Tanggal</th>
-                <th width="10%">Petugas</th>
-                <th width="37%">Deskripsi</th>
-                <th width="15%">Akun Debit</th>
-                <th width="15%">Akun Kredit</th>
-                <th width="10%" align="left">Nominal</th>
-            </tr>
-        </thead>
-        <tbody>';
-
+            <thead>
+                <tr style="background-color: #f5f5f5;">
+                    <th width="3%">No</th>
+                    <th width="10%">Tanggal</th>
+                    <th width="37%">Deskripsi Transaksi</th>
+                    <th width="10%">Petugas</th>
+                    <th width="15%">Akun Debit</th>
+                    <th width="15%">Akun Kredit</th>
+                    <th width="10%" align="left">Nominal</th>
+                </tr>
+            </thead>
+            <tbody>';
+            
         $no = 1;
-        foreach ($data as $deskripsi => $itemsByNominal) {
-            foreach ($itemsByNominal as $nominal => $transaksi) {
-                $debit = $transaksi->where('posisi', 'debit')->first();
-                $kredit = $transaksi->where('posisi', 'kredit')->first();
-                $tanggal = optional($transaksi->first())->tanggal_transaksi;
-                $petugas = $debit->ms_pengguna->nama ?? ($kredit->ms_pengguna->nama ?? '-');
+        foreach ($data as $jurnal) {
+            $debit = $jurnal->akuntansi_jurnal_detail->where('posisi', 'debit');
+            $kredit = $jurnal->akuntansi_jurnal_detail->where('posisi', 'kredit');
 
-                $html .= '<tr>
+            $akunDebit = $debit->map(
+                fn($detail) => $detail->kode_rekening . ' - ' .
+                    ($detail->akuntansi_rekening->nama_rekening ?? '-')
+            )->implode('<br>') ?: '-';
+
+            $akunKredit = $kredit->map(
+                fn($detail) => $detail->kode_rekening . ' - ' .
+                    ($detail->akuntansi_rekening->nama_rekening ?? '-')
+            )->implode('<br>') ?: '-';
+
+            $tanggal = $jurnal->tanggal_transaksi ? HelperController::formatTanggalIndonesia($jurnal->tanggal_transaksi, 'd F Y') : '-';
+
+            $deskripsi = htmlspecialchars(
+                $jurnal->deskripsi ?? '-',
+                ENT_QUOTES,
+                'UTF-8'
+            );
+
+            $petugas = htmlspecialchars(
+                $jurnal->ms_pengguna->nama ?? '-',
+                ENT_QUOTES,
+                'UTF-8'
+            );
+
+            $nominal = number_format($debit->sum('nominal'), 0, ',', '.');
+
+           $html .= '
+            <tr>
                 <td width="3%" align="center">' . $no++ . '.</td>
-                <td width="10%">' . ($tanggal ? HelperController::formatTanggalIndonesia($tanggal, 'd F Y') : '-') . '</td>
-                <td width="10%">' . htmlspecialchars($petugas) . '</td>
-                <td width="37%">' . htmlspecialchars($deskripsi) . '</td>
-                <td width="15%" align="left">' . ($debit->akuntansi_rekening->nama_rekening ?? '-') . '</td>
-                <td width="15%" align="left">' . ($kredit->akuntansi_rekening->nama_rekening ?? '-') . '</td>
-                <td width="10%" align="">Rp' . number_format($nominal, 0, ',', '.') . '</td>
+                <td width="10%">' . $tanggal . '</td>
+                <td width="37%">' . $deskripsi . '</td>
+                <td width="10%">' . $petugas . '</td>
+                <td width="15%">' . $akunDebit . '</td>
+                <td width="15%">' . $akunKredit . '</td>
+                <td width="10%" align="right">Rp' . $nominal . '</td>
             </tr>';
-            }
         }
 
-        $html .= '</tbody></table>';
+        $html .= '
+            </tbody>
+        </table>';
+        
 
         $pdf::writeHTML($html, true, false, true, false, '');
         $pdf::Output('laporan_jurnal_keuangan.pdf', 'I');

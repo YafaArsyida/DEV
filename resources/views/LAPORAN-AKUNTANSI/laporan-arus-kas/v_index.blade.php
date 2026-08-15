@@ -9,7 +9,7 @@
                         <h4 class="fs-16 mb-1">Laporan Arus Kas</h4>
                         <p class="text-muted mb-0">Akuntansi > Laporan Keuangan > Laporan Arus Kas </p>
                     </div>
-                    @livewire('parameter.jenjang-tahun-ajar')   
+                    @livewire('parameter.jenjang')   
                 </div><!-- end card header -->
             </div>
             <!--end col-->

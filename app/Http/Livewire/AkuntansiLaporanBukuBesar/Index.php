@@ -85,6 +85,7 @@ class Index extends Component
 
         $transaksiJurnal = AkuntansiJurnalDetail::whereRaw('0 = 1')
             ->paginate($this->perPage);
+            
         $saldoAwalHalaman = 0;
 
         if ($this->selectedRekening) {
@@ -189,38 +190,5 @@ class Index extends Component
             'saldoAwal' => $saldoAwal,
             'saldoAwalHalaman' => $saldoAwalHalaman,
         ]);
-    }
-
-    public function cetakPdf()
-    {
-        if (!$this->selectedJenjang) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Silakan pilih jenjang terlebih dahulu.']);
-            return;
-        }
-
-        if (!$this->selectedRekening) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Silakan pilih rekening terlebih dahulu.']);
-            return;
-        }
-
-        if (!$this->startDate || !$this->endDate) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Silakan pilih periode terlebih dahulu.']);
-            return;
-        }
-
-        if ($this->startDate > $this->endDate) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Tanggal mulai harus lebih awal atau sama dengan tanggal selesai.']);
-            return;
-        }
-
-        $url = route('akuntansi.laporan-buku-besar.pdf', [
-            'jenjang' => $this->selectedJenjang,
-            'rekening' => $this->selectedRekening,
-            'start_date' => $this->startDate,
-            'end_date' => $this->endDate,
-            'search' => $this->search,
-        ]);
-
-        $this->dispatchBrowserEvent('openNewTab', ['url' => $url]);
     }
 }

@@ -1,32 +1,53 @@
 <div class="row justify-content-center">
     <div class="col-xxl-6">
-        <div class="card">
-            <div class="card-header border-0 pb-0">
-                <div class="d-flex align-items-center">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+           <div class="card-header">
+                <div class="d-flex align-items-center flex-wrap gap-3">
                     <div class="flex-grow-1">
-                        <h5 class="card-title mb-0">
-                            Laporan Neraca
-                        </h5>
-                        {{-- <p class="mb-0">Neraca adalah laporan keuangan yang menunjukkan kondisi keuangan sekolah pada titik waktu tertentu. Laporan ini menggambarkan hubungan antara aset yang dimiliki, kewajiban yang harus dibayar, dan ekuitas (modal) sekolah. Neraca selalu dalam keadaan seimbang</p>        --}}
-                    </div>
-                    <div class="flex-shrink-0">
-                        <div class="d-flex gap-2 flex-wrap">
-                            {{-- <button data-bs-toggle="modal" data-bs-target="#ExportLaporan" class="btn btn-soft-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button> --}}
-                            @if ($selectedJenjang && $selectedTahunAjar)
-                            <div class="flex-shrink-0">
-                                <div class="d-flex gap-2 flex-wrap">
-                                    <button data-bs-toggle="modal" data-bs-target="#ExportLaporan" class="btn btn-soft-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button>
-                                    <button wire:click="cetakLaporan" class="btn btn-danger d-inline-flex align-items-center gap-1">
-                                        <i class="ri-printer-line align-bottom"></i>
-                                        <span>Cetak Laporan</span>
-                                    </button>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="avatar-sm flex-shrink-0">
+                                <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                                    <i class="ri-bar-chart-box-line"></i>
                                 </div>
                             </div>
-                            @endif
+
+                            <div>
+                                <h5 class="fw-bold mb-1">
+                                    Laporan Neraca
+                                </h5>
+                                <small class="text-muted">
+                                    Ringkasan posisi aset, kewajiban, dan ekuitas sekolah berdasarkan periode yang dipilih.
+                                </small>
+                            </div>
                         </div>
                     </div>
+
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        {{-- EXPORT & CETAK --}}
+                        @if ($selectedJenjang)
+
+                            <button type="button"
+                                data-bs-toggle="modal"
+                                data-bs-target="#ExportLaporan"
+                                class="btn btn-success rounded-pill px-4 d-inline-flex align-items-center gap-1">
+
+                                <i class="ri-file-excel-2-line"></i>
+                                <span>Export</span>
+
+                            </button>
+
+                            <button type="button"
+                                wire:click="cetakLaporan"
+                                class="btn btn-danger rounded-pill px-4 d-inline-flex align-items-center gap-1">
+
+                                <i class="ri-printer-line"></i>
+                                <span>Cetak</span>
+
+                            </button>
+                        @endif
+                    </div>
                 </div>
-            </div><!-- end card header -->
+            </div>
             <div class="card-body">
                 <div class="row g-3 mb-3">
                     <div class="col-xxl-12 col-sm-12"> 
@@ -54,134 +75,375 @@
                 {{-- DATA --}}
                 <div class="live-preview">
                     <div class="table-responsive">
-                        <div class="text-center my-3">
-                            <h4 class="mb-0">Laporan Neraca</h4>
-                            <div>Yayasan Drul Khukama Unit {{ $namaJenjang }}</div>
+                        <div class="text-center py-3">
+                            <h4 class="fw-bold mb-1 text-dark">Laporan Neraca</h4>
+
+                            <div class="text-muted fs-13 mb-2">
+                                Yayasan Drul Khukama
+                                <span class="mx-1">•</span>
+                                Unit {{ $namaJenjang }}
+                            </div>
+
                             @if ($endDate)
-                                <div>
-                                    <strong>
-                                        Per {{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($endDate, 'd F Y') }}
-                                    </strong>
+                                <div class="d-inline-flex align-items-center gap-2 bg-primary-subtle text-primary px-3 py-2 rounded-pill fs-13">
+                                    <i class="ri-calendar-line"></i>
+                                    <span>
+                                        Posisi per
+                                        <strong>
+                                            {{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($endDate, 'd F Y') }}
+                                        </strong>
+                                    </span>
                                 </div>
-                                @else
-                                <div>
+                            @else
+                                <div class="d-inline-flex align-items-center gap-2 bg-secondary-subtle text-secondary px-3 py-2 rounded-pill fs-13">
+                                    <i class="ri-calendar-check-line"></i>
                                     <strong>
                                         Semua Periode
                                     </strong>
                                 </div>
                             @endif
                         </div>
-                        <table class="table table-bordered table-hover table-nowrap align-middle" style="width:100%">
-                            <thead>
+
+                        <table class="table table-hover table-nowrap align-middle mb-0" style="width:100%">
+                            <thead class="table-light">
                                 <tr>
-                                    <th>Nama Akun</th>
-                                    <th class="text-end">Saldo</th>
+                                    <th class="text-start">
+                                        Nama Akun
+                                    </th>
+
+                                    <th class="text-end">
+                                        Saldo
+                                    </th>
                                 </tr>
                             </thead>
+
                             <tbody>
-                                {{-- ASET --}}
-                                <tr><th colspan="2" class="bg-light">ASET</th></tr>
-                                @php $totalAset = 0; @endphp
-                                @foreach ($kelompok['aset'] as $akun)
-                                    <tr>
-                                        <td>{{ $akun['nama'] }}</td>
-                                        <td class="text-end">RP{{ number_format($akun['saldo'], 0, ',', '.') }}</td>
-                                    </tr>
-                                    @php $totalAset += $akun['saldo']; @endphp
-                                @endforeach
+                                    {{-- ASET --}}
                                 <tr>
-                                    <th class="bg-dark text-white">TOTAL ASET</th>
-                                    <th class="bg-dark text-white text-end">RP{{ number_format($totalAset, 0, ',', '.') }}</th>
+                                    <td colspan="2" class="bg-primary-subtle text-primary fw-bold text-uppercase fs-12 py-2">
+                                        <i class="ri-building-line me-1"></i>
+                                        Aset
+                                    </td>
                                 </tr>
-                        
-                                {{-- KEWAJIBAN --}}
-                                <tr><th colspan="2" class="bg-light">KEWAJIBAN</th></tr>
-                                @php $totalKewajiban = 0; @endphp
+
+                                @foreach ($kelompok['aset'] as $akun)
+                                <tr>
+                                    <td class="ps-4">
+                                        <span class="fw-medium">
+                                            {{ $akun['kode'] }}
+                                        </span>
+
+                                        <span class="text-muted">
+                                            - {{ $akun['nama'] }}
+                                        </span>
+                                    </td>
+
+                                    <td class="text-end text-nowrap">
+                                        Rp{{ number_format($akun['saldo'], 0, ',', '.') }}
+                                    </td>
+                                </tr>
+                                @endforeach
+
+                                {{-- TOTAL ASET --}}
+                                <tr class="border-top border-2">
+                                    <td class="fw-bold">
+                                        Total Aset
+                                    </td>
+
+                                    <td class="text-end fw-bold text-nowrap">
+                                        Rp{{ number_format($totalAset, 0, ',', '.' ) }}
+                                    </td>
+                                </tr>
+
+                                    {{-- KEWAJIBAN --}}
+                                <tr>
+                                    <td colspan="2" class="bg-warning-subtle text-warning-emphasis fw-bold text-uppercase fs-12 py-2">
+                                        <i class="ri-file-list-3-line me-1"></i>
+                                        Kewajiban
+                                    </td>
+                                </tr>
+
                                 @foreach ($kelompok['kewajiban'] as $akun)
                                     <tr>
-                                        <td>{{ $akun['nama'] }}</td>
-                                        <td class="text-end">RP{{ number_format($akun['saldo'], 0, ',', '.') }}</td>
-                                    </tr>
-                                    @php $totalKewajiban += $akun['saldo']; @endphp
-                                @endforeach
-                                <tr>
-                                    <th>Total Kewajiban</th>
-                                    <th class="text-end">RP{{ number_format($totalKewajiban, 0, ',', '.') }}</th>
-                                </tr>
-                        
-                                {{-- EKUITAS --}}
-                                <tr><th colspan="2" class="bg-light">EKUITAS</th></tr>
-                                @if(isset($labaRugi))
-                                    <tr>
-                                        <td>
-                                            {{ $tutupBuku == 'sudah' ? 'Akumulasi Surplus/Defisit' : 'Surplus/Defisit Tahun Berjalan' }}
+                                        <td class="ps-4">
+                                            <span class="fw-medium">
+                                                {{ $akun['kode'] }}
+                                            </span>
+
+                                            <span class="text-muted">
+                                                - {{ $akun['nama'] }}
+                                            </span>
                                         </td>
-                                        <td class="text-end">RP{{ number_format($labaRugi, 0, ',', '.') }}</td>
+
+                                        <td class="text-end text-nowrap">
+                                            Rp{{ number_format($akun['saldo'], 0, ',', '.' ) }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+
+                                {{-- TOTAL KEWAJIBAN --}}
+                                <tr class="border-top border-2">
+
+                                    <td class="fw-bold">
+                                        Total Kewajiban
+                                    </td>
+
+                                    <td class="text-end fw-bold text-nowrap">
+                                        Rp{{ number_format(
+                                            $totalKewajiban,
+                                            0,
+                                            ',',
+                                            '.'
+                                        ) }}
+                                    </td>
+
+                                </tr>
+
+
+                                {{-- =================================================
+                                    EKUITAS
+                                ================================================== --}}
+                                <tr>
+                                    <td colspan="2"
+                                        class="bg-success-subtle text-success fw-bold text-uppercase fs-12 py-2">
+                                        <i class="ri-funds-line me-1"></i>
+                                        Ekuitas
+                                    </td>
+                                </tr>
+
+                                {{-- LABA / RUGI --}}
+                                @if (isset($labaRugi))
+                                    <tr>
+                                        <td class="ps-4">
+                                            <span class="fw-medium">
+                                                Surplus/Defisit Tahun Berjalan
+                                            </span>
+                                        </td>
+
+                                        <td class="text-end text-nowrap fw-medium">
+                                            Rp{{ number_format($labaRugi, 0, ',', '.' ) }}
+                                        </td>
                                     </tr>
                                 @endif
-                                @php $totalEkuitas = 0; @endphp
+
                                 @foreach ($kelompok['ekuitas'] as $akun)
                                     <tr>
-                                        <td>{{ $akun['nama'] }}</td>
-                                        <td class="text-end">RP{{ number_format($akun['saldo'], 0, ',', '.') }}</td>
+                                        <td class="ps-4">
+                                            <span class="fw-medium">
+                                                {{ $akun['kode'] }}
+                                            </span>
+
+                                            <span class="text-muted">
+                                                - {{ $akun['nama'] }}
+                                            </span>
+                                        </td>
+
+                                        <td class="text-end text-nowrap">
+                                            Rp{{ number_format($akun['saldo'], 0, ',', '.' ) }}
+                                        </td>
                                     </tr>
-                                    @php $totalEkuitas += $akun['saldo']; @endphp
                                 @endforeach
-                                <tr>
-                                    <th>Total Ekuitas</th>
-                                    <th class="text-end">RP{{ number_format(($labaRugi ?? 0) + $totalEkuitas, 0, ',', '.') }}</th>
+
+                                {{-- TOTAL EKUITAS --}}
+                                <tr class="border-top border-2">
+                                    <td class="fw-bold">
+                                        Total Ekuitas
+                                    </td>
+
+                                    <td class="text-end fw-bold text-nowrap">
+                                        Rp{{ number_format($totalEkuitas, 0, ',', '.' ) }}
+                                    </td>
                                 </tr>
-                        
-                                {{-- TOTAL PASSIVA --}}
+
+                                    {{-- TOTAL PASSIVA --}}
                                 <tr>
-                                    <th class="bg-dark text-white">TOTAL KEWAJIBAN + EKUITAS</th>
-                                    <th class="bg-dark text-white text-end">RP{{ number_format($totalKewajiban + $labaRugi ?? 0 + $totalEkuitas, 0, ',', '.') }}</th>
+                                    <td colspan="2" class="py-2 border-0"></td>
                                 </tr>
+
+                                <tr class="fw-bold">
+                                    <td class="bg-dark text-white py-3 text-uppercase">
+                                        <i class="ri-scales-3-line me-1"></i>
+                                        Total Kewajiban + Ekuitas
+
+                                    </td>
+
+                                    <td class="bg-dark text-white text-end py-3 text-nowrap">
+                                        Rp{{ number_format($totalPassiva,0,',', '.' ) }}
+                                    </td>
+
+                                </tr>
+
                             </tbody>
+
                         </table>
+
+
+                        {{-- =====================================================
+                            VALIDASI NERACA
+                        ====================================================== --}}
+                        @if (isset($selisihNeraca) && $selisihNeraca != 0)
+                            <div class="alert alert-warning border-0 rounded-4 mt-3 mb-0">
+                                <div class="d-flex align-items-start gap-3">
+                                    <div class="avatar-sm flex-shrink-0">
+                                        <div class="avatar-title bg-warning-subtle text-warning rounded-circle">
+                                            <i class="ri-error-warning-line fs-18"></i>
+                                        </div>
+                                    </div>
+
+                                    <div>
+
+                                        <h6 class="fw-bold mb-1">
+                                            Neraca Belum Seimbang
+                                        </h6>
+
+                                        <p class="mb-0 text-muted fs-13">
+
+                                            Terdapat selisih antara Total Aset dan
+                                            Total Kewajiban + Ekuitas sebesar
+
+                                            <strong class="text-warning-emphasis">
+                                                Rp{{ number_format(abs($selisihNeraca), 0, ',', '.') }}
+                                            </strong>.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        @else
+                            <div class="alert alert-success border-0 rounded-4 mt-3 mb-0">
+                                <div class="d-flex align-items-start gap-3">
+                                    <div class="avatar-sm flex-shrink-0">
+                                        <div class="avatar-title bg-success-subtle text-success rounded-circle">
+                                            <i class="ri-checkbox-circle-line fs-18"></i>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <h6 class="fw-bold mb-1">
+                                            Neraca Seimbang
+                                        </h6>
+
+                                        <p class="mb-0 text-muted fs-13">
+                                            Total Aset sama dengan Total Kewajiban + Ekuitas.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
                     </div>
-                    
                 </div>
             </div>  
         </div>
-        <div class="modal fade zoomIn" id="ExportLaporan" tabindex="-1" aria-labelledby="exportRecordLabel" aria-hidden="true" wire:ignore.self>
+        <div class="modal fade zoomIn" id="ExportLaporan" tabindex="-1" aria-labelledby="exportNeracaLabel" aria-hidden="true" wire:ignore.self>
             <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                    <div class="modal-header border-0 pb-0">
+                        <button type="button"
+                            class="btn btn-light btn-icon rounded-circle ms-auto"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
+                            <i class="ri-close-line fs-18"></i>
+                        </button>
                     </div>
-                    <div class="modal-body p-5 text-center">
-                        <lord-icon src="https://cdn.lordicon.com/fjvfsqea.json" trigger="loop" colors="primary:#405189,secondary:#f06548" style="width:90px;height:90px"></lord-icon>
-                        <div class="mt-4 text-center">
-                            <h4 class="fs-semibold">Konfirmasi Export</h4>
-                            <p class="text-muted fs-14 mb-4 pt-1">
-                                Apakah Anda yakin ingin mengekspor laporan Neraca? Data yang diekspor akan sesuai dengan tabel yang ditampilkan.
-                            </p>
-                            <div class="hstack gap-2 justify-content-center remove">
-                                <button class="btn btn-link link-success fw-medium text-decoration-none shadow-none" data-bs-dismiss="modal">
-                                    <i class="ri-close-line me-1 align-middle"></i> Batal
-                                </button>
-                                <button class="btn btn-primary" id="konfirmasiExportLaporan" data-bs-dismiss="modal">Ya, Export!</button>
+
+                    <div class="modal-body px-4 pb-5 pt-2 text-center">
+                        <div class="mb-4">
+                            <div class="avatar-xl mx-auto">
+                                <div class="avatar-title bg-success-subtle text-success rounded-circle">
+                                    <lord-icon src="https://cdn.lordicon.com/fjvfsqea.json"
+                                        trigger="loop"
+                                        colors="primary:#405189,secondary:#0ab39c"
+                                        style="width:70px;height:70px">
+                                    </lord-icon>
+                                </div>
                             </div>
                         </div>
+
+                        <div class="mb-2">
+                            <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill mb-3">
+                                Export Excel
+                            </span>
+
+                            <h3 class="fw-bold mb-2" id="exportNeracaLabel">
+                                Export Laporan Neraca?
+                            </h3>
+
+                            <p class="text-muted mb-0 lh-lg px-lg-4">
+                                Apakah Anda yakin ingin mengekspor laporan Neraca
+                                <strong class="text-dark">{{ $namaJenjang ?? 'Unit' }}</strong>
+                                sesuai periode yang sedang ditampilkan?
+                            </p>
+                        </div>
+
+                        <div class="alert alert-light border rounded-4 text-start mt-4 mb-0">
+                            <div class="d-flex align-items-start gap-3">
+                                <div class="flex-shrink-0">
+                                    <div class="avatar-sm">
+                                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
+                                            <i class="ri-bar-chart-box-line fs-18"></i>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex-grow-1">
+                                    <h6 class="fw-semibold mb-1">
+                                        Laporan Neraca
+                                    </h6>
+
+                                    <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                                        <span class="badge bg-primary-subtle text-primary">
+                                            {{ $namaJenjang ?? 'Semua Unit' }}
+                                        </span>
+
+                                        <span class="text-muted fs-13">
+                                            @if ($endDate)
+                                                Periode: {{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($endDate, 'd F Y') }}
+                                            @else
+                                                Semua Periode
+                                            @endif
+                                        </span>
+                                    </div>
+
+                                    <p class="text-muted mb-0 fs-13">
+                                        Data laporan akan diekspor sesuai tampilan tabel yang sedang ditampilkan.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer border-0 pt-0 px-4 pb-4 justify-content-center">
+                        <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">
+                            <i class="ri-close-line me-1"></i>
+                            Batal
+                        </button>
+
+                        <button type="button"
+                            class="btn btn-success rounded-pill px-4"
+                            id="konfirmasiExportLaporan"
+                            data-bs-dismiss="modal">
+                            <i class="ri-file-excel-2-line me-1"></i>
+                            Ya, Export
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
+
         <script>
             document.getElementById('konfirmasiExportLaporan').addEventListener('click', function () {
-                alertify.success("Menyiapkan Dokumen");
-                // Tambahkan delay 1 detik
+                alertify.success("Menyiapkan Dokumen Excel");
+
                 setTimeout(function () {
-                    // Ambil elemen tabel berdasarkan ID
                     var table = document.querySelector("table");
-                    
-                    // Konversi tabel ke format Excel
-                    var workbook = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
-                    
-                    // Simpan file Excel
+
+                    if (!table) {
+                        alertify.error("Tabel Laporan Neraca tidak ditemukan.");
+                        return;
+                    }
+
+                    var workbook = XLSX.utils.table_to_book(table, { sheet: "Neraca" });
                     XLSX.writeFile(workbook, "Laporan-Neraca.xlsx");
-                }, 1000); // 1000 ms = 1 detik
+                }, 500);
             });
         </script>
     </div>

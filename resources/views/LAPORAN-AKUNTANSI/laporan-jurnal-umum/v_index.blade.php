@@ -9,16 +9,12 @@
                         <h4 class="fs-16 mb-1">Jurnal Keuangan</h4>
                         <p class="text-muted mb-0">Akuntansi > Jurnal Keuangan</p>
                     </div>
-                    @livewire('parameter.jenjang-tahun-ajar')   
+                    @livewire('parameter.jenjang')   
                 </div><!-- end card header -->
             </div>
             <!--end col-->
         </div>
-        <div class="row">
-            <div class="col-xxl-12">
-                @livewire('akuntansi-laporan-jurnal-umum.index')   
-            </div>
-        </div>
+        @livewire('akuntansi-laporan-jurnal-umum.index')   
     </div>
 </div>
 @endsection

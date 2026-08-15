@@ -17,7 +17,6 @@ class Index extends Component
     public $perPage = 50;
 
     public $selectedJenjang = null;
-    public $selectedTahunAjar = null;
     public $startDate = null;
     public $endDate = null;
 
@@ -35,11 +34,11 @@ class Index extends Component
         $this->endDate   = now()->format('Y-m-d');
     }
 
-    public function updateParameters($jenjang, $tahunAjar)
+    public function updateParameters($jenjang)
     {
         // Update nilai selectedJenjang dan selectedTahunAjar
         $this->selectedJenjang = $jenjang;
-        $this->selectedTahunAjar = $tahunAjar;
+        // $this->selectedTahunAjar = $tahunAjar;
     }
 
     public function updatedStartDate()
@@ -74,7 +73,7 @@ class Index extends Component
 
     public function cetakLaporan()
     {
-        if (!$this->selectedJenjang || !$this->selectedTahunAjar) {
+        if (!$this->selectedJenjang) {
             $this->dispatchBrowserEvent('alertify-error', ['message' => 'Jenjang dan Tahun Ajar wajib dipilih']);
             return;
         }
@@ -83,7 +82,6 @@ class Index extends Component
 
         $url = route('akuntansi.laporan-jurnal-umum.pdf', [
             'jenjang' => $this->selectedJenjang,
-            'tahun' => $this->selectedTahunAjar,
             'start_date' => $this->startDate,
             'end_date' => $this->endDate,
             'search' => $this->search
@@ -98,7 +96,6 @@ class Index extends Component
             'akuntansi_jurnal_detail.akuntansi_rekening',
             'ms_pengguna',
         ])
-        ->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
         ->where('ms_jenjang_id', $this->selectedJenjang)
         ->where('ms_departemen_id', 'SEKOLAH')
         // ->where('status', 'active')

@@ -6,17 +6,23 @@ use App\Models\AkuntansiJurnalDetail;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class Index extends Component
 {
+    use WithPagination;
+    protected $paginationTheme = 'bootstrap'; // Menggunakan tema Bootstrap untuk paginasi
+
+    public $perPage = 50;
+
     public $selectedJenjang = null;
-    public $selectedTahunAjar = null;
+
     public $selectedBulan = null;
    
     public $startDate = null;
     public $endDate = null;
 
-    public $selectedRekening = '';
+    public $selectedRekening = null;
 
     public $search = '';
 
@@ -24,23 +30,33 @@ class Index extends Component
         'parameterUpdated' => 'updateParameters',
     ];
 
-    public function mount()
+     public function mount()
     {
-        // Default ke hari ini
-        // $this->startDate = now()->format('Y-m-d');
         $this->startDate = now()->startOfMonth()->format('Y-m-d');
         $this->endDate   = now()->format('Y-m-d');
     }
 
-    public function updateParameters($jenjang, $tahunAjar)
+    public function updateParameters($jenjang)
     {
-        // Update nilai selectedJenjang dan selectedTahunAjar
         $this->selectedJenjang = $jenjang;
-        $this->selectedTahunAjar = $tahunAjar;
+        $this->selectedRekening = null;
+        $this->resetPage();
+    }
+
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedSelectedRekening()
+    {
+        $this->resetPage();
     }
 
     public function updatedStartDate()
     {
+        $this->resetPage();
+
         $this->dispatchBrowserEvent('alertify-success', [
             'message' => 'Periode mulai diperbarui'
         ]);
@@ -48,6 +64,8 @@ class Index extends Component
 
     public function updatedEndDate()
     {
+        $this->resetPage();
+
         $this->dispatchBrowserEvent('alertify-success', [
             'message' => 'Periode selesai diperbarui'
         ]);
@@ -55,21 +73,17 @@ class Index extends Component
 
     public function resetTanggal()
     {
-        // $this->startDate = now()->format('Y-m-d');
         $this->startDate = now()->startOfMonth()->format('Y-m-d');
         $this->endDate   = now()->format('Y-m-d');
-        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
-    }
 
-    public function updatingSearch()
-    {
-        $this->emitSelf('$refresh'); //ringan
+        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
+        $this->resetPage();
     }
 
     public function cetakLaporan()
     {
-        if (!$this->selectedJenjang || !$this->selectedTahunAjar) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Jenjang dan Tahun Ajar wajib dipilih']);
+        if (!$this->selectedJenjang) {
+            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Jenjang wajib dipilih']);
             return;
         }
 
@@ -77,7 +91,6 @@ class Index extends Component
 
         $url = route('akuntansi.laporan-arus-kas.pdf', [
             'jenjang' => $this->selectedJenjang,
-            'tahun' => $this->selectedTahunAjar,
             'rekening' => $this->selectedRekening,
             'start_date' => $this->startDate,
             'end_date' => $this->endDate,
@@ -88,68 +101,145 @@ class Index extends Component
 
     public function render()
     {
-        $akunKasBank = [11001, 11002]; // 11001 = Kas, 11002 = Bank
+        $akunKasBank = ['11001', '11002'];
 
-        // Ambil data transaksi sesuai filter
-        $transaksiJurnal = AkuntansiJurnalDetail::with('akuntansi_rekening', 'ms_pengguna')
-            ->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
-            ->where('ms_jenjang_id', $this->selectedJenjang)
-            ->when($this->selectedRekening, function ($query) {
-                // Jika user memilih rekening tertentu
-                $query->where('kode_rekening', $this->selectedRekening);
-            }, function ($query) use ($akunKasBank) {
-                // Jika tidak ada pilihan, tampilkan semua Kas/Bank
-                $query->whereIn('kode_rekening', $akunKasBank);
-            })
-            ->when($this->startDate && $this->endDate, function ($query) {
-                $startDate = Carbon::parse($this->startDate)->startOfDay();
-                $endDate   = Carbon::parse($this->endDate)->endOfDay();
+        $transaksiJurnal = AkuntansiJurnalDetail::with([
+            'akuntansi_rekening',
+            'akuntansi_jurnal.ms_pengguna',
+        ])
+            ->whereIn(
+                'kode_rekening',
+                $this->selectedRekening
+                    ? [$this->selectedRekening]
+                    : $akunKasBank
+            )
+            ->whereHas('akuntansi_jurnal', function ($query) {
 
-                $query->whereBetween('tanggal_transaksi', [$startDate, $endDate]);
+                $query->where('ms_jenjang_id', $this->selectedJenjang)
+                    ->where('ms_departemen_id', 'SEKOLAH');
+
+                // FILTER PERIODE
+                if ($this->startDate && $this->endDate) {
+                    $query->whereBetween('tanggal_transaksi', [
+                        Carbon::parse($this->startDate)->startOfDay(),
+                        Carbon::parse($this->endDate)->endOfDay(),
+                    ]);
+                }
+
+                // PENCARIAN
+                if ($this->search) {
+                    $query->where(function ($query) {
+                        $query->where(
+                            'deskripsi',
+                            'like',
+                            '%' . $this->search . '%'
+                        )
+                        ->orWhere(
+                            'nomor_jurnal',
+                            'like',
+                            '%' . $this->search . '%'
+                        );
+                    });
+                }
             })
-            ->when($this->search, function ($query) {
-                $query->where('deskripsi', 'like', '%' . $this->search . '%');
-            })
-            ->orderBy('tanggal_transaksi')
+            ->join(
+                'akuntansi_jurnal',
+                'akuntansi_jurnal.akuntansi_jurnal_id',
+                '=',
+                'akuntansi_jurnal_detail.akuntansi_jurnal_id'
+            )
+            ->orderBy('akuntansi_jurnal.tanggal_transaksi')
+            ->select('akuntansi_jurnal_detail.*')
             ->get();
 
-        // Hitung total kas masuk (debit) & kas keluar (kredit)
-        $totalDebit = $transaksiJurnal->where('posisi', 'debit')->sum('nominal');
-        $totalKredit = $transaksiJurnal->where('posisi', 'kredit')->sum('nominal');
+        /*
+        |--------------------------------------------------------------------------
+        | KAS MASUK & KAS KELUAR
+        |--------------------------------------------------------------------------
+        */
 
-        // Hitung saldo awal
+        $totalKasMasuk = $transaksiJurnal
+            ->where('posisi', 'debit')
+            ->sum('nominal');
+
+        $totalKasKeluar = $transaksiJurnal
+            ->where('posisi', 'kredit')
+            ->sum('nominal');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SALDO AWAL
+        |--------------------------------------------------------------------------
+        */
 
         $saldoAwal = 0;
-        if ($this->startDate != null && $this->endDate != null) {
-            $saldoAwal = AkuntansiJurnalDetail::where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
-                ->where('ms_jenjang_id', $this->selectedJenjang)
-                ->when($this->selectedRekening, function ($query) {
-                    // Jika user memilih rekening tertentu
-                    $query->where('kode_rekening', $this->selectedRekening);
-                }, function ($query) use ($akunKasBank) {
-                    // Jika tidak ada pilihan, tampilkan semua Kas/Bank
-                    $query->whereIn('kode_rekening', $akunKasBank);
-                })
-                ->when($this->startDate, function ($query) {
-                    $startDate = Carbon::createFromFormat('Y-m-d', $this->startDate)->startOfDay();
-                    $query->where('tanggal_transaksi', '<', $startDate);
+
+        if ($this->startDate) {
+
+            $saldoAwal = AkuntansiJurnalDetail::query()
+                ->whereIn(
+                    'kode_rekening',
+                    $this->selectedRekening
+                        ? [$this->selectedRekening]
+                        : $akunKasBank
+                )
+                ->whereHas('akuntansi_jurnal', function ($query) {
+
+                    $query->where(
+                        'ms_jenjang_id',
+                        $this->selectedJenjang
+                    )
+                    ->where(
+                        'ms_departemen_id',
+                        'SEKOLAH'
+                    )
+                    ->where(
+                        'tanggal_transaksi',
+                        '<',
+                        Carbon::parse($this->startDate)->startOfDay()
+                    );
                 })
                 ->selectRaw("
-                SUM(CASE WHEN posisi = 'debit' THEN nominal ELSE 0 END) -
-                SUM(CASE WHEN posisi = 'kredit' THEN nominal ELSE 0 END) as saldo
-            ")
-                ->value('saldo');
+                    SUM(
+                        CASE
+                            WHEN posisi = 'debit'
+                            THEN nominal
+                            ELSE 0
+                        END
+                    )
+                    -
+                    SUM(
+                        CASE
+                            WHEN posisi = 'kredit'
+                            THEN nominal
+                            ELSE 0
+                        END
+                    ) AS saldo
+                ")
+                ->value('saldo') ?? 0;
         }
 
-        // Saldo akhir
-        $saldoAkhir = $saldoAwal + ($totalDebit - $totalKredit);
 
-        return view('livewire.akuntansi-laporan-arus-kas.index', [
-            'transaksiJurnal' => $transaksiJurnal,
-            'saldoAwal'       => $saldoAwal,
-            'saldoAkhir'      => $saldoAkhir,
-            'totalDebit'      => $totalDebit,
-            'totalKredit'     => $totalKredit,
-        ]);
+        /*
+        |--------------------------------------------------------------------------
+        | SALDO AKHIR
+        |--------------------------------------------------------------------------
+        */
+
+        $saldoAkhir = $saldoAwal
+            + $totalKasMasuk
+            - $totalKasKeluar;
+
+
+        return view('livewire.akuntansi-laporan-arus-kas.index',
+            [
+                'transaksiJurnal' => $transaksiJurnal,
+                'saldoAwal'       => $saldoAwal,
+                'saldoAkhir'      => $saldoAkhir,
+                'totalKasMasuk'   => $totalKasMasuk,
+                'totalKasKeluar'  => $totalKasKeluar,
+            ]
+        );
     }
 }

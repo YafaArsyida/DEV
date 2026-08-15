@@ -1,47 +1,104 @@
 <div class="">
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-        <div class="card-header border-0 pb-0">
+        <div class="card-header">
             <div class="d-flex align-items-center flex-wrap gap-3">
-                {{-- Judul --}}
-                <h5 class="card-title mb-0 flex-grow-1">Laporan Pengeluaran</h5>
-            
-                {{-- Tombol Export & Cetak --}}
-                <div class="d-flex gap-2 flex-wrap">
-                    <button data-bs-toggle="modal" data-bs-target="#ExportLaporan" class="btn rounded-pill px-4 btn-success">
-                        <i class="ri-file-excel-2-line pb-0"></i> Export
-                    </button>
-                    <button wire:click="cetakLaporan" class="btn rounded-pill px-4 btn-danger d-inline-flex align-items-center gap-1">
-                        <i class="ri-printer-line align-bottom"></i>
-                        <span>Cetak Laporan</span>
-                    </button>
+                <div class="flex-grow-1">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="avatar-sm flex-shrink-0">
+                            <div class="avatar-title bg-danger-subtle text-danger rounded-circle fs-20">
+                                <i class="ri-wallet-3-line"></i>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h5 class="fw-bold mb-1">
+                                Laporan Pengeluaran
+                            </h5>
+
+                            <small class="text-muted">
+                                Ringkasan pengeluaran sekolah berdasarkan periode yang dipilih.
+                            </small>
+                        </div>
+                    </div>
                 </div>
-            
-                <div class="d-flex align-items-center gap-2">
-                    <input type="date" class="form-control" wire:model="startDate">
-                    <span class="text-muted">–</span>
-                    <input type="date" class="form-control" wire:model="endDate">
-                    <button type="button" class="btn btn-soft-secondary" wire:click="resetTanggal" title="Reset Tanggal">
-                        <i class="ri-refresh-line"></i>
+
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    {{-- EXPORT --}}
+                    <button type="button" data-bs-toggle="modal"
+                        data-bs-target="#ExportLaporan"
+                        class="btn btn-success rounded-pill px-4 d-inline-flex align-items-center gap-1">
+
+                        <i class="ri-file-excel-2-line"></i>
+                        <span>Export</span>
                     </button>
+
+                    <button type="button"
+                        wire:click="cetakLaporan"
+                        class="btn btn-danger rounded-pill px-4 d-inline-flex align-items-center gap-1">
+
+                        <i class="ri-printer-line"></i>
+                        <span>Cetak</span>
+                    </button>
+
+                    <div class="vr d-none d-lg-block"></div>
+
+                    {{-- PERIODE --}}
+                    <div class="d-flex align-items-center gap-2">
+                        <input type="date" class="form-control"
+                            wire:model="startDate" title="Tanggal Mulai">
+
+                        <span class="text-muted">
+                            –
+                        </span>
+
+                        <input type="date" class="form-control"
+                            wire:model="endDate" title="Tanggal Akhir">
+
+                        <button type="button" class="btn btn-soft-secondary"
+                            wire:click="resetTanggal" title="Reset Tanggal">
+
+                            <i class="ri-refresh-line"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div><!-- end card header -->
+        </div>
         <div class="card-body">
             <div class="live-preview">
                 <div class="table-responsive">
-                    <div class="text-center my-3">
-                        <h4 class="mb-0">Laporan Pengeluaran Sekolah</h4>
-                        <div>Yayasan Drul Khukama Unit {{ $namaJenjang }}</div>
+                    <div class="text-center py-3">
+                        {{-- JUDUL --}}
+                        <h4 class="fw-bold mb-1 text-dark">
+                            Laporan Pengeluaran Sekolah
+                        </h4>
+
+                        {{-- UNIT --}}
+                        <div class="text-muted fs-13 mb-2">
+                            Yayasan Drul Khukama
+                            <span class="mx-1">•</span>
+                            Unit {{ $namaJenjang }}
+                        </div>
+
+                        {{-- PERIODE --}}
                         @if ($startDate && $endDate)
-                            <div>
-                                <strong>
-                                    Periode {{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($startDate, 'F Y') }}
-                                    sampai
-                                    {{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($endDate, 'F Y') }}
-                                </strong>
+                            <div class="d-inline-flex align-items-center gap-2 bg-primary-subtle text-primary px-3 py-2 rounded-pill fs-13">
+                                <i class="ri-calendar-line"></i>
+                                <span>
+                                    Periode
+                                    <strong>
+                                        {{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($startDate, 'd F Y') }}
+                                    </strong>
+
+                                    <span class="mx-1">–</span>
+
+                                    <strong>
+                                        {{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($endDate, 'd F Y') }}
+                                    </strong>
+                                </span>
                             </div>
-                            @else
-                            <div>
+                        @else
+                            <div class="d-inline-flex align-items-center gap-2 bg-secondary-subtle text-secondary px-3 py-2 rounded-pill fs-13">
+                                <i class="ri-calendar-check-line"></i>
                                 <strong>
                                     Semua Periode
                                 </strong>

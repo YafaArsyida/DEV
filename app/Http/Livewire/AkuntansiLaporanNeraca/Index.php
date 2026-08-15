@@ -3,33 +3,39 @@
 namespace App\Http\Livewire\AkuntansiLaporanNeraca;
 
 use App\Models\AkuntansiJurnalDetail;
-use App\Models\AkuntansiKelompokRekening;
-use App\Models\AkuntansiRekening;
 use App\Models\Jenjang;
-use App\Models\TahunAjar;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class Index extends Component
 {
     public $selectedJenjang = null;
-    public $selectedTahunAjar = null;
     public $selectedBulan = null;
+    public $startDate = null;
     public $endDate = null;
 
     public $namaJenjang = '';
     public $labaRugi = 0;
     public $tutupBuku = 'belum';
+    public $totalAset = 0;
+    public $totalKewajiban = 0;
+    public $totalEkuitas = 0;
+    public $totalPassiva = 0;
+    public $selisihNeraca = 0;
 
     protected $listeners = [
         'parameterUpdated' => 'updateParameters',
     ];
 
-    public function updateParameters($jenjang, $tahunAjar)
+    public function mount()
     {
-        // Update nilai selectedJenjang dan selectedTahunAjar
+        $this->endDate = Carbon::today()->toDateString();
+    }
+
+    public function updateParameters($jenjang)
+    {
         $this->selectedJenjang = $jenjang;
-        $this->selectedTahunAjar = $tahunAjar;
 
         $janjang = Jenjang::find($jenjang);
         $this->namaJenjang = $janjang ? $janjang->nama_jenjang : 'Tidak Diketahui';
@@ -44,20 +50,14 @@ class Index extends Component
 
     public function resetTanggal()
     {
-        $this->endDate = null;
+        $this->endDate = Carbon::today()->toDateString();
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
-    }
-
-    public function isTahunAjaranSudahTutupBuku()
-    {
-        $tahunAjar = TahunAjar::find($this->selectedTahunAjar);
-        return $tahunAjar && $tahunAjar->tutup_buku === 'sudah';
     }
 
     public function cetakLaporan()
     {
-        if (!$this->selectedJenjang || !$this->selectedTahunAjar) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Jenjang dan Tahun Ajar wajib dipilih']);
+        if (!$this->selectedJenjang) {
+            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Jenjang wajib dipilih']);
             return;
         }
 
@@ -65,63 +65,75 @@ class Index extends Component
 
         $url = route('akuntansi.laporan-neraca.pdf', [
             'jenjang' => $this->selectedJenjang,
-            'tahun' => $this->selectedTahunAjar,
+            'start_date' => $this->startDate,
             'end_date' => $this->endDate,
         ]);
 
         $this->emit('openNewTab', $url);
     }
 
+    protected function getDateRange(): array
+    {
+        $endDate = $this->endDate
+            ? Carbon::createFromFormat('Y-m-d', $this->endDate)->endOfDay()
+            : null;
+
+        $startDate = $this->startDate
+            ? Carbon::createFromFormat('Y-m-d', $this->startDate)->startOfDay()
+            : ($endDate ? Carbon::parse($endDate)->startOfYear()->startOfDay() : null);
+
+        return [$startDate, $endDate];
+    }
+
     public function render()
     {
-        if ($this->selectedTahunAjar) {
-            $tahunAjar = TahunAjar::findOrFail($this->selectedTahunAjar);
-            $this->labaRugi = $tahunAjar->hitungLabaRugi($this->selectedJenjang, $this->endDate);
-            $this->tutupBuku = $tahunAjar->tutup_buku;
-        }
+        [$startDate, $endDate] = $this->getDateRange();
 
-        $transaksi = AkuntansiJurnalDetail::with('akuntansi_rekening')
-            ->where('ms_jenjang_id', $this->selectedJenjang)
-            ->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
-            ->when($this->endDate, function ($query) {
-                $endDate = Carbon::createFromFormat('Y-m-d', $this->endDate)->endOfDay();
-                $query->where('tanggal_transaksi', '<=', $endDate);
+        $akunSaldo = AkuntansiJurnalDetail::query()
+            ->join('akuntansi_rekening', 'akuntansi_jurnal_detail.kode_rekening', '=', 'akuntansi_rekening.kode_rekening')
+            ->join('akuntansi_jurnal', 'akuntansi_jurnal_detail.akuntansi_jurnal_id', '=', 'akuntansi_jurnal.akuntansi_jurnal_id')
+            ->where('akuntansi_jurnal.ms_jenjang_id', $this->selectedJenjang)
+            ->where('akuntansi_jurnal.ms_departemen_id', 'SEKOLAH')
+            ->whereRaw("LEFT(akuntansi_jurnal_detail.kode_rekening, 1) IN ('1', '2', '3')")
+            ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('akuntansi_jurnal.tanggal_transaksi', [$startDate, $endDate]);
             })
-
+            ->when($endDate && !$startDate, function ($query) use ($endDate) {
+                $query->where('akuntansi_jurnal.tanggal_transaksi', '<=', $endDate);
+            })
+            ->select(
+                'akuntansi_jurnal_detail.kode_rekening',
+                'akuntansi_rekening.nama_rekening',
+                'akuntansi_rekening.posisi_normal',
+                DB::raw('SUM(CASE WHEN akuntansi_jurnal_detail.posisi = "debit" THEN akuntansi_jurnal_detail.nominal ELSE 0 END) as total_debit'),
+                DB::raw('SUM(CASE WHEN akuntansi_jurnal_detail.posisi = "kredit" THEN akuntansi_jurnal_detail.nominal ELSE 0 END) as total_kredit')
+            )
+            ->groupBy(
+                'akuntansi_jurnal_detail.kode_rekening',
+                'akuntansi_rekening.nama_rekening',
+                'akuntansi_rekening.posisi_normal'
+            )
+            ->orderBy('akuntansi_jurnal_detail.kode_rekening')
             ->get();
 
-        // Kelompokkan transaksi berdasarkan kategori rekening (1xx, 2xx, 3xx)
         $kelompok = [
             'aset' => [],
             'kewajiban' => [],
             'ekuitas' => [],
         ];
 
-        foreach ($transaksi->groupBy('kode_rekening') as $kode => $transaksiRek) {
-            // Abaikan akun 32001 jika tahun ajaran sudah ditutup buku
-            if ($kode == '32001' || $kode == '33001') {
-                continue;
-            }
-
-            $rekening = $transaksiRek->first()->akuntansi_rekening;
-            $namaRekening = $rekening->nama_rekening;
-            $posisiNormal = $rekening->posisi_normal;
-            $kodeAwal = substr($kode, 0, 1);
-
-            // Hitung saldo berdasarkan posisi normal
-            $saldo = $transaksiRek->sum(function ($t) use ($posisiNormal) {
-                if ($t->posisi === $posisiNormal) {
-                    return $t->nominal;
-                } else {
-                    return -$t->nominal;
-                }
-            });
+        foreach ($akunSaldo as $item) {
+            $saldo = $item->posisi_normal === 'debit'
+                ? ((float) $item->total_debit - (float) $item->total_kredit)
+                : ((float) $item->total_kredit - (float) $item->total_debit);
 
             $data = [
-                'kode' => $kode,
-                'nama' => $namaRekening,
+                'kode' => $item->kode_rekening,
+                'nama' => $item->nama_rekening,
                 'saldo' => $saldo,
             ];
+
+            $kodeAwal = substr((string) $item->kode_rekening, 0, 1);
 
             if ($kodeAwal === '1') {
                 $kelompok['aset'][] = $data;
@@ -132,8 +144,56 @@ class Index extends Component
             }
         }
 
-        return view('livewire.akuntansi-laporan-neraca.index', [
-            'kelompok' => $kelompok,
-        ]);
+        $pendapatan = AkuntansiJurnalDetail::query()
+            ->join('akuntansi_jurnal', 'akuntansi_jurnal_detail.akuntansi_jurnal_id', '=', 'akuntansi_jurnal.akuntansi_jurnal_id')
+            ->join('akuntansi_rekening', 'akuntansi_jurnal_detail.kode_rekening', '=', 'akuntansi_rekening.kode_rekening')
+            ->where('akuntansi_jurnal.ms_jenjang_id', $this->selectedJenjang)
+            ->where('akuntansi_jurnal.ms_departemen_id', 'SEKOLAH')
+            ->where('akuntansi_jurnal_detail.posisi', 'kredit')
+            ->where('akuntansi_rekening.kode_rekening', 'like', '4%')
+            ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('akuntansi_jurnal.tanggal_transaksi', [$startDate, $endDate]);
+            })
+            ->when($endDate && !$startDate, function ($query) use ($endDate) {
+                $query->where('akuntansi_jurnal.tanggal_transaksi', '<=', $endDate);
+            })
+            ->sum('akuntansi_jurnal_detail.nominal');
+
+        $beban = AkuntansiJurnalDetail::query()
+            ->join('akuntansi_jurnal', 'akuntansi_jurnal_detail.akuntansi_jurnal_id', '=', 'akuntansi_jurnal.akuntansi_jurnal_id')
+            ->join('akuntansi_rekening', 'akuntansi_jurnal_detail.kode_rekening', '=', 'akuntansi_rekening.kode_rekening')
+            ->where('akuntansi_jurnal.ms_jenjang_id', $this->selectedJenjang)
+            ->where('akuntansi_jurnal.ms_departemen_id', 'SEKOLAH')
+            ->where('akuntansi_jurnal_detail.posisi', 'debit')
+            ->where('akuntansi_rekening.kode_rekening', 'like', '5%')
+            ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('akuntansi_jurnal.tanggal_transaksi', [$startDate, $endDate]);
+            })
+            ->when($endDate && !$startDate, function ($query) use ($endDate) {
+                $query->where('akuntansi_jurnal.tanggal_transaksi', '<=', $endDate);
+            })
+            ->sum('akuntansi_jurnal_detail.nominal');
+
+        $this->labaRugi = (float) $pendapatan - (float) $beban;
+
+        $this->totalAset = collect($kelompok['aset'])->sum('saldo');
+        $this->totalKewajiban = collect($kelompok['kewajiban'])->sum('saldo');
+        $this->totalEkuitas = collect($kelompok['ekuitas'])->sum('saldo') + ($this->labaRugi ?? 0);
+        $this->totalPassiva = $this->totalKewajiban + $this->totalEkuitas;
+        $this->selisihNeraca = $this->totalAset - $this->totalPassiva;
+
+        return view('livewire.akuntansi-laporan-neraca.index',
+            [
+                'kelompok' => $kelompok,
+                'labaRugi' => $this->labaRugi,
+                'totalAset' => $this->totalAset,
+                'totalKewajiban' => $this->totalKewajiban,
+                'totalEkuitas' => $this->totalEkuitas,
+                'totalPassiva' => $this->totalPassiva,
+                'selisihNeraca' => $this->selisihNeraca,
+                'startDate' => $startDate ? $startDate->toDateString() : null,
+                'endDate' => $endDate ? $endDate->toDateString() : null,
+            ]
+        );
     }
 }

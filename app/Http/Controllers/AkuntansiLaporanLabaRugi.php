@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\AkuntansiJurnal;
 use App\Models\AkuntansiJurnalDetail;
 use App\Models\Jenjang;
 use App\Models\TahunAjar;
@@ -16,63 +17,107 @@ class AkuntansiLaporanLabaRugi extends Controller
     {
         return view('LAPORAN-AKUNTANSI.laporan-laba-rugi.v_index');
     }
+
     public function cetakPDF(Request $request)
     {
         $selectedJenjang = $request->jenjang;
-        $selectedTahunAjar = $request->tahun;
         $startDate = $request->start_date;
         $endDate = $request->end_date;
 
         $jenjang = Jenjang::find($selectedJenjang);
-        $tahunAjar = TahunAjar::find($selectedTahunAjar);
 
-        if (!$selectedJenjang || !$selectedTahunAjar) {
-            return response()->json(['error' => 'Jenjang dan Tahun Ajar wajib dipilih'], 400);
+        if (!$selectedJenjang) {
+            return response()->json(['error' => 'Jenjang wajib dipilih'], 400);
         }
 
-        $pendapatan = AkuntansiJurnalDetail::with('akuntansi_rekening')
+        $jurnals = AkuntansiJurnal::with([
+            'akuntansi_jurnal_detail.akuntansi_rekening',
+        ])
             ->where('ms_jenjang_id', $selectedJenjang)
-            ->where('ms_tahun_ajaran_id', $selectedTahunAjar)
-            ->where('posisi', 'kredit')
-            ->when($startDate && $endDate, function ($q) use ($startDate, $endDate) {
-                $start = Carbon::createFromFormat('Y-m-d', $startDate)->startOfDay();
-                $end   = Carbon::createFromFormat('Y-m-d', $endDate)->endOfDay();
+            ->where('ms_departemen_id', 'SEKOLAH')
+            ->when(
+                $startDate && $endDate,
+                function ($query) use ($startDate, $endDate) {
+                    $start = Carbon::createFromFormat('Y-m-d', $startDate)->startOfDay();
+                    $end = Carbon::createFromFormat('Y-m-d', $endDate)->endOfDay();
 
-                $q->whereBetween('tanggal_transaksi', [$start, $end]);
+                    $query->whereBetween('tanggal_transaksi', [$start, $end]);
+                }
+            )
+            ->get();
+
+        $pendapatanDetails = collect();
+        $bebanDetails = collect();
+
+        foreach ($jurnals as $jurnal) {
+            foreach ($jurnal->akuntansi_jurnal_detail as $detail) {
+                $detail->tanggal_transaksi = $jurnal->tanggal_transaksi;
+
+                if (
+                    $detail->posisi === 'kredit' &&
+                    str_starts_with((string) $detail->kode_rekening, '4')
+                ) {
+                    $pendapatanDetails->push($detail);
+                }
+
+                if (
+                    $detail->posisi === 'debit' &&
+                    str_starts_with((string) $detail->kode_rekening, '5')
+                ) {
+                    $bebanDetails->push($detail);
+                }
+            }
+        }
+
+        $pendapatanPerBulan = $pendapatanDetails->groupBy([
+            fn($item) => $item->akuntansi_rekening->nama_rekening,
+            fn($item) => Carbon::parse($item->tanggal_transaksi)->format('Y-m'),
+        ]);
+
+        $bebanPerBulan = $bebanDetails->groupBy([
+            fn($item) => $item->akuntansi_rekening->nama_rekening,
+            fn($item) => Carbon::parse($item->tanggal_transaksi)->format('Y-m'),
+        ]);
+
+        $bulanHeaders = $pendapatanPerBulan
+            ->merge($bebanPerBulan)
+            ->flatMap(function ($dataPerBulan) {
+                return $dataPerBulan->keys();
             })
-            ->whereHas('akuntansi_rekening', fn($q) => $q->where('kode_rekening', 'like', '4%'))
-            ->get()
-            ->groupBy([
-                fn($i) => $i->akuntansi_rekening->nama_rekening,
-                fn($i) => Carbon::parse($i->tanggal_transaksi)->format('Y-m')
-            ]);
+            ->unique()
+            ->sort()
+            ->values();
 
-        $beban = AkuntansiJurnalDetail::with('akuntansi_rekening')
-            ->where('ms_jenjang_id', $selectedJenjang)
-            ->where('ms_tahun_ajaran_id', $selectedTahunAjar)
-            ->where('posisi', 'debit')
-            ->when($startDate && $endDate, function ($q) use ($startDate, $endDate) {
-                $start = Carbon::createFromFormat('Y-m-d', $startDate)->startOfDay();
-                $end   = Carbon::createFromFormat('Y-m-d', $endDate)->endOfDay();
+        $bulanIndo = $bulanHeaders->mapWithKeys(function ($bulan) {
+            return [
+                $bulan => HelperController::formatTanggalIndonesia($bulan . '-01', 'F Y'),
+            ];
+        });
 
-                $q->whereBetween('tanggal_transaksi', [$start, $end]);
-            })
-            ->whereHas('akuntansi_rekening', fn($q) => $q->where('kode_rekening', 'like', '5%'))
-            ->get()
-            ->groupBy([
-                fn($i) => $i->akuntansi_rekening->nama_rekening,
-                fn($i) => Carbon::parse($i->tanggal_transaksi)->format('Y-m')
-            ]);
+        $totalPendapatanPerBulan = [];
+        foreach ($bulanHeaders as $bulan) {
+            $totalPendapatanPerBulan[$bulan] = $pendapatanPerBulan->sum(function ($dataPerBulan) use ($bulan) {
+                return optional($dataPerBulan[$bulan] ?? null)->sum('nominal');
+            });
+        }
 
-        $bulanHeaders = collect($pendapatan)->merge($beban)->flatMap(fn($i) => collect($i)->keys())->unique()->sort()->values();
-        $bulanIndo = $bulanHeaders->mapWithKeys(fn($b) => [$b => HelperController::formatTanggalIndonesia($b . '-01', 'F Y')]);
+        $totalBebanPerBulan = [];
+        foreach ($bulanHeaders as $bulan) {
+            $totalBebanPerBulan[$bulan] = $bebanPerBulan->sum(function ($dataPerBulan) use ($bulan) {
+                return optional($dataPerBulan[$bulan] ?? null)->sum('nominal');
+            });
+        }
+
+        $totalPendapatan = array_sum($totalPendapatanPerBulan);
+        $totalBeban = array_sum($totalBebanPerBulan);
+        $totalLabaRugi = $totalPendapatan - $totalBeban;
 
         $judul = 'Laporan Laba Rugi';
-        $yayasan = 'Yayasan Drul Khukama Unit ' . ($jenjang->nama_jenjang ?? '-') . ' Tahun Ajaran ' . ($tahunAjar->nama_tahun_ajar ?? '-');
+        $yayasan = 'Yayasan Drul Khukama Unit ' . ($jenjang->nama_jenjang ?? '-');
 
         if ($request->start_date && $request->end_date) {
-            $periode = 'Periode ' . \App\Http\Controllers\HelperController::formatTanggalIndonesia($request->start_date, 'd F Y') .
-                ' sampai ' . \App\Http\Controllers\HelperController::formatTanggalIndonesia($request->end_date, 'd F Y');
+            $periode = 'Periode ' . HelperController::formatTanggalIndonesia($request->start_date, 'd F Y') .
+                ' sampai ' . HelperController::formatTanggalIndonesia($request->end_date, 'd F Y');
         } else {
             $periode = 'Semua Periode';
         }
@@ -92,69 +137,64 @@ class AkuntansiLaporanLabaRugi extends Controller
         $pdf::SetFont('times', '', 9);
 
         $html = '<table border="0.5" cellspacing="0" cellpadding="4" width="100%">';
-
-        // HEAD
         $html .= '<tr style="background-color:#f2f2f2;"><th align="left">Nama Rekening</th>';
-        foreach ($bulanIndo as $b) $html .= "<th>$b</th>";
+        foreach ($bulanIndo as $label) {
+            $html .= '<th>' . $label . '</th>';
+        }
         $html .= '<th>Total</th></tr>';
 
-        // Pendapatan
         $html .= '<tr><td colspan="' . ($bulanIndo->count() + 2) . '"><strong>Pendapatan</strong></td></tr>';
-        foreach ($pendapatan as $nama => $perBulan) {
+        foreach ($pendapatanPerBulan as $nama => $perBulan) {
             $total = 0;
-            $html .= "<tr><td>$nama</td>";
+            $html .= '<tr><td>' . htmlspecialchars($nama) . '</td>';
+
             foreach ($bulanIndo as $key => $_) {
                 $sum = optional($perBulan[$key] ?? null)->sum('nominal');
                 $total += $sum;
                 $html .= '<td>Rp' . number_format($sum, 0, ',', '.') . '</td>';
             }
+
             $html .= '<td><strong>Rp' . number_format($total, 0, ',', '.') . '</strong></td></tr>';
         }
 
-        // Total Pendapatan per Bulan
         $html .= '<tr style="background-color:#d1d1d1;"><td><strong>Total Pendapatan</strong></td>';
-        $grandPendapatan = 0;
         foreach ($bulanIndo as $key => $_) {
-            $bulanSum = $pendapatan->reduce(fn($c, $pb) => $c + optional($pb[$key] ?? null)->sum('nominal'), 0);
-            $grandPendapatan += $bulanSum;
+            $bulanSum = $pendapatanPerBulan->reduce(function ($carry, $dataPerBulan) use ($key) {
+                return $carry + optional($dataPerBulan[$key] ?? null)->sum('nominal');
+            }, 0);
             $html .= '<td><strong>Rp' . number_format($bulanSum, 0, ',', '.') . '</strong></td>';
         }
-        $html .= '<td><strong>Rp' . number_format($grandPendapatan, 0, ',', '.') . '</strong></td></tr>';
+        $html .= '<td><strong>Rp' . number_format($totalPendapatan, 0, ',', '.') . '</strong></td></tr>';
 
-        // Beban
         $html .= '<tr><td colspan="' . ($bulanIndo->count() + 2) . '"><strong>Beban</strong></td></tr>';
-        foreach ($beban as $nama => $perBulan) {
+        foreach ($bebanPerBulan as $nama => $perBulan) {
             $total = 0;
-            $html .= "<tr><td>$nama</td>";
+            $html .= '<tr><td>' . htmlspecialchars($nama) . '</td>';
+
             foreach ($bulanIndo as $key => $_) {
                 $sum = optional($perBulan[$key] ?? null)->sum('nominal');
                 $total += $sum;
                 $html .= '<td>Rp' . number_format($sum, 0, ',', '.') . '</td>';
             }
+
             $html .= '<td><strong>Rp' . number_format($total, 0, ',', '.') . '</strong></td></tr>';
         }
 
-        // Total Beban per Bulan
         $html .= '<tr style="background-color:#d1d1d1;"><td><strong>Total Beban</strong></td>';
-        $grandBeban = 0;
         foreach ($bulanIndo as $key => $_) {
-            $bulanSum = $beban->reduce(fn($c, $pb) => $c + optional($pb[$key] ?? null)->sum('nominal'), 0);
-            $grandBeban += $bulanSum;
+            $bulanSum = $bebanPerBulan->reduce(function ($carry, $dataPerBulan) use ($key) {
+                return $carry + optional($dataPerBulan[$key] ?? null)->sum('nominal');
+            }, 0);
             $html .= '<td><strong>Rp' . number_format($bulanSum, 0, ',', '.') . '</strong></td>';
         }
-        $html .= '<td><strong>Rp' . number_format($grandBeban, 0, ',', '.') . '</strong></td></tr>';
+        $html .= '<td><strong>Rp' . number_format($totalBeban, 0, ',', '.') . '</strong></td></tr>';
 
-        // Laba Rugi
         $html .= '<tr style="background-color:#f2f2f2;"><td><strong>LABA (RUGI)</strong></td>';
-        $totalLaba = 0;
-        foreach ($bulanIndo as $bulan => $_) {
-            $pend = $pendapatan->map(fn($rek) => optional($rek[$bulan] ?? null)->sum('nominal'))->sum();
-            $beb = $beban->map(fn($rek) => optional($rek[$bulan] ?? null)->sum('nominal'))->sum();
-            $laba = $pend - $beb;
-            $totalLaba += $laba;
+        foreach ($bulanIndo as $key => $_) {
+            $laba = ($totalPendapatanPerBulan[$key] ?? 0) - ($totalBebanPerBulan[$key] ?? 0);
             $html .= '<td><strong>Rp' . number_format($laba, 0, ',', '.') . '</strong></td>';
         }
-        $html .= '<td><strong>Rp' . number_format($totalLaba, 0, ',', '.') . '</strong></td></tr>';
+        $html .= '<td><strong>Rp' . number_format($totalLabaRugi, 0, ',', '.') . '</strong></td></tr>';
         $html .= '</table>';
 
         $pdf::writeHTML($html, true, false, true, false, '');

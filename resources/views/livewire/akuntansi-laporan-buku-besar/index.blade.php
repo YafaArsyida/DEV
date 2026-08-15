@@ -167,15 +167,10 @@
                 </div>
             </div>
         </div>
-        <div class="modal fade zoomIn"
-            id="ModalExportBukuBesar"
-            tabindex="-1"
-            aria-labelledby="exportBukuBesarLabel"
-            aria-hidden="true">
-
+        <div class="modal fade zoomIn" id="ModalExportBukuBesar" tabindex="-1"
+            aria-labelledby="exportBukuBesarLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-
                     {{-- CLOSE BUTTON --}}
                     <div class="modal-header border-0 pb-0">
                         <button type="button"
@@ -189,7 +184,6 @@
 
                     {{-- BODY --}}
                     <div class="modal-body px-4 pb-5 pt-2 text-center">
-
                         {{-- ICON --}}
                         <div class="mb-4">
                             <div class="avatar-xl mx-auto">
@@ -204,7 +198,6 @@
 
                         {{-- TITLE --}}
                         <div class="mb-2">
-
                             <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill mb-3">
                                 Export Excel
                             </span>
@@ -225,9 +218,7 @@
 
                         {{-- INFORMATION REKENING --}}
                         <div class="alert alert-light border rounded-4 text-start mt-4 mb-0">
-
                             <div class="d-flex align-items-start gap-3">
-
                                 <div class="flex-shrink-0">
                                     <div class="avatar-sm">
                                         <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
@@ -237,13 +228,11 @@
                                 </div>
 
                                 <div class="flex-grow-1">
-
                                     <h6 class="fw-semibold mb-1">
                                         {{ $selectedRekeningData->nama_rekening ?? 'Rekening belum dipilih' }}
                                     </h6>
 
                                     <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
-
                                         <span class="badge bg-primary-subtle text-primary">
                                             {{ $selectedRekeningData->kode_rekening ?? '-' }}
                                         </span>
@@ -252,34 +241,26 @@
                                             Posisi normal:
                                             {{ $selectedRekeningData->posisi_normal ?? '-' }}
                                         </span>
-
                                     </div>
 
                                     <p class="text-muted mb-0 fs-13">
                                         Data Buku Besar rekening ini akan diekspor ke Excel.
                                     </p>
-
                                 </div>
-
                             </div>
-
                         </div>
-
                     </div>
 
                     {{-- FOOTER --}}
                     <div class="modal-footer border-0 pt-0 px-4 pb-4 justify-content-center">
 
-                        <button type="button"
-                            class="btn btn-light rounded-pill px-4"
-                            data-bs-dismiss="modal">
-
+                        <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">
                             <i class="ri-close-line me-1"></i>
                             Batal
                         </button>
+
                         <button type="button"
-                            class="btn btn-success rounded-pill px-4"
-                            id="konfirmasiExportBukuBesar"
+                            class="btn btn-success rounded-pill px-4" id="konfirmasiExportBukuBesar"
                             data-kode-rekening="{{ $selectedRekeningData->kode_rekening ?? '' }}"
                             data-nama-rekening="{{ $selectedRekeningData->nama_rekening ?? '' }}"
                             data-bs-dismiss="modal">
@@ -287,9 +268,7 @@
                             <i class="ri-file-excel-2-line me-1"></i>
                             Ya, Export
                         </button>
-
                     </div>
-
                 </div>
             </div>
         </div>
@@ -329,14 +308,20 @@
                 });
         </script>
     </div>
-@else
+    @else
     <div class="col-xxl-12">
         <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
             <div class="card-body text-center py-5">
-                <h5 class="fw-semibold mb-2">Pilih satu rekening untuk menampilkan Buku Besar.</h5>
-                <p class="text-muted mb-0">Gunakan filter rekening dan periode untuk melihat transaksi dan saldo berjalan.</p>
+                <div class="noresult text-center py-3">
+                    <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop"
+                        colors="primary:#405189,secondary:#08a88a"
+                        style="width:75px;height:75px">
+                    </lord-icon>
+                    <h5 class="mt-2">Pilih satu rekening untuk menampilkan Buku Besar.</h5>
+                    <p class="text-muted mb-0">Gunakan filter rekening dan periode untuk melihat transaksi dan saldo berjalan.</p>
+                </div>
             </div>
         </div>
     </div>
-@endif
+    @endif
 </div>
