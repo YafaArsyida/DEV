@@ -17,7 +17,7 @@
 
                             <div>
                                 <h5 class="fw-bold mb-1">
-                                    Laporan Arus Kas
+                                    Laporan Arus Kas - {{ $namaRekening }}
                                 </h5>
 
                                 <small class="text-muted">
@@ -93,52 +93,43 @@
                 {{-- DATA --}}
                 <div class="live-preview">
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle">
+                        <table id="Data" class="table table-hover table-nowrap align-middle">
 
                             {{-- HEADER --}}
                             <thead class="table-light">
                                 <tr>
-                                    <th class="text-uppercase">No</th>
-                                    <th class="text-uppercase text-start" style="width: 120px;">
+                                    <th class="text-uppercase text-center" style="width: 60px;">
+                                        No
+                                    </th>
+                                    <th class="text-uppercase text-start">
                                         Tanggal
                                     </th>
-                                    <th class="text-uppercase text-start" style="width: 120px;">
+                                    <th class="text-uppercase text-start">
                                         Akun
                                     </th>
                                     <th class="text-uppercase text-start">
                                         Petugas
                                     </th>
-                                    <th class="text-uppercase text-start" style="min-width: 500px;">
+                                    <th class="text-uppercase text-start">
                                         Deskripsi Transaksi
                                     </th>
                                     <th class="text-uppercase text-center">
-                                        Pemasukan
+                                        Kas Masuk
                                     </th>
                                     <th class="text-uppercase text-center">
-                                        Pengeluaran
+                                        Kas Keluar
                                     </th>
                                 </tr>
                             </thead>
 
                             {{-- BODY --}}
                             <tbody>
-
-                                {{-- SALDO AWAL --}}
-                                <tr class="table-light fw-semibold">
-                                    <td colspan="5" class="text-end">
-                                        Saldo Awal
-                                    </td>
-                                    <td colspan="2" class="text-center">
-                                        Rp{{ number_format($saldoAwal, 0, ',', '.') }}
-                                    </td>
-                                </tr>
-
-                                @forelse ($transaksiJurnal as $trx)
-
+                                @forelse ($transaksiJurnal as $key => $trx)
                                     <tr>
+
                                         {{-- NO --}}
-                                        <td class="text-start">
-                                            {{ $loop->iteration }}.
+                                        <td class="text-center">
+                                            {{ $transaksiJurnal->firstItem() + $key }}.
                                         </td>
 
                                         {{-- TANGGAL --}}
@@ -166,10 +157,10 @@
                                             {{ $trx->akuntansi_jurnal->deskripsi ?? '-' }}
                                         </td>
 
-                                        {{-- PEMASUKAN --}}
+                                        {{-- KAS MASUK --}}
                                         <td class="text-center">
                                             @if ($trx->posisi === 'debit')
-                                                <span class="fs-14 text-success">
+                                                <span class="fs-12 text-success">
                                                     Rp{{ number_format($trx->nominal, 0, ',', '.') }}
                                                 </span>
                                             @else
@@ -177,68 +168,128 @@
                                             @endif
                                         </td>
 
-                                        {{-- PENGELUARAN --}}
+                                        {{-- KAS KELUAR --}}
                                         <td class="text-center">
                                             @if ($trx->posisi === 'kredit')
-                                                <span class="fs-14 text-danger">
+                                                <span class="fs-12 text-danger">
                                                     Rp{{ number_format($trx->nominal, 0, ',', '.') }}
                                                 </span>
                                             @else
                                                 -
                                             @endif
                                         </td>
+
                                     </tr>
 
                                 @empty
 
                                     <tr>
                                         <td colspan="7" class="text-center text-muted py-4">
+                                            <i class="ri-inbox-line fs-4 d-block mb-2"></i>
                                             Tidak ada transaksi pada periode yang dipilih.
                                         </td>
                                     </tr>
 
                                 @endforelse
-
                             </tbody>
 
                             {{-- FOOTER --}}
                             <tfoot>
 
                                 {{-- TOTAL --}}
-                                <tr class="table-light">
-                                    <td colspan="5" class="text-end fw-bold">
+                                <tr class="table-light fw-bold">
+
+                                    <td colspan="5" class="text-end">
                                         TOTAL
                                     </td>
 
                                     <td class="text-center">
-                                        <span class="fs-14 text-success">
+                                        <span class="fs-12 text-success">
                                             Rp{{ number_format($totalKasMasuk, 0, ',', '.') }}
                                         </span>
                                     </td>
 
                                     <td class="text-center">
-                                        <span class="fs-14 text-danger">
+                                        <span class="fs-12 text-danger">
                                             Rp{{ number_format($totalKasKeluar, 0, ',', '.') }}
                                         </span>
                                     </td>
-                                </tr>
 
-                                {{-- SALDO AKHIR --}}
-                                <tr class="fw-bold">
-                                    <td colspan="5" class="text-end">
-                                        SALDO AKHIR
-                                    </td>
-
-                                    <td colspan="2" class="text-center">
-                                        <span class="fs-14">
-                                            Rp{{ number_format($saldoAkhir, 0, ',', '.') }}
-                                        </span>
-                                    </td>
                                 </tr>
 
                             </tfoot>
 
                         </table>
+                        <div class="mt-3">
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                <div class="text-muted fs-13">
+                                    Menampilkan
+                                    <span class="fw-semibold">
+                                        {{ $transaksiJurnal->firstItem() ?? 0 }}
+                                    </span>
+                                    -
+                                    <span class="fw-semibold">
+                                        {{ $transaksiJurnal->lastItem() ?? 0 }}
+                                    </span>
+                                    dari
+                                    <span class="fw-semibold">
+                                        {{ $transaksiJurnal->total() }}
+                                    </span>
+                                    transaksi
+                                </div>
+                                <div>
+                                    {{ $transaksiJurnal->links() }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row justify-content-end mt-3">
+                        <div class="col-xl-5 col-lg-6 col-md-8">
+                            <div class="border rounded-4 overflow-hidden">
+
+                                {{-- SALDO AWAL --}}
+                                <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
+                                    <span class="fw-medium">
+                                        Saldo Awal {{ $namaRekening }}
+                                    </span>
+                                    <span class="fw-semibold fs-12">
+                                        Rp{{ number_format($saldoAwal, 0, ',', '.') }}
+                                    </span>
+                                </div>
+
+                                {{-- KAS MASUK --}}
+                                <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
+                                    <span class="fw-medium">
+                                        Total Kas Masuk
+                                    </span>
+                                    <span class="fw-semibold text-success fs-12">
+                                        + Rp{{ number_format($totalKasMasuk, 0, ',', '.') }}
+                                    </span>
+                                </div>
+
+                                {{-- KAS KELUAR --}}
+                                <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
+                                    <span class="fw-medium">
+                                        Total Kas Keluar
+                                    </span>
+                                    <span class="fw-semibold text-danger fs-12">
+                                        - Rp{{ number_format($totalKasKeluar, 0, ',', '.') }}
+                                    </span>
+                                </div>
+
+                                {{-- SALDO AKHIR --}}
+                                <div class="d-flex justify-content-between align-items-center px-3 py-3 bg-dark text-white">
+                                    <span class="fw-bold">
+                                        Saldo Akhir {{ $namaRekening }}
+                                    </span>
+                                    <span class="fw-bold fs-12">
+                                        Rp{{ number_format($saldoAkhir, 0, ',', '.') }}
+                                    </span>
+                                </div>
+
+                            </div>
+
+                        </div>
                     </div>
                 </div>
             </div>  

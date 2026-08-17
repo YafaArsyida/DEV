@@ -154,14 +154,27 @@
                                 @endforelse
                             </tbody>
                         </table>
-                    </div>
-
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <div class="text-muted">
-                            Menampilkan {{ $transaksiJurnal->firstItem() ?? 0 }} – {{ $transaksiJurnal->lastItem() ?? 0 }} dari {{ $transaksiJurnal->total() }} transaksi
-                        </div>
-                        <div>
-                            {{ $transaksiJurnal->links() }}
+                        <div class="mt-3">
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                <div class="text-muted fs-13">
+                                    Menampilkan
+                                    <span class="fw-semibold">
+                                        {{ $transaksiJurnal->firstItem() ?? 0 }}
+                                    </span>
+                                    -
+                                    <span class="fw-semibold">
+                                        {{ $transaksiJurnal->lastItem() ?? 0 }}
+                                    </span>
+                                    dari
+                                    <span class="fw-semibold">
+                                        {{ $transaksiJurnal->total() }}
+                                    </span>
+                                    transaksi
+                                </div>
+                                <div>
+                                    {{ $transaksiJurnal->links() }}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

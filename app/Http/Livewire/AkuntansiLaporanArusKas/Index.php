@@ -101,98 +101,152 @@ class Index extends Component
 
     public function render()
     {
+        $namaRekening = 'Kas & Bank';
+
+        if ($this->selectedRekening === '11001') {
+            $namaRekening = 'Kas Besar';
+        } elseif ($this->selectedRekening === '11002') {
+            $namaRekening = 'Bank Sekolah';
+        }
+
         $akunKasBank = ['11001', '11002'];
 
-        $transaksiJurnal = AkuntansiJurnalDetail::with([
-            'akuntansi_rekening',
-            'akuntansi_jurnal.ms_pengguna',
-        ])
-            ->whereIn(
-                'kode_rekening',
-                $this->selectedRekening
-                    ? [$this->selectedRekening]
-                    : $akunKasBank
-            )
-            ->whereHas('akuntansi_jurnal', function ($query) {
+        /*
+        |--------------------------------------------------------------------------
+        | FILTER REKENING KAS / BANK
+        |--------------------------------------------------------------------------
+        */
+        $kodeKasBank = $this->selectedRekening
+            ? [$this->selectedRekening]
+            : $akunKasBank;
 
-                $query->where('ms_jenjang_id', $this->selectedJenjang)
-                    ->where('ms_departemen_id', 'SEKOLAH');
 
-                // FILTER PERIODE
-                if ($this->startDate && $this->endDate) {
-                    $query->whereBetween('tanggal_transaksi', [
-                        Carbon::parse($this->startDate)->startOfDay(),
-                        Carbon::parse($this->endDate)->endOfDay(),
-                    ]);
-                }
-
-                // PENCARIAN
-                if ($this->search) {
-                    $query->where(function ($query) {
-                        $query->where(
-                            'deskripsi',
-                            'like',
-                            '%' . $this->search . '%'
-                        )
-                        ->orWhere(
-                            'nomor_jurnal',
-                            'like',
-                            '%' . $this->search . '%'
-                        );
-                    });
-                }
-            })
+        /*
+        |--------------------------------------------------------------------------
+        | BASE QUERY TRANSAKSI
+        |--------------------------------------------------------------------------
+        */
+        $baseQuery = AkuntansiJurnalDetail::query()
+            ->with([
+                'akuntansi_rekening',
+                'akuntansi_jurnal.ms_pengguna',
+            ])
+            ->whereIn('akuntansi_jurnal_detail.kode_rekening', $kodeKasBank)
             ->join(
                 'akuntansi_jurnal',
                 'akuntansi_jurnal.akuntansi_jurnal_id',
                 '=',
                 'akuntansi_jurnal_detail.akuntansi_jurnal_id'
             )
-            ->orderBy('akuntansi_jurnal.tanggal_transaksi')
-            ->select('akuntansi_jurnal_detail.*')
-            ->get();
+            ->where('akuntansi_jurnal.ms_jenjang_id', $this->selectedJenjang)
+            ->where('akuntansi_jurnal.ms_departemen_id', 'SEKOLAH');
+
 
         /*
         |--------------------------------------------------------------------------
-        | KAS MASUK & KAS KELUAR
+        | FILTER PERIODE
         |--------------------------------------------------------------------------
         */
+        if ($this->startDate && $this->endDate) {
+            $baseQuery->whereBetween(
+                'akuntansi_jurnal.tanggal_transaksi',
+                [
+                    Carbon::parse($this->startDate)->startOfDay(),
+                    Carbon::parse($this->endDate)->endOfDay(),
+                ]
+            );
+        }
 
-        $totalKasMasuk = $transaksiJurnal
-            ->where('posisi', 'debit')
-            ->sum('nominal');
 
-        $totalKasKeluar = $transaksiJurnal
-            ->where('posisi', 'kredit')
-            ->sum('nominal');
+        /*
+        |--------------------------------------------------------------------------
+        | QUERY TRANSAKSI UNTUK TABEL
+        |--------------------------------------------------------------------------
+        |
+        | Search hanya digunakan untuk menyaring transaksi yang ditampilkan.
+        |
+        */
+        $transaksiQuery = clone $baseQuery;
+
+        if ($this->search) {
+            $transaksiQuery->where(function ($query) {
+                $query->where(
+                    'akuntansi_jurnal.deskripsi',
+                    'like',
+                    '%' . $this->search . '%'
+                )
+                ->orWhere(
+                    'akuntansi_jurnal.nomor_jurnal',
+                    'like',
+                    '%' . $this->search . '%'
+                );
+            });
+        }
+
+        $transaksiJurnal = $transaksiQuery
+            ->orderBy('akuntansi_jurnal.tanggal_transaksi')
+            ->orderBy('akuntansi_jurnal.akuntansi_jurnal_id')
+            ->orderBy('akuntansi_jurnal_detail.akuntansi_jurnal_detail_id')
+            ->select('akuntansi_jurnal_detail.*')
+            ->paginate($this->perPage);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | TOTAL KAS MASUK & KAS KELUAR
+        |--------------------------------------------------------------------------
+        |
+        | Tidak menggunakan pagination.
+        | Menghitung seluruh transaksi pada periode/filter.
+        |
+        */
+        $summaryQuery = clone $baseQuery;
+
+        $summary = $summaryQuery
+            ->selectRaw("
+                SUM(
+                    CASE
+                        WHEN akuntansi_jurnal_detail.posisi = 'debit'
+                        THEN akuntansi_jurnal_detail.nominal
+                        ELSE 0
+                    END
+                ) AS total_kas_masuk,
+
+                SUM(
+                    CASE
+                        WHEN akuntansi_jurnal_detail.posisi = 'kredit'
+                        THEN akuntansi_jurnal_detail.nominal
+                        ELSE 0
+                    END
+                ) AS total_kas_keluar
+            ")
+            ->first();
+
+        $totalKasMasuk = $summary->total_kas_masuk ?? 0;
+        $totalKasKeluar = $summary->total_kas_keluar ?? 0;
 
 
         /*
         |--------------------------------------------------------------------------
         | SALDO AWAL
         |--------------------------------------------------------------------------
+        |
+        | Saldo seluruh Kas/Bank sebelum tanggal mulai laporan.
+        |
         */
-
         $saldoAwal = 0;
 
         if ($this->startDate) {
 
             $saldoAwal = AkuntansiJurnalDetail::query()
-                ->whereIn(
-                    'kode_rekening',
-                    $this->selectedRekening
-                        ? [$this->selectedRekening]
-                        : $akunKasBank
-                )
+                ->whereIn('kode_rekening', $kodeKasBank)
                 ->whereHas('akuntansi_jurnal', function ($query) {
-
                     $query->where(
                         'ms_jenjang_id',
                         $this->selectedJenjang
                     )
                     ->where(
-                        'ms_departemen_id',
-                        'SEKOLAH'
+                        'ms_departemen_id', 'SEKOLAH'
                     )
                     ->where(
                         'tanggal_transaksi',
@@ -201,36 +255,37 @@ class Index extends Component
                     );
                 })
                 ->selectRaw("
-                    SUM(
-                        CASE
-                            WHEN posisi = 'debit'
-                            THEN nominal
-                            ELSE 0
-                        END
+                    COALESCE(
+                        SUM(
+                            CASE
+                                WHEN posisi = 'debit'
+                                THEN nominal
+                                ELSE 0
+                            END
+                        ),
+                        0
                     )
                     -
-                    SUM(
-                        CASE
-                            WHEN posisi = 'kredit'
-                            THEN nominal
-                            ELSE 0
-                        END
+                    COALESCE(
+                        SUM(
+                            CASE
+                                WHEN posisi = 'kredit'
+                                THEN nominal
+                                ELSE 0
+                            END
+                        ),
+                        0
                     ) AS saldo
                 ")
                 ->value('saldo') ?? 0;
         }
-
 
         /*
         |--------------------------------------------------------------------------
         | SALDO AKHIR
         |--------------------------------------------------------------------------
         */
-
-        $saldoAkhir = $saldoAwal
-            + $totalKasMasuk
-            - $totalKasKeluar;
-
+        $saldoAkhir = $saldoAwal + $totalKasMasuk - $totalKasKeluar;
 
         return view('livewire.akuntansi-laporan-arus-kas.index',
             [
@@ -239,6 +294,7 @@ class Index extends Component
                 'saldoAkhir'      => $saldoAkhir,
                 'totalKasMasuk'   => $totalKasMasuk,
                 'totalKasKeluar'  => $totalKasKeluar,
+                'namaRekening' => $namaRekening,
             ]
         );
     }

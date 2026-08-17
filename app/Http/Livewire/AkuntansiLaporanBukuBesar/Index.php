@@ -105,7 +105,23 @@ class Index extends Component
                 ->where('akuntansi_jurnal_detail.kode_rekening', $this->selectedRekening)
                 ->where('akuntansi_jurnal.ms_jenjang_id', $this->selectedJenjang)
                 ->where('akuntansi_jurnal.tanggal_transaksi', '<', $start)
-                ->selectRaw("\n                    SUM(CASE WHEN akuntansi_jurnal_detail.posisi = 'debit' THEN akuntansi_jurnal_detail.nominal ELSE 0 END) as total_debit,\n                    SUM(CASE WHEN akuntansi_jurnal_detail.posisi = 'kredit' THEN akuntansi_jurnal_detail.nominal ELSE 0 END) as total_kredit\n                ")
+                ->selectRaw("
+                    SUM(
+                        CASE
+                            WHEN akuntansi_jurnal_detail.posisi = 'debit'
+                            THEN akuntansi_jurnal_detail.nominal
+                            ELSE 0
+                        END
+                    ) as total_debit,
+
+                    SUM(
+                        CASE
+                            WHEN akuntansi_jurnal_detail.posisi = 'kredit'
+                            THEN akuntansi_jurnal_detail.nominal
+                            ELSE 0
+                        END
+                    ) as total_kredit
+                ")
                 ->first();
 
             $totalDebitBefore = $saldoAwalData->total_debit ?? 0;
@@ -142,6 +158,7 @@ class Index extends Component
                 ->select('akuntansi_jurnal_detail.*');
 
             $transaksiJurnal = $query->paginate($this->perPage);
+
             $saldoAwalHalaman = $saldoAwal;
 
             if ($transaksiJurnal->currentPage() > 1 && $transaksiJurnal->count() > 0) {
@@ -166,10 +183,29 @@ class Index extends Component
                         });
                     })
                     ->whereRaw(
-                        '(akuntansi_jurnal.tanggal_transaksi, akuntansi_jurnal.akuntansi_jurnal_id, akuntansi_jurnal_detail.akuntansi_jurnal_detail_id) < (?, ?, ?)',
+                        '(akuntansi_jurnal.tanggal_transaksi,
+                        akuntansi_jurnal.akuntansi_jurnal_id,
+                        akuntansi_jurnal_detail.akuntansi_jurnal_detail_id)
+                        < (?, ?, ?)',
                         [$firstTanggal, $firstJurnalId, $firstDetailId]
                     )
-                    ->selectRaw("\n                        SUM(CASE WHEN akuntansi_jurnal_detail.posisi = 'debit' THEN akuntansi_jurnal_detail.nominal ELSE 0 END) as total_debit,\n                        SUM(CASE WHEN akuntansi_jurnal_detail.posisi = 'kredit' THEN akuntansi_jurnal_detail.nominal ELSE 0 END) as total_kredit\n                    ")
+                    ->selectRaw("
+                        SUM(
+                            CASE 
+                                WHEN akuntansi_jurnal_detail.posisi = 'debit'
+                                THEN akuntansi_jurnal_detail.nominal
+                                ELSE 0
+                            END
+                        ) AS total_debit,
+
+                        SUM(
+                            CASE 
+                                WHEN akuntansi_jurnal_detail.posisi = 'kredit'
+                                THEN akuntansi_jurnal_detail.nominal
+                                ELSE 0
+                            END
+                        ) AS total_kredit
+                    ")
                     ->first();
 
                 $totalDebitPageBefore = $saldoAwalHalamanData->total_debit ?? 0;
