@@ -1,22 +1,46 @@
-<div class="card">
-    <div class="card-header border-0">
-        <div class="d-flex align-items-center">
-            <h5 class="card-title mb-0 flex-grow-1">Petugas Administrasi</h5>
-            <div class="flex-shrink-0">
-                <div class="d-flex gap-2 flex-wrap">
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ModalAddPengguna" data-bs-trigger="hover"
-                        data-bs-placement="top" title="Petugas Baru">
-                        <i class="ri-group-line"></i> Petugas Baru
-                    </button>
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card-header">
+        <div class="d-flex align-items-center flex-wrap gap-3">
+            {{-- Judul --}}
+            <div class="flex-grow-1">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-sm flex-shrink-0">
+                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                            <i class="ri-group-line"></i>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h5 class="fw-bold mb-1">
+                            Petugas Administrasi
+                        </h5>
+
+                        <small class="text-muted">
+                            Kelola data petugas administrasi sekolah.
+                        </small>
+                    </div>
                 </div>
+            </div>
+
+            {{-- Tombol --}}
+            <div class="flex-shrink-0">
+                <button type="button" data-bs-toggle="modal" data-bs-target="#ModalAddPengguna"
+                    class="btn btn-primary rounded-pill px-4 d-inline-flex align-items-center gap-1">
+                    <i class="ri-add-line align-bottom"></i>
+                    <span>
+                        Petugas Baru
+                    </span>
+                </button>
             </div>
         </div>
     </div>
-    <div class="card-body border border-dashed border-end-0 border-start-0">
-        <div class="row g-3">
+    <div class="card-body">
+        <div class="row g-3 mb-4">
             <div class="col-xxl-12 col-sm-12">
+                <label for="searchData" class="form-label small text-muted text-uppercase fw-medium mb-2">Pencarian</label>
                 <div class="search-box">
-                    <input type="text" class="form-control search" wire:model.debounce.300ms="search" placeholder="cari nama, deskripsi atau lainnya...">
+                    <input type="text" id="searchData" class="form-control search" wire:model.debounce.300ms="search"
+                        placeholder="Cari nama, deskripsi, atau lainnya...">
                     <i class="ri-search-line search-icon"></i>
                 </div>
             </div>
@@ -31,27 +55,25 @@
             </div> --}}
         </div>
         <!--end row-->
-    </div>
-    <div class="card-body">
         <div class="live-preview">
             <div class="table-responsive">
-                <table class="table table-hover nowrap align-middle" style="width:100%">
+                <table class="table table-hover table-nowrap align-middle" style="width:100%">
                     <thead class="table-light">
                         <tr>
-                            <th class="text-uppercase" width="50px">no</th>
-                            <th class="text-uppercase" width="50px">hapus</th>
+                            <th class="text-uppercase text-center" width="50px">no</th>
+                            <th class="text-uppercase text-center" width="50px">hapus</th>
                             <th class="text-uppercase">petugas</th>
                             <th class="text-uppercase">username</th>
                             <th class="text-uppercase">peran</th>
                             <th class="text-uppercase">akses jenjang</th>
-                            <th class="text-uppercase">aksi</th>
+                            <th class="text-uppercase text-center">aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                     @forelse($pengguna as $index => $user)
                         <tr>
-                            <td>{{ $index + 1 }}</td>
-                            <td>
+                            <td class="text-center">{{ $index + 1 }}</td>
+                            <td class="text-center">
                                 <!-- Hapus Pengguna -->
                                 <a href="#ModalDeletePengguna" data-bs-toggle="modal" class="text-danger d-inline-block remove-item-btn" 
                                 wire:click.prevent="$emit('deletePengguna', {{ $user['ms_pengguna_id'] }})" 
@@ -59,30 +81,38 @@
                                     <i class="ri-delete-bin-5-fill fs-16"></i>
                                 </a>
                             </td>
-                            <td style="white-space: nowrap;">{{ $user['nama'] }}</td>
+                            <td>{{ $user['nama'] }}</td>
                             <td>{{ $user['email'] }}</td>
                             <td class="text-uppercase text-secondary">{{ $user['peran'] }}</td>
-                            <td style="white-space: nowrap;">{{ implode(', ', $user['aksesJenjang']) }}</td>
-                            <td style="white-space: nowrap;">
-                                <!-- Detail Pengguna -->
-                                <a href="#ModalDetailPengguna" data-bs-toggle="modal" class="text-secondary d-inline-block detail-item-btn" 
-                                wire:click.prevent="$emit('detailPengguna', {{ $user['ms_pengguna_id'] }})">
-                                    <i class="ri-eye-line fs-17 align-middle"></i> Detail
-                                </a>
-                                
-                                <!-- Edit Pengguna -->
-                                <a href="#ModalEditPengguna" data-bs-toggle="modal" class="text-warning d-inline-block detail-item-btn ms-1" 
-                                wire:click.prevent="$emit('editPengguna', {{ $user['ms_pengguna_id'] }})">
-                                    <i class="ri-mark-pen-line fs-17 align-middle"></i> Edit
-                                </a>
+                            <td>{{ implode(', ', $user['aksesJenjang']) }}</td>
+                            <td>
+                                <div class="d-flex justify-content-center gap-2">
+                                    {{-- DETAIL --}}
+                                    <a href="#ModalDetailPengguna" data-bs-toggle="modal"
+                                        class="btn btn-soft-primary btn-sm rounded-pill px-3"
+                                        title="Detail Pengguna" wire:click.prevent="$emit('detailPengguna', {{ $user['ms_pengguna_id'] }})">
 
-                                <!-- Reset Password -->
-                                <a href="#ModalKonfirmasiReset" data-bs-toggle="modal" class="text-danger d-inline-block detail-item-btn ms-1" 
-                                wire:click.prevent="$emit('resetPassword', {{ $user['ms_pengguna_id'] }})">
-                                    <i class="ri-lock-unlock-line fs-17 align-middle"></i> Reset
-                                </a>
+                                        <i class="ri-eye-line me-1"></i>
+                                        Detail
+                                    </a>
+
+                                    {{-- EDIT --}}
+                                    <a href="#ModalEditPengguna" data-bs-toggle="modal"
+                                        class="btn btn-primary btn-sm rounded-pill px-3"
+                                        title="Edit Pengguna" wire:click.prevent="$emit('editPengguna', {{ $user['ms_pengguna_id'] }})">
+                                        <i class="ri-mark-pen-line me-1"></i> Edit
+                                    </a>
+
+                                    {{-- RESET PASSWORD --}}
+                                    <a href="#ModalKonfirmasiReset"
+                                        data-bs-toggle="modal" class="btn btn-soft-danger btn-sm rounded-pill px-3"
+                                        title="Reset Password" wire:click.prevent="$emit('resetPassword', {{ $user['ms_pengguna_id'] }})">
+
+                                        <i class="ri-lock-unlock-line me-1"></i>
+                                        Reset
+                                    </a>
+                                </div>
                             </td>
-
                         </tr>
                     @empty
                         <tr>

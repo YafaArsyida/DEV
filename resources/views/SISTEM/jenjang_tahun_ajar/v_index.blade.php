@@ -20,21 +20,19 @@
         </div>
         <!-- end page title -->
         <div class="row">
-            {{-- JENJANG --}}
-            <div class="col-xxl-7">
-                @livewire('jenjang.create')
-                @livewire('jenjang.index')   
-                @livewire('jenjang.edit')  
-                @livewire('jenjang.delete')  
-            </div>
-            <!--end col-->
             {{-- TAHUN AJAR --}}
             <div class="col-xxl-5">
                 @livewire('tahun-ajar.create')   
                 @livewire('tahun-ajar.index')   
                 @livewire('tahun-ajar.edit')   
                 @livewire('tahun-ajar.delete')  
-
+            </div>
+            {{-- JENJANG --}}
+            <div class="col-xxl-7">
+                @livewire('jenjang.create')
+                @livewire('jenjang.index')   
+                @livewire('jenjang.edit')  
+                @livewire('jenjang.delete')  
             </div>
             <!--end col-->
         </div>        
