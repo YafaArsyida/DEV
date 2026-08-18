@@ -34,30 +34,4 @@ class TahunAjar extends Model
     {
         return $this->belongsTo(User::class, 'ms_pengguna_id', 'ms_pengguna_id');
     }
-
-    // Model TahunAjar
-    public function hitungLabaRugi($jenjang_id = null, $endDate = null)
-    {
-        $pendapatan = AkuntansiJurnalDetail::with('akuntansi_rekening')
-            ->where('ms_tahun_ajaran_id', $this->ms_tahun_ajar_id)
-            ->when($jenjang_id, fn($q) => $q->where('ms_jenjang_id', $jenjang_id))
-            ->when($endDate, fn($q) => $q->whereDate('tanggal_transaksi', '<=', $endDate))
-            ->where('posisi', 'kredit')
-            ->whereHas('akuntansi_rekening', function ($query) {
-                $query->where('kode_rekening', 'like', '4%');
-            })
-            ->sum('nominal');
-
-        $beban = AkuntansiJurnalDetail::with('akuntansi_rekening')
-            ->where('ms_tahun_ajaran_id', $this->ms_tahun_ajar_id)
-            ->when($jenjang_id, fn($q) => $q->where('ms_jenjang_id', $jenjang_id))
-            ->when($endDate, fn($q) => $q->whereDate('tanggal_transaksi', '<=', $endDate))
-            ->where('posisi', 'debit')
-            ->whereHas('akuntansi_rekening', function ($query) {
-                $query->where('kode_rekening', 'like', '5%');
-            })
-            ->sum('nominal');
-
-        return $pendapatan - $beban;
-    }
 }

@@ -21,7 +21,7 @@
         <!-- end page title -->
         <div class="row">
             {{-- JENJANG --}}
-            <div class="col-xxl-5">
+            <div class="col-xxl-7">
                 @livewire('jenjang.create')
                 @livewire('jenjang.index')   
                 @livewire('jenjang.edit')  
@@ -29,7 +29,7 @@
             </div>
             <!--end col-->
             {{-- TAHUN AJAR --}}
-            <div class="col-xxl-7">
+            <div class="col-xxl-5">
                 @livewire('tahun-ajar.create')   
                 @livewire('tahun-ajar.index')   
                 @livewire('tahun-ajar.edit')   

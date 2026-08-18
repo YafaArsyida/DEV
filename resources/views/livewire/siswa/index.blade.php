@@ -83,7 +83,7 @@
         <div class="row g-3 align-items-end mb-3">
             <!-- Input Pencarian -->
             <div class="col-12 col-lg-6">
-                <label for="searchData" class="form-label">Pencarian</label>
+                <label for="searchData" class="form-label small text-muted text-uppercase fw-medium mb-2">Pencarian</label>
                 <div class="search-box">
                     <input type="text" id="searchData" class="form-control search" wire:model.debounce.300ms="search"
                         placeholder="Cari nama, deskripsi, atau lainnya...">
@@ -92,7 +92,7 @@
             </div>
             <!-- Dropdown Kelas -->
             <div class="col-6 col-lg-3">
-                <label for="filterKelas" class="form-label">Kelas</label>
+                <label for="filterKelas" class="form-label small text-muted text-uppercase fw-medium mb-2">Kelas</label>
                 <select id="filterKelas" wire:model="selectedKelas" class="form-select" style="cursor: pointer;"
                     data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Kelas">
                     <option value="">Semua Kelas</option>
@@ -103,7 +103,7 @@
             </div>
             <!-- Dropdown Jumlah Per Halaman -->
             <div class="col-6 col-lg-3">
-                <label for="perPage" class="form-label">Tampilkan</label>
+                <label for="perPage" class="form-label small text-muted text-uppercase fw-medium mb-2">Tampilkan</label>
                 <select id="perPage" wire:model="perPage" class="form-select" style="cursor: pointer;">
                     <option value="10">10 Data</option>
                     <option value="20">20 Data</option>

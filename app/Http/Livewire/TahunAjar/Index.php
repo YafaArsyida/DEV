@@ -58,95 +58,95 @@ class Index extends Component
         }
     }
 
-    public function tutupBuku($tahunAjarId)
-    {
-        $tahunAjar = TahunAjarModel::findOrFail($tahunAjarId);
-        $jenjang = $this->selectedJenjang;
+    // public function tutupBuku($tahunAjarId)
+    // {
+    //     $tahunAjar = TahunAjarModel::findOrFail($tahunAjarId);
+    //     $jenjang = $this->selectedJenjang;
 
-        // Cek apakah sudah ditutup
-        if ($tahunAjar->tutup_buku === 'sudah') {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Tahun ajaran ini sudah ditutup sebelumnya']);
-            return;
-        }
+    //     // Cek apakah sudah ditutup
+    //     if ($tahunAjar->tutup_buku === 'sudah') {
+    //         $this->dispatchBrowserEvent('alertify-error', ['message' => 'Tahun ajaran ini sudah ditutup sebelumnya']);
+    //         return;
+    //     }
 
-        // Ambil nilai laba/rugi dari fungsi model
-        $labaRugi = $tahunAjar->hitungLabaRugi($jenjang);
+    //     // Ambil nilai laba/rugi dari fungsi model
+    //     $labaRugi = $tahunAjar->hitungLabaRugi($jenjang);
 
-        // Akun-akun
-        $akunLabaRugi = '32001';
-        $akunAkumulasi = '33001';
-        $tanggal = now();
-        $deskripsi = "Tutup Buku Tahun Ajaran {$tahunAjar->nama_tahun_ajar}";
+    //     // Akun-akun
+    //     $akunLabaRugi = '32001';
+    //     $akunAkumulasi = '33001';
+    //     $tanggal = now();
+    //     $deskripsi = "Tutup Buku Tahun Ajaran {$tahunAjar->nama_tahun_ajar}";
 
-        DB::beginTransaction();
-        try {
-            if ($labaRugi !== 0) {
-                if ($labaRugi > 0) {
-                    // Laba: debit laba rugi, kredit saldo ditahan
-                    AkuntansiJurnalDetail::create([
-                        'kode_rekening' => $akunLabaRugi,
-                        'posisi' => 'debit',
-                        'nominal' => $labaRugi,
-                        'tanggal_transaksi' => $tanggal,
-                        'ms_pengguna_id' => auth()->id(),
-                        'ms_tahun_ajaran_id' => $tahunAjarId,
-                        'ms_jenjang_id' => $jenjang,
-                        'is_canceled' => 'active',
-                        'deskripsi' => $deskripsi,
-                    ]);
-                    AkuntansiJurnalDetail::create([
-                        'kode_rekening' => $akunAkumulasi,
-                        'posisi' => 'kredit',
-                        'nominal' => $labaRugi,
-                        'tanggal_transaksi' => $tanggal,
-                        'ms_pengguna_id' => auth()->id(),
-                        'ms_tahun_ajaran_id' => $tahunAjarId,
-                        'ms_jenjang_id' => $jenjang,
-                        'is_canceled' => 'active',
-                        'deskripsi' => $deskripsi,
-                    ]);
-                } else {
-                    $rugi = abs($labaRugi);
-                    // Rugi: debit saldo ditahan, kredit laba rugi
-                    AkuntansiJurnalDetail::create([
-                        'kode_rekening' => $akunAkumulasi,
-                        'posisi' => 'debit',
-                        'nominal' => $rugi,
-                        'tanggal_transaksi' => $tanggal,
-                        'ms_pengguna_id' => auth()->id(),
-                        'ms_tahun_ajaran_id' => $tahunAjarId,
-                        'ms_jenjang_id' => $jenjang,
-                        'is_canceled' => 'active',
-                        'deskripsi' => $deskripsi,
-                    ]);
-                    AkuntansiJurnalDetail::create([
-                        'kode_rekening' => $akunLabaRugi,
-                        'posisi' => 'kredit',
-                        'nominal' => $rugi,
-                        'tanggal_transaksi' => $tanggal,
-                        'ms_pengguna_id' => auth()->id(),
-                        'ms_tahun_ajaran_id' => $tahunAjarId,
-                        'ms_jenjang_id' => $jenjang,
-                        'is_canceled' => 'active',
-                        'deskripsi' => $deskripsi,
-                    ]);
-                }
-            }
+    //     DB::beginTransaction();
+    //     try {
+    //         if ($labaRugi !== 0) {
+    //             if ($labaRugi > 0) {
+    //                 // Laba: debit laba rugi, kredit saldo ditahan
+    //                 AkuntansiJurnalDetail::create([
+    //                     'kode_rekening' => $akunLabaRugi,
+    //                     'posisi' => 'debit',
+    //                     'nominal' => $labaRugi,
+    //                     'tanggal_transaksi' => $tanggal,
+    //                     'ms_pengguna_id' => auth()->id(),
+    //                     'ms_tahun_ajaran_id' => $tahunAjarId,
+    //                     'ms_jenjang_id' => $jenjang,
+    //                     'is_canceled' => 'active',
+    //                     'deskripsi' => $deskripsi,
+    //                 ]);
+    //                 AkuntansiJurnalDetail::create([
+    //                     'kode_rekening' => $akunAkumulasi,
+    //                     'posisi' => 'kredit',
+    //                     'nominal' => $labaRugi,
+    //                     'tanggal_transaksi' => $tanggal,
+    //                     'ms_pengguna_id' => auth()->id(),
+    //                     'ms_tahun_ajaran_id' => $tahunAjarId,
+    //                     'ms_jenjang_id' => $jenjang,
+    //                     'is_canceled' => 'active',
+    //                     'deskripsi' => $deskripsi,
+    //                 ]);
+    //             } else {
+    //                 $rugi = abs($labaRugi);
+    //                 // Rugi: debit saldo ditahan, kredit laba rugi
+    //                 AkuntansiJurnalDetail::create([
+    //                     'kode_rekening' => $akunAkumulasi,
+    //                     'posisi' => 'debit',
+    //                     'nominal' => $rugi,
+    //                     'tanggal_transaksi' => $tanggal,
+    //                     'ms_pengguna_id' => auth()->id(),
+    //                     'ms_tahun_ajaran_id' => $tahunAjarId,
+    //                     'ms_jenjang_id' => $jenjang,
+    //                     'is_canceled' => 'active',
+    //                     'deskripsi' => $deskripsi,
+    //                 ]);
+    //                 AkuntansiJurnalDetail::create([
+    //                     'kode_rekening' => $akunLabaRugi,
+    //                     'posisi' => 'kredit',
+    //                     'nominal' => $rugi,
+    //                     'tanggal_transaksi' => $tanggal,
+    //                     'ms_pengguna_id' => auth()->id(),
+    //                     'ms_tahun_ajaran_id' => $tahunAjarId,
+    //                     'ms_jenjang_id' => $jenjang,
+    //                     'is_canceled' => 'active',
+    //                     'deskripsi' => $deskripsi,
+    //                 ]);
+    //             }
+    //         }
 
-            // Update status tahun ajaran
-            $tahunAjar->update([
-                'tutup_buku' => 'sudah',
-                'tanggal_tutup_buku' => $tanggal,
-                'ms_pengguna_id' => auth()->id(),
-            ]);
+    //         // Update status tahun ajaran
+    //         $tahunAjar->update([
+    //             'tutup_buku' => 'sudah',
+    //             'tanggal_tutup_buku' => $tanggal,
+    //             'ms_pengguna_id' => auth()->id(),
+    //         ]);
 
-            DB::commit();
-            $this->dispatchBrowserEvent('alertify-success', ['message' => 'Tutup buku berhasil.']);
-        } catch (\Exception $e) {
-            DB::rollback();
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Tutup buku gagal: ' . $e->getMessage()]);
-        }
-    }
+    //         DB::commit();
+    //         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Tutup buku berhasil.']);
+    //     } catch (\Exception $e) {
+    //         DB::rollback();
+    //         $this->dispatchBrowserEvent('alertify-error', ['message' => 'Tutup buku gagal: ' . $e->getMessage()]);
+    //     }
+    // }
     public function render()
     {
         $query = TahunAjarModel::query();
