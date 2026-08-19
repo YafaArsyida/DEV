@@ -83,17 +83,40 @@ class Index extends Component
     public function cetakLaporan()
     {
         if (!$this->selectedJenjang) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Jenjang wajib dipilih']);
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Jenjang wajib dipilih'
+            ]);
             return;
         }
 
-        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Laporan diproses.']);
+        // Tentukan rekening yang dicetak
+        $rekening = $this->selectedRekening ?: null;
+
+        // Validasi periode
+        if (!$this->startDate || !$this->endDate) {
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Periode tanggal wajib dipilih'
+            ]);
+            return;
+        }
+
+        // Pastikan tanggal valid
+        if (Carbon::parse($this->startDate)->gt(Carbon::parse($this->endDate))) {
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Tanggal awal tidak boleh lebih besar dari tanggal akhir'
+            ]);
+            return;
+        }
+
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Laporan sedang diproses...'
+        ]);
 
         $url = route('akuntansi.laporan-arus-kas.pdf', [
-            'jenjang' => $this->selectedJenjang,
-            'rekening' => $this->selectedRekening,
+            'jenjang'    => $this->selectedJenjang,
+            'rekening'   => $rekening,
             'start_date' => $this->startDate,
-            'end_date' => $this->endDate,
+            'end_date'   => $this->endDate,
         ]);
 
         $this->emit('openNewTab', $url);

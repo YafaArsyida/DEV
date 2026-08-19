@@ -93,32 +93,18 @@
                 {{-- DATA --}}
                 <div class="live-preview">
                     <div class="table-responsive">
-                        <table id="Data" class="table table-hover table-nowrap align-middle">
+                        <table id="DataArusKas" class="table table-hover table-nowrap align-middle">
 
                             {{-- HEADER --}}
                             <thead class="table-light">
                                 <tr>
-                                    <th class="text-uppercase text-center" style="width: 60px;">
-                                        No
-                                    </th>
-                                    <th class="text-uppercase text-start">
-                                        Tanggal
-                                    </th>
-                                    <th class="text-uppercase text-start">
-                                        Akun
-                                    </th>
-                                    <th class="text-uppercase text-start">
-                                        Petugas
-                                    </th>
-                                    <th class="text-uppercase text-start">
-                                        Deskripsi Transaksi
-                                    </th>
-                                    <th class="text-uppercase text-center">
-                                        Kas Masuk
-                                    </th>
-                                    <th class="text-uppercase text-center">
-                                        Kas Keluar
-                                    </th>
+                                    <th class="text-uppercase text-center" style="width: 60px;">No</th>
+                                    <th class="text-uppercase text-start">Tanggal</th>
+                                    <th class="text-uppercase text-start">Akun</th>
+                                    <th class="text-uppercase text-start">Petugas</th>
+                                    <th class="text-uppercase text-start">Deskripsi Transaksi</th>
+                                    <th class="text-uppercase text-center">Kas Masuk</th>
+                                    <th class="text-uppercase text-center">Kas Keluar</th>
                                 </tr>
                             </thead>
 
@@ -294,106 +280,151 @@
                 </div>
             </div>  
         </div>
-        <div class="modal fade zoomIn" id="ExportLaporan" tabindex="-1" aria-labelledby="exportRecordLabel" aria-hidden="true" wire:ignore.self>
+        <div class="modal fade zoomIn" id="ExportLaporan" tabindex="-1"
+            aria-labelledby="exportArusKasLabel" aria-hidden="true" wire:ignore.self>
             <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+
+                    {{-- HEADER --}}
+                    <div class="modal-header border-0 pb-0">
+                        <button type="button" class="btn btn-light btn-icon rounded-circle ms-auto"
+                            data-bs-dismiss="modal" aria-label="Close">
+                            <i class="ri-close-line fs-18"></i>
+                        </button>
                     </div>
-                    <div class="modal-body p-5 text-center">
-                        <lord-icon src="https://cdn.lordicon.com/fjvfsqea.json" trigger="loop" colors="primary:#405189,secondary:#f06548" style="width:90px;height:90px"></lord-icon>
-                        <div class="mt-4 text-center">
-                            <h4 class="fs-semibold">Konfirmasi Export</h4>
-                            <p class="text-muted fs-14 mb-4 pt-1">
-                                Apakah Anda yakin ingin mengekspor Laporan Arus Kas? Data yang diekspor akan sesuai dengan tabel yang ditampilkan.
-                            </p>
-                            <div class="hstack gap-2 justify-content-center remove">
-                                <button class="btn btn-link link-success fw-medium text-decoration-none shadow-none" data-bs-dismiss="modal">
-                                    <i class="ri-close-line me-1 align-middle"></i> Batal
-                                </button>
-                                <button class="btn btn-primary" id="konfirmasiExportLaporan" data-bs-dismiss="modal">Ya, Export!</button>
+
+                    {{-- BODY --}}
+                    <div class="modal-body px-4 pb-5 pt-2 text-center">
+                        {{-- ICON --}}
+                        <div class="mb-4">
+                            <div class="avatar-xl mx-auto">
+                                <div class="avatar-title bg-success-subtle text-success rounded-circle">
+                                    <lord-icon
+                                        src="https://cdn.lordicon.com/fjvfsqea.json"
+                                        trigger="loop"
+                                        colors="primary:#405189,secondary:#0ab39c"
+                                        style="width:70px;height:70px">
+                                    </lord-icon>
+                                </div>
                             </div>
                         </div>
+
+                        {{-- TITLE --}}
+                        <div class="mb-2">
+                            <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill mb-3">
+                                Export Excel
+                            </span>
+
+                            <h3 class="fw-bold mb-2" id="exportArusKasLabel">
+                                Export Laporan Arus Kas?
+                            </h3>
+
+                            <p class="text-muted mb-0 lh-lg px-lg-4">
+                                Apakah Anda yakin ingin mengekspor
+                                <strong class="text-dark">
+                                    Laporan Arus Kas
+                                </strong>
+                                untuk rekening
+                                <strong class="text-dark">
+                                    {{ $namaRekening ?? '-' }}
+                                </strong>
+                                ke Excel?
+                            </p>
+                        </div>
+
+                        {{-- INFORMATION REKENING --}}
+                        <div class="alert alert-light border rounded-4 text-start mt-4 mb-0">
+                            <div class="d-flex align-items-start gap-3">
+                                {{-- ICON --}}
+                                <div class="flex-shrink-0">
+                                    <div class="avatar-sm">
+                                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
+                                            <i class="ri-exchange-funds-line fs-18"></i>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- INFORMATION --}}
+                                <div class="flex-grow-1">
+                                    <h6 class="fw-semibold mb-1">
+                                        {{ $namaRekening ?? 'Rekening belum dipilih' }}
+                                    </h6>
+
+                                    <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                                        <span class="badge bg-primary-subtle text-primary">
+                                            Arus Kas
+                                        </span>
+
+                                        @if(!empty($namaRekening))
+                                            <span class="text-muted fs-13">
+                                                Ringkasan transaksi kas masuk dan kas keluar
+                                            </span>
+                                        @endif
+                                    </div>
+                                    <p class="text-muted mb-0 fs-13">
+                                        Data yang diekspor akan mengikuti data
+                                        Laporan Arus Kas yang sedang ditampilkan.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- FOOTER --}}
+                    <div class="modal-footer border-0 pt-0 px-4 pb-4 justify-content-center">
+
+                        <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">
+                            <i class="ri-close-line me-1"></i>
+                            Batal
+                        </button>
+
+                        <button type="button" class="btn btn-success rounded-pill px-4"
+                            id="konfirmasiExportLaporan" data-nama-rekening="{{ $namaRekening ?? '' }}" data-bs-dismiss="modal">
+                            <i class="ri-file-excel-2-line me-1"></i>
+                            Ya, Export
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    {{-- <div class="col-xxl-4">
-        <!-- Info: Apa itu Laporan Arus Kas -->
-        <div class="card shadow-none mb-3">
-            <div class="card-body bg-info-subtle rounded">
-                <div class="d-flex">
-                    <div class="flex-shrink-0">
-                        <i class="bx bx-wallet text-info fs-22"></i>
-                    </div>
-                    <div class="flex-grow-1 ms-3">
-                        <h6 class="fs-15 mb-2">Apa itu Laporan Arus Kas?</h6>
-                        <p class="text-muted mb-0">
-                            Laporan Arus Kas adalah laporan keuangan yang menunjukkan pergerakan uang masuk (pemasukan) dan uang keluar (pengeluaran) sekolah dalam periode tertentu.
-                            Laporan ini membantu memantau posisi kas dan bank secara <em>real-time</em> sehingga memudahkan pengelolaan keuangan harian.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Fungsi Laporan Arus Kas -->
-        <div class="card shadow-none mb-3">
-            <div class="card-body bg-success-subtle rounded">
-                <div class="d-flex">
-                    <div class="flex-shrink-0">
-                        <i class="bx bx-list-check text-success fs-22"></i>
-                    </div>
-                    <div class="flex-grow-1 ms-3">
-                        <h6 class="fs-15 mb-2">Fungsi Laporan Arus Kas</h6>
-                        <ul class="mb-0 text-muted">
-                            <li>Memantau saldo kas dan bank secara akurat berdasarkan periode dan akun terpilih</li>
-                            <li>Menganalisis sumber pemasukan dan pengeluaran sekolah</li>
-                            <li>Membantu perencanaan keuangan jangka pendek maupun panjang</li>
-                            <li>Memastikan ketersediaan dana untuk kebutuhan operasional</li>
-                            <li>Mendukung transparansi dan akuntabilitas keuangan lembaga</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Catatan Penting -->
-        <div class="card shadow-none">
-            <div class="card-body bg-warning-subtle rounded">
-                <div class="d-flex">
-                    <div class="flex-shrink-0">
-                        <i class="bx bx-error-circle text-warning fs-22"></i>
-                    </div>
-                    <div class="flex-grow-1 ms-3">
-                        <h6 class="fs-15 mb-2">Catatan Penting</h6>
-                        <p class="text-muted mb-0">
-                            Fitur pencarian hanya memfilter transaksi berdasarkan <strong>deskripsi</strong>. 
-                            Saat pencarian digunakan, perhitungan <em>Saldo Awal</em> dan <em>Saldo Akhir</em> akan mengikuti hasil filter, 
-                            sehingga nilainya tidak mencerminkan saldo sebenarnya. 
-                            Untuk melihat saldo final yang akurat, gunakan filter <strong>Akun</strong> dan <strong>Periode</strong> tanpa pencarian.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> --}}
-
     <script>
-        document.getElementById('konfirmasiExportLaporan').addEventListener('click', function () {
-            alertify.success("Menyiapkan Dokumen");
-            // Tambahkan delay 1 detik
-            setTimeout(function () {
-                // Ambil elemen tabel berdasarkan ID
-                var table = document.querySelector("table");
-                
-                // Konversi tabel ke format Excel
-                var workbook = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
-                
-                // Simpan file Excel
-                XLSX.writeFile(workbook, "Laporan-Arus-Kas.xlsx");
-            }, 1000); // 1000 ms = 1 detik
-        });
+        document.getElementById('konfirmasiExportLaporan')
+            .addEventListener('click', function () {
+
+                alertify.success("Menyiapkan Dokumen Excel");
+
+                const namaRekening = this.dataset.namaRekening || 'Semua-Rekening';
+
+                setTimeout(function () {
+
+                    // Ambil tabel khusus Laporan Arus Kas
+                    const table = document.getElementById('DataArusKas');
+
+                    if (!table) {
+                        alertify.error("Tabel Laporan Arus Kas tidak ditemukan.");
+                        return;
+                    }
+
+                    // Konversi tabel ke Excel
+                    const workbook = XLSX.utils.table_to_book(table, {
+                        sheet: 'Arus Kas'
+                    });
+
+                    // Bersihkan nama rekening agar aman digunakan sebagai nama file
+                    const namaFile = namaRekening
+                        .replace(/[\\/:*?"<>|]/g, '')
+                        .replace(/\s+/g, '-')
+                        .trim();
+
+                    const tanggal = '{{ date('Y-m-d') }}';
+
+                    const namaFileExcel =
+                        `Laporan-Arus-Kas-${namaFile}-${tanggal}.xlsx`;
+
+                    XLSX.writeFile(workbook, namaFileExcel);
+
+                }, 500);
+            });
     </script>
 </div>

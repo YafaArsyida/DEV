@@ -1,18 +1,76 @@
 {{-- Success is as dangerous as failure. --}}
-<div class="card">
-    <div class="card-header align-items-center d-flex">
-        <h4 class="card-title mb-0">Pesan Transaksi Tabungan</h4>   
-        <div class="ms-auto"> <!-- Menambahkan ms-auto untuk mendorong ke kanan -->
-            <div class="dropdown">
-                @if ($selectedJenjang)
-                    <button class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#kuitansiTabungan" aria-controls="kuitansiTabungan" wire:click="$emit('kuitansiTabungan', {{ $selectedJenjang }})"><i class="ri-file-paper-2-line me-1 align-bottom"></i> Kuitansi Tabungan</button>
-                    @if (!$pesans)
-                        <button data-bs-target="#createPesanTabunganSiswa" data-bs-toggle="modal" wire:click="$emit('createPesanTabunganSiswa', {{ $selectedJenjang }})" class="btn btn-soft-success shadow-none"><i class="ri-whatsapp-line align-bottom me-1"></i> Setting WhatsApp</button>
-                    @else
-                        <button data-bs-target="#loadPesanTabunganSiswa" data-bs-toggle="modal" wire:click="$emit('loadPesanTabunganSiswa', {{ $ms_pesan_id }})" class="btn btn-soft-success shadow-none"><i class="ri-whatsapp-line align-bottom me-1"></i> Edit WhatsApp</button>
-                    @endif
-                @endif
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card-header">
+        <div class="d-flex align-items-center flex-wrap gap-3">
+            {{-- HEADER --}}
+            <div class="flex-grow-1">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-sm flex-shrink-0">
+                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                            <i class="ri-wallet-3-line"></i>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h5 class="fw-bold mb-1">
+                            Pesan Transaksi Tabungan
+                        </h5>
+
+                        <small class="text-muted">
+                            Kelola pesan WhatsApp untuk transaksi tabungan siswa.
+                        </small>
+                    </div>
+                </div>
             </div>
+
+            {{-- ACTION --}}
+            @if ($selectedJenjang)
+                <div class="flex-shrink-0">
+                    <div class="d-flex align-items-center flex-wrap gap-2">
+
+                        {{-- KUITANSI TABUNGAN --}}
+                        <button type="button"
+                            class="btn btn-primary rounded-pill px-4 d-inline-flex align-items-center gap-1" data-bs-toggle="offcanvas"
+                            data-bs-target="#kuitansiTabungan" aria-controls="kuitansiTabungan"
+                            wire:click="$emit('kuitansiTabungan', {{ $selectedJenjang }})">
+
+                            <i class="ri-file-paper-2-line align-bottom"></i>
+                            <span>Kuitansi Tabungan</span>
+                        </button>
+
+                        {{-- WHATSAPP --}}
+                        @if (!$pesans)
+
+                            <button
+                                type="button"
+                                class="btn btn-success rounded-pill px-4 d-inline-flex align-items-center gap-1 shadow-none"
+                                data-bs-target="#createPesanTabunganSiswa"
+                                data-bs-toggle="modal"
+                                wire:click="$emit('createPesanTabunganSiswa', {{ $selectedJenjang }})">
+
+                                <i class="ri-whatsapp-line align-bottom"></i>
+                                <span>Setting WhatsApp</span>
+                            </button>
+
+                        @else
+
+                            <button
+                                type="button"
+                                class="btn btn-success rounded-pill px-4 d-inline-flex align-items-center gap-1 shadow-none"
+                                data-bs-target="#loadPesanTabunganSiswa"
+                                data-bs-toggle="modal"
+                                wire:click="$emit('loadPesanTabunganSiswa', {{ $ms_pesan_id }})">
+
+                                <i class="ri-whatsapp-line align-bottom"></i>
+                                <span>Edit WhatsApp</span>
+                            </button>
+
+                        @endif
+
+                    </div>
+                </div>
+            @endif
+
         </div>
     </div>
     <div class="card-body">

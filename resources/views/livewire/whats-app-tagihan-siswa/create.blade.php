@@ -6,8 +6,7 @@
                 <div class="d-flex align-items-center gap-3">
                     <div class="avatar-sm">
                         <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
-                            <i class="ri-calendar-event-line">
-                            </i>
+                            <i class="ri-whatsapp-line"></i>
                         </div>
                     </div>
                     <div>

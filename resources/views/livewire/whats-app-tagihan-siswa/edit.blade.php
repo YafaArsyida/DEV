@@ -12,7 +12,7 @@
                     </div>
                     <div>
                         <h5 class="fw-bold mb-1">
-                            Edit Pesan Tagihan Siswa
+                            Perbarui Pesan Tagihan Siswa
                         </h5>
                         {{-- <small>
                             Tambahkan agenda kegiatan generasi penerus dengan pengaturan tingkat, jadwal, dan lokasi.
