@@ -1,10 +1,31 @@
 {{-- Knowing others is intelligence; knowing yourself is true wisdom. --}}
 <div wire:ignore.self class="modal fade" id="createKuitansiTabungan" tabindex="-1" aria-labelledby="createKuitansiTabunganLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
             <div class="modal-header">
-                <h5 class="modal-title" id="createKuitansiTabunganLabel">Setting Kuitansi Tabungan</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-sm">
+                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                            <i class="ri-wallet-3-line"></i>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h5 class="fw-bold mb-1" id="createKuitansiTabunganLabel">
+                            Buat Template Kuitansi Tabungan
+                        </h5>
+
+                        <small class="text-muted">
+                            Atur format dan isi kuitansi transaksi tabungan.
+                        </small>
+                    </div>
+                </div>
+
+                <button
+                    type="button" class="btn btn-light btn-icon rounded-circle"
+                    data-bs-dismiss="modal" aria-label="Close">
+                    <i class="ri-close-line fs-18"></i>
+                </button>
             </div>
             <form wire:submit.prevent="createKuitansi">
                 <div class="modal-body">
@@ -14,7 +35,7 @@
                             <img src="{{ $logo->temporaryUrl() }}" alt="Preview Logo Baru" class="" height="80px">
                         </div>
                     @else
-                        <h6 class="text-muted">Belum ada foto kop yang diunggah.</h6>
+                        <h6 class="text-muted">Belum ada logo yang diunggah.</h6>
                     @endif
                     
                     <div class="mb-3">
@@ -73,9 +94,15 @@
                         @enderror
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <a href="javascript:void(0);" class="btn btn-link link-success shadow-none fw-medium" data-bs-dismiss="modal"><i class="ri-close-line me-1 align-middle"></i> Tutup</a>
-                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                <div class="modal-footer border-0 px-4 pb-4 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">
+                        <i class="ri-close-line me-1"></i>
+                        Tutup
+                    </button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4">
+                        <i class="ri-save-3-line me-1"></i>
+                        Simpan
+                    </button>
                 </div>
             </form>
         </div>

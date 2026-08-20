@@ -1,29 +1,83 @@
-<div wire:ignore.self class="offcanvas offcanvas-top" id="kuitansiTabungan" aria-labelledby="kuitansiTransaksiLabel" style="min-height:100vh;">
-    <div class="offcanvas-header border-bottom">
-        <h5 class="offcanvas-title" id="kuitansiTransaksiLabel">Format Kuitansi Tabungan</h5>
-        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+<div wire:ignore.self class="offcanvas offcanvas-top bg-light" id="kuitansiTabungan" aria-labelledby="kuitansiTransaksiLabel" style="min-height:100vh;">
+    <div class="offcanvas-header border-bottom px-4 py-3 shadow-sm">
+        <div class="d-flex justify-content-between align-items-start w-100">
+            <!-- Kiri -->
+            <div class="d-flex align-items-center gap-3">
+                <div class="avatar-sm">
+                    <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-18">
+                        <i class="ri-wallet-3-line"></i>
+                    </div>
+                </div>
+
+                <div>
+                    <h5 class="fw-bold mb-1">
+                        Format Kuitansi Tabungan
+                    </h5>
+                </div>
+            </div>
+            <!-- Kanan -->
+            <button type="button"
+                class="btn btn-light btn-icon rounded-circle shadow-none"
+                data-bs-dismiss="offcanvas">
+                <i class="ri-close-line fs-18"></i>
+            </button>
+        </div>
     </div>
     <div class="offcanvas-body">
         <div class="row justify-content-center">
             <div class="col-xxl-4">
-                <div class="card">
-                    <div class="card-header align-items-center d-flex">
-                        <h4 class="card-title mb-0">Kuitansi Tabungan</h4>   
-                        <div class="ms-auto"> <!-- Menambahkan ms-auto untuk mendorong ke kanan -->
-                            <div class="dropdown">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div class="card-header">
+                        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4">
+                            {{-- TITLE --}}
+                            <div>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="avatar-sm">
+                                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                                            <i class="ri-wallet-3-line"></i>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <h5 class="fw-bold mb-1">
+                                            Kuitansi Tabungan
+                                        </h5>
+
+                                        <small class="text-muted">
+                                            Atur format dan isi kuitansi transaksi tabungan.
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- ACTION --}}
+                            <div class="d-flex gap-2 flex-wrap">
                                 @if ($selectedJenjang)
+
                                     @if (!$kuitansi)
-                                        <a href="#createKuitansiTabungan" data-bs-toggle="modal" class="btn btn-ghost-secondary btn-icon shadow-none" wire:click="$emit('createKuitansiTabungan', {{ $selectedJenjang }})">
-                                            <i class="ri-settings-5-line fs-20" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Setting Kuitansi"></i>
-                                        </a>
+                                        <button
+                                            type="button" class="btn btn-primary rounded-pill px-4 d-inline-flex align-items-center gap-1"
+                                            data-bs-toggle="modal" data-bs-target="#createKuitansiTabungan"
+                                            wire:click="$emit('createKuitansiTabungan', {{ $selectedJenjang }})">
+
+                                            <i class="ri-add-line"></i>
+                                            <span>Buat Kuitansi</span>
+                                        </button>
+
                                     @else
-                                    <a href="#editKuitansiTabungan" data-bs-toggle="modal" class="btn btn-ghost-secondary btn-icon shadow-none" 
-                                    wire:click="$emit('loadKuitansiTabungan', {{ $kuitansi->ms_kuitansi_transaksi_tabungan_id }}, {{ $selectedJenjang }})">
-                                        <i class="ri-quill-pen-line fs-20" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Edit Kuitansi"></i>
-                                    </a>
+                                        <button
+                                            type="button" class="btn btn-primary rounded-pill px-4 d-inline-flex align-items-center gap-1"
+                                            data-bs-toggle="modal" data-bs-target="#editKuitansiTabungan"
+                                            wire:click="$emit('loadKuitansiTabungan', {{ $kuitansi->ms_kuitansi_transaksi_tabungan_id }}, {{ $selectedJenjang }})">
+
+                                            <i class="ri-quill-pen-line"></i>
+                                            <span>Edit Kuitansi</span>
+                                        </button>
                                     @endif
+
                                 @endif
                             </div>
+
                         </div>
                     </div>
                     @if ($kuitansi)
