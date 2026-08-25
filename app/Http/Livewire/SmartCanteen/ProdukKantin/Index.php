@@ -34,7 +34,7 @@ class Index extends Component
         $this->selectedKategori = $kategoriId;
     }
 
-    public function updateParameters($kantin, $tahunAjar)
+    public function updateParameters($kantin)
     {
         $this->selectedKantin = $kantin;
 

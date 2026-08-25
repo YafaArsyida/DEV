@@ -41,10 +41,11 @@ class Create extends Component
 
     public function save()
     {
-        $validatedData = $this->validate();
         DB::beginTransaction();
 
         try {
+
+            $this->validate();
 
             KategoriProdukSmartCanteen::create([
                 'ms_kantin_id' => $this->ms_kantin_id,
@@ -56,8 +57,11 @@ class Create extends Component
             DB::commit();
 
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'Berhasil menambah kategori!']);
+            
             $this->resetInput();
+
             $this->dispatchBrowserEvent('hide-modal', ['modalId' => 'ModalTambahKategori']);
+           
             $this->emit('refreshKategori');
             $this->emit('refreshProduk');
         } catch (\Exception $e) {

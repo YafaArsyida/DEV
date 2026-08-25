@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\SmartCanteen\SettlementTransaksi;
 
+use App\Models\SmartCanteen\Kantin;
 use App\Models\SmartCanteen\SettlementSmartCanteen;
 use App\Models\User;
 use Carbon\Carbon;
@@ -18,11 +19,12 @@ class RiwayatSettlement extends Component
     public $endDate;
 
     // Parameter dari listener
-    public $selectedKantin = null;
-    public $selectedTahunAjar = null;
+    public $selectedKantin;
+    public $selectedJenjang;
+
+    public $namaKantin;
 
     public $namaJenjang = '-';
-    public $namaTahunAjar = '-';
 
     public $selectedPetugas = null;       // filter petugas kantin
     public $select_petugas = [];
@@ -32,13 +34,15 @@ class RiwayatSettlement extends Component
         'refreshSettlement'
     ];
 
-    public function updateParameters($kantin, $tahunAjar)
+    public function updateParameters($kantin)
     {
         $this->selectedKantin = $kantin;
-        $this->selectedTahunAjar = $tahunAjar;
+
+        $this->namaKantin = Kantin::find($kantin)?->nama_kantin ?? '-';
 
         $this->resetPage();
     }
+    
     public function refreshSettlement()
     {
         $this->resetPage(); // Reset paginasi saat pencarian berubah
@@ -64,9 +68,9 @@ class RiwayatSettlement extends Component
     {
         $query = SettlementSmartCanteen::query()
             ->where('ms_kantin_id', $this->selectedKantin)
+            // ->where('ms_jenjang_id', $this->selectedJenjang)
             ->orderBy('tanggal_settlement', 'desc');
 
-        // Filter tanggal
         if ($this->startDate && $this->endDate) {
             $query->whereBetween('tanggal_settlement', [
                 Carbon::parse($this->startDate)->startOfDay(),
@@ -74,8 +78,7 @@ class RiwayatSettlement extends Component
             ]);
         }
 
-        // return $query->get();
-        return $query->paginate(10);
+        return $query->paginate(50);
     }
 
     public function render()

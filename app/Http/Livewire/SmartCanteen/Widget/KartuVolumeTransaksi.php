@@ -4,7 +4,6 @@ namespace App\Http\Livewire\SmartCanteen\Widget;
 
 use App\Models\Jenjang;
 use App\Models\SmartCanteen\TransaksiSmartCanteen;
-use App\Models\TahunAjar;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -13,7 +12,6 @@ use Livewire\Component;
 class KartuVolumeTransaksi extends Component
 {
     public $selectedKantin = null;
-    public $selectedTahunAjar = null;
 
     // Periode
     public $periode = 'today'; // today | yesterday | 1_month | 2_month
@@ -31,17 +29,16 @@ class KartuVolumeTransaksi extends Component
     protected $listeners = [
         'parameterUpdated' => 'updateParameters',
     ];
-    public function updateParameters($kantin, $tahunAjar)
+    public function updateParameters($kantin)
     {
         $this->selectedKantin = $kantin;
-        $this->selectedTahunAjar = $tahunAjar;
 
         $this->loadPetugasByKantin();
     }
 
     protected function loadPetugasByKantin()
     {
-        if (!$this->selectedKantin || !$this->selectedTahunAjar) {
+        if (!$this->selectedKantin) {
             $this->select_petugas = collect();
             return;
         }

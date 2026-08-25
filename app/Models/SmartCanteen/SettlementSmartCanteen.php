@@ -2,6 +2,7 @@
 
 namespace App\Models\SmartCanteen;
 
+use App\Models\AkuntansiJurnal;
 use App\Models\Jenjang;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,12 +18,15 @@ class SettlementSmartCanteen extends Model
     protected $fillable = [
         'ms_pengguna_id',
         'ms_kantin_id',
+
+        'ms_jenjang_id',
+
         'tanggal_settlement',
         'total_settlement',
         'metode_pembayaran', // tunai / transfer
+        
         'deskripsi',
-        'akun_jurnal_debit_id',
-        'akun_jurnal_kredit_id',
+        'akuntansi_jurnal_id',
     ];
 
     // Settlement -> hasMany Transaksi
@@ -38,5 +42,14 @@ class SettlementSmartCanteen extends Model
     public function ms_pengguna()
     {
         return $this->belongsTo(User::class, 'ms_pengguna_id', 'ms_pengguna_id');
+    }
+
+    public function akuntansi_jurnal()
+    {
+        return $this->belongsTo(AkuntansiJurnal::class, 'akuntansi_jurnal_id', 'akuntansi_jurnal_id');
+    }
+    public function ms_jenjang()
+    {
+        return $this->belongsTo(Jenjang::class, 'ms_jenjang_id', 'ms_jenjang_id');
     }
 }

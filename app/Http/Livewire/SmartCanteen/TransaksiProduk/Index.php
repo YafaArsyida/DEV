@@ -17,7 +17,6 @@ class Index extends Component
 
 
     public $selectedKantin = null;
-    public $selectedTahunAjar = null;
 
     public $namaKantin = '';
     public $selectedKategori = null;
@@ -26,11 +25,10 @@ class Index extends Component
 
     public $user_type;
     public $user_id;
-    public $ms_penempatan_siswa_id;
+
     public $ms_jenjang_id;
 
     public $nama;
-    public $nama_kelas;
     public $educard;
     public $saldo_edupay;
 
@@ -50,11 +48,10 @@ class Index extends Component
         'filterKategori' => 'setKategori',
     ];
 
-    public function parameterUpdated($kantin, $tahunAjar)
+    public function parameterUpdated($kantin)
     {
-        // Update nilai selectedKantin dan selectedTahunAjar
+        // Update nilai selectedKantin 
         $this->selectedKantin = $kantin;
-        $this->selectedTahunAjar = $tahunAjar;
 
         $j = Kantin::find($kantin);
         $this->namaKantin = $j ? $j->nama_kantin : 'Tidak Diketahui';
@@ -65,10 +62,8 @@ class Index extends Component
         $this->reset([
             'user_type',
             'user_id',
-            'ms_penempatan_siswa_id',
-
+            
             'nama',
-            'nama_kelas',
             'nama_jabatan',
 
             'educard',
@@ -91,90 +86,111 @@ class Index extends Component
             return;
         }
 
-        $card = EduCard::with(['ms_siswa', 'ms_pegawai'])
+        $card = EduCard::with(['ms_siswa', 'ms_pegawai.ms_jabatan'])
             ->where('kode_kartu', $value)
             ->first();
 
         if (!$card) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Kartu tidak terdaftar.']);
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Kartu tidak terdaftar.'
+            ]);
+
             $this->resetSmartcardInput();
             $this->resetScan();
             $this->emit('resetKeranjang');
+
             return;
         }
 
+        // Reset jenjang terlebih dahulu
+        $this->ms_jenjang_id = null;
+
         // =========================================
-        //  HANDLE SISWA
+        // HANDLE SISWA
         // =========================================
         if ($card->ms_siswa) {
-            $penempatan = PenempatanSiswa::where('ms_siswa_id', $card->ms_siswa->ms_siswa_id)
-                ->where('ms_tahun_ajar_id', $this->selectedTahunAjar)
-                ->first();
 
-            if (!$penempatan) {
-                $this->dispatchBrowserEvent('alertify-error', [
-                    'message' => 'Transaksi ditolak. Tidak ada penempatan pada Tahun Ajar ini.'
-                ]);
+            $this->user_type = 'siswa';
+            $this->user_id   = $card->ms_siswa->ms_siswa_id;
+            $this->nama      = $card->ms_siswa->nama_siswa;
+            $this->educard   = $card->kode_kartu;
 
-                $this->resetSmartcardInput();
-                $this->resetScan();
+            /*
+            * Siswa tidak memiliki ms_jenjang_id
+            * langsung di tabel ms_siswa.
+            *
+            * Jenjang diambil dari penempatan siswa
+            * pada Tahun Ajar yang sedang aktif.
+            *
+            * Penempatan hanya digunakan untuk
+            * mendapatkan informasi jenjang,
+            * bukan sebagai validasi transaksi kantin.
+            */
+           $penempatan = PenempatanSiswa::where(
+                'ms_siswa_id', $this->user_id
+            )
+            ->latest('ms_penempatan_siswa_id')
+            ->first();
 
-                return;
+            if ($penempatan) {
+                $this->ms_jenjang_id = $penempatan->ms_jenjang_id;
             }
 
-            $this->user_type  = 'siswa';
-            $this->user_id    = $card->ms_siswa->ms_siswa_id;
-            $this->ms_penempatan_siswa_id = $penempatan->ms_penempatan_siswa_id;
-            $this->ms_jenjang_id = $penempatan->ms_jenjang_id;
-
-            $this->nama       = $card->ms_siswa->nama_siswa;
-            $this->nama_kelas = $penempatan->ms_kelas->nama_kelas;
-
-            $this->educard    = $card->kode_kartu;
-
-            $saldo = SaldoEduPay::getSaldo($this->user_id, 'siswa');
+            // Ambil saldo EduPay siswa
+            $saldo = SaldoEduPay::getSaldo(
+                $this->user_id, 'siswa'
+            );
 
             $this->saldo_edupay = $saldo->saldo_edupay;
         }
 
-        // =========================================
-        //  HANDLE PEGAWAI
-        // =========================================
+        // HANDLE PEGAWAI
         elseif ($card->ms_pegawai) {
 
-            $this->user_type  = 'pegawai';
-            $this->user_id    = $card->ms_pegawai->ms_pegawai_id;
+            $this->user_type = 'pegawai';
+            $this->user_id   = $card->ms_pegawai->ms_pegawai_id;
+            $this->nama      = $card->ms_pegawai->nama_pegawai;
+
+            // Jenjang langsung dari data pegawai
             $this->ms_jenjang_id = $card->ms_pegawai->ms_jenjang_id;
 
-            $this->nama       = $card->ms_pegawai->nama_pegawai;
-            $this->nama_jabatan = $card->ms_pegawai->ms_jabatan->nama_jabatan;
+            $this->nama_jabatan = $card->ms_pegawai->ms_jabatan
+                ? $card->ms_pegawai->ms_jabatan->nama_jabatan
+                : null;
 
-            $this->educard    = $card->kode_kartu;
+            $this->educard = $card->kode_kartu;
 
-            $saldo = SaldoEduPay::getSaldo($this->user_id, 'pegawai');
+            // Ambil saldo EduPay pegawai
+            $saldo = SaldoEduPay::getSaldo(
+                $this->user_id,
+                'pegawai'
+            );
 
             $this->saldo_edupay = $saldo->saldo_edupay;
         }
 
+        // KARTU VALID
         $this->emit('scanSuccess', [
-            'user_type'              => $this->user_type,
-            'user_id'                => $this->user_id,
-            'ms_penempatan_siswa_id' => $this->ms_penempatan_siswa_id,
-            'ms_jenjang_id'          => $this->ms_jenjang_id,
-            'nama'                   => $this->nama,
-            'nama_kelas'             => $this->nama_kelas ?? null,
-            'nama_jabatan'           => $this->nama_jabatan ?? null,
-            'educard'                => $this->educard,
-            'saldo_edupay'           => $this->saldo_edupay,
+            'user_type'    => $this->user_type,
+            'user_id'      => $this->user_id,
+            'nama'         => $this->nama,
 
-            'ms_kantin_id'           => $this->selectedKantin,
-            'ms_tahun_ajar_id'       => $this->selectedTahunAjar,
+            'nama_jabatan' => $this->nama_jabatan ?? null,
+
+            'educard'      => $this->educard,
+            'saldo_edupay' => $this->saldo_edupay,
+
+            // Jenjang sumber transaksi
+            'ms_jenjang_id' => $this->ms_jenjang_id,
+            'ms_kantin_id'  => $this->selectedKantin,
         ]);
 
         // NOTIFIKASI
-        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Kartu valid.']);
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Kartu valid.'
+        ]);
 
-        // Reset & Refocus
+        // Reset & refocus
         $this->resetSmartcardInput();
     }
 
@@ -192,14 +208,12 @@ class Index extends Component
 
         if ($this->selectedKantin) {
             $query = ProdukSmartCanteen::where(
-                'ms_kantin_id',
-                $this->selectedKantin
+                'ms_kantin_id', $this->selectedKantin
             );
 
             if ($this->search) {
                 $query->where(
-                    'nama_produk_kantin',
-                    'like',
+                    'nama_produk_kantin', 'like',
                     '%' . $this->search . '%'
                 );
             }

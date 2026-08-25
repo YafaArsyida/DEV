@@ -1,53 +1,93 @@
 {{-- Be like water. --}}
-<div class="card">
-    <div class="card-header border-0 pb-0">
-        <div class="d-flex align-items-center">
-            <h5 class="card-title mb-0 flex-grow-1">Top Jajan</h5>
-            <div class="flex-shrink-0">
-                <div class="d-flex gap-2 flex-wrap">
-                    <button data-bs-toggle="modal" data-bs-target="#ExportLaporanTopExcel" class="btn btn-soft-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button>
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    {{-- HEADER --}}
+    <div class="card-header">
+        <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
+
+            {{-- TITLE --}}
+            <div class="d-flex align-items-center gap-3">
+                <div class="avatar-sm">
+                    <div class="avatar-title bg-warning-subtle text-warning rounded-circle fs-20">
+                        <i class="ri-shopping-basket-2-line"></i>
+                    </div>
+                </div>
+
+                <div>
+                    <h5 class="card-title fw-bold mb-0">
+                        Top Jajan
+                    </h5>
                 </div>
             </div>
+
+            {{-- ACTION --}}
+            {{-- <div class="flex-shrink-0">
+                <button
+                    data-bs-toggle="modal"
+                    data-bs-target="#ExportLaporanTopExcel"
+                    class="btn btn-soft-success d-inline-flex align-items-center gap-1">
+                    <i class="ri-file-excel-2-line"></i>
+                    <span>Export</span>
+                </button>
+            </div> --}}
+
         </div>
     </div>
+
     <div class="card-body">
-        <div class="row g-3 align-items-end mb-3">
-            <!-- Input Pencarian -->
+        <div class="row g-3 mb-3">
+
+            {{-- Input Pencarian --}}
             <div class="col-xxl-4 col-sm-6">
-                <label for="searchInput" class="form-label fw-semibold">Pencarian</label>
-                <div class="position-relative">
-                    <input type="text" id="searchInput" 
-                        class="form-control ps-4" 
-                        wire:model.debounce.300ms="search" 
+                <label for="searchInput"
+                    class="form-label small text-muted text-uppercase fw-medium mb-2">
+                    Pencarian
+                </label>
+
+                <div class="search-box">
+                    <input type="text" id="searchInput" class="form-control search"
+                        wire:model.debounce.300ms="search"
                         placeholder="Cari nama, deskripsi, atau lainnya...">
-                    <i class="ri-search-line position-absolute top-50 start-0 translate-middle-y ms-2 text-muted"></i>
+                    <i class="ri-search-line search-icon"></i>
                 </div>
             </div>
+
+            {{-- Pembeli --}}
             <div class="col-xxl-4 col-sm-6">
-                <label for="selectJenis" class="form-label">Pembeli</label>
-                <select id="selectJenis" wire:model="selectedJenis" class="form-select" style="cursor: pointer">
+                <label for="selectJenis"
+                    class="form-label small text-muted text-uppercase fw-medium mb-2">
+                    Pembeli
+                </label>
+
+                <select id="selectJenis" wire:model="selectedJenis"
+                    class="form-select" style="cursor: pointer">
                     <option value="">Semua</option>
                     <option value="siswa">Siswa</option>
                     <option value="pegawai">Pegawai</option>
                 </select>
             </div>
-            
-            <!-- Filter Periode -->
+
+            {{-- Periode --}}
             <div class="col-xxl-4 col-sm-6">
-                <label for="selectPeriode" class="form-label fw-semibold">Periode</label>
-                <select id="selectPeriode" wire:model="selectedPeriode" class="form-select" style="cursor: pointer">
+                <label for="selectPeriode"
+                    class="form-label small text-muted text-uppercase fw-medium mb-2">
+                    Periode
+                </label>
+
+                <select id="selectPeriode" wire:model="selectedPeriode"
+                    class="form-select" style="cursor: pointer">
                     <option value="bulan_ini">Bulan Ini</option>
                     <option value="3_bulan">3 Bulan Terakhir</option>
                     <option value="6_bulan">6 Bulan Terakhir</option>
                 </select>
             </div>
+
         </div>
 
         <!--end row-->
         {{-- DATA --}}
         <div class="live-preview">
             <div class="table-responsive">
-                <table id="tabelSmartCanteenTop" class="table table-hover nowrap align-middle" style="width:100%">
+                <table id="tabelSmartCanteenTop" class="table table-hover table-nowrap align-middle" style="width:100%">
                     <thead class="table-light">
                         <tr>
                             <th class="text-uppercase" style="width: 50px;">NO</th>
@@ -70,7 +110,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <span class="fs-14 text-warning">
+                                    <span class="fs-12 fw-medium text-warning">
                                     @if ($item->user_type === 'siswa' && $item->ms_siswa)
                                         {{ $item->ms_siswa->ms_educard->kode_kartu ?? '-' }}
                                     @elseif ($item->user_type === 'pegawai')
@@ -79,8 +119,8 @@
                                     </span>
                                 </td>
                                 <td class="text-center">
-                                    <span class="fs-14 text-success">
-                                        RP{{ number_format($item->total_jajan, 0, ',', '.') }}
+                                    <span class="fs-12 fw-medium">
+                                        Rp{{ number_format($item->total_jajan, 0, ',', '.') }}
                                     </span>
                                 </td>
                             </tr>

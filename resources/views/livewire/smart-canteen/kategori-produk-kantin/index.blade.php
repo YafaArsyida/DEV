@@ -1,34 +1,58 @@
-<div class="">
-    <div class="row g-3 mb-3">
-    <div class="col-xxl-8 col-sm-6">
-        <div class="search-box">
-            <input type="text" class="form-control search" 
-                   wire:model.debounce.300ms="search" 
-                   placeholder="cari nama, deskripsi atau lainnya...">
-            <i class="ri-search-line search-icon"></i>
+<div wire:ignore.self style="width: 500px;" class="offcanvas offcanvas-end" id="offcanvasKategori" data-bs-scroll="true" 
+    data-bs-backdrop="false" aria-labelledby="offcanvasKategoriLabel">
+
+    <div class="offcanvas-header border-bottom px-4 py-3 shadow-sm">
+        <div class="d-flex justify-content-between align-items-start w-100">
+            <!-- Kiri -->
+            <div class="d-flex align-items-center gap-3">
+                <div class="avatar-sm">
+                    <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-18">
+                        <i class="ri-file-chart-line"></i>
+                    </div>
+                </div>
+
+                <div>
+                    <h5 class="fw-bold mb-1">
+                        Kategori Produk SmartKantin
+                    </h5>
+                </div>
+            </div>
+            <!-- Kanan -->
+            <button type="button"
+                class="btn btn-light btn-icon rounded-circle shadow-none"
+                data-bs-dismiss="offcanvas">
+                <i class="ri-close-line fs-18"></i>
+            </button>
         </div>
     </div>
-    <div class="col-xxl-4 col-sm-6">
-        <button type="button" 
-                class="btn btn-primary w-100"
-                data-bs-toggle="modal" 
-                data-bs-target="#ModalTambahKategori"
-                 wire:click="$emit('showCreateKategori', {{ $selectedKantin ?? 'null' }})">
-            <i class="ri-add-fill me-1 align-bottom"></i> Kategori
-        </button>
-    </div>
-</div>
 
-<div class="col-xl-12">
-    <div class="mt-4">
+    <div class="offcanvas-body">
+        <div class="row g-3 mb-3">
+            <div class="col-xxl-8 col-sm-6">
+                <div class="search-box">
+                    <input type="text" class="form-control search" 
+                        wire:model.debounce.300ms="search" 
+                        placeholder="cari nama, deskripsi atau lainnya...">
+                    <i class="ri-search-line search-icon"></i>
+                </div>
+            </div>
+            <div class="col-xxl-4 col-sm-6">
+                <button type="button"  class="btn btn-primary w-100"
+                        data-bs-toggle="modal" data-bs-target="#ModalTambahKategori"
+                        wire:click="$emit('showCreateKategori', {{ $selectedKantin ?? 'null' }})">
+                    <i class="ri-add-fill me-1 align-bottom"></i> Kategori
+                </button>
+            </div>
+        </div>
         <div class="live-preview">
             <div class="table-responsive">
-                <table class="table table-bordered table-striped table-hover nowrap align-middle">
+                <!-- Tabel Data Kelas -->
+                <table class="table table-hover table-nowrap align-middle" style="width:100%">
                     <thead class="table-light">
                         <tr>
-                            <th class="text-uppercase text-center">No</th>
+                            <th class="text-uppercase text-center" width="30px">No</th>
                             <th class="text-uppercase">Kategori</th>
-                            <th class="text-uppercase">Aksi</th>
+                            <th class="text-uppercase text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -39,29 +63,27 @@
                                     <div class="d-flex align-items-center">
                                         <i class="{{ $kat->icon ?? 'ri-price-tag-3-line' }} fs-1 text-primary me-2"></i>
                                         <div>
-                                            <h5 class="fs-13 mb-0">{{ $kat->nama_kategori_produk_kantin }}</h5>
-                                            <p class="fs-12 mb-0 text-muted">{{ $kat->deskripsi ?? '-' }}</p>
+                                            <span class="fw-medium">{{ $kat->nama_kategori_produk_kantin }}</span>
+                                            <p class="text-muted mb-0">{{ $kat->deskripsi ?? '-' }}</p>
                                         </div>
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="hstack gap-2">
-                                        {{-- Tombol Edit Kategori --}}
-                                        <button class="btn btn-sm btn-primary d-inline-flex align-items-center"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#ModalEditKategori"
-                                                title="Edit Kategori"
-                                                wire:click.prevent="$emit('loadDataKategori', {{ $kat->ms_kategori_produk_kantin_id }})">
-                                            <i class="ri-quill-pen-line align-bottom me-1"></i> Edit
+                                    <div class="d-flex justify-content-center gap-2">
+                                        {{-- Edit Kategori --}}
+                                        <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 d-inline-flex align-items-center gap-1"
+                                            data-bs-toggle="modal" data-bs-target="#ModalEditKategori"
+                                            title="Edit Kategori" wire:click.prevent="$emit('loadDataKategori', {{ $kat->ms_kategori_produk_kantin_id }})">
+                                            <i class="ri-mark-pen-line"></i>
+                                            <span>Edit</span>
                                         </button>
 
-                                        {{-- Tombol Hapus Kategori --}}
-                                        <button class="btn btn-sm btn-soft-danger d-inline-flex align-items-center"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#ModalDeleteKategori"
-                                                title="Hapus Kategori"
-                                                wire:click.prevent="$emit('confirmDeleteKategori', {{ $kat->ms_kategori_produk_kantin_id }})">
-                                            <i class="ri-delete-bin-5-line align-bottom me-1"></i>
+                                        {{-- Hapus Kategori --}}
+                                        <button type="button" class="btn btn-soft-danger btn-sm rounded-pill px-3 d-inline-flex align-items-center gap-1"
+                                            data-bs-toggle="modal" data-bs-target="#ModalDeleteKategori"
+                                            title="Hapus Kategori" wire:click.prevent="$emit('confirmDeleteKategori', {{ $kat->ms_kategori_produk_kantin_id }})">
+                                            <i class="ri-delete-bin-5-line"></i>
+                                            <span>Hapus</span>
                                         </button>
                                     </div>
                                 </td>
@@ -76,6 +98,4 @@
             </div>
         </div>
     </div>
-</div>
-
 </div>

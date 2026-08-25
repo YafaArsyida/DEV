@@ -4,55 +4,46 @@ namespace App\Http\Livewire\SmartCanteen\AksesKantin;
 
 use App\Models\User;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class Index extends Component
 {
+    use WithPagination;
+
+    protected $paginationTheme = 'bootstrap';
+
     public $search = '';
-    public $pengguna = [];
+    public $perPage = 50;
 
     protected $listeners = [
-        'refreshPengguna' => 'loadPengguna',
+        'refreshPengguna' => '$refresh',
+        'refreshKantin' => '$refresh',
+    ];
 
-        'refreshKantin' => 'loadPengguna',
-    ]; // Gunakan Livewire refresh untuk memuat ulang data
-
-    public function mount()
-    {
-        $this->loadPengguna();
-    }
-    
     public function updatedSearch()
     {
-        $this->loadPengguna();
+        $this->resetPage();
     }
 
-    public function loadPengguna()
+    public function getAllPenggunaProperty()
     {
-        $query = User::with(['ms_kantin'])
+        return User::query()
+            ->with('ms_kantin')
             ->where('peran', 'KANTIN')
-
-            // 🔍 search
-            ->where(function ($q) {
-                $q->where('nama', 'like', '%' . $this->search . '%')
-                    ->orWhere('email', 'like', '%' . $this->search . '%');
+            ->when($this->search, function ($query) {
+                $query->where(function ($q) {
+                    $q->where('nama', 'like', '%' . $this->search . '%')
+                        ->orWhere('email', 'like', '%' . $this->search . '%');
+                });
             })
-
-            ->get();
-
-        $this->pengguna = $query->map(function ($user) {
-            return [
-                'ms_pengguna_id' => $user->ms_pengguna_id,
-                'nama' => $user->nama,
-                'email' => $user->email,
-                'peran' => $user->peran,
-                'aksesKantin' => $user->ms_kantin
-                    ->pluck('nama_kantin')
-                    ->toArray(),
-            ];
-        })->toArray();
+            ->latest('ms_pengguna_id')
+            ->paginate($this->perPage);
     }
+
     public function render()
     {
-        return view('livewire.smart-canteen.akses-kantin.index');
+        return view('livewire.smart-canteen.akses-kantin.index', [
+            'pengguna' => $this->allPengguna,
+        ]);
     }
 }

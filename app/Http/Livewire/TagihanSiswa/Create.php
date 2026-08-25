@@ -2,7 +2,6 @@
 
 namespace App\Http\Livewire\TagihanSiswa;
 
-use App\Models\AkuntansiJurnalDetail;
 use App\Models\JenisTagihanSiswa;
 use App\Models\KategoriTagihanSiswa;
 use App\Models\Kelas;

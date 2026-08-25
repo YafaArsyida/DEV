@@ -1,98 +1,129 @@
- <div class="" id="produkList">
-    <div class="card mb-4 shadow-sm border-0">
-        <div class="card-body p-4">
+<div id="produkList" class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card-header">
+        <div class="row align-items-center g-3">
+            {{-- INFORMASI PENGGUNA --}}
+            <div class="col-lg-7">
+                @if($nama)
+                    <div class="d-flex align-items-center gap-3">
 
-            <div class="row g-4 align-items-center">
-                <!-- ============================ -->
-                <!-- KIRI — DATA PENGGUNA -->
-                <!-- ============================ -->
-                <div class="col-md-7">
-
-                    @if($nama)
-
-                        <h4 class="fw-bold text-dark mb-1">
-                            {{ $nama }}
-                            <span class="text-muted">—</span>
-
-                            @if($user_type === 'siswa')
-                                <span class="text-primary">{{ $nama_kelas ?: 'Belum ada kelas' }}</span>
-                            @elseif($user_type === 'pegawai')
-                                <span class="text-primary">{{ $nama_jabatan ?: 'Belum ada jabatan' }}</span>
-                            @else
-                                <span class="text-primary">Belum ada informasi</span>
-                            @endif
-                        </h4>
-
-                        <div class="text-muted mb-2">
-                            SmartCard :
-                            <span class="fw-semibold text-primary">{{ $educard ?: '-' }}</span>
+                        {{-- ICON --}}
+                        <div class="avatar-md flex-shrink-0">
+                            <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-22">
+                                @if($user_type === 'siswa')
+                                    <i class="ri-user-3-line"></i>
+                                @elseif($user_type === 'pegawai')
+                                    <i class="ri-user-settings-line"></i>
+                                @else
+                                    <i class="ri-user-line"></i>
+                                @endif
+                            </div>
                         </div>
 
-                        <div class="mt-1">
-                            {{-- <div class="text-muted small">Saldo EduPay</div> --}}
-                            <h3 class="fw-bold text-success mb-0">
-                                RP{{ number_format($saldo_edupay ?? 0, 0, ',', '.') }}
-                            </h3>
+                        {{-- USER --}}
+                        <div class="flex-grow-1 min-w-0">
+
+                            <div class="d-flex align-items-center flex-wrap gap-2">
+
+                                <h5 class="fw-bold text-dark mb-0">
+                                    {{ $nama }}
+                                </h5>
+
+                                @if($user_type === 'siswa')
+
+                                    <span class="badge bg-primary-subtle text-primary rounded-pill">
+                                        <i class="ri-school-line me-1"></i>
+                                        Siswa
+                                    </span>
+
+                                @elseif($user_type === 'pegawai')
+
+                                    <span class="badge bg-primary-subtle text-primary rounded-pill">
+                                        <i class="ri-briefcase-line me-1"></i>
+                                        {{ $nama_jabatan ?: 'Pegawai' }}
+                                    </span>
+
+                                @endif
+                                
+                                <small class="text-muted">
+                                    <i class="ri-bank-card-line me-1"></i>
+                                    {{ $educard ?: '-' }}
+                                </small>
+
+                            </div>
+
+                            {{-- SMARTCARD --}}
+                            <div class="mt-1">
+                                <div class="d-flex align-items-center gap-2">
+
+                                    <i class="ri-wallet-3-line text-success fs-18"></i>
+
+                                    <h3 class="fw-bold text-success mb-0">
+                                        Rp{{ number_format($saldo_edupay ?? 0, 0, ',', '.') }}
+                                    </h3>
+
+                                </div>
+                            </div>
+
                         </div>
 
-                    @else
-
-                        <div class="text-muted">
-                            <h5 class="mb-0">Scan SmartCard untuk transaksi</h5>
+                    </div>
+                @else
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="avatar-md flex-shrink-0">
+                            <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-22">
+                                <i class="ri-scan-2-line"></i>
+                            </div>
                         </div>
 
-                    @endif
+                        <div>
+                            <h5 class="fw-bold mb-1">
+                                Siap Melakukan Transaksi
+                            </h5>
 
-                </div>
+                            <small class="text-muted">
+                                Scan SmartCard untuk memulai transaksi.
+                            </small>
+                        </div>
 
-                <!-- ============================ -->
-                <!-- KANAN — INPUT SCAN -->
-                <!-- ============================ -->
-                <div class="col-md-5">
-                
-                    <label class="fw-semibold mb-1">
-                        Scan / Input SmartCard
-                    </label>
-                
-                    <div class="input-group input-group-lg shadow-sm">
-                
+                    </div>
+
+                @endif
+            </div>
+            {{-- SCANNER --}}
+            <div class="col-lg-5">
+                <div class="border rounded-4 p-3">
+                    <div class="input-group input-group-lg">
+
                         <span class="input-group-text bg-primary text-white border-primary">
                             <i class="ri-sensor-fill fs-4"></i>
                         </span>
-                
-                        <input type="text" id="inputSmartcard" wire:model.defer="smartcardInput" wire:keydown.enter="prosesSmartcard"
-                            class="form-control border-primary" placeholder="Tempelkan SmartCard atau ketik kode..." autofocus>
-                
-                        {{-- tombol reset --}}
-                        <button type="button" class="btn btn-primary" wire:click="resetScan">
-            
-                            <i class="ri-refresh-line"></i>
-                        </button>
-                
-                    </div>
-                
-                </div>
 
+                        <input
+                            type="text"
+                            id="inputSmartcard"
+                            wire:model.defer="smartcardInput"
+                            wire:keydown.enter="prosesSmartcard"
+                            class="form-control border-primary"
+                            placeholder="Tempelkan kartu atau ketik kode..."
+                            autocomplete="off"
+                            autofocus>
+
+                        <button
+                            type="button"
+                            class="btn btn-primary"
+                            wire:click="resetScan"
+                            title="Reset Scan"
+                            aria-label="Reset Scan">
+
+                            <i class="ri-refresh-line"></i>
+
+                        </button>
+                    </div>
+                </div>
             </div>
 
         </div>
     </div>
-
-
-    <!-- Search & Filter -->
-    {{-- <div class="card-body border-end-0 border-start-0">
-        <form>
-            <div class="row g-3">
-                <div class="col-xxl-12 col-sm-12">
-                    <div class="search-box">
-                        <input type="text" class="form-control search" wire:model.debounce.300ms="search" placeholder="Cari nama produk...">
-                        <i class="ri-search-line search-icon"></i>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div> --}}
-
     <!-- Tabs kategori -->
     <div class="card-body pt-0">
         <ul class="nav nav-tabs nav-tabs-custom nav-success" role="tablist">
@@ -148,5 +179,4 @@
             if (el) el.focus();
         });
     </script>
-
 </div>

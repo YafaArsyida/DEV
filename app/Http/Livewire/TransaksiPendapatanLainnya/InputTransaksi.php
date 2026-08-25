@@ -147,8 +147,7 @@ class InputTransaksi extends Component
 
                 'deskripsi' => $deskripsi,
 
-                'akuntansi_jurnal_id' =>
-                    $jurnal->akuntansi_jurnal_id,
+                'akuntansi_jurnal_id' => $jurnal->akuntansi_jurnal_id,
             ]);
 
             // =====================================================

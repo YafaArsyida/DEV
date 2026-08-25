@@ -10,7 +10,6 @@ use Livewire\Component;
 class KartuTopJajan extends Component
 {
     public $selectedKantin = null;
-    public $selectedTahunAjar = null;
 
     public $selectedJenis = '';   // siswa / pegawai / semua
     public $search = '';
@@ -20,11 +19,10 @@ class KartuTopJajan extends Component
         'parameterUpdated' => 'updateParameters',
     ];
 
-    public function updateParameters($kantin, $tahunAjar)
+    public function updateParameters($kantin)
     {
-        // Update nilai selectedKantin dan selectedTahunAjar
+        // Update nilai selectedKantin
         $this->selectedKantin = $kantin;
-        $this->selectedTahunAjar = $tahunAjar;
     }
 
     public function render()

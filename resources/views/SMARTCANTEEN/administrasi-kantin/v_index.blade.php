@@ -19,7 +19,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-xxl-6">
+            <div class="col-xxl-5">
                 <div class="sticky-side-div">
                     @livewire('smart-canteen.kantin.index')
                 </div>
@@ -28,7 +28,7 @@
                 @livewire('smart-canteen.kantin.detail')
                 @livewire('smart-canteen.kantin.delete')
             </div>
-            <div class="col-xxl-6">
+            <div class="col-xxl-7">
                 @livewire('smart-canteen.akses-kantin.index')
                 @livewire('smart-canteen.akses-kantin.create')
                 @livewire('smart-canteen.akses-kantin.detail')

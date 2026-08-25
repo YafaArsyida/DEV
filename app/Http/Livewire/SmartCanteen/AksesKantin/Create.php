@@ -2,7 +2,6 @@
 
 namespace App\Http\Livewire\SmartCanteen\AksesKantin;
 
-use App\Models\Jenjang;
 use App\Models\SmartCanteen\Kantin;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -12,10 +11,9 @@ use Livewire\Component;
 
 class Create extends Component
 {
-    public $nama, $email, $password;
+    public $nama, $telepon, $email, $password;
 
     public $ms_kantin_id;        // 🔥 single select
-    public $ms_jenjang_id = [];  // 🔥 multi jenjang
 
     protected $listeners = ['createPetugasKantin'];
 
@@ -34,10 +32,6 @@ class Create extends Component
 
             // 🔥 kantin = single
             'ms_kantin_id' => 'required|exists:ms_kantin,ms_kantin_id',
-
-            // 🔥 jenjang = multi
-            'ms_jenjang_id' => 'required|array|min:1',
-            'ms_jenjang_id.*' => 'exists:ms_jenjang,ms_jenjang_id',
         ];
     }
 
@@ -64,20 +58,11 @@ class Create extends Component
             // 1. create user
             $user = User::create([
                 'nama' => $this->nama,
+                'telepon' => $this->telepon,
                 'email' => $this->email,
                 'password' => Hash::make($this->password),
                 'peran' => 'KANTIN',
             ]);
-
-            // 2. akses jenjang (multi)
-            foreach ($this->ms_jenjang_id as $jenjangId) {
-                DB::table('ms_akses_jenjang')->insert([
-                    'ms_pengguna_id' => $user->ms_pengguna_id,
-                    'ms_jenjang_id' => $jenjangId,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
 
             // 3. akses kantin (single)
             DB::table('ms_akses_kantin')->insert([
@@ -115,6 +100,7 @@ class Create extends Component
     public function resetInput()
     {
         $this->nama = '';
+        $this->telepon = '';
         $this->email = '';
         $this->password = '';
         $this->ms_kantin_id = [];
@@ -123,7 +109,6 @@ class Create extends Component
     public function render()
     {
         return view('livewire.smart-canteen.akses-kantin.create', [
-            'jenjangList' => Jenjang::where('status', 'Aktif')->get(),
             'kantinList' => Kantin::get()
         ]);
     }

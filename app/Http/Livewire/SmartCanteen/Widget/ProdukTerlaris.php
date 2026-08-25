@@ -12,7 +12,6 @@ class ProdukTerlaris extends Component
     use WithPagination;
 
     public $selectedKantin = null;
-    public $selectedTahunAjar = null;
 
     public $selectedPeriode = 'today';
 
@@ -34,10 +33,9 @@ class ProdukTerlaris extends Component
     /** 
      * Menerima parameter dari komponen Parameter (jenjang & tahun ajar)
      */
-    public function updateParameters($kantin, $tahunAjar)
+    public function updateParameters($kantin)
     {
         $this->selectedKantin = $kantin;
-        $this->selectedTahunAjar = $tahunAjar;
 
         $this->resetPage();
     }

@@ -40,7 +40,7 @@ class ProdukAktif extends Component
     /**
      * Listener untuk update kantin
      */
-    public function updateParameters($kantin, $tahunAjar)
+    public function updateParameters($kantin)
     {
         $this->selectedKantin = $kantin;
 

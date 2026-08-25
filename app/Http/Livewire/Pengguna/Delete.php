@@ -2,10 +2,10 @@
 
 namespace App\Http\Livewire\Pengguna;
 
-use App\Models\EduPay;
-use App\Models\Tabungan;
-use App\Models\Tagihan;
-use App\Models\Transaksi;
+use App\Models\TagihanSiswa;
+use App\Models\TransaksiEduPay;
+use App\Models\TransaksiTabungan;
+use App\Models\TransaksiTagihanSiswa;
 use App\Models\User;
 use Livewire\Component;
 
@@ -29,10 +29,10 @@ class Delete extends Component
 
             if ($pengguna) {
                 // Validasi hubungan dengan model lain
-                $relatedDataExists = EduPay::where('ms_pengguna_id', $this->ms_pengguna_id)->exists() ||
-                    Tabungan::where('ms_pengguna_id', $this->ms_pengguna_id)->exists() ||
-                    Transaksi::where('ms_pengguna_id', $this->ms_pengguna_id)->exists() ||
-                    Tagihan::where('ms_pengguna_id', $this->ms_pengguna_id)->exists();
+                $relatedDataExists = TransaksiEduPay::where('ms_pengguna_id', $this->ms_pengguna_id)->exists() ||
+                    TransaksiTabungan::where('ms_pengguna_id', $this->ms_pengguna_id)->exists() ||
+                    TransaksiTagihanSiswa::where('ms_pengguna_id', $this->ms_pengguna_id)->exists() ||
+                    TagihanSiswa::where('ms_pengguna_id', $this->ms_pengguna_id)->exists();
 
                 if ($relatedDataExists) {
                     $this->dispatchBrowserEvent('alertify-error', ['message' => 'Tidak dapat dihapus, memiliki transaksi terkait.']);
@@ -53,7 +53,7 @@ class Delete extends Component
 
         // Reset properti dan tutup modal
         $this->reset(['ms_pengguna_id']);
-        $this->dispatchBrowserEvent('hide-delete-modal', ['modalId' => 'ModalDeletePengguna']);
+        $this->dispatchBrowserEvent('hide-modal', ['modalId' => 'ModalDeletePengguna']);
     }
 
     public function render()

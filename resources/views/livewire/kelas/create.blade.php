@@ -2,7 +2,7 @@
 <div wire:ignore.self class="modal fade" id="ModalAddKelas" tabindex="-1" aria-labelledby="ModalAddKelas" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-            <div class="modal-header border-0">
+            <div class="modal-header">
                 <div class="d-flex align-items-center gap-3">
                     <div class="avatar-sm">
                         <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">

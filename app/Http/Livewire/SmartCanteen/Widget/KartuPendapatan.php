@@ -13,7 +13,6 @@ use Livewire\Component;
 class KartuPendapatan extends Component
 {
     public $selectedKantin = null;
-    public $selectedTahunAjar = null;
 
     public $periode = 'today'; // today | yesterday | 1_month | 3_month
     public $labelPeriode = 'Hari Ini';
@@ -28,13 +27,11 @@ class KartuPendapatan extends Component
         'parameterUpdated' => 'updateParameters',
     ];
 
-    public function updateParameters($kantin, $tahunAjar)
+    public function updateParameters($kantin)
     {
         $this->selectedKantin = $kantin;
-        $this->selectedTahunAjar = $tahunAjar;
 
         $kantin = Kantin::find($kantin);
-        $tahunAjar = TahunAjar::find($tahunAjar);
     }
 
     public function mount()

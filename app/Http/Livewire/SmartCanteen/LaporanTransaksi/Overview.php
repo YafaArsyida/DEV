@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 class Overview extends Component
 {
     public $selectedKantin = null;
-    public $selectedTahunAjar = null;
+
     public $selectedPeriode = 'hari_ini'; // default
 
     protected $listeners = [
@@ -18,11 +18,10 @@ class Overview extends Component
         'refreshSaldoEduPay'
     ];
 
-    public function updateParameters($kantin, $tahunAjar)
+    public function updateParameters($kantin)
     {
-        // Update nilai selectedKantin dan selectedTahunAjar
+        // Update nilai selectedKantin 
         $this->selectedKantin = $kantin;
-        $this->selectedTahunAjar = $tahunAjar;
     }
 
     public function refreshSaldoEduPay()

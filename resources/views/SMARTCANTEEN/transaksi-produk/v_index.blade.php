@@ -9,16 +9,12 @@
                 <div class="tab-content text-muted">
                     <div class="tab-pane active" id="tabSiswaKelas" role="tabpanel">
                         <div class="row">
-                            <div class="col-xxl-8 col-md-8 pe-1">
-                                <div class="card">
-                                    @livewire('smart-canteen.transaksi-produk.index')   
-                                </div><!-- end card -->
+                            <div class="col-xxl-8 col-md-8">
+                                @livewire('smart-canteen.transaksi-produk.index')   
                             </div>
                             <!--end col-->
-                            <div class="col-xxl-4 col-md-4 ps-0">
-                                <div class="sticky-side-div">
-                                    @livewire('smart-canteen.transaksi-produk.keranjang-produk')   
-                                </div>
+                            <div class="col-xxl-4 col-md-4">
+                                @livewire('smart-canteen.transaksi-produk.keranjang-produk')   
                             </div>
                         </div>
                         <!--end row-->

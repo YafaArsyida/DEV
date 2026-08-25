@@ -11,7 +11,6 @@ use Livewire\Component;
 class TopJajan extends Component
 {
     public $selectedKantin = null;
-    public $selectedTahunAjar = null;
 
     public $selectedJenis = '';   // siswa / pegawai / semua
     public $search = '';
@@ -21,11 +20,10 @@ class TopJajan extends Component
         'parameterUpdated' => 'updateParameters',
     ];
 
-    public function updateParameters($jenjang, $tahunAjar)
+    public function updateParameters($kantin)
     {
         // Update nilai selectedKantin dan selectedTahunAjar
-        $this->selectedKantin = $jenjang;
-        $this->selectedTahunAjar = $tahunAjar;
+        $this->selectedKantin = $kantin;
     }
 
     public function render()

@@ -109,8 +109,7 @@
                             </div>
                         </div>
                         <div class="flex-grow-1 cursor-pointer"
-                            role="button"
-                            wire:click="$emit('showHistoriTagihan', {
+                            role="button" wire:click="$emit('showHistoriTagihan', {
                                 ms_penempatan_siswa_id: {{ $ms_penempatan_siswa_id }},
                                 jenjang: {{ $ms_jenjang_id }},
                                 tahunAjar: {{ $ms_tahun_ajar_id }}

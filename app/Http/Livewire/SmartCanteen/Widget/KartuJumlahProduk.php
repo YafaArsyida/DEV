@@ -13,10 +13,8 @@ use Livewire\Component;
 class KartuJumlahProduk extends Component
 {
     public $selectedKantin = null;
-    public $selectedTahunAjar = null;
 
     public $namaKantin = null;
-    public $namaTahunAjar = null;
 
     public $selectedKategori = null;
     public $listKategori = [];
@@ -44,16 +42,13 @@ class KartuJumlahProduk extends Component
         ]);
     }
 
-    public function updateParameters($kantin, $tahunAjar)
+    public function updateParameters($kantin)
     {
         $this->selectedKantin = $kantin;
-        $this->selectedTahunAjar = $tahunAjar;
 
         $kantin = Kantin::find($kantin);
-        $tahunAjar = TahunAjar::find($tahunAjar);
 
         $this->namaKantin = $kantin ? $kantin->nama_kantin : 'Tidak Diketahui';
-        $this->namaTahunAjar = $tahunAjar ? $tahunAjar->nama_tahun_ajar : 'Tidak Diketahui';
 
         // Load kategori sesuai jenjang
         $this->loadKategori();

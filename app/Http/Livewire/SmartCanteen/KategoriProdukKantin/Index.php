@@ -10,7 +10,6 @@ class Index extends Component
 {
     public $search = '';
     public $selectedKantin = null;
-    public $selectedTahunAjar = null;
     public $namaKantin = '';
 
     protected $listeners = [
@@ -18,7 +17,7 @@ class Index extends Component
         'parameterUpdated' => 'updateParameters'
     ];
 
-    public function updateParameters($kantin, $tahunAjar)
+    public function updateParameters($kantin)
     {
         $this->selectedKantin = $kantin;
 

@@ -2,9 +2,7 @@
 
 namespace App\Http\Livewire\Parameter;
 
-use App\Models\AkuntansiJurnalDetail;
 use Livewire\Component;
-use App\Models\Jenjang;
 use App\Models\SmartCanteen\Kantin;
 use App\Models\SmartCanteen\TransaksiSmartCanteen;
 use App\Models\TahunAjar;
@@ -13,7 +11,6 @@ use Illuminate\Support\Facades\Auth;
 class SmartCanteen extends Component
 {
     public $selectedKantin = null;
-    public $selectedTahunAjar = null;
 
     public $saldoPendapatanKantin;
 
@@ -23,11 +20,6 @@ class SmartCanteen extends Component
     ];
 
     public function updatedSelectedKantin()
-    {
-        $this->checkAndEmitParameters();
-    }
-
-    public function updatedSelectedTahunAjar()
     {
         $this->checkAndEmitParameters();
     }
@@ -48,17 +40,13 @@ class SmartCanteen extends Component
             })->first();
         }
 
-        $firstTahunAjar = TahunAjar::where('status', 'Aktif')
-            ->orderBy('urutan', 'asc')->first();
-
         $this->selectedKantin = $firstKantin->ms_kantin_id ?? null;
-        $this->selectedTahunAjar = $firstTahunAjar->ms_tahun_ajar_id ?? null;
     }
 
     private function checkAndEmitParameters()
     {
-        if ($this->selectedKantin !== null && $this->selectedTahunAjar !== null) {
-            $this->emit('parameterUpdated', $this->selectedKantin, $this->selectedTahunAjar);
+        if ($this->selectedKantin !== null) {
+            $this->emit('parameterUpdated', $this->selectedKantin);
             $this->dispatchBrowserEvent('alertify-success', ['message' => 'Memperbarui...']);
         }
     }
@@ -66,8 +54,7 @@ class SmartCanteen extends Component
     public function refreshParameters()
     {
         $this->selectedKantin = null;
-        $this->selectedTahunAjar = null;
-        $this->emit('parameterUpdated', null, null);
+        $this->emit('parameterUpdated', null);
     }
 
     /**
@@ -128,8 +115,8 @@ class SmartCanteen extends Component
             })->get();
         }
 
-        if ($this->selectedKantin && $this->selectedTahunAjar) {
-            $this->emit('parameterUpdated', $this->selectedKantin, $this->selectedTahunAjar);
+        if ($this->selectedKantin) {
+            $this->emit('parameterUpdated', $this->selectedKantin);
         }
 
         // $this->refreshSaldo();

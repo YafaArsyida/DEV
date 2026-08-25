@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\SmartCanteen\Widget;
 
+use App\Models\AkuntansiJurnal;
 use App\Models\AkuntansiJurnalDetail;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -14,10 +15,11 @@ class KartuJurnalKantin extends Component
 
     protected $paginationTheme = 'bootstrap'; // Gunakan tema Bootstrap
 
+    public $perPage = 10;
+
     public $periode = 'hari_ini'; // default
 
     public $selectedKantin = null;
-    public $selectedTahunAjar = null;
 
     protected $listeners = [
         'parameterUpdated' => 'updateParameters',
@@ -34,11 +36,10 @@ class KartuJurnalKantin extends Component
         $this->emitSelf('$refresh'); //ringan
     }
 
-    public function updateParameters($kantin, $tahunAjar)
+    public function updateParameters($kantin)
     {
-        // Update nilai selectedKantin dan selectedTahunAjar
+        // Update nilai selectedKantin
         $this->selectedKantin = $kantin;
-        $this->selectedTahunAjar = $tahunAjar;
     }
 
     protected function getTanggalFilter()
@@ -59,32 +60,37 @@ class KartuJurnalKantin extends Component
 
     public function render()
     {
+
         [$startDate, $endDate] = $this->getTanggalFilter();
 
         $user = Auth::user();
 
-        $jurnal = AkuntansiJurnalDetail::with('akuntansi_rekening', 'ms_pengguna')
-            ->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
-
-            ->when($user->peran !== 'SUPERADMIN', function ($query) use ($user) {
-                $query->where('ms_pengguna_id', $user->ms_pengguna_id);
-            })
-            
-            ->where('kode_rekening', '21001.01')
+        $query = AkuntansiJurnal::with([
+            'akuntansi_jurnal_detail.akuntansi_rekening',
+            'ms_pengguna',
+        ])
+            ->where('ms_departemen_id', 'KANTIN')
             ->whereBetween('tanggal_transaksi', [
-                $startDate->startOfDay(),
-                $endDate->endOfDay()
-            ])
+                $startDate->copy()->startOfDay(),
+                $endDate->copy()->endOfDay(),
+            ]);
+
+        if ($user->peran !== 'SUPERADMIN') {
+            $query->where(
+                'ms_pengguna_id',
+                $user->ms_pengguna_id
+            );
+        }
+
+        $transaksiJurnal = $query
             ->orderBy('tanggal_transaksi', 'desc')
-            ->paginate(10);
+            ->orderBy('akuntansi_jurnal_id', 'desc')
+            ->paginate($this->perPage);
 
-        // grouping SETELAH paginate
-        $transaksiJurnal = $jurnal->getCollection()
-            ->groupBy(['deskripsi', 'nominal']);
-
-        return view('livewire.smart-canteen.widget.kartu-jurnal-kantin',[
-            'transaksiJurnal' => $transaksiJurnal,
-            'jurnalPagination' => $jurnal,
-        ]);
+        return view('livewire.smart-canteen.widget.kartu-jurnal-kantin',
+            [
+                'transaksiJurnal' => $transaksiJurnal,
+            ]
+        );
     }
 }

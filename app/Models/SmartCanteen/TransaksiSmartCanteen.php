@@ -2,6 +2,7 @@
 
 namespace App\Models\SmartCanteen;
 
+use App\Models\AkuntansiJurnal;
 use App\Models\AkuntansiJurnalDetail;
 use App\Models\Jenjang;
 use App\Models\Pegawai;
@@ -23,15 +24,18 @@ class TransaksiSmartCanteen extends Model
     protected $fillable = [
         'user_type',
         'user_id',
-        'ms_penempatan_siswa_id',
+        'ms_jenjang_id',
+
         'ms_pengguna_id',
         'ms_kantin_id',
+
         'tanggal_transaksi',
         'total_transaksi',
         'metode_pembayaran',
+
         'deskripsi',
-        'akuntansi_jurnal_detail_debit_id',
-        'akuntansi_jurnal_detail_kredit_id',
+        
+        'akuntansi_jurnal_id',
         'status_settlement',
         'ms_settlement_kantin_id'
     ];
@@ -53,14 +57,6 @@ class TransaksiSmartCanteen extends Model
     }
 
     /**
-     * Relasi ke model Siswa
-     */
-    public function ms_penempatan_siswa()
-    {
-        return $this->belongsTo(PenempatanSiswa::class, 'ms_penempatan_siswa_id', 'ms_penempatan_siswa_id');
-    }
-
-    /**
      * Relasi ke model Pengguna
      */
     public function ms_pengguna()
@@ -68,9 +64,9 @@ class TransaksiSmartCanteen extends Model
         return $this->belongsTo(User::class, 'ms_pengguna_id', 'ms_pengguna_id');
     }
 
-    public function akuntansi_jurnal_detail()
+    public function akuntansi_jurnal()
     {
-        return $this->belongsTo(AkuntansiJurnalDetail::class, 'akuntansi_jurnal_detail_id', 'akuntansi_jurnal_detail_id');
+        return $this->belongsTo(AkuntansiJurnal::class, 'akuntansi_jurnal_id', 'akuntansi_jurnal_id');
     }
 
     public function dt_transaksi_kantin()

@@ -20,8 +20,13 @@ class DetailSettlement extends Component
             ->where('ms_settlement_kantin_id', $settlementId)
             ->first();
 
-        $this->detailList = TransaksiSmartCanteen::where('ms_settlement_kantin_id', $settlementId)
-            ->orderBy('created_at', 'asc')
+       $this->detailList = TransaksiSmartCanteen::with([
+            'ms_siswa',
+            'ms_pegawai',
+            'dt_transaksi_kantin.ms_produk_kantin',
+        ])
+            ->where('ms_settlement_kantin_id', $settlementId)
+            ->orderBy('tanggal_transaksi', 'asc')
             ->get();
     }
 

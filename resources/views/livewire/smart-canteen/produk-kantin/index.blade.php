@@ -1,45 +1,76 @@
- <div class="card" id="produkList">
-    <div class="card-header border-0">
-        <div class="row align-items-center gy-3">
-            <div class="col-sm">
-                <h5 class="card-title mb-0">Administrasi Produk SmartCanteen</h5>
-                <p class="text-muted mb-0">SmartCanteen > Administrasi Produk {{ $namaKantin }}</p>
-            </div>
-            <div class="col-sm-auto">
-                <div class="d-flex gap-1 flex-wrap">
-                    <button type="button" class="btn btn-success add-btn" data-bs-toggle="modal" 
-                        data-bs-target="#ModalTambahProduk"
-                        wire:click="$emit('showCreateProduk', {{ $selectedKantin ?? 'null' }})">
-                        <i class="ri-add-line align-bottom me-1"></i> Tambah Produk
-                    </button>
-                    <button type="button" class="btn btn-info">
-                        <i class="ri-file-download-line align-bottom me-1"></i> Import
-                    </button>
-                    <button class="btn btn-soft-danger" id="remove-actions" onClick="deleteMultiple()">
-                        <i class="ri-delete-bin-2-line"></i>
-                    </button>
+<div id="produkList" class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card-header">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4">
+            {{-- TITLE --}}
+            <div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-sm flex-shrink-0">
+                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                            <i class="ri-shopping-bag-3-line"></i>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h5 class="fw-bold mb-1">
+                            Administrasi Produk SmartCanteen
+                        </h5>
+
+                        <small class="text-muted">
+                            Kelola produk, harga, dan kategori untuk kantin
+                            <span class="fw-semibold text-dark">
+                                {{ $namaKantin }}
+                            </span>.
+                        </small>
+                    </div>
+
                 </div>
             </div>
+
+            {{-- ACTION --}}
+            <div class="d-flex gap-2 flex-wrap">
+
+                {{-- TAMBAH PRODUK --}}
+                <button type="button" class="btn btn-primary rounded-pill px-4 d-inline-flex align-items-center gap-1"
+                    data-bs-toggle="modal" data-bs-target="#ModalTambahProduk"
+                    wire:click="$emit('showCreateProduk', {{ $selectedKantin ?? 'null' }})">
+
+                    <i class="ri-add-line"></i>
+                    <span>Tambah Produk</span>
+                </button>
+
+                {{-- IMPORT --}}
+                {{-- <button type="button"
+                    class="btn btn-soft-info rounded-pill px-4 d-inline-flex align-items-center gap-1">
+                    <i class="ri-file-upload-line"></i>
+                    <span>Import</span>
+                </button> --}}
+
+                {{-- DELETE MULTIPLE --}}
+                {{-- <button type="button" class="btn btn-soft-danger btn-icon rounded-circle"
+                    id="remove-actions" onclick="deleteMultiple()" title="Hapus Produk Terpilih">
+
+                    <i class="ri-delete-bin-2-line fs-18"></i>
+                </button> --}}
+
+            </div>
+
         </div>
     </div>
-
     <!-- Search & Filter -->
-    <div class="card-body border border-dashed border-end-0 border-start-0">
-        <form>
-            <div class="row g-3">
-                <div class="col-xxl-10 col-sm-8">
-                    <div class="search-box">
-                        <input type="text" class="form-control search" wire:model.debounce.300ms="search" placeholder="Cari nama produk...">
-                        <i class="ri-search-line search-icon"></i>
-                    </div>
-                </div>
-                <div class="col-xxl-2 col-sm-4">
-                    <button type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasKategori" aria-controls="offcanvasKategori" class="btn btn-primary w-100">
-                        <i class="ri-equalizer-fill me-1 align-bottom"></i> Master Kategori Produk
-                    </button>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-xxl-10 col-sm-8">
+                <div class="search-box">
+                    <input type="text" class="form-control search" wire:model.debounce.300ms="search" placeholder="Cari nama produk...">
+                    <i class="ri-search-line search-icon"></i>
                 </div>
             </div>
-        </form>
+            <div class="col-xxl-2 col-sm-4">
+                <button type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasKategori" aria-controls="offcanvasKategori" class="btn btn-primary w-100">
+                    <i class="ri-equalizer-fill me-1 align-bottom"></i> Master Kategori Produk
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- Tabs kategori -->

@@ -1,4 +1,4 @@
-<div class="card shadow-sm border-0">
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
     <div class="card-body p-0">
         <!-- Alert CTA -->
         <div class="alert alert-warning border-0 rounded-0 m-0 d-flex align-items-center" role="alert">

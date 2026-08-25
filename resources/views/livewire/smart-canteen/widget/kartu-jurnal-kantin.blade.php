@@ -19,45 +19,85 @@
                     <thead class="table-light">
                         <tr>
                             <th class="">No</th>
-                            <th class="text-start" style="width: 200px;">Tanggal</th>
+                            <th class="text-start">Tanggal</th>
+                            <th class="">Nomor Jurnal</th>
+                            <th class="text-start">Deskripsi Transaksi</th>
                             <th class="text-start">Petugas</th>
-                            <th class="text-start" style="min-width: 500px;">Deskripsi Transaksi</th>
                             <th class="text-center">Nominal</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @php
-                        $nomorUrut = 1; // Inisialisasi nomor urut
-                        @endphp
-
-                        @foreach ($transaksiJurnal as $deskripsi => $transaksiByNominal)
-                        @foreach ($transaksiByNominal as $nominal => $transaksi)
-                        @php
-                        $debit = $transaksi->where('posisi', 'debit')->first();
-                        $kredit = $transaksi->where('posisi', 'kredit')->first();
-                        $tanggal = $transaksi->first()->tanggal_transaksi ?? null;
-                        @endphp
+                    @forelse ($transaksiJurnal as $transaksi)
                         <tr>
-                            <td class="text-start">{{ $nomorUrut++ }}.</td>
+
+                            {{-- NO --}}
                             <td class="text-start">
-                                {{ $tanggal ? \App\Http\Controllers\HelperController::formatTanggalIndonesia($tanggal,
-                                'd F Y H:i:s') : '-' }}
+                                {{ $transaksiJurnal->firstItem() + $loop->index }}.
                             </td>
-                            <td class="text-start">{{ $debit ? $debit->ms_pengguna->nama : ($kredit ?
-                                $kredit->ms_pengguna->nama : '-') }}</td>
-                            <td>{{ $deskripsi }}</td>
+
+                            {{-- TANGGAL --}}
+                            <td>
+                                {{ $transaksi->tanggal_transaksi
+                                    ? \Carbon\Carbon::parse($transaksi->tanggal_transaksi)
+                                        ->format('d/m/Y')
+                                    : '-' }}
+                            </td>
+                            <td>
+                                {{ $transaksi->nomor_jurnal }}
+                            </td>
+
+                            {{-- PETUGAS --}}
+                            <td>
+                                {{ $transaksi->deskripsi }}
+                            </td>
+
+                            <td>
+                                {{ $transaksi->ms_pengguna->nama ?? '-' }}
+                            </td>
+
+                            @php
+                                $nominal = optional(
+                                    $transaksi->akuntansi_jurnal_detail->firstWhere('posisi', 'debit')
+                                )->nominal ?? 0;
+                            @endphp
+
                             <td class="text-center">
-                                <span class="fs-14 text-info">
-                                    RP{{ number_format($nominal, 0, ',', '.') }}
+                                <span class="fs-12 fw-medium">
+                                    Rp{{ number_format($nominal, 0, ',', '.') }}
                                 </span>
                             </td>
                         </tr>
-                        @endforeach
-                        @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-4">
+                                Tidak ada transaksi.
+                            </td>
+                        </tr>
+                    @endforelse
                     </tbody>
                 </table>
-                <div class="mt-3 d-flex justify-content-end">
-                    {{ $jurnalPagination->links() }}
+                {{-- PAGINATION --}}
+                <div class="mt-3">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div class="text-muted fs-13">
+                            Menampilkan
+                            <span class="fw-semibold">
+                                {{ $transaksiJurnal->firstItem() ?? 0 }}
+                            </span>
+                            -
+                            <span class="fw-semibold">
+                                {{ $transaksiJurnal->lastItem() ?? 0 }}
+                            </span>
+                            dari
+                            <span class="fw-semibold">
+                                {{ $transaksiJurnal->total() }}
+                            </span>
+                            data kelas
+                        </div>
+                        <div>
+                            {{ $transaksiJurnal->links() }}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

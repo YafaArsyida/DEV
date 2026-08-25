@@ -56,7 +56,7 @@
 
                                 <td class="text-center">
                                     <span class="fs-12 fw-medium">
-                                        RP{{ number_format($nominal, 0, ',', '.') }}
+                                        Rp{{ number_format($nominal, 0, ',', '.') }}
                                     </span>
                                 </td>
                             </tr>

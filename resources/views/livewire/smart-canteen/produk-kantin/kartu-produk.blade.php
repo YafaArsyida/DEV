@@ -1,6 +1,6 @@
 @forelse ($listProduk as $item)
     <div class="col-xxl-2 col-md-3 col-lg-3">
-        <div class="card card-animate text-center shadow-sm rounded-3 h-100 border">
+        <div class="card card-animate text-center shadow-sm rounded-4 h-100 border">
             <div class="card-body p-3 d-flex flex-column justify-content-between">
                 <!-- Ikon Produk + Dropdown -->
                 <div class="position-relative d-inline-block mx-auto">

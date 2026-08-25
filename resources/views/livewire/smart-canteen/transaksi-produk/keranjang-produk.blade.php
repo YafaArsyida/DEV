@@ -1,14 +1,28 @@
 {{-- MOCKUP KERANJANG KANTIN --}}
-<div class="card">
-    <div class="card-body p-4">
-        <div class="row g-4 align-items-center mb-2">
-            <div class="col-sm-12">
-                <p class="text-muted mb-2 text-uppercase fw-semibold">Keranjang Kantin</p>
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden sticky-side-div">
+    <div class="card-header">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4">
+            {{-- TITLE --}}
+            <div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-sm flex-shrink-0">
+                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                            <i class="ri-store-2-line"></i>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h5 class="fw-bold mb-1">
+                            Keranjang Produk
+                        </h5>
+                    </div>
+                </div>
             </div>
         </div>
-
+    </div>
+    <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-borderless align-middle mb-0">
+            <table class="table table-hover table-nowrap align-middle" style="width:100%">
                 <thead class="table-light">
                     <tr class="table-active text-uppercase text-center">
                         {{-- <th style="width: 50px;">Batal</th> --}}

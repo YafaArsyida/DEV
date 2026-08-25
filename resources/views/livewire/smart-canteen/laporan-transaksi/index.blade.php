@@ -1,80 +1,138 @@
 {{-- Stop trying to control. --}}
-<div class="card">
-    <div class="card-header border-0 pb-0">
-        <div class="d-flex align-items-center">
-            <div class="flex-grow-1">
-                <h5 class="card-title mb-0">Laporan Transaksi SmartCanteen</h5>
-                {{-- <p class="mb-0">Transaksi akan ditampilkan dari semua petugas untuk memastikan penghitungan yang akurat dan terkini.</p> --}}
-            </div>
-            <div class="flex-shrink-0">
-                <div class="d-flex gap-2 flex-wrap">
-                    <button wire:click="cetakLaporan" class="btn btn-danger d-inline-flex align-items-center gap-1">
-                        <i class="ri-printer-line align-bottom"></i>
-                        <span>Cetak Laporan</span>
-                    </button>
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    {{-- HEADER --}}
+    <div class="card-header">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4">
 
-                    <button data-bs-toggle="modal" data-bs-target="#ExportLaporanExcel" class="btn btn-soft-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button>
-                    {{-- @if($selectedPetugas)             --}}
-                    <button type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSettlement" aria-controls="offcanvasSettlement" class="btn btn-info d-inline-flex align-items-center gap-1">
-                        <i class="ri-history-line align-bottom"></i>
-                        <span>Riwayat Settlement</span>
-                    </button>
-                    {{-- @endif --}}
-                    {{-- <button data-bs-toggle="modal" data-bs-target="#ExportEduPay" wire:click.prevent="showExportEduPay"  class="btn btn-soft-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button> --}}
+            {{-- TITLE --}}
+            <div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-sm">
+                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                            <i class="ri-store-2-line"></i>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h5 class="fw-bold mb-1">
+                            Laporan Transaksi SmartCanteen
+                        </h5>
+                        <small class="text-muted">
+                            Lihat dan kelola riwayat transaksi SmartCanteen secara lengkap.
+                        </small>
+                    </div>
                 </div>
             </div>
+
+            {{-- ACTION --}}
+            <div class="flex-shrink-0">
+                <div class="d-flex gap-2 flex-wrap">
+
+                    {{-- CETAK --}}
+                    <button wire:click="cetakLaporan"
+                        type="button" class="btn btn-danger rounded-pill px-4 d-inline-flex align-items-center gap-1">
+                        <i class="ri-printer-line"></i>
+                        <span>Cetak</span>
+                    </button>
+
+                    {{-- EXCEL --}}
+                    <button type="button"
+                        class="btn btn-success rounded-pill px-4 d-inline-flex align-items-center gap-1"
+                        data-bs-toggle="modal" data-bs-target="#ExportLaporanExcel">
+                        <i class="ri-file-excel-2-line"></i>
+                        <span>Excel</span>
+                    </button>
+
+                    {{-- RIWAYAT SETTLEMENT --}}
+                    <button type="button" data-bs-toggle="offcanvas"
+                        data-bs-target="#offcanvasSettlement" aria-controls="offcanvasSettlement"
+                        class="btn btn-primary rounded-pill px-4 d-inline-flex align-items-center gap-1">
+                        <i class="ri-history-line"></i>
+                        <span>Settlement</span>
+                    </button>
+
+                </div>
+            </div>
+
         </div>
     </div>
     <div class="card-body">
-        <div class="row g-3 align-items-end mb-3">
-           <div class="col-xxl-2 col-sm-6">
-                <label class="form-label">Petugas</label>
-            
-                @if(auth()->user()->peran === 'kantin')
-                {{-- TAMPIL READONLY --}}
-                <input type="text" class="form-control" value="{{ auth()->user()->nama }}" readonly>
+        <div class="row g-3 mb-3">
+            {{-- PETUGAS --}}
+            <div class="col-xxl-3 col-sm-6">
+                <label class="form-label small text-muted text-uppercase fw-medium mb-2">
+                    Petugas
+                </label>
+
+                @if (auth()->user()->peran === 'kantin')
+                    <input type="text" class="form-control" value="{{ auth()->user()->nama }}" readonly>
                 @else
-                {{-- TAMPIL DROPDOWN --}}
-                <select wire:model="selectedPetugas" class="form-select">
-                    <option value="">-- Semua Petugas --</option>
-                    @foreach ($select_petugas as $petugas)
-                    <option value="{{ $petugas->ms_pengguna_id }}">
-                        {{ $petugas->nama }}
-                    </option>
-                    @endforeach
-                </select>
+                    <select wire:model="selectedPetugas" class="form-select" style="cursor: pointer">
+                        <option value="">-- Semua Petugas --</option>
+                        @foreach ($select_petugas as $petugas)
+                            <option value="{{ $petugas->ms_pengguna_id }}">
+                                {{ $petugas->nama }}
+                            </option>
+                        @endforeach
+                    </select>
                 @endif
             </div>
 
-            <div class="col-xxl-2 col-sm-6">
-                <label for="selectJenis" class="form-label">Jenis Pembeli</label>
-                <select id="selectJenis" wire:model="selectedJenis" class="form-select" style="cursor: pointer">
+             {{-- PENCARIAN --}}
+            {{-- <div class="col-xxl-2 col-sm-6">
+                <label for="searchInput" class="form-label small text-muted text-uppercase fw-medium mb-2">
+                    Pencarian
+                </label>
+
+                <div class="search-box">
+                    <input type="text" id="searchInput" class="form-control search"
+                        wire:model.debounce.300ms="search" placeholder="...">
+                    <i class="ri-search-line search-icon"></i>
+                </div>
+            </div> --}}
+
+            {{-- JENJANG / UNIT SUMBER DANA --}}
+            <div class="col-xxl-3 col-sm-6">
+                <label class="form-label small text-muted text-uppercase fw-medium mb-2">
+                    Sumber Dana
+                </label>
+
+                <select wire:model="selectedJenjang" class="form-select" style="cursor: pointer">
                     <option value="">Semua</option>
-                    <option value="siswa">Siswa</option>
-                    <option value="pegawai">Pegawai</option>
+                    @foreach ($select_jenjang as $jenjang)
+                        <option value="{{ $jenjang->ms_jenjang_id }}">
+                            {{ $jenjang->nama_jenjang }}
+                        </option>
+                    @endforeach
+                    <option value="umum">Umum</option>
                 </select>
             </div>
-            
-            <!-- Input Pencarian -->
-            <div class="col-xxl-4 col-sm-6">
-                <label for="searchInput" class="form-label fw-semibold">Pencarian</label>
-                <div class="position-relative">
-                    <input type="text" id="searchInput" 
-                        class="form-control ps-4" 
-                        wire:model.debounce.300ms="search" 
-                        placeholder="Cari nama, deskripsi, atau lainnya...">
-                    <i class="ri-search-line position-absolute top-50 start-0 translate-middle-y ms-2 text-muted"></i>
-                </div>
+
+            {{-- STATUS SETTLEMENT --}}
+            <div class="col-xxl-2 col-sm-6">
+                <label class="form-label small text-muted text-uppercase fw-medium mb-2">
+                    Settlement
+                </label>
+
+                <select wire:model="selectedSettlement" class="form-select" style="cursor: pointer">
+                    <option value="">Semua Status</option>
+                    <option value="belum">Belum Settlement</option>
+                    <option value="sudah">Sudah Settlement</option>
+                </select>
             </div>
 
-            <!-- Filter Periode -->
+            {{-- PERIODE --}}
             <div class="col-xxl-4 col-sm-6">
-                <label class="form-label fw-semibold">Periode</label>
+                <label
+                    class="form-label small text-muted text-uppercase fw-medium mb-2">
+                    Periode
+                </label>
+
                 <div class="d-flex align-items-center gap-2">
                     <input type="date" id="startDate" class="form-control" wire:model="startDate">
-                    <span class="text-muted">–</span>
+                    <span class="text-muted flex-shrink-0">–</span>
                     <input type="date" id="endDate" class="form-control" wire:model="endDate">
-                    <button type="button" class="btn btn-soft-secondary" wire:click="resetTanggal" title="Reset Tanggal">
+                    <button type="button" class="btn btn-soft-secondary flex-shrink-0" wire:click="resetTanggal" title="Reset Tanggal">
                         <i class="ri-refresh-line"></i>
                     </button>
                 </div>
@@ -85,13 +143,13 @@
         {{-- DATA --}}
         <div class="live-preview">
             <div class="table-responsive">
-                <table id="tabelSmartCanteen" class="table table-hover nowrap align-middle" style="width:100%">
+                <table id="tabelSmartCanteen" class="table table-hover table-nowrap align-middle" style="width:100%">
                     <thead class="table-light">
                         <tr>
                             <th class="text-uppercase">No</th>
                             <th class="text-uppercase text start" scope="col" style="width: 200px;">Tanggal</th>
                             <th class="text-uppercase">Pembeli</th>
-                            <th class="text-uppercase" scope="col">Transaksi</th>
+                            <th class="text-uppercase" scope="col">Metode</th>
                             <th class="text-uppercase text-center">Petugas</th>
                             <th class="text-uppercase text-center">Nominal</th>
                             <th class="text-uppercase text-center">Settlement</th>
@@ -101,51 +159,43 @@
                     @forelse ($laporan as $index => $item)
                         <tr class="text-center">
                             <td class="text-start">
-                                {{ ($laporan->currentPage() - 1) * $laporan->perPage() + $index + 1 }}.
+                                {{ ($laporan->currentPage() - 1) * $laporan->peRpage() + $index + 1 }}.
                             </td>
                             <td class="text-uppercase text-start">
-                                {{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($item->tanggal_transaksi) }}
+                                {{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($item->tanggal_transaksi, 'd F Y') }}
                             </td>
-                            <td class="text-start" style="white-space: nowrap;">
+                            <td class="text-start">
                                 @if ($item->user_type == 'siswa')
                                     {{ ucfirst($item->ms_siswa->nama_siswa) }}
-                                    <p class="fs-12 mb-0 text-muted">
-                                        {{ $item->ms_penempatan_siswa->ms_kelas->nama_kelas ?? '' }}
-                                    </p>
                                 @elseif ($item->user_type == 'pegawai')
                                     {{ ucfirst($item->ms_pegawai->nama_pegawai) }}
-                                    <p class="fs-12 mb-0 text-muted text-primary">
+                                    {{-- <p class="fs-12 mb-0 text-muted text-primary">
                                         {{ $item->ms_pegawai->ms_jabatan->nama_jabatan ?? '' }}
-                                    </p>
+                                    </p> --}}
                                 @else
                                     <span class="text-muted">Umum</span>
                                 @endif
                             </td>
-                            <td class="text-start">
-                                <span class="fs-14">
-                                    {!! 'RP' . number_format($item->total_transaksi, 0, ',', '.') . ' - <i>' . ucfirst($item->metode_pembayaran) . '</i>' !!}
-                                </span>
-                                <p class="text-muted mb-0">{{ $item->deskripsi ?? '' }}</p>
+                            <td class="text-start fs-12 fw-medium">
+                                {{ $item->metode_pembayaran }}
                             </td>
-                            <td style="white-space: nowrap;">{{ $item->ms_pengguna->nama ?? '-' }}</td>
-                            <td>
-                                <span class="fs-14 text-success">
-                                    RP{{ number_format($item->total_transaksi, 0, ',', '.') }}
-                                </span>
+                            <td>{{ $item->ms_pengguna->nama ?? '-' }}</td>
+                            <td class="fs-12 fw-medium text-center">
+                                Rp{{ number_format($item->total_transaksi, 0, ',', '.') }}
                             </td>
                             <!-- 🔥 STATUS SETTLEMENT -->
-                            <td style="white-space: nowrap;" class="text-center">
+                            <td class="text-center">
                                 @if($item->status_settlement === 'sudah')
                                     <span class="text-success fw-semibold">
-                                        <i class="ri-check-line me-1"></i> Sudah Disettlement
+                                        <i class="ri-check-line me-1"></i> Sudah
                                     </span>
                                 @elseif($item->status_settlement === 'belum')
                                     <span class="text-warning fw-semibold">
-                                        <i class="ri-timer-line me-1"></i> Menunggu Settlement
+                                        <i class="ri-timer-line me-1"></i> Menunggu
                                     </span>
                                 @else
                                     <span class="text-primary fw-semibold">
-                                        <i class="ri-check-double-line me-1"></i> Langsung Masuk Kantin
+                                        <i class="ri-check-double-line me-1"></i> Langsung
                                     </span>
                                 @endif
                             </td>
@@ -169,9 +219,9 @@
                         <tr>
                             <td colspan="4"></td>
                             <td class="fw-semibold text-uppercase">Total</td>
-                            <td class="text-end">
-                                <span class="fs-14 fw-semibold text-success">
-                                    RP{{ number_format($totalTransaksi, 0, ',', '.') }}
+                            <td class="text-center">
+                                <span class="fs-12 fw-semibold">
+                                    Rp{{ number_format($totalTransaksi, 0, ',', '.') }}
                                 </span>
                             </td>
                         </tr>
@@ -184,27 +234,140 @@
         </div>
     </div>
     {{-- MODAL --}}
-    <div class="modal fade zoomIn" id="ExportLaporanExcel" tabindex="-1" aria-labelledby="exportRecordLabel" aria-hidden="true" wire:ignore.self>
+    <div class="modal fade zoomIn"
+        id="ExportLaporanExcel"
+        tabindex="-1"
+        aria-labelledby="exportLaporanLabel"
+        aria-hidden="true"
+        wire:ignore.self>
+
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+
+                {{-- CLOSE BUTTON --}}
+                <div class="modal-header border-0 pb-0">
+                    <button type="button"
+                        class="btn btn-light btn-icon rounded-circle ms-auto"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                        <i class="ri-close-line fs-18"></i>
+                    </button>
                 </div>
-                <div class="modal-body p-5 text-center">
-                    <lord-icon src="https://cdn.lordicon.com/fjvfsqea.json" trigger="loop" colors="primary:#405189,secondary:#f06548" style="width:90px;height:90px"></lord-icon>
-                    <div class="mt-4 text-center">
-                        <h4 class="fs-semibold">Konfirmasi Export</h4>
-                        <p class="text-muted fs-14 mb-4 pt-1">
-                            Apakah Anda yakin ingin mengekspor laporan SmartCanteen? Data yang diekspor akan sesuai dengan tabel yang ditampilkan.
-                        </p>
-                        <div class="hstack gap-2 justify-content-center remove">
-                            <button class="btn btn-link link-success fw-medium text-decoration-none shadow-none" data-bs-dismiss="modal">
-                                <i class="ri-close-line me-1 align-middle"></i> Batal
-                            </button>
-                            <button class="btn btn-primary" id="konfirmasiExportLaporan" data-bs-dismiss="modal">Ya, Export!</button>
+
+                {{-- BODY --}}
+                <div class="modal-body px-4 pb-5 pt-2 text-center">
+
+                    {{-- ICON --}}
+                    <div class="mb-4">
+                        <div class="avatar-xl mx-auto">
+                            <div class="avatar-title bg-success-subtle text-success rounded-circle">
+                                <lord-icon
+                                    src="https://cdn.lordicon.com/fjvfsqea.json"
+                                    trigger="loop"
+                                    colors="primary:#405189,secondary:#0ab39c"
+                                    style="width:70px;height:70px">
+                                </lord-icon>
+                            </div>
                         </div>
                     </div>
+
+                    {{-- TITLE --}}
+                    <div class="mb-2">
+                        <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill mb-3">
+                            Export Excel
+                        </span>
+
+                        <h3 class="fw-bold mb-2" id="exportLaporanLabel">
+                            Export Laporan SmartCanteen?
+                        </h3>
+
+                        <p class="text-muted mb-0 lh-lg px-lg-4">
+                            Apakah Anda yakin ingin mengekspor
+                            <strong class="text-dark">
+                                laporan transaksi SmartCanteen
+                            </strong>
+                            ke Excel?
+                        </p>
+                    </div>
+
+                    {{-- INFORMATION --}}
+                    <div class="alert alert-light border rounded-4 text-start mt-4 mb-0">
+                        <div class="d-flex align-items-start gap-3">
+
+                            <div class="flex-shrink-0">
+                                <div class="avatar-sm">
+                                    <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
+                                        <i class="ri-file-list-3-line fs-18"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex-grow-1">
+                                <h6 class="fw-semibold mb-1">
+                                    Data Laporan
+                                </h6>
+
+                                <p class="text-muted mb-2 fs-13">
+                                    Data yang diekspor akan mengikuti
+                                    filter dan tabel yang sedang ditampilkan.
+                                </p>
+
+                                <div class="d-flex flex-wrap align-items-center gap-2">
+
+                                    <span class="badge bg-primary-subtle text-primary">
+                                        SmartCanteen
+                                    </span>
+
+                                    @if ($selectedJenjang === 'umum')
+                                        <span class="badge bg-warning-subtle text-warning">
+                                            Sumber Dana: Umum
+                                        </span>
+                                    @elseif (!empty($selectedJenjang))
+                                        <span class="badge bg-primary-subtle text-primary">
+                                            Sumber Dana Terpilih
+                                        </span>
+                                    @else
+                                        <span class="badge bg-secondary-subtle text-secondary">
+                                            Semua Sumber Dana
+                                        </span>
+                                    @endif
+
+                                    @if (!empty($selectedSettlement))
+                                        <span class="badge bg-info-subtle text-info">
+                                            Settlement Terfilter
+                                        </span>
+                                    @endif
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
                 </div>
+
+                {{-- FOOTER --}}
+                <div class="modal-footer border-0 pt-0 px-4 pb-4 justify-content-center">
+
+                    <button type="button"
+                        class="btn btn-light rounded-pill px-4"
+                        data-bs-dismiss="modal">
+
+                        <i class="ri-close-line me-1"></i>
+                        Batal
+                    </button>
+
+                    <button type="button"
+                        class="btn btn-success rounded-pill px-4"
+                        id="konfirmasiExportLaporan"
+                        data-bs-dismiss="modal">
+
+                        <i class="ri-file-excel-2-line me-1"></i>
+                        Ya, Export
+                    </button>
+
+                </div>
+
             </div>
         </div>
     </div>

@@ -12,10 +12,8 @@ use Livewire\Component;
 class KartuSettlement extends Component
 {
     public $selectedKantin = null;
-    public $selectedTahunAjar = null;
 
     public $namaKantin = '';
-    public $namaTahunAjar = '';
 
     public $jenisSaldo = 'estimasi'; // estimasi | belum | sudah
     public $totalSaldo = 0;
@@ -24,16 +22,13 @@ class KartuSettlement extends Component
     protected $listeners = [
         'parameterUpdated' => 'updateParameters',
     ];
-    public function updateParameters($kantin, $tahunAjar)
+    public function updateParameters($kantin)
     {
         $this->selectedKantin = $kantin;
-        $this->selectedTahunAjar = $tahunAjar;
 
         $kantin = Kantin::find($kantin);
-        $tahunAjar = TahunAjar::find($tahunAjar);
 
         $this->namaKantin = $kantin ? $kantin->nama_kantin : 'Tidak Diketahui';
-        $this->namaTahunAjar = $tahunAjar ? $tahunAjar->nama_tahun_ajar : 'Tidak Diketahui';
     }
 
     public function setJenisSaldo($jenis)
