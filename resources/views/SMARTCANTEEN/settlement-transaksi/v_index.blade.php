@@ -5,11 +5,11 @@
         <div class="row">
             <div class="col-xxl-12">
                 @livewire('smart-canteen.settlement-transaksi.index')
-                @livewire('smart-canteen.settlement-transaksi.detail-settlement')
             </div>
         </div>
     </div>
     @livewire('smart-canteen.settlement-transaksi.riwayat-settlement')
+    @livewire('smart-canteen.settlement-transaksi.detail-settlement')
 </div>
 @endsection
 
