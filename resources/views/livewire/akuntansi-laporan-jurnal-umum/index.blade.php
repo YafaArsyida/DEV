@@ -48,7 +48,19 @@
             <div class="card-body">
                 <div class="row g-3 align-items-end mb-3">
                     <!-- Input Pencarian -->
-                    <div class="col-xxl-8 col-sm-6">
+                    <div class="col-xxl-2">
+                        <label class="form-label small text-muted text-uppercase fw-medium mb-2">
+                            Departemen
+                        </label>
+
+                        <select wire:model="selectDepartemen"class="form-select">
+                            <option value="">Semua Departemen</option>
+                            <option value="SEKOLAH">Sekolah</option>
+                            <option value="KANTIN">Kantin</option>
+                            <option value="KOPERASI">Koperasi</option>
+                        </select>
+                    </div>
+                    <div class="col-xxl-6 col-sm-6">
                         <label for="searchEkstrakurikuler" class="form-label small text-muted text-uppercase fw-medium mb-2">Pencarian</label>
                         <div class="search-box">
                             <input type="text" id="searchEkstrakurikuler" class="form-control search" wire:model.debounce.300ms="search"

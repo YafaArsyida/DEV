@@ -60,9 +60,7 @@ class Edit extends Component
     {
         $data = [];
 
-        // ==============================
         // UPDATE DESKRIPSI TRANSAKSI
-        // ==============================
         if (
             !empty($this->deskripsi) &&
             $this->deskripsi !== $this->transaksi->deskripsi
@@ -70,9 +68,7 @@ class Edit extends Component
             $data['deskripsi'] = $this->deskripsi;
         }
 
-        // ==============================
         // UPDATE TANGGAL TRANSAKSI
-        // ==============================
         if ($this->tanggal) {
 
             $old = Carbon::parse(
@@ -91,21 +87,15 @@ class Edit extends Component
             }
         }
 
-        // ==============================
         // TIDAK ADA PERUBAHAN
-        // ==============================
         if (empty($data)) {
             return;
         }
 
-        // ==============================
         // UPDATE TRANSAKSI
-        // ==============================
         $this->transaksi->update($data);
 
-        // ==============================
         // UPDATE HEADER JURNAL
-        // ==============================
         if ($this->transaksi->akuntansi_jurnal_id) {
 
             $jurnalData = [];

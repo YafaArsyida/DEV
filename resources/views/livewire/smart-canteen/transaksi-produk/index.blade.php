@@ -2,7 +2,7 @@
     <div class="card-header">
         <div class="row align-items-center g-3">
             {{-- INFORMASI PENGGUNA --}}
-            <div class="col-lg-7">
+            <div class="col-xxl-7 col-md-6">
                 @if($nama)
                     <div class="d-flex align-items-center gap-3">
 
@@ -90,34 +90,40 @@
                 @endif
             </div>
             {{-- SCANNER --}}
-            <div class="col-lg-5">
+            <div class="col-xxl-5 col-md-6">
                 <div class="border rounded-4 p-3">
-                    <div class="input-group input-group-lg">
 
-                        <span class="input-group-text bg-primary text-white border-primary">
-                            <i class="ri-sensor-fill fs-4"></i>
-                        </span>
+                    <div class="d-flex gap-3">
 
-                        <input
-                            type="text"
-                            id="inputSmartcard"
-                            wire:model.defer="smartcardInput"
-                            wire:keydown.enter="prosesSmartcard"
-                            class="form-control border-primary"
-                            placeholder="Tempelkan kartu atau ketik kode..."
-                            autocomplete="off"
-                            autofocus>
+                        {{-- Scan Smartcard --}}
+                        <div class="input-group input-group-lg flex-grow-1">
+                            <span class="input-group-text bg-primary text-white border-primary">
+                                <i class="ri-sensor-fill fs-4"></i>
+                            </span>
 
-                        <button
-                            type="button"
-                            class="btn btn-primary"
-                            wire:click="resetScan"
-                            title="Reset Scan"
-                            aria-label="Reset Scan">
+                            <input type="text" id="inputSmartcard"
+                                wire:model.defer="smartcardInput"
+                                wire:keydown.enter="prosesSmartcard"
+                                class="form-control border-primary"
+                                placeholder="Tempelkan kartu atau ketik kode..."
+                                autocomplete="off" autofocus>
 
-                            <i class="ri-refresh-line"></i>
+                            <button type="button" class="btn btn-primary"
+                                wire:click="resetScan" title="Reset Scan" aria-label="Reset Scan">
+                                <i class="ri-refresh-line"></i>
+                            </button>
+                        </div>
 
+                        {{-- Histori --}}
+                        <button type="button" class="btn btn-outline-primary btn-lg px-3"
+                            data-bs-toggle="offcanvas"
+                            data-bs-target="#offcanvasHistori"
+                            aria-controls="offcanvasHistori"
+                            wire:click="$emit('openHistori')"
+                            title="Histori Transaksi" aria-label="Histori Transaksi">
+                            <i class="ri-file-list-3-line fs-4"></i>
                         </button>
+
                     </div>
                 </div>
             </div>

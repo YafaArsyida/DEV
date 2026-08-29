@@ -22,6 +22,7 @@
             <!--end col-->
             <div class="col-xxl-8">
                 @livewire('transaksi-edu-pay-siswa.data-edu-pay')
+                @livewire('transaksi-edu-pay-siswa.detail')
                 @livewire('transaksi-edu-pay-siswa.edit')
                 @livewire('transaksi-edu-pay-siswa.delete')
             </div>

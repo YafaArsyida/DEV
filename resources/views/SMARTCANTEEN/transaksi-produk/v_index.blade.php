@@ -1,29 +1,27 @@
-@extends('template_machine_smartcanteen.v_template')
+@extends('template_machine_smartcanteen.v_template_pos')
 @section('content')
 
-<div class="page-content">
-    <div class="container-fluid" style="max-width: 100%">
-        <div class="row">
-            <div class="col-lg-12">
-                <!-- Tab panes -->
-                <div class="tab-content text-muted">
-                    <div class="tab-pane active" id="tabSiswaKelas" role="tabpanel">
-                        <div class="row">
-                            <div class="col-xxl-8 col-md-8">
-                                @livewire('smart-canteen.transaksi-produk.index')   
-                            </div>
-                            <!--end col-->
-                            <div class="col-xxl-4 col-md-4">
-                                @livewire('smart-canteen.transaksi-produk.keranjang-produk')   
-                            </div>
-                        </div>
-                        <!--end row-->
-                    </div>
-                </div>
-                <!--end tab-content-->
+<div class="page-content" style="margin-top: 20px">
+    <div class="container-fluid px-3" style="max-width: 100%;" >
+
+        <div class="row g-3">
+
+            {{-- Produk --}}
+            <div class="col-xxl-8 col-xl-8 col-lg-8">
+                @livewire('smart-canteen.transaksi-produk.index')
+                @livewire('smart-canteen.transaksi-produk.histori')
+                @livewire('smart-canteen.transaksi-produk.edit')
             </div>
+
+            {{-- Keranjang --}}
+            <div class="col-xxl-4 col-xl-4 col-lg-4">
+                @livewire('smart-canteen.transaksi-produk.keranjang-produk')
+            </div>
+
         </div>
+
     </div>
 </div>
+
 @endsection
 

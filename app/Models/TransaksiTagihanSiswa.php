@@ -20,7 +20,9 @@ class TransaksiTagihanSiswa extends Model
         'tanggal_transaksi',
         'metode_pembayaran',
         'deskripsi',
+
         'akuntansi_jurnal_id',
+        'status_transaksi'
     ];
     /**
      * Relasi ke model PenempatanSiswa

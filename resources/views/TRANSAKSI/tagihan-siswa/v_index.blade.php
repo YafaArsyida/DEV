@@ -36,6 +36,7 @@
     
                 @livewire('transaksi-edu-pay-siswa.index')
                 @livewire('transaksi-edu-pay-siswa.delete')
+                @livewire('transaksi-edu-pay-siswa.detail')
                 @livewire('transaksi-edu-pay-siswa.edit')
             </div>
             <!--end col-->

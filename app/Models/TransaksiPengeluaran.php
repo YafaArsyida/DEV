@@ -21,7 +21,9 @@ class TransaksiPengeluaran extends Model
         'metode_pembayaran', //untuk mengurangi saldo kas atau bank
         'tanggal',
         'deskripsi',
+
         'akuntansi_jurnal_id',
+        'status_transaksi'
     ];
 
     public function ms_pengguna()

@@ -24,7 +24,6 @@ class AkuntansiJurnal extends Model
         'ms_tahun_ajaran_id',
         'ms_jenjang_id',
         'ms_departemen_id',
-        'status',
     ];
     public static function generateNomorJurnal($tanggal = null)
     {

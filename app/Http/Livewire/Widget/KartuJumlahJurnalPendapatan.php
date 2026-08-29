@@ -92,7 +92,6 @@ class KartuJumlahJurnalPendapatan extends Component
             ->whereHas('akuntansi_jurnal', function ($query) {
                 $query->where('ms_jenjang_id', $this->selectedJenjang)
                     ->where('ms_departemen_id', 'SEKOLAH')
-                    ->where('status', 'active')
                     ->whereBetween('tanggal_transaksi', [
                         $this->startDate,
                         $this->endDate

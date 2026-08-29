@@ -54,12 +54,12 @@
                     <a href="{{ route('smartCanteen.administrasi.produk') }}"
                     class="nav-link menu-link {{ request()->routeIs('smartCanteen.administrasi.produk') ? 'active' : '' }}">
                         <i class="mdi mdi-food-outline"></i>
-                        <span data-key="t-kelas-siswa">Master Produk</span>
+                        <span data-key="t-kelas-siswa">Kelola Produk</span>
                     </a>
                 </li>
                 <li class="menu-title"><span data-key="t-administrasi">Transaksi</span></li>
                 <li class="nav-item">
-                    <a href="{{ route('smartCanteen.transaksi.produk') }}"
+                    <a target="_blank" href="{{ route('smartCanteen.transaksi.produk') }}"
                     class="nav-link menu-link {{ request()->routeIs('smartCanteen.transaksi.produk') ? 'active' : '' }}">
                         <i class="mdi mdi-cart-outline"></i>
                         <span data-key="t-kelas-siswa">Transaksi Penjualan</span>

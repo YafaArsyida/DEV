@@ -20,6 +20,8 @@ class DetailTransaksiSmartCanteen extends Model
         'jumlah_produk',
         'jumlah_bayar',
         'deskripsi',
+
+        'status_transaksi'
     ];
 
     public function ms_transaksi_kantin()

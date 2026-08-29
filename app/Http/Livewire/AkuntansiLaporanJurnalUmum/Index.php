@@ -17,6 +17,7 @@ class Index extends Component
     public $perPage = 50;
 
     public $selectedJenjang = null;
+    public $selectDepartemen = null;
     public $startDate = null;
     public $endDate = null;
 
@@ -71,6 +72,15 @@ class Index extends Component
         $this->resetPage(); // Reset paginasi saat pencarian berubah
     }
 
+    public function updatedSelectDepartemen()
+    {
+        $this->resetPage();
+
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Departemen diperbarui'
+        ]);
+    }
+
     public function cetakLaporan()
     {
         if (!$this->selectedJenjang) {
@@ -97,7 +107,14 @@ class Index extends Component
             'ms_pengguna',
         ])
         ->where('ms_jenjang_id', $this->selectedJenjang)
-        ->where('ms_departemen_id', 'SEKOLAH')
+        ->when(
+            $this->selectDepartemen,
+            function ($query) {
+                $query->where(
+                    'ms_departemen_id', $this->selectDepartemen
+                );
+            }
+        )
         // ->where('status', 'active')
         ->when(
             $this->startDate && $this->endDate,

@@ -179,8 +179,7 @@ class DataSiswa extends Component
         // UPDATE SALDO EDUPAY
         // =========================================================
         $saldo->increment(
-            'saldo_edupay',
-            $this->nominal_topup
+            'saldo_edupay', $this->nominal_topup
         );
     }
     
@@ -300,14 +299,13 @@ class DataSiswa extends Component
             }
 
             // 🔥 Ambil saldo + lock (penting untuk uang)
-            $saldo = SaldoEduPay::where('user_id', $this->ms_siswa_id)
-                ->where('user_type', 'siswa')
-                ->lockForUpdate()
-                ->first();
+            $saldo = SaldoEduPay::getSaldo(
+                $this->ms_siswa_id, 'siswa'
+            );
 
-            if (!$saldo) {
-                throw new \Exception('Data saldo tidak ditemukan!');
-            }
+            $saldo = SaldoEduPay::where('ms_saldo_edupay_id', $saldo->ms_saldo_edupay_id)
+                ->lockForUpdate()
+                ->first();                  
 
             // 🔥 Proses utama
             $this->processTopUp($saldo);

@@ -62,8 +62,7 @@ class JenjangTahunAjar extends Component
             ->whereHas('akuntansi_jurnal', function ($query) {
                 $query->where('ms_tahun_ajaran_id', $this->selectedTahunAjar)
                     ->where('ms_jenjang_id', $this->selectedJenjang)
-                    ->where('ms_departemen_id', 'SEKOLAH')
-                    ->where('status', 'active');
+                    ->where('ms_departemen_id', 'SEKOLAH');
             })
             ->selectRaw("
                 SUM(

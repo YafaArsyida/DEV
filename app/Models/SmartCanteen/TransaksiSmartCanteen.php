@@ -36,8 +36,12 @@ class TransaksiSmartCanteen extends Model
         'deskripsi',
         
         'akuntansi_jurnal_id',
+        'akuntansi_jurnal_reversal_id',
+
         'status_settlement',
-        'ms_settlement_kantin_id'
+        'ms_settlement_kantin_id',
+
+        'status_transaksi'
     ];
 
     /**
@@ -67,6 +71,11 @@ class TransaksiSmartCanteen extends Model
     public function akuntansi_jurnal()
     {
         return $this->belongsTo(AkuntansiJurnal::class, 'akuntansi_jurnal_id', 'akuntansi_jurnal_id');
+    }
+    
+    public function akuntansi_jurnal_reversal()
+    {
+        return $this->belongsTo(AkuntansiJurnal::class, 'akuntansi_jurnal_reversal_id', 'akuntansi_jurnal_id');
     }
 
     public function dt_transaksi_kantin()

@@ -1,5 +1,5 @@
 <!doctype html>
-<html data-layout="vertical" data-topbar="light" data-sidebar="light" data-bs-theme="light" data-sidebar-size="lg" data-sidebar-image="none" data-preloader="disable">
+<html data-layout="horizontal" data-topbar="light" data-sidebar="light" data-bs-theme="light" data-sidebar-size="lg" data-sidebar-image="none" data-preloader="disable">
 
     <head>
         @include('template_machine.v_head')
@@ -8,7 +8,6 @@
     <body>
         <!-- Begin page -->
         <div id="layout-wrapper">
-
             <header id="page-topbar">
                 <div class="layout-width" style="max-width: 100%">
                     <div class="navbar-header">
@@ -45,18 +44,6 @@
                             <!-- App Search-->
                             <div class="app-search d-none d-md-flex header-item">
                                 <div class="position-relative">
-                                     {{-- <div class="row">
-                                        <div class="col-lg-12">
-                                            <div class="card overflow-hidden">
-                                                <div class="card-body bg-success-subtle text-success fw-semibold d-flex">
-                                                    <marquee class="fs-14">
-                                                        NFT art is a digital asset that is collectable, unique, and non-transferrable, Cortes explained. Every NFT is unique in it's creative design and cannot be duplicated, making them limited and rare. NFTs get their value because the transaction proves ownership of the art.
-                                                    </marquee>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <!--end col-->
-                                    </div> --}}
                                     <h3 class='mb-0'>SmartCanteen</h3>
                                 </div>
                             </div>
@@ -109,10 +96,6 @@
                 </div>
             </header>
 
-            <!-- ========== Left Sidebar Start ========== -->
-            @include('template_machine_smartcanteen.v_sidebar')
-            <!-- Left Sidebar End -->
-
             <!-- Vertical Overlay-->
             <div class="vertical-overlay"></div>
 
@@ -121,23 +104,11 @@
             <!-- ============================================================== -->
             <div class="main-content">
                 @yield('content') {{-- section --}}
-
-                <!-- End Page-content -->
-                {{-- @include('template_machine.v_footer')  --}}
-                {{-- sxtends --}}
             </div>
             <!-- end main content-->
 
         </div>
         <!-- END layout-wrapper -->
-
-
-
-        <!--start back-to-top-->
-        <button onclick="topFunction()" class="btn btn-danger btn-icon" id="back-to-top">
-            <i class="ri-arrow-up-line"></i>
-        </button>
-        <!--end back-to-top-->
 
         <!--preloader-->
         <div id="preloader">
@@ -183,13 +154,6 @@
                     bootstrapModal.show();
                 }
             });
-            // modal
-            Livewire.on('openNewTab', (url) => {
-                setTimeout(function() {
-                    window.open(url, '_blank');
-                }, 1000);
-            });
-
         </script>   
     </body>
 </html>

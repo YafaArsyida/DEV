@@ -20,7 +20,9 @@ class TransaksiPendapatanLainnya extends Model
         'metode_pembayaran',
         'tanggal',
         'deskripsi',
+
         'akuntansi_jurnal_id',
+        'status_transaksi'
     ];
     public function ms_pengguna()
     {

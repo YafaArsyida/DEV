@@ -161,8 +161,8 @@ class Index extends Component
                 '=',
                 'akuntansi_jurnal_detail.akuntansi_jurnal_id'
             )
-            ->where('akuntansi_jurnal.ms_jenjang_id', $this->selectedJenjang)
-            ->where('akuntansi_jurnal.ms_departemen_id', 'SEKOLAH');
+            ->where('akuntansi_jurnal.ms_jenjang_id', $this->selectedJenjang);
+            // ->where('akuntansi_jurnal.ms_departemen_id', 'SEKOLAH');
 
 
         /*
@@ -268,9 +268,9 @@ class Index extends Component
                         'ms_jenjang_id',
                         $this->selectedJenjang
                     )
-                    ->where(
-                        'ms_departemen_id', 'SEKOLAH'
-                    )
+                    // ->where(
+                    //     'ms_departemen_id', 'SEKOLAH'
+                    // )
                     ->where(
                         'tanggal_transaksi',
                         '<',

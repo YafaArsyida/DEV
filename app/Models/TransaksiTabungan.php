@@ -21,7 +21,9 @@ class TransaksiTabungan extends Model
         'nominal',
         'tanggal',
         'deskripsi',
+
         'akuntansi_jurnal_id',
+        'status_transaksi'
     ];
 
     protected $casts = [
