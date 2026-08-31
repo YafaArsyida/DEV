@@ -146,16 +146,16 @@ class Create extends Component
             count($selectedOnPage) === count($pageIds);
     }
 
-    public function updatedselectAllTagihan($value)
-    {
-        if ($value) {
-            $this->tagihanSelected = $this->jenis_tagihans
-                ->pluck('ms_jenis_tagihan_siswa_id')
-                ->toArray();
-        } else {
-            $this->tagihanSelected = [];
-        }
-    }
+    // public function updatedselectAllTagihan($value)
+    // {
+    //     if ($value) {
+    //         $this->tagihanSelected = $this->jenis_tagihans
+    //             ->pluck('ms_jenis_tagihan_siswa_id')
+    //             ->toArray();
+    //     } else {
+    //         $this->tagihanSelected = [];
+    //     }
+    // }
 
     public function createTagihan()
     {
@@ -202,6 +202,7 @@ class Create extends Component
             $existing = TagihanSiswa::lockForUpdate()
                 ->whereIn('ms_penempatan_siswa_id', $this->siswaSelected)
                 ->whereIn('ms_jenis_tagihan_siswa_id', $this->tagihanSelected)
+                ->where('status_transaksi', '!=', 'dibatalkan')
                 ->get()
                 ->groupBy('ms_penempatan_siswa_id');
 

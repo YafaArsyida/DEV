@@ -225,9 +225,12 @@ class DataTabungan extends Component
             $saldo = $summary['saldoAwal'];
 
             $transaksiTabungan = $transaksiTabungan->map(function ($item) use (&$saldo) {
-                $saldo += $item->jenis_transaksi === 'setoran'
-                    ? $item->nominal
-                    : -$item->nominal;
+
+                if ($item->status_transaksi !== 'dibatalkan') {
+                    $saldo += $item->jenis_transaksi === 'setoran'
+                        ? $item->nominal
+                        : -$item->nominal;
+                }
 
                 $item->saldo = $saldo;
 

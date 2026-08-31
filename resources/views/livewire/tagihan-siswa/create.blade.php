@@ -245,9 +245,9 @@
                                         <thead class="table-light">
                                             <tr>
                                                 <th scope="col" style="width: 50px;">
-                                                    <div class="form-check">
+                                                    {{-- <div class="form-check">
                                                         <input class="form-check-input" type="checkbox" wire:model="selectAllTagihan">
-                                                    </div>
+                                                    </div> --}}
                                                 </th>
                                                 <th class="text-uppercase">Jenis Tagihan</th>
                                                 <th class="text-uppercase">Kategori</th>

@@ -80,66 +80,228 @@
                         <td></td>
                     </tr>
                     @forelse ($transaksiTabungan as $item)
-                        <tr>
-                            <td class="text-center">{{ $loop->iteration }}.</td>
+
+                        @php
+                            $bolehDibatalkan =
+                                in_array($item->jenis_transaksi, [
+                                    'setoran',
+                                    'penarikan',
+                                ]) &&
+                                $item->status_transaksi !== 'dibatalkan' &&
+                                \Carbon\Carbon::parse($item->tanggal)->isToday();
+
+                            $titlePembatalan = $bolehDibatalkan
+                                ? 'Koreksi Transaksi'
+                                : (
+                                    $item->status_transaksi === 'dibatalkan'
+                                        ? 'Transaksi sudah dibatalkan'
+                                        : 'Hanya transaksi hari ini yang dapat dikoreksi'
+                                );
+
+                            $bolehEdit = $item->status_transaksi !== 'dibatalkan';
+
+                            $tooltipEdit = $bolehEdit
+                                ? 'Edit Transaksi'
+                                : 'Transaksi sudah dibatalkan';
+
+                            $bolehKirimWhatsapp = $item->status_transaksi !== 'dibatalkan';
+                        @endphp
+
+                        <tr class="{{ $item->status_transaksi === 'dibatalkan' ? 'table-danger' : '' }}">
+                            <td class="text-center" style="width: 50px">{{ $loop->iteration }}.</td>
+                            {{-- PEMBATALAN --}}
                             <td class="text-center">
-                                <a href="#ModalDeleteTabungan" data-bs-toggle="modal" class="text-danger d-inline-block remove-item-btn"
-                                    wire:click.prevent="$emit('confirmDeleteTabungan', {{ $item->ms_transaksi_tabungan_id }})"
-                                    data-bs-trigger="hover" data-bs-placement="top" title="Hapus Transaksi Tabungan">
+                                <a
+                                    @if ($bolehDibatalkan)
+                                        href="#ModalDeleteTabungan"
+                                        data-bs-toggle="modal"
+                                        wire:click.prevent="$emit('confirmDeleteTabungan', {{ $item->ms_transaksi_tabungan_id }})"
+                                    @else
+                                        href="javascript:void(0)"
+                                        aria-disabled="true"
+                                        tabindex="-1"
+                                    @endif
+                                    class="{{ $bolehDibatalkan ? 'text-danger' : 'text-muted disabled' }} d-inline-block remove-item-btn"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-trigger="hover"
+                                    data-bs-placement="top"
+                                    title="{{ $titlePembatalan }}"
+                                >
                                     <i class="ri-delete-bin-5-fill fs-14"></i>
                                 </a>
                             </td>
-                            <td class="text-uppercase">
-                                {{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($item->tanggal) }}
+
+                            {{-- TANGGAL --}}
+                            <td class="text-uppercase text-start">
+                                <div class="fw-medium">
+                                    {{ \App\Http\Controllers\HelperController::formatTanggalIndonesia(
+                                        $item->tanggal,
+                                        'd F Y'
+                                    ) }}
+                                </div>
+
+                                <small class="text-muted">
+                                    {{ \Carbon\Carbon::parse($item->tanggal)->format('H:i') }}
+                                </small>
                             </td>
+
+                            {{-- TRANSAKSI --}}
                             <td>
-                                <span class="fs-12 fw-medium">
-                                    {!! 'Rp' . number_format($item->nominal, 0, ',', '.') . ' - <i>' . ucfirst($item->jenis_transaksi) . '</i>' !!}
-                                </span>
-                                <p class="text-muted mb-0">{{ $item->deskripsi ?? '' }}</p>
+                                <div>
+                                    <span
+                                        class="fs-12 fw-medium {{ $item->status_transaksi === 'dibatalkan'
+                                            ? 'text-decoration-line-through text-muted'
+                                            : '' }}"
+                                    >
+                                        Rp{{ number_format($item->nominal, 0, ',', '.') }}
+                                        -
+                                        <i>{{ ucfirst($item->jenis_transaksi) }}</i>
+                                    </span>
+
+                                    @if ($item->status_transaksi === 'dibatalkan')
+                                        <span class="badge bg-danger-subtle text-danger ms-1">
+                                            Dibatalkan
+                                        </span>
+                                    @endif
+                                </div>
+
+                                <p class="text-muted mb-0">
+                                    {{ $item->deskripsi ?? '' }}
+                                </p>
                             </td>
 
-                            <td class="text-center">{{ $item->ms_pengguna->nama }}</td>
+                            {{-- PETUGAS --}}
                             <td class="text-center">
-                                <span class="fs-12 fw-medium text-success">
-                                    {{ $item->jenis_transaksi === 'setoran' ? 'Rp' . number_format($item->nominal, 0, ',', '.') : '-' }}
-                                </span>
+                                {{ $item->ms_pengguna->nama }}
                             </td>
+
+                            {{-- SETORAN --}}
                             <td class="text-center">
-                                <span class="fs-12 fw-medium text-danger">
-                                    {{ $item->jenis_transaksi === 'penarikan' ? 'Rp' . number_format($item->nominal, 0, ',', '.') : '-' }}
+                                <span
+                                    class="fs-12 fw-medium {{ $item->status_transaksi === 'dibatalkan'
+                                        ? 'text-muted text-decoration-line-through'
+                                        : 'text-success' }}"
+                                >
+                                    {{ $item->jenis_transaksi === 'setoran'
+                                        ? 'Rp' . number_format($item->nominal, 0, ',', '.')
+                                        : '-' }}
                                 </span>
                             </td>
 
+                            {{-- PENARIKAN --}}
+                            <td class="text-center">
+                                <span
+                                    class="fs-12 fw-medium {{ $item->status_transaksi === 'dibatalkan'
+                                        ? 'text-muted text-decoration-line-through'
+                                        : 'text-danger' }}"
+                                >
+                                    {{ $item->jenis_transaksi === 'penarikan'
+                                        ? 'Rp' . number_format($item->nominal, 0, ',', '.')
+                                        : '-' }}
+                                </span>
+                            </td>
+
+                            {{-- SALDO --}}
                             <td class="text-center">
                                 <span class="fs-12 fw-medium">
                                     Rp{{ number_format($item->saldo, 0, ',', '.') }}
                                 </span>
                             </td>
+
+                            {{-- AKSI --}}
                             <td class="text-start">
                                 <ul class="list-inline hstack gap-2 mb-0">
-                                    <li class="list-inline-item detail" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Edit Transaksi">
-                                        <a href="#loadTransaksiTabungan" data-bs-toggle="modal" wire:click.prevent="$emit('loadTransaksiTabungan', {{ $item->ms_transaksi_tabungan_id }})" 
-                                            class="btn btn-primary btn-sm rounded-pill px-3">
+
+                                    {{-- DETAIL --}}
+                                    <li class="list-inline-item detail"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-trigger="hover"
+                                        data-bs-placement="top"
+                                        title="Detail Transaksi">
+
+                                        <a href="#detailTransaksiTabungan"
+                                            data-bs-toggle="modal"
+                                            wire:click.prevent="$emit('loadDetailTransaksiTabungan', {{ $item->ms_transaksi_tabungan_id }})"
+                                            class="btn btn-info btn-sm rounded-pill px-3">
+
+                                            <i class="ri-eye-line me-1"></i>
+                                            <span>Detail</span>
+                                        </a>
+                                    </li>
+                                    {{-- EDIT --}}
+                                    <li
+                                        class="list-inline-item detail"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-trigger="hover"
+                                        data-bs-placement="top"
+                                        title="{{ $tooltipEdit }}"
+                                    >
+                                        <a
+                                            href="#loadTransaksiTabungan"
+                                            data-bs-toggle="modal"
+                                            wire:click.prevent="$emit('loadTransaksiTabungan', {{ $item->ms_transaksi_tabungan_id }})"
+                                            class="btn btn-sm rounded-pill px-3 {{ $bolehEdit
+                                                ? 'btn-primary'
+                                                : 'btn-muted disabled' }}"
+                                            @unless ($bolehEdit)
+                                                tabindex="-1"
+                                                aria-disabled="true"
+                                                style="pointer-events: none;"
+                                            @endunless
+                                        >
                                             <i class="ri-mark-pen-line me-1"></i>
                                             <span>Edit</span>
                                         </a>
                                     </li>
-                                    <li class="list-inline-item detail" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Cetak Bukti Transaksi">
-                                        <a wire:click="cetakTransaksi({{ $item->ms_transaksi_tabungan_id }})" class="btn btn-sm btn-danger rounded-pill px-3">
+
+                                    {{-- CETAK --}}
+                                    <li
+                                        class="list-inline-item detail"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-trigger="hover"
+                                        data-bs-placement="top"
+                                        title="Cetak Bukti Transaksi"
+                                    >
+                                        <a
+                                            wire:click="cetakTransaksi({{ $item->ms_transaksi_tabungan_id }})"
+                                            class="btn btn-sm btn-danger rounded-pill px-3"
+                                        >
                                             <i class="ri-printer-line me-1"></i>
                                             <span>Cetak</span>
                                         </a>
                                     </li>
-                                    <li class="list-inline-item detail" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Kirim Pesan Transaksi">
-                                        <a  wire:click.prevent="kirimWhatsapp({{ $item->ms_transaksi_tabungan_id }})" class="btn btn-soft-success btn-sm rounded-pill px-3">
+
+                                    {{-- WHATSAPP --}}
+                                    <li
+                                        class="list-inline-item detail"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-trigger="hover"
+                                        data-bs-placement="top"
+                                        title="{{ $bolehKirimWhatsapp
+                                            ? 'Kirim Pesan Transaksi'
+                                            : 'Transaksi sudah dibatalkan' }}"
+                                    >
+                                        <a
+                                            wire:click.prevent="kirimWhatsapp({{ $item->ms_transaksi_tabungan_id }})"
+                                            class="btn btn-sm rounded-pill px-3 {{ $bolehKirimWhatsapp
+                                                ? 'btn-soft-success'
+                                                : 'btn-muted disabled' }}"
+                                            @unless ($bolehKirimWhatsapp)
+                                                tabindex="-1"
+                                                aria-disabled="true"
+                                                style="pointer-events: none;"
+                                            @endunless
+                                        >
                                             <i class="ri-whatsapp-line me-1"></i>
                                             <span>Kirim WhatsApp</span>
                                         </a>
                                     </li>
+
                                 </ul>
                             </td>
+
                         </tr>
+
                     @empty
                         <tr>
                             <td colspan="9" class="text-center text-muted">

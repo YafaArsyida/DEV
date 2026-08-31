@@ -105,69 +105,200 @@ class Manage extends Component
         DB::beginTransaction();
 
         try {
-            $anyTagihanDeleted = false;
+            $anyTagihanDibatalkan = false;
+            $jumlahBerhasil = 0;
+            $jumlahGagal = 0;
 
             foreach ($this->TagihanSelected as $ms_tagihan_siswa_id) {
-                $tagihan = TagihanSiswa::find($ms_tagihan_siswa_id);
 
-                if ($tagihan) {
-                    // Cek apakah tagihan sudah pernah dibayar
-                    $isInDetailTransaksi = DetailTransaksiTagihanSiswa::where('ms_tagihan_siswa_id', $ms_tagihan_siswa_id)->exists();
+                // =====================================================
+                // 1. LOCK TAGIHAN
+                // =====================================================
+                $tagihan = TagihanSiswa::with([
+                    'ms_penempatan_siswa.ms_siswa',
+                    'ms_jenis_tagihan_siswa',
+                    'akuntansi_jurnal',
+                ])
+                    ->lockForUpdate()
+                    ->find($ms_tagihan_siswa_id);
 
-                    if ($isInDetailTransaksi) {
-                        // Jika sudah pernah dibayar, tampilkan pesan error dan lewati proses penghapusan
-                        $this->dispatchBrowserEvent('alertify-error', ['message' => "Tagihan tidak dapat dihapus karena memiliki riwayat pembayaran."]);
-                        continue;
-                    }
-
-                    $isInKeranjang = KeranjangTagihanSiswa::where('ms_tagihan_siswa_id', $tagihan->ms_tagihan_siswa_id)->first();
-                    if ($isInKeranjang) {
-                        $this->dispatchBrowserEvent('alertify-error', ['message' => "Tagihan tidak dapat dihapus karena masuk keranjang"]);
-                        continue;
-                    }
-
-                    // Hapus akuntansi
-                    if ($tagihan->akuntansi_jurnal_id) {
-                        AccountingService::delete(
-                            $tagihan->akuntansi_jurnal_id
-                        );
-                    }
-
-
-                    $tagihan->ms_pengguna_id = auth()->user()->ms_pengguna_id; // Set pengguna yang menghapus
-                    
-                    $tagihan->deskripsi = sprintf(
-                        'Tagihan %s dihapus oleh %s',
-                        $tagihan->ms_jenis_tagihan_siswa->nama_jenis_tagihan_siswa,
-                        $this->nama_petugas
-                    );
-                    $tagihan->save();
-
-                    // Soft delete tagihan
-                    $tagihan->delete();
-                    $anyTagihanDeleted = true;
+                if (!$tagihan) {
+                    $jumlahGagal++;
+                    continue;
                 }
+
+                // =====================================================
+                // 2. VALIDASI STATUS TAGIHAN
+                // =====================================================
+                if ($tagihan->status_transaksi === 'dibatalkan') {
+                    $jumlahGagal++;
+                    continue;
+                }
+
+                // =====================================================
+                // 3. CEK KERANJANG
+                // =====================================================
+                $keranjangExists = KeranjangTagihanSiswa::where(
+                    'ms_tagihan_siswa_id', $tagihan->ms_tagihan_siswa_id
+                )->exists();
+
+                if ($keranjangExists) {
+                    $jumlahGagal++;
+                    continue;
+                }
+
+                // =====================================================
+                // 4. CEK PEMBAYARAN
+                // =====================================================
+                $pembayaranExists = DetailTransaksiTagihanSiswa::where(
+                    'ms_tagihan_siswa_id', $tagihan->ms_tagihan_siswa_id
+                )->exists();
+
+                if ($pembayaranExists) {
+                    $jumlahGagal++;
+                    continue;
+                }
+
+                // =====================================================
+                // 5. VALIDASI JURNAL ASLI
+                // =====================================================
+                $jurnalAsli = $tagihan->akuntansi_jurnal;
+
+                if (!$jurnalAsli) {
+                    $jumlahGagal++;
+                    continue;
+                }
+
+                if (
+                    !$jurnalAsli->akuntansi_jurnal_detail ||
+                    $jurnalAsli->akuntansi_jurnal_detail->isEmpty()
+                ) {
+                    $jumlahGagal++;
+                    continue;
+                }
+
+                // =====================================================
+                // 6. INFORMASI TAGIHAN
+                // =====================================================
+                $namaJenisTagihan =
+                    $tagihan->ms_jenis_tagihan_siswa
+                        ->nama_jenis_tagihan_siswa
+                        ?? 'Tagihan';
+
+                $namaSiswa =
+                    $tagihan->ms_penempatan_siswa
+                        ?->ms_siswa
+                        ?->nama_siswa
+                        ?? '-';
+
+                // =====================================================
+                // 7. DESKRIPSI JURNAL REVERSAL
+                // =====================================================
+                $deskripsiJurnal = sprintf(
+                    'Pembatalan %s Rp %s - %s oleh %s',
+                    $namaJenisTagihan,
+                    number_format(
+                        $tagihan->jumlah_tagihan_siswa,
+                        0,
+                        ',',
+                        '.'
+                    ),
+                    $namaSiswa,
+                    $this->nama_petugas
+                );
+
+                // =====================================================
+                // 8. BUAT JURNAL REVERSAL
+                // =====================================================
+                $jurnalReversal = AccountingService::reverse(
+                    $tagihan->akuntansi_jurnal_id,
+                    [
+                        'tanggal' => now(),
+                        'deskripsi' => $deskripsiJurnal,
+                        'ms_pengguna_id' => auth()->user()->ms_pengguna_id,
+                    ]
+                );
+
+                // =====================================================
+                // 9. UPDATE STATUS TAGIHAN
+                // =====================================================
+                $tagihan->update([
+                    'status_transaksi' => 'dibatalkan',
+                    'akuntansi_jurnal_reversal_id' => $jurnalReversal->akuntansi_jurnal_id,
+                    'ms_pengguna_id' => auth()->user()->ms_pengguna_id,
+                    'deskripsi' => sprintf(
+                        'Tagihan %s dibatalkan oleh %s',
+                        $namaJenisTagihan,
+                        $this->nama_petugas
+                    ),
+                ]);
+
+                $anyTagihanDibatalkan = true;
+                $jumlahBerhasil++;
             }
+
+            // =====================================================
+            // 10. COMMIT
+            // =====================================================
             DB::commit();
+
+            // =====================================================
+            // 11. RESET STATE
+            // =====================================================
+            $this->TagihanSelectAll = false;
+            $this->TagihanSelected = [];
+
+            // =====================================================
+            // 12. REFRESH DATA
+            // =====================================================
+            $this->emitSelf('$refresh');
+            $this->emit('refreshTagihanSiswa');
+
             $this->dispatchBrowserEvent('hide-modal', [
                 'modalId' => 'ModalAksiDeleteMultiple'
             ]);
 
-            if ($anyTagihanDeleted) {
-                $this->dispatchBrowserEvent('alertify-success', ['message' => 'Tagihan berhasil dihapus.']);
+            // =====================================================
+            // 13. NOTIFIKASI
+            // =====================================================
+            if ($anyTagihanDibatalkan) {
+
+                if ($jumlahGagal > 0) {
+                    $this->dispatchBrowserEvent('alertify-warning', [
+                        'message' =>
+                            "{$jumlahBerhasil} tagihan berhasil dibatalkan, "
+                            . "{$jumlahGagal} tagihan tidak dapat dibatalkan."
+                    ]);
+                } else {
+                    $this->dispatchBrowserEvent('alertify-success', [
+                        'message' =>
+                            "{$jumlahBerhasil} tagihan berhasil dibatalkan."
+                    ]);
+                }
+
+            } else {
+                $this->dispatchBrowserEvent('alertify-error', [
+                    'message' =>
+                        'Tidak ada tagihan yang dapat dibatalkan.'
+                ]);
             }
-            // Commit transaksi jika berhasil
-        } catch (\Exception $e) {
-            // Rollback transaksi jika terjadi kesalahan
+
+        } catch (\Throwable $e) {
+
+            // =====================================================
+            // ROLLBACK
+            // =====================================================
             DB::rollBack();
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Terjadi kesalahan saat menghapus data: ' . $e->getMessage()]);
+
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' =>
+                    'Terjadi kesalahan saat membatalkan tagihan: '
+                    . $e->getMessage()
+            ]);
+
+            $this->TagihanSelectAll = false;
+            $this->TagihanSelected = [];
         }
-
-        $this->TagihanSelectAll = false;
-        $this->TagihanSelected = [];
-
-        $this->emitSelf('$refresh');
-        $this->emit('refreshTagihanSiswa');
     }
 
     // EDIT TAGIHAN
@@ -312,6 +443,7 @@ class Manage extends Component
                 'ms_penempatan_siswa.ms_kelas'
             ])
             ->where('ms_penempatan_siswa_id', $this->ms_penempatan_siswa_id)
+            ->where('status_transaksi', '!=', 'dibatalkan')
             ->withSum('dt_transaksi_tagihan_siswa as total_bayar', 'jumlah_bayar');
 
         // FILTER KATEGORI

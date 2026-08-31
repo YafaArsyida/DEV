@@ -70,28 +70,46 @@
                         <td></td>
                     </tr>
                     @forelse ($transaksiEduPay as $item)
+                    @php
+                        $bolehDibatalkan =
+                            in_array($item->jenis_transaksi, [
+                                'topup tunai',
+                                'topup online',
+                                'penarikan',
+                            ]) &&
+                            $item->status_transaksi !== 'dibatalkan' &&
+                            \Carbon\Carbon::parse($item->tanggal)->isToday();
+
+                        $titlePembatalan = $bolehDibatalkan
+                            ? 'Koreksi Transaksi'
+                            : (
+                                $item->status_transaksi === 'dibatalkan'
+                                    ? 'Transaksi sudah dibatalkan'
+                                    : 'Hanya transaksi hari ini yang dapat dikoreksi'
+                            );
+                    @endphp
+
                     <tr class="{{ $item->status_transaksi === 'dibatalkan' ? 'table-danger' : '' }}">
                         <td class="text-center" style="width: 50px">{{ $loop->iteration }}.</td>
                         <td class="text-center">
-                            @if ($item->jenis_transaksi === 'topup tunai' &&
-                                $item->status_transaksi !== 'dibatalkan' && 
-                                \Carbon\Carbon::parse($item->tanggal)->isToday())
-                                <a href="#ModalDeleteEduPay" data-bs-toggle="modal"
-                                    class="text-danger d-inline-block remove-item-btn"
+                            <a
+                                @if ($bolehDibatalkan)
+                                    href="#ModalDeleteEduPay"
+                                    data-bs-toggle="modal"
                                     wire:click.prevent="$emit('confirmDeleteEduPay', {{ $item->ms_transaksi_edupay_id }})"
-                                    data-bs-trigger="hover" data-bs-placement="top"
-                                    title="Koreksi Transaksi Top Up Tunai Hari Ini"
-                                >
-                                    <i class="ri-delete-bin-5-fill fs-14"></i>
-                                </a>
-                            @else
-                                <span class="text-muted d-inline-block remove-item-btn"
-                                    data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top"
-                                    title="Hanya Top Up Tunai hari ini yang dapat dikoreksi"
-                                >
-                                    <i class="ri-delete-bin-5-fill fs-14"></i>
-                                </span>
-                            @endif
+                                @else
+                                    href="javascript:void(0)"
+                                    aria-disabled="true"
+                                    tabindex="-1"
+                                @endif
+                                class="{{ $bolehDibatalkan ? 'text-danger' : 'text-muted disabled' }} d-inline-block remove-item-btn"
+                                data-bs-toggle="tooltip"
+                                data-bs-trigger="hover"
+                                data-bs-placement="top"
+                                title="{{ $titlePembatalan }}"
+                            >
+                                <i class="ri-delete-bin-5-fill fs-14"></i>
+                            </a>
                         </td>
                         <td class="text-uppercase text-start">
                             <div class="fw-medium">
@@ -146,65 +164,97 @@
 
                         <td class="text-start">
                             <ul class="list-inline hstack gap-2 mb-0">
-                                <li class="list-inline-item detail" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Detail Transaksi">
+
+                                {{-- DETAIL --}}
+                                <li class="list-inline-item detail"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-trigger="hover"
+                                    data-bs-placement="top"
+                                    title="Detail Transaksi">
+
                                     <a href="#detailTransaksiEduPay"
                                         data-bs-toggle="modal"
                                         wire:click.prevent="$emit('loadDetailTransaksiEduPay', {{ $item->ms_transaksi_edupay_id }})"
                                         class="btn btn-info btn-sm rounded-pill px-3">
+
                                         <i class="ri-eye-line me-1"></i>
                                         <span>Detail</span>
                                     </a>
                                 </li>
-                                <li class="list-inline-item detail" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Edit Transaksi">
-                                    @if (
-                                        $item->status_transaksi !== 'dibatalkan' &&
-                                        ($item->jenis_transaksi === 'penarikan' || $item->jenis_transaksi === 'topup tunai')
-                                    )
-                                        <a href="#loadTransaksiEduPay" 
-                                            data-bs-toggle="modal" 
-                                            wire:click.prevent="$emit('loadTransaksiEduPay', {{ $item->ms_transaksi_edupay_id }})" 
-                                            class="btn btn-primary btn-sm rounded-pill px-3">
-                                            <i class="ri-mark-pen-line me-1"></i>
-                                            <span>Edit</span>
-                                        </a>
-                                    @else
-                                        <span class="btn btn-muted btn-sm rounded-pill px-3" 
-                                            data-bs-toggle="tooltip" 
-                                            data-bs-trigger="hover" 
-                                            data-bs-placement="top" 
-                                            title="{{ $item->status_transaksi === 'dibatalkan'
-                                                ? 'Transaksi sudah dibatalkan'
-                                                : 'Transaksi ' . ucfirst($item->jenis_transaksi) . ' tidak dapat diedit' }}">
-                                            <i class="ri-mark-pen-line me-1"></i>
-                                            <span>Edit</span>
-                                        </span>
-                                    @endif
-                                </li>
 
-                                <li class="list-inline-item detail" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Cetak Bukti Transaksi">
-                                    <a wire:click="cetakTransaksi({{ $item->ms_transaksi_edupay_id }})" class="btn btn-sm btn-danger rounded-pill px-3">
-                                        <i class="ri-printer-line me-1"></i>
-                                            <span>Cetak</span>
+                                {{-- EDIT --}}
+                                @php
+                                    $bolehEdit =
+                                        $item->status_transaksi !== 'dibatalkan' &&
+                                        in_array($item->jenis_transaksi, ['penarikan', 'topup tunai']);
+
+                                    $tooltipEdit = $item->status_transaksi === 'dibatalkan'
+                                        ? 'Transaksi sudah dibatalkan'
+                                        : 'Transaksi ' . ucfirst($item->jenis_transaksi) . ' tidak dapat diedit';
+                                @endphp
+
+                                <li class="list-inline-item detail"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-trigger="hover"
+                                    data-bs-placement="top"
+                                    title="{{ $bolehEdit ? 'Edit Transaksi' : $tooltipEdit }}">
+
+                                    <a href="#loadTransaksiEduPay"
+                                        data-bs-toggle="modal"
+                                        wire:click.prevent="$emit('loadTransaksiEduPay', {{ $item->ms_transaksi_edupay_id }})"
+                                        class="btn btn-sm rounded-pill px-3 {{ $bolehEdit ? 'btn-primary' : 'btn-muted disabled' }}"
+                                        @unless($bolehEdit)
+                                            tabindex="-1"
+                                            aria-disabled="true"
+                                            style="pointer-events: none;"
+                                        @endunless>
+
+                                        <i class="ri-mark-pen-line me-1"></i>
+                                        <span>Edit</span>
                                     </a>
                                 </li>
 
-                                <li class="list-inline-item detail" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Kirim Pesan Transaksi">
-                                    @if ($item->status_transaksi !== 'dibatalkan')
-                                        <a wire:click.prevent="kirimWhatsapp({{ $item->ms_transaksi_edupay_id }})"
-                                            class="btn btn-soft-success btn-sm rounded-pill px-3">
-                                            <i class="ri-whatsapp-line me-1"></i>
-                                            <span>Kirim WhatsApp</span>
-                                        </a>
-                                    @else
-                                        <span
-                                            class="btn btn-muted btn-sm rounded-pill px-3"
-                                            data-bs-toggle="tooltip"
-                                            title="Transaksi sudah dibatalkan">
-                                            <i class="ri-whatsapp-line me-1"></i>
-                                            <span>Kirim WhatsApp</span>
-                                        </span>
-                                    @endif
+                                {{-- CETAK --}}
+                                <li class="list-inline-item detail"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-trigger="hover"
+                                    data-bs-placement="top"
+                                    title="Cetak Bukti Transaksi">
+
+                                    <a wire:click="cetakTransaksi({{ $item->ms_transaksi_edupay_id }})"
+                                        class="btn btn-sm btn-danger rounded-pill px-3">
+
+                                        <i class="ri-printer-line me-1"></i>
+                                        <span>Cetak</span>
+                                    </a>
                                 </li>
+
+                                {{-- WHATSAPP --}}
+                                @php
+                                    $bolehKirimWhatsapp = $item->status_transaksi !== 'dibatalkan';
+                                @endphp
+
+                                <li class="list-inline-item detail"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-trigger="hover"
+                                    data-bs-placement="top"
+                                    title="{{ $bolehKirimWhatsapp
+                                        ? 'Kirim Pesan Transaksi'
+                                        : 'Transaksi sudah dibatalkan' }}">
+
+                                    <a wire:click.prevent="kirimWhatsapp({{ $item->ms_transaksi_edupay_id }})"
+                                        class="btn btn-sm rounded-pill px-3 {{ $bolehKirimWhatsapp ? 'btn-soft-success' : 'btn-muted disabled' }}"
+                                        @unless($bolehKirimWhatsapp)
+                                            tabindex="-1"
+                                            aria-disabled="true"
+                                            style="pointer-events: none;"
+                                        @endunless>
+
+                                        <i class="ri-whatsapp-line me-1"></i>
+                                        <span>Kirim WhatsApp</span>
+                                    </a>
+                                </li>
+
                             </ul>
                         </td>
                     </tr>

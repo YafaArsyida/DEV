@@ -43,7 +43,7 @@ class Delete extends Component
             $this->nama_user = '-';
         }
     }
-
+    
     protected function validateSaldoDelete($transaksi, $saldo)
     {
         $saldoValue = $saldo->saldo_edupay;
@@ -63,95 +63,81 @@ class Delete extends Component
 
     protected function processPembatalan($transaksi, $saldo)
     {
-        // 1. AMBIL JURNAL ASLI BESERTA DETAILNYA
-        $jurnalAsli = $transaksi->akuntansi_jurnal;
-
-        if (!$jurnalAsli) {
+        // =========================================================
+        // 1. VALIDASI JURNAL ASLI
+        // =========================================================
+        if (!$transaksi->akuntansi_jurnal_id) {
             throw new \Exception(
                 'Jurnal asli transaksi tidak ditemukan.'
             );
         }
 
-        $detailAsli = $jurnalAsli->akuntansi_jurnal_detail;
+        // =========================================================
+        // 2. TENTUKAN NAMA TRANSAKSI
+        // =========================================================
+        $namaTransaksi = match ($transaksi->jenis_transaksi) {
+            'topup tunai'  => 'Top Up Tunai EduPay',
+            'topup online' => 'Top Up Online EduPay',
+            'penarikan'    => 'Penarikan EduPay',
+            default        => throw new \Exception(
+                'Jenis transaksi EduPay tidak dapat dibatalkan.'
+            ),
+        };
 
-        if ($detailAsli->isEmpty()) {
-            throw new \Exception(
-                'Detail jurnal asli tidak ditemukan.'
-            );
-        }
-
-        // 2. VALIDASI DETAIL JURNAL
-        foreach ($detailAsli as $detail) {
-            if (!in_array($detail->posisi, ['debit', 'kredit'])) {
-                throw new \Exception(
-                    'Posisi jurnal tidak valid pada rekening '
-                    . $detail->kode_rekening
-                );
-            }
-
-            if ($detail->nominal <= 0) {
-                throw new \Exception(
-                    'Nominal jurnal tidak valid pada rekening '
-                    . $detail->kode_rekening
-                );
-            }
-        }
-
-        // 3. BUAT DETAIL JURNAL REVERSAL
-        //    Debit  -> Kredit
-        //    Kredit -> Debit
-        $detailReversal = $detailAsli
-            ->map(function ($detail) {
-                return [
-                    'kode_rekening' => $detail->kode_rekening,
-                    'posisi' => $detail->posisi === 'debit'
-                        ? 'kredit'
-                        : 'debit',
-                    'nominal' => $detail->nominal,
-                ];
-            })
-            ->values()
-            ->toArray();
-
-        // 4. DESKRIPSI JURNAL REVERSAL
+        // =========================================================
+        // 3. DESKRIPSI JURNAL REVERSAL
+        // =========================================================
         $deskripsiJurnal = sprintf(
-            'Pembatalan Top Up Tunai EduPay Rp %s - %s',
+            'Pembatalan %s Rp %s - %s',
+            $namaTransaksi,
             number_format($transaksi->nominal, 0, ',', '.'),
             $this->nama_user
         );
 
-        // 6. BUAT JURNAL REVERSAL
-        $jurnalPembatalan = AccountingService::create([
-            'tanggal' => now(),
-            'deskripsi' => $deskripsiJurnal,
-            'ms_pengguna_id' => auth()->user()->ms_pengguna_id,
+        // =========================================================
+        // 4. BUAT JURNAL REVERSAL
+        // =========================================================
+        $jurnalPembatalan = AccountingService::reverse(
+            $transaksi->akuntansi_jurnal_id,
+            [
+                'tanggal' => now(),
 
-            'ms_tahun_ajaran_id' => $jurnalAsli->ms_tahun_ajaran_id,
+                'deskripsi' => $deskripsiJurnal,
 
-            'ms_jenjang_id' => $jurnalAsli->ms_jenjang_id,
+                'ms_pengguna_id' => auth()->user()->ms_pengguna_id,
+            ]
+        );
 
-            'ms_departemen_id' => $jurnalAsli->ms_departemen_id,
+        // =========================================================
+        // 5. KOREKSI SALDO EDUPAY
+        // =========================================================
+        if (in_array($transaksi->jenis_transaksi, [
+            'topup tunai',
+            'topup online',
+        ])) {
 
-            'detail' => $detailReversal,
-        ]);
+            // Top Up dibatalkan
+            // Saldo EduPay dikurangi kembali
+            $saldo->decrement(
+                'saldo_edupay', $transaksi->nominal
+            );
 
-        // 7. VALIDASI SALDO EDU PAY
-        if ($saldo->saldo_edupay < $transaksi->nominal) {
-            throw new \Exception(
-                'Saldo EduPay tidak cukup untuk membatalkan top up.'
+        } elseif ($transaksi->jenis_transaksi === 'penarikan') {
+
+            // Penarikan dibatalkan
+            // Saldo EduPay dikembalikan
+            $saldo->increment(
+                'saldo_edupay', $transaksi->nominal
             );
         }
 
-        // 8. KEMBALIKAN SALDO DENGAN MENGURANGI SALDO EDUPAY
-        $saldo->decrement(
-            'saldo_edupay', $transaksi->nominal
-        );
 
-        // 9. UPDATE TRANSAKSI EDUPAY
+        // =========================================================
+        // 6. UPDATE TRANSAKSI EDUPAY
+        // =========================================================
         $transaksi->update([
             'status_transaksi' => 'dibatalkan',
-            'akuntansi_jurnal_reversal_id' =>
-                $jurnalPembatalan->akuntansi_jurnal_id,
+            'akuntansi_jurnal_reversal_id' => $jurnalPembatalan->akuntansi_jurnal_id,
         ]);
     }
 
@@ -173,7 +159,9 @@ class Delete extends Component
         DB::beginTransaction();
 
         try {
-            // LOCK TRANSAKSI
+            // =====================================================
+            // 1. LOCK TRANSAKSI
+            // =====================================================
             $transaksi = TransaksiEduPay::lockForUpdate()
                 ->find($this->ms_transaksi_edupay_id);
 
@@ -183,16 +171,22 @@ class Delete extends Component
                 );
             }
 
-            // VALIDASI
-            if ($transaksi->jenis_transaksi !== 'topup tunai') {
+            // =====================================================
+            // 2. VALIDASI
+            // =====================================================
+             if (!in_array($transaksi->jenis_transaksi, [
+                'topup tunai',
+                'topup online',
+                'penarikan',
+            ])) {
                 throw new \Exception(
-                    'Hanya Top Up Tunai yang dapat dibatalkan.'
+                    'Jenis transaksi EduPay ini tidak dapat dibatalkan.'
                 );
             }
 
             if (!Carbon::parse($transaksi->tanggal)->isToday()) {
                 throw new \Exception(
-                    'Top Up Tunai hanya dapat dibatalkan pada hari transaksi.'
+                    'Transaksi hanya dapat dibatalkan pada hari transaksi.'
                 );
             }
 
@@ -202,7 +196,9 @@ class Delete extends Component
                 );
             }
 
-            // LOCK SALDO
+            // =====================================================
+            // 3. LOCK SALDO
+            // =====================================================
             $saldo = SaldoEduPay::where('user_id', $transaksi->user_id)
                 ->where('user_type', $transaksi->user_type)
                 ->lockForUpdate()
@@ -214,11 +210,23 @@ class Delete extends Component
                 );
             }
 
-            // PROSES PEMBATALAN
+            // =====================================================
+            // 4. VALIDASI SALDO
+            // =====================================================
+            $this->validateSaldoDelete(
+                $transaksi, $saldo
+            );
+
+            // =====================================================
+            // 5. PROSES PEMBATALAN
+            // =====================================================
             $this->processPembatalan($transaksi, $saldo);
 
             DB::commit();
 
+            // =====================================================
+            // 6. SUCCESS
+            // =====================================================
             $this->afterDeleteSuccess();
 
         } catch (\Throwable $e) {

@@ -96,14 +96,10 @@ class Edit extends Component
         $this->transaksi->update($data);
 
         // Update tanggal jurnal saja
-        if (
-            $this->transaksi->akuntansi_jurnal_id &&
-            $tanggalJurnal
-        ) {
-
-            AkuntansiJurnal::where(
-                'akuntansi_jurnal_id', $this->transaksi->akuntansi_jurnal_id
-            )->update([
+        if ($this->transaksi->akuntansi_jurnal_id && $tanggalJurnal) 
+        {
+            AkuntansiJurnal::where('akuntansi_jurnal_id', $this->transaksi->akuntansi_jurnal_id)
+            ->update([
                 'tanggal_transaksi' => $tanggalJurnal,
             ]);
         }

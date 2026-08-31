@@ -32,6 +32,7 @@
     
                 @livewire('transaksi-tabungan-siswa.index')
                 @livewire('transaksi-tabungan-siswa.delete')
+                @livewire('transaksi-tabungan-siswa.detail')
                 @livewire('transaksi-tabungan-siswa.edit')
     
                 @livewire('transaksi-edu-pay-siswa.index')
