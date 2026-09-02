@@ -230,7 +230,6 @@ class DataKeranjang extends Component
                 'ms_departemen_id' => 'SEKOLAH',
 
                 'detail' => [
-
                     // Debit Kas / Bank / EduPay
                     [
                         'kode_rekening' => $debitAkunId,
@@ -290,25 +289,20 @@ class DataKeranjang extends Component
 
                 $sudah = $tagihan->jumlah_sudah_dibayar ?? 0;
 
-                $sisa = $tagihan->jumlah_tagihan_siswa
-                    - ($sudah + $item->jumlah_bayar);
+                $sisa = $tagihan->jumlah_tagihan_siswa - ($sudah + $item->jumlah_bayar);
 
                 $status = $sisa > 0
                     ? 'Masih Dicicil'
                     : 'Lunas';
 
                 DetailTransaksiTagihanSiswa::create([
-                    'ms_transaksi_tagihan_siswa_id' =>
-                        $transaksi->ms_transaksi_tagihan_siswa_id,
+                    'ms_transaksi_tagihan_siswa_id' => $transaksi->ms_transaksi_tagihan_siswa_id,
 
-                    'ms_tagihan_siswa_id' =>
-                        $item->ms_tagihan_siswa_id,
+                    'ms_tagihan_siswa_id' => $item->ms_tagihan_siswa_id,
 
-                    'jumlah_bayar' =>
-                        $item->jumlah_bayar,
+                    'jumlah_bayar' => $item->jumlah_bayar,
 
-                    'deskripsi' =>
-                        $status,
+                    'deskripsi' => $status,
                 ]);
 
                 $tagihan->update([

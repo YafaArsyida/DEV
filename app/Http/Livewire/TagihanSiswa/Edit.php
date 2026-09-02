@@ -78,114 +78,215 @@ class Edit extends Component
         DB::beginTransaction();
 
         try {
-            $this->jumlah_perubahan_tagihan = $this->normalizeAmount($this->jumlah_perubahan_tagihan);
+            // =====================================================
+            // 1. NORMALISASI & VALIDASI INPUT
+            // =====================================================
+            $this->jumlah_perubahan_tagihan =
+                $this->normalizeAmount($this->jumlah_perubahan_tagihan);
 
-            // Validasi input jumlah tagihan
-            $rules = ['jumlah_perubahan_tagihan' => 'numeric|min:0'];
-            $messages = [
-                'jumlah_perubahan_tagihan.numeric' => 'Jumlah tagihan harus berupa angka.',
-                'jumlah_perubahan_tagihan.min' => 'Jumlah tagihan tidak boleh kurang dari 0.',
+            $rules = [
+                'jumlah_perubahan_tagihan' => 'numeric|min:0',
             ];
-            
+
+            $messages = [
+                'jumlah_perubahan_tagihan.numeric' =>
+                    'Jumlah tagihan harus berupa angka.',
+
+                'jumlah_perubahan_tagihan.min' =>
+                    'Jumlah tagihan tidak boleh kurang dari 0.',
+            ];
+
             $this->validate($rules, $messages);
 
-            // Ambil data tagihan
-            $tagihan = TagihanSiswa::find($this->tagihan->ms_tagihan_siswa_id);
+            // =====================================================
+            // 2. LOCK TAGIHAN
+            // =====================================================
+            $tagihan = TagihanSiswa::with([
+                'ms_penempatan_siswa.ms_siswa',
+                'ms_jenis_tagihan_siswa',
+            ])
+                ->lockForUpdate()
+                ->find($this->tagihan->ms_tagihan_siswa_id);
+
             if (!$tagihan) {
                 throw new \Exception('Tagihan tidak ditemukan.');
             }
 
-            $tagihan->load([
-                'ms_penempatan_siswa.ms_siswa',
-                'ms_jenis_tagihan_siswa',
-            ]);
+            // =====================================================
+            // 3. VALIDASI STATUS TAGIHAN
+            // =====================================================
+            // if ($tagihan->status_transaksi === 'dibatalkan') {
+            //     throw new \Exception(
+            //         'Tagihan yang sudah dibatalkan tidak dapat diedit.'
+            //     );
+            // }
 
-            $namaSiswa = $tagihan->ms_penempatan_siswa->ms_siswa->nama_siswa;
+            // =====================================================
+            // 4. VALIDASI JURNAL
+            // =====================================================
+            if (!$tagihan->akuntansi_jurnal_id) {
+                throw new \Exception(
+                    'Jurnal tagihan tidak ditemukan.'
+                );
+            }
 
-            $namaJenis = $tagihan->ms_jenis_tagihan_siswa->nama_jenis_tagihan_siswa;
+            // =====================================================
+            // 5. DATA TAGIHAN
+            // =====================================================
+            $namaSiswa =
+                $tagihan->ms_penempatan_siswa
+                    ?->ms_siswa
+                    ?->nama_siswa
+                    ?? '-';
 
-            $deskripsiJurnal = sprintf('Tagihan %s - %s', $namaJenis, $namaSiswa);
+            $namaJenis =
+                $tagihan->ms_jenis_tagihan_siswa
+                    ?->nama_jenis_tagihan_siswa
+                    ?? 'Tagihan';
 
-            // Ambil jumlah yang sudah dibayarkan
+            $deskripsiJurnal = sprintf(
+                'Tagihan %s - %s',
+                $namaJenis,
+                $namaSiswa
+            );
+
+            // =====================================================
+            // 6. JUMLAH YANG SUDAH DIBAYAR
+            // =====================================================
             $jumlahSudahDibayar = $tagihan->jumlah_sudah_dibayar();
 
-            // Cek validasi jumlah tagihan
+            // =====================================================
+            // 7. VALIDASI NOMINAL
+            // =====================================================
             if ($this->jumlah_perubahan_tagihan < $jumlahSudahDibayar) {
                 throw ValidationException::withMessages([
-                    'jumlah_perubahan_tagihan' => 'Jumlah tagihan tidak boleh kurang dari yang sudah dibayarkan (' . number_format($jumlahSudahDibayar) . ').'
+                    'jumlah_perubahan_tagihan' =>
+                        'Jumlah tagihan tidak boleh kurang dari '
+                        . 'yang sudah dibayarkan (Rp'
+                        . number_format(
+                            $jumlahSudahDibayar,
+                            0,
+                            ',',
+                            '.'
+                        )
+                        . ').'
                 ]);
             }
-            // Tentukan status berdasarkan jumlah tagihan dan jumlah yang sudah dibayarkan
-            $dataToUpdate['jumlah_tagihan_siswa'] = $this->jumlah_perubahan_tagihan;
+
+            // =====================================================
+            // 8. TENTUKAN STATUS TAGIHAN
+            // =====================================================
+            $dataToUpdate = [
+                'jumlah_tagihan_siswa' =>
+                    $this->jumlah_perubahan_tagihan,
+            ];
+
             if ($jumlahSudahDibayar == 0) {
+
                 $dataToUpdate['status'] = 'Belum Dibayar';
-            } elseif ($this->jumlah_perubahan_tagihan > $jumlahSudahDibayar) {
+
+            } elseif (
+                $this->jumlah_perubahan_tagihan > $jumlahSudahDibayar
+            ) {
+
                 $dataToUpdate['status'] = 'Masih Dicicil';
+
             } else {
+
                 $dataToUpdate['status'] = 'Lunas';
             }
-            
-            // Update jurnal
+
+            // =====================================================
+            // 9. UPDATE JURNAL TAGIHAN
+            // =====================================================
             AccountingService::update(
                 $tagihan->akuntansi_jurnal_id,
                 [
                     'tanggal' => now(),
+
                     'deskripsi' => $deskripsiJurnal,
 
                     'detail' => [
-
                         [
                             'kode_rekening' => 12001,
                             'posisi' => 'debit',
                             'nominal' => $this->jumlah_perubahan_tagihan,
                         ],
-
                         [
                             'kode_rekening' => 41001,
                             'posisi' => 'kredit',
                             'nominal' => $this->jumlah_perubahan_tagihan,
-                        ]
-
-                    ]
+                        ],
+                    ],
                 ]
             );
 
-            // Perbarui deskripsi
+            // =====================================================
+            // 10. DESKRIPSI PERUBAHAN
+            // =====================================================
+            $nominalLama =
+                $tagihan->getOriginal('jumlah_tagihan_siswa');
+
             $dataToUpdate['deskripsi'] = sprintf(
                 'Nominal tagihan diubah dari Rp%s menjadi Rp%s oleh %s',
-                number_format($tagihan->getOriginal('jumlah_tagihan_siswa'), 0, ',', '.'),
-                number_format($this->jumlah_perubahan_tagihan, 0, ',', '.'),
+                number_format($nominalLama, 0, ',', '.'),
+                number_format(
+                    $this->jumlah_perubahan_tagihan,
+                    0,
+                    ',',
+                    '.'
+                ),
                 $this->nama_petugas
             );
 
-            // Lakukan pembaruan data tagihan
+            // =====================================================
+            // 11. UPDATE TAGIHAN
+            // =====================================================
             $tagihan->update($dataToUpdate);
 
-            // Commit transaksi
+            // =====================================================
+            // 12. COMMIT
+            // =====================================================
             DB::commit();
 
-            // Emit event untuk refresh data
+            // =====================================================
+            // 13. REFRESH DATA
+            // =====================================================
             $this->emit('refreshTagihanSiswa');
             $this->emit('reloadTagihanSiswa');
-            $this->dispatchBrowserEvent('hide-modal', ['modalId' => 'ModalAksiEdit']);
-            $this->dispatchBrowserEvent('alertify-success', ['message' => 'Tagihan berhasil diperbarui.']);
 
-            // Reset jumlah perubahan tagihan
+            $this->dispatchBrowserEvent('hide-modal', [
+                'modalId' => 'ModalAksiEdit'
+            ]);
+
+            $this->dispatchBrowserEvent('alertify-success', [
+                'message' => 'Tagihan berhasil diperbarui.'
+            ]);
+
+            // =====================================================
+            // 14. RESET
+            // =====================================================
             $this->jumlah_perubahan_tagihan = 0;
+
         } catch (ValidationException $e) {
+
             DB::rollBack();
 
             $this->dispatchBrowserEvent('alertify-error', [
                 'message' => 'Gagal validasi, cek input!'
             ]);
 
-            throw $e; // 🔥 penting untuk tampilkan error di blade
+            // Penting agar error validasi tetap tampil di Blade
+            throw $e;
 
         } catch (\Throwable $e) {
+
             DB::rollBack();
 
             $this->dispatchBrowserEvent('alertify-error', [
-                'message' => $e->getMessage() ?? 'Terjadi kesalahan sistem'
+                'message' =>
+                    $e->getMessage()
+                    ?? 'Terjadi kesalahan sistem'
             ]);
         }
     }

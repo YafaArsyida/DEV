@@ -11,6 +11,7 @@ use App\Models\TransaksiTagihanSiswa;
 use App\Services\AccountingService;
 use Livewire\Component;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class Delete extends Component
@@ -67,6 +68,9 @@ class Delete extends Component
             return;
         }
 
+        // =========================================================
+        // 1. DESKRIPSI REFUND
+        // =========================================================
         $namaJenis = $detailTransaksi
             ->map(fn($d) => $d->nama_jenis_tagihan_siswa())
             ->unique()
@@ -80,18 +84,17 @@ class Delete extends Component
         );
 
         // =========================================================
-        // BUAT JURNAL REFUND
+        // 2. BUAT JURNAL PENGEMBALIAN DANA
         // =========================================================
         $jurnal = AccountingService::create([
             'tanggal' => now(),
             'deskripsi' => $deskripsi,
             'ms_pengguna_id' => auth()->user()->ms_pengguna_id,
-            'ms_tahun_ajaran_id' => $this->ms_tahun_ajar_id,
-            'ms_jenjang_id' => $this->ms_jenjang_id,
-            'ms_departemen_id' => 'SEKOLAH',
+            'ms_tahun_ajaran_id' => $transaksi->akuntansi_jurnal->ms_tahun_ajaran_id ?? $this->ms_tahun_ajar_id,
+            'ms_jenjang_id' => $transaksi->akuntansi_jurnal->ms_jenjang_id ?? $this->ms_jenjang_id,
+            'ms_departemen_id' => $transaksi->akuntansi_jurnal->ms_departemen_id ?? 'SEKOLAH',
 
             'detail' => [
-
                 // Debit Bank Sekolah
                 [
                     'kode_rekening' => 11002,
@@ -105,11 +108,12 @@ class Delete extends Component
                     'posisi' => 'kredit',
                     'nominal' => $total,
                 ],
-
             ],
         ]);
 
-        // SIMPAN TRANSAKSI EDUPAY
+        // =========================================================
+        // 3. SIMPAN TRANSAKSI EDUPAY
+        // =========================================================
         TransaksiEduPay::create([
             'user_type' => 'siswa',
             'user_id' => $this->ms_siswa_id,
@@ -119,54 +123,75 @@ class Delete extends Component
             'nominal' => $total,
             'tanggal' => now(),
             'akuntansi_jurnal_id' => $jurnal->akuntansi_jurnal_id,
+            'status_transaksi' => 'aktif',
             'deskripsi' => $deskripsi,
         ]);
 
         // =========================================================
-        // TAMBAH SALDO EDUPAY
+        // 4. TAMBAH SALDO EDUPAY
         // =========================================================
-        $saldo = SaldoEduPay::getSaldo(
-            $this->ms_siswa_id, 'siswa'
-        );
+        $saldo = SaldoEduPay::lockForUpdate()
+            ->where('user_id', $this->ms_siswa_id)
+            ->where('user_type', 'siswa')
+            ->first();
 
-        if ($saldo) {
-            $saldo->increment(
-                'saldo_edupay', $total
+        if (!$saldo) {
+            throw new \Exception(
+                'Saldo EduPay siswa tidak ditemukan.'
             );
-
-            $this->emit('successTransaksiEduPay');
         }
+
+        $saldo->increment('saldo_edupay', $total);
+
+        $this->emit('successTransaksiEduPay');
     }
 
-    protected function deleteTransaksiEduPay($transaksi)
+    protected function deleteTransaksiEduPay($transaksi, $jurnalReversalId)
     {
         if (!$transaksi->akuntansi_jurnal_id) {
             return;
         }
 
-        $edupay = TransaksiEduPay::where(
-            'akuntansi_jurnal_id', $transaksi->akuntansi_jurnal_id
-        )->first();
+        $edupay = TransaksiEduPay::lockForUpdate()
+            ->where(
+                'akuntansi_jurnal_id',
+                $transaksi->akuntansi_jurnal_id
+            )
+            ->first();
 
         if (!$edupay) {
             return;
         }
 
+        // =========================================================
+        // 1. KEMBALIKAN SALDO EDUPAY
+        // =========================================================
         $total = $edupay->nominal;
 
-        // Hapus transaksi EduPay
-        $edupay->delete();
+        $saldo = SaldoEduPay::lockForUpdate()
+            ->where('user_id', $edupay->user_id)
+            ->where('user_type', 'siswa')
+            ->first();
 
-        // Kembalikan saldo EduPay
-        $saldo = SaldoEduPay::getSaldo($this->ms_siswa_id, 'siswa');
-
-        if ($saldo) {
-            $saldo->increment(
-                'saldo_edupay', $total
+        if (!$saldo) {
+            throw new \Exception(
+                'Saldo EduPay siswa tidak ditemukan.'
             );
-
-            $this->emit('successTransaksiEduPay');
         }
+
+        $saldo->increment('saldo_edupay', $total);
+
+        // =========================================================
+        // 2. TANDAI TRANSAKSI EDUPAY SEBAGAI DIBATALKAN
+        // =========================================================
+        $edupay->update([
+            'status_transaksi' => 'dibatalkan',
+            'akuntansi_jurnal_reversal_id' => $jurnalReversalId,
+            'deskripsi' => $edupay->deskripsi
+                . " Transaksi dibatalkan oleh petugas {$this->nama_petugas}",
+        ]);
+
+        $this->emit('successTransaksiEduPay');
     }
 
     protected function afterDeleteSuccess()
@@ -188,6 +213,9 @@ class Delete extends Component
         DB::beginTransaction();
 
         try {
+            // =========================================================
+            // 1. AMBIL TRANSAKSI + LOCK
+            // =========================================================
             $transaksi = TransaksiTagihanSiswa::lockForUpdate()
                 ->find($this->ms_transaksi_tagihan_siswa_id);
 
@@ -195,59 +223,98 @@ class Delete extends Component
                 throw new \Exception('Transaksi tidak ditemukan!');
             }
 
-            // Ambil detail transaksi sebelum dihapus
+            // Jangan boleh membatalkan transaksi yang sudah dibatalkan
+            if ($transaksi->status_transaksi === 'dibatalkan') {
+                throw new \Exception('Transaksi sudah dibatalkan.');
+            }
+
+            // =========================================================
+            // 2. AMBIL DETAIL TRANSAKSI + LOCK
+            // =========================================================
             $detailTransaksi = DetailTransaksiTagihanSiswa::where(
                 'ms_transaksi_tagihan_siswa_id',
                 $transaksi->ms_transaksi_tagihan_siswa_id
-            )->get();
+            )
+                ->lockForUpdate()
+                ->get();
 
             if ($detailTransaksi->isEmpty()) {
                 throw new \Exception('Detail transaksi tidak ditemukan!');
             }
 
             // =========================================================
-            // REFUND / KEMBALIKAN SALDO EDUPAY
+            // 3. REVERSAL JURNAL
             // =========================================================
-            // Untuk transaksi Transfer ke Rekening Sekolah,
+            if ($transaksi->akuntansi_jurnal_id) {
+
+                $jurnalReversal = AccountingService::reverse(
+                    $transaksi->akuntansi_jurnal_id,
+                    [
+                        'tanggal' => now(),
+                        'deskripsi' => sprintf(
+                            'Pembatalan pembayaran tagihan %s, %s oleh %s',
+                            $this->nama_siswa,
+                            $transaksi->metode_pembayaran,
+                            $this->nama_petugas
+                        ),
+                        'ms_pengguna_id' => Auth::user()->ms_pengguna_id,
+                    ]
+                );
+
+                $jurnalReversalId = $jurnalReversal->akuntansi_jurnal_id;
+
+            } else {
+                throw new \Exception(
+                    'Jurnal transaksi tidak ditemukan. Pembatalan dibatalkan.'
+                );
+            }
+
+            // =========================================================
+            // 4. REFUND / KEMBALIKAN SALDO EDUPAY
+            // =========================================================
+
+            // Transfer ke Rekening Sekolah:
             // dana dikembalikan ke saldo EduPay.
             if ($transaksi->metode_pembayaran === 'Transfer ke Rekening Sekolah') {
                 $this->handleRefund($transaksi, $detailTransaksi);
             }
 
-            // Untuk transaksi EduPay,
+            // EduPay:
             // saldo yang sebelumnya dipotong dikembalikan.
+            //
+            // Catatan:
+            // Jurnal pembayaran sudah di-reverse DI ATAS.
+            // Jangan melakukan AccountingService::reverse lagi di sini.
             if ($transaksi->metode_pembayaran === 'EduPay') {
-                $this->deleteTransaksiEduPay($transaksi);
-            }
-
-            // HAPUS JURNAL TRANSAKSI
-            if ($transaksi->akuntansi_jurnal_id) {
-                AccountingService::delete(
-                    $transaksi->akuntansi_jurnal_id
+                $this->deleteTransaksiEduPay(
+                    $transaksi, $jurnalReversalId
                 );
             }
 
-            // SIMPAN TAGIHAN YANG TERDAMPAK
+            // =========================================================
+            // 5. SIMPAN TAGIHAN YANG TERDAMPAK
+            // =========================================================
             $tagihanIds = $detailTransaksi
                 ->pluck('ms_tagihan_siswa_id')
                 ->unique();
 
-            // HAPUS DETAIL TRANSAKSI
+            // =========================================================
+            // 6. TANDAI DETAIL SEBAGAI DIBATALKAN
+            // =========================================================
             foreach ($detailTransaksi as $detail) {
-
                 $detail->update([
-                    'deskripsi' => "Dihapus oleh {$this->nama_petugas}",
+                    'status_transaksi' => 'dibatalkan',
+                    'deskripsi' => "Dibatalkan oleh {$this->nama_petugas}",
                 ]);
-
-                $detail->delete();
             }
 
             // =========================================================
-            // UPDATE STATUS TAGIHAN
+            // 7. UPDATE STATUS TAGIHAN
             // =========================================================
             foreach ($tagihanIds as $tagihanId) {
 
-                $tagihan = TagihanSiswa::find($tagihanId);
+                $tagihan = TagihanSiswa::lockForUpdate()
+                    ->find($tagihanId);
 
                 if (!$tagihan) {
                     continue;
@@ -265,23 +332,26 @@ class Delete extends Component
 
                 $tagihan->update([
                     'status' => $status,
-                    'deskripsi' => "Update setelah delete transaksi oleh {$this->nama_petugas}",
+                    'deskripsi' => "Update setelah pembatalan transaksi oleh {$this->nama_petugas}",
                 ]);
             }
 
             // =========================================================
-            // HAPUS TRANSAKSI UTAMA
+            // 8. TANDAI TRANSAKSI UTAMA SEBAGAI DIBATALKAN
             // =========================================================
             $transaksi->update([
-                'deskripsi' => $transaksi->deskripsi . " Transaksi dihapus oleh petugas {$this->nama_petugas}",
+                'status_transaksi' => 'dibatalkan',
+                'akuntansi_jurnal_reversal_id' => $jurnalReversalId,
+                'deskripsi' => $transaksi->deskripsi
+                    . " Transaksi dibatalkan oleh petugas {$this->nama_petugas}",
             ]);
-
-            $transaksi->delete();
 
             DB::commit();
 
             $this->afterDeleteSuccess();
+
         } catch (\Throwable $e) {
+
             DB::rollBack();
 
             $this->dispatchBrowserEvent('alertify-error', [
@@ -289,6 +359,7 @@ class Delete extends Component
             ]);
         }
     }
+
     public function render()
     {
         return view('livewire.transaksi-tagihan-siswa.delete');

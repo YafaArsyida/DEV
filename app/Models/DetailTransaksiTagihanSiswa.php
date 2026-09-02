@@ -19,6 +19,8 @@ class DetailTransaksiTagihanSiswa extends Model
         'ms_tagihan_siswa_id',
         'jumlah_bayar',
         'deskripsi',
+
+        'status_transaksi'
     ];
 
     /**

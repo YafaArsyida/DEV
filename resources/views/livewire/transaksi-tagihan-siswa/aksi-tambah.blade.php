@@ -144,7 +144,7 @@
                                                         <span class="input-group-text">
                                                             Rp
                                                         </span>
-                                                        <input class="form-control" onkeyup="formatTagihan(this)" wire:model.live.debounce.300ms="jumlahTagihan.{{ $item['ms_jenis_tagihan_siswa_id'] }}">
+                                                        <input class="form-control fw-medium fs-12" onkeyup="formatTagihan(this)" wire:model.live.debounce.300ms="jumlahTagihan.{{ $item['ms_jenis_tagihan_siswa_id'] }}">
                                                     </div>
                                                 @endif
                                             </td>

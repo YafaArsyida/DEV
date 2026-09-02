@@ -187,11 +187,25 @@ class DataTabungan extends Component
 
         if ($this->startDate && $this->ms_pegawai_id) {
             $result = (clone $baseQuery)
+                ->where('status_transaksi', '!=', 'dibatalkan')
                 ->where('tanggal', '<', $this->startDate)
                 ->selectRaw("
-                SUM(CASE WHEN jenis_transaksi = 'setoran' THEN nominal ELSE 0 END) as total_setoran,
-                SUM(CASE WHEN jenis_transaksi = 'penarikan' THEN nominal ELSE 0 END) as total_penarikan
-            ")
+                    SUM(
+                        CASE
+                            WHEN jenis_transaksi = 'setoran'
+                            THEN nominal
+                            ELSE 0
+                        END
+                    ) as total_setoran,
+
+                    SUM(
+                        CASE
+                            WHEN jenis_transaksi = 'penarikan'
+                            THEN nominal
+                            ELSE 0
+                        END
+                    ) as total_penarikan
+                ")
                 ->first();
 
             $setoran = $result->total_setoran ?? 0;
@@ -209,22 +223,34 @@ class DataTabungan extends Component
 
         if ($this->ms_pegawai_id) {
             $transaksiTabungan = (clone $baseQuery)
-                ->when($this->startDate && $this->endDate, fn($q) => $q->whereBetween('tanggal', [
-                    $this->startDate . ' 00:00:00',
-                    $this->endDate . ' 23:59:59'
-                ]))
-                ->orderBy('tanggal')    
+                ->when(
+                    $this->startDate && $this->endDate,
+                    fn($q) => $q->whereBetween('tanggal', [
+                        $this->startDate . ' 00:00:00',
+                        $this->endDate . ' 23:59:59'
+                    ])
+                )
+                ->orderBy('tanggal')
                 ->orderBy('ms_transaksi_tabungan_id')
                 ->get();
 
-            // saldo berjalan
+            // =====================================================
+            // SALDO BERJALAN
+            // Transaksi dibatalkan tidak mengubah saldo
+            // =====================================================
             $saldo = $summary['saldoAwal'];
 
             $transaksiTabungan = $transaksiTabungan->map(function ($item) use (&$saldo) {
-                $saldo += $item->jenis_transaksi === 'setoran'
-                    ? $item->nominal
-                    : -$item->nominal;
 
+                if ($item->status_transaksi !== 'dibatalkan') {
+
+                    $saldo += $item->jenis_transaksi === 'setoran'
+                        ? $item->nominal
+                        : -$item->nominal;
+                }
+
+                // Saldo transaksi dibatalkan tetap menggunakan
+                // saldo terakhir sebelum transaksi tersebut.
                 $item->saldo = $saldo;
 
                 return $item;

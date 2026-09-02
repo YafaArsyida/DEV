@@ -139,25 +139,15 @@ class AccountingService
 
                 'tanggal_transaksi' => $data['tanggal'] ?? now(),
 
-                'deskripsi' =>
-                    $data['deskripsi']
-                    ?? 'Reversal ' . $jurnalAsli->nomor_jurnal,
+                'deskripsi' => $data['deskripsi'] ?? 'Reversal ' . $jurnalAsli->nomor_jurnal,
 
-                'ms_pengguna_id' =>
-                    $data['ms_pengguna_id']
-                    ?? auth()->user()->ms_pengguna_id,
+                'ms_pengguna_id' => $data['ms_pengguna_id'] ?? auth()->user()->ms_pengguna_id,
 
-                'ms_tahun_ajaran_id' =>
-                    $data['ms_tahun_ajaran_id']
-                    ?? $jurnalAsli->ms_tahun_ajaran_id,
+                'ms_tahun_ajaran_id' => $data['ms_tahun_ajaran_id'] ?? $jurnalAsli->ms_tahun_ajaran_id,
 
-                'ms_jenjang_id' =>
-                    $data['ms_jenjang_id']
-                    ?? $jurnalAsli->ms_jenjang_id,
+                'ms_jenjang_id' => $data['ms_jenjang_id'] ?? $jurnalAsli->ms_jenjang_id,
 
-                'ms_departemen_id' =>
-                    $data['ms_departemen_id']
-                    ?? $jurnalAsli->ms_departemen_id,
+                'ms_departemen_id' => $data['ms_departemen_id'] ?? $jurnalAsli->ms_departemen_id,
 
                 'status' => 'active',
             ]);
@@ -174,16 +164,13 @@ class AccountingService
 
                     'akuntansi_jurnal_id' => $jurnalReversal->akuntansi_jurnal_id,
 
-                    'kode_rekening' =>
-                        $detail->kode_rekening,
+                    'kode_rekening' => $detail->kode_rekening,
 
-                    'posisi' =>
-                        strtolower($detail->posisi) === 'debit'
+                    'posisi' => strtolower($detail->posisi) === 'debit'
                             ? 'kredit'
                             : 'debit',
 
-                    'nominal' =>
-                        $detail->nominal,
+                    'nominal' => $detail->nominal,
                 ]);
             }
 

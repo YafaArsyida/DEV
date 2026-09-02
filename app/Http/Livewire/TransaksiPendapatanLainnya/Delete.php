@@ -57,26 +57,45 @@ class Delete extends Component
             }
 
             // ==========================================
-            // AUDIT TRANSAKSI
+            // VALIDASI STATUS
             // ==========================================
-            $transaksi->update([
-                'deskripsi' => $transaksi->deskripsi .
-                    " (Dihapus oleh petugas {$this->nama_petugas})",
-            ]);
+            if ($transaksi->status_transaksi === 'dibatalkan') {
+                throw new \Exception('Transaksi sudah dibatalkan.');
+            }
 
             // ==========================================
-            // HAPUS JURNAL
+            // VALIDASI JURNAL
             // ==========================================
-            if ($transaksi->akuntansi_jurnal_id) {
-                AccountingService::delete(
-                    $transaksi->akuntansi_jurnal_id
+            if (!$transaksi->akuntansi_jurnal_id) {
+                throw new \Exception(
+                    'Jurnal transaksi tidak ditemukan.'
                 );
             }
 
             // ==========================================
-            // SOFT DELETE TRANSAKSI
+            // BUAT JURNAL REVERSAL
             // ==========================================
-            $transaksi->delete();
+            $jurnalPembatalan = AccountingService::reverse(
+                $transaksi->akuntansi_jurnal_id,
+                [
+                    'tanggal' => now(),
+                    'deskripsi' =>
+                        'Pembatalan transaksi pendapatan lainnya '
+                        . '- ' . $transaksi->deskripsi,
+                    'ms_pengguna_id' => auth()->user()->ms_pengguna_id,
+                ]
+            );
+
+
+            // ==========================================
+            // AUDIT TRANSAKSI
+            // ==========================================
+            $transaksi->update([
+                'status_transaksi' => 'dibatalkan',
+                'akuntansi_jurnal_reversal_id' => $jurnalPembatalan->akuntansi_jurnal_id,
+                'deskripsi' => $transaksi->deskripsi
+                    . " (Dibatalkan oleh petugas {$this->nama_petugas})",
+            ]);
 
             // ==========================================
             // COMMIT
@@ -89,13 +108,14 @@ class Delete extends Component
             $this->emit('refreshTransaksi');
             $this->emit('refreshSaldo');
 
-            $this->dispatchBrowserEvent(
-                'hide-modal', ['modalId' => 'deletePendapatanLainnya']
+            $this->dispatchBrowserEvent('hide-modal',[
+                    'modalId' => 'deletePendapatanLainnya'
+                ]
             );
 
-            $this->dispatchBrowserEvent(
-                'alertify-success',
-                ['message' => 'Transaksi berhasil dihapus.']
+            $this->dispatchBrowserEvent('alertify-success',[
+                    'message' => 'Transaksi berhasil dibatalkan.'
+                ]
             );
 
         } catch (\Throwable $e) {

@@ -94,57 +94,168 @@
                         <td></td>
                     </tr>
                     @forelse ($data as $item)
-                    <tr class="text-center">
-                        <!-- Kolom nomor urut -->
-                        <td style="width: 50px">{{ $loop->iteration }}.</td>
-                        <!-- Kolom hapus -->
-                        <td>
-                            <a href="#deletePendapatanLainnya" data-bs-toggle="modal" class="text-danger d-inline-block remove-item-btn" 
-                            wire:click.prevent="$emit('confirmDeletePendapatanLainnya', {{ $item->transaksi_pendapatan_lainnya_id }})" data-bs-trigger="hover" data-bs-placement="top" title="Hapus Transaksi">
-                                <i class="ri-delete-bin-5-fill fs-14"></i>
-                            </a>
+                    @php
+                        $dibatalkan = $item->status_transaksi === 'dibatalkan';
+
+                        $bolehDibatalkan = !$dibatalkan;
+
+                        $titlePembatalan = $bolehDibatalkan
+                            ? 'Batalkan Transaksi'
+                            : 'Transaksi sudah dibatalkan';
+
+                        $bolehEdit = !$dibatalkan;
+
+                        $tooltipEdit = $bolehEdit
+                            ? 'Edit Transaksi'
+                            : 'Transaksi sudah dibatalkan';
+                    @endphp
+
+                    <tr class="text-center {{ $dibatalkan ? 'table-danger' : '' }}">
+
+                        {{-- Kolom nomor urut --}}
+                        <td style="width: 50px">
+                            {{ $loop->iteration }}.
                         </td>
 
-                        <!-- Kolom tanggal transaksi -->
-                        <td class="text-uppercase text-start">
-                            {{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($item->tanggal) }}
+                        {{-- Kolom pembatalan --}}
+                        <td>
+                            @if ($bolehDibatalkan)
+                                <a href="#deletePendapatanLainnya"
+                                    data-bs-toggle="modal"
+                                    class="text-danger d-inline-block remove-item-btn"
+                                    wire:click.prevent="$emit(
+                                        'confirmDeletePendapatanLainnya',
+                                        {{ $item->transaksi_pendapatan_lainnya_id }}
+                                    )"
+                                    data-bs-trigger="hover"
+                                    data-bs-placement="top"
+                                    title="{{ $titlePembatalan }}">
+
+                                    <i class="ri-delete-bin-5-fill fs-14"></i>
+                                </a>
+                            @else
+                                <a href="javascript:void(0);"
+                                    class="text-muted d-inline-block remove-item-btn"
+                                    aria-disabled="true"
+                                    tabindex="-1"
+                                    data-bs-trigger="hover"
+                                    data-bs-placement="top"
+                                    title="{{ $titlePembatalan }}">
+
+                                    <i class="ri-delete-bin-5-fill fs-14"></i>
+                                </a>
+                            @endif
                         </td>
+
+                        {{-- Kolom tanggal transaksi --}}
+                        <td class="text-uppercase text-start">
+                            <div class="fw-medium">
+                                {{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($item->tanggal, 'd F Y') }}
+                            </div>
+
+                            <small class="text-muted">
+                                {{ \Carbon\Carbon::parse($item->tanggal)->format('H:i') }}
+                            </small>
+                        </td>
+
+                        {{-- Kolom detail transaksi --}}
                         <td class="text-start">
-                            <span class="fs-12 fw-medium">
+
+                            <span class="fs-12 fw-medium
+                                {{ $dibatalkan ? 'text-muted text-decoration-line-through' : '' }}">
+
                                 {!! 'Rp' . number_format($item->nominal, 0, ',', '.') . ' - <i>' .
                                     ucfirst($item->akuntansi_rekening->nama_rekening) . '</i>' !!}
                             </span>
-                            <p class="text-muted mb-0">{{ $item->deskripsi ?? '' }}</p>
+
+                            @if ($dibatalkan)
+                                <span class="badge bg-danger ms-1">
+                                    Dibatalkan
+                                </span>
+                            @endif
+
+                            <p class="text-muted mb-0">
+                                {{ $item->deskripsi ?? '' }}
+                            </p>
+
                         </td>
+
+                        {{-- Petugas --}}
                         <td>
                             {{ $item->ms_pengguna->nama ?? 'Tidak Diketahui' }}
                         </td>
+
+                        {{-- Metode pembayaran --}}
                         <td>
                             {{ $item->metode_pembayaran }}
                         </td>
-                        <!-- Kolom nominal pendapatan -->
+
+                        {{-- Kolom nominal pendapatan --}}
                         <td class="text-center">
-                            <span class="fs-12 fw-medium text-success">
+
+                            <span class="fs-12 fw-medium
+                                {{ $dibatalkan
+                                    ? 'text-muted text-decoration-line-through'
+                                    : 'text-success'
+                                }}">
+
                                 Rp{{ number_format($item->nominal, 0, ',', '.') }}
+
                             </span>
+
                         </td>
+
+                        {{-- Saldo --}}
                         <td>
                             <span class="fs-12 fw-medium">
                                 Rp{{ number_format($item->saldo, 0, ',', '.') }}
                             </span>
                         </td>
-                        <!-- Kolom aksi -->
+
+                        {{-- Kolom aksi --}}
                         <td class="text-start">
-                            <a href="#editPendapatanLainnya" 
-                                data-bs-toggle="modal" 
-                                wire:click.prevent="$emit('editPendapatanLainnya', {{ $item->transaksi_pendapatan_lainnya_id }})" 
-                                class="btn btn-primary btn-sm rounded-pill px-3">
-                                <i class="ri-mark-pen-line me-1"></i>
-                                <span>Edit</span>
-                            </a>
+
+                            @if ($bolehEdit)
+
+                                <a href="#editPendapatanLainnya"
+                                    data-bs-toggle="modal"
+                                    wire:click.prevent="$emit(
+                                        'editPendapatanLainnya',
+                                        {{ $item->transaksi_pendapatan_lainnya_id }}
+                                    )"
+                                    class="btn btn-primary btn-sm rounded-pill px-3"
+                                    data-bs-trigger="hover"
+                                    data-bs-placement="top"
+                                    title="{{ $tooltipEdit }}">
+
+                                    <i class="ri-mark-pen-line me-1"></i>
+                                    <span>Edit</span>
+
+                                </a>
+
+                            @else
+
+                                <a href="javascript:void(0);"
+                                    class="btn btn-secondary btn-sm rounded-pill px-3 disabled"
+                                    aria-disabled="true"
+                                    tabindex="-1"
+                                    data-bs-trigger="hover"
+                                    data-bs-placement="top"
+                                    title="{{ $tooltipEdit }}"
+                                    style="pointer-events: none;">
+
+                                    <i class="ri-mark-pen-line me-1"></i>
+                                    <span>Edit</span>
+
+                                </a>
+
+                            @endif
+
                         </td>
+
                     </tr>
-                    @empty
+
+                @empty
                     <tr>
                         <td colspan="9">
                             <div class="noresult text-center py-3">

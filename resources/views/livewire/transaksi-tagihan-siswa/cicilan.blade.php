@@ -1,4 +1,4 @@
-<div wire:ignore.self class="modal fade" id="ModalAksiBayar" tabindex="-1" aria-labelledby="ModalAksiBayarLabel"
+<div wire:ignore.self class="modal fade" id="ModalCicilan" tabindex="-1" aria-labelledby="ModalCicilanLabel"
     aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
@@ -29,39 +29,33 @@
                     <tbody>
                         @if($tagihan)
                         <tr>
-                            <th scope="row" style="width: 150px;">Tagihan</th>
+                            <th scope="row" style="width: 150px;">Jenis Tagihan</th>
                             <td>
-                                <span class="fw-medium">
-                                    {{ $tagihan->ms_jenis_tagihan_siswa->nama_jenis_tagihan_siswa }}
-                                    -
-                                    <i>{{
-                                        $tagihan->ms_jenis_tagihan_siswa->ms_kategori_tagihan_siswa->nama_kategori_tagihan_siswa
-                                        }}</i>
-                                </span>
-                                <p class="text-muted mb-0">
-                                    Rp{{ number_format($tagihan->jumlah_tagihan_siswa, 0, ',', '.') }}
-                                </p>
+                                {{ $tagihan->ms_jenis_tagihan_siswa->nama_jenis_tagihan_siswa }} - <i>{{ $tagihan->nama_kategori_tagihan_siswa() }}</i>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Nominal Tagihan</th>
+                            <td>
+                                <div class="fw-medium fs-12">Rp{{ number_format($tagihan->jumlah_tagihan_siswa, 0, ',', '.') }}</div>
                             </td>
                         </tr>
 
                         <tr>
                             <th scope="row">Dibayarkan</th>
                             <td>
-                                <span class="text-success">
+                                <div class="fw-medium fs-12 text-success">
                                     Rp{{ number_format($tagihan->total_bayar ?? 0, 0, ',', '.') }}
-                                </span>
+                                </div>
                             </td>
                         </tr>
 
                         <tr>
                             <th scope="row">Kekurangan</th>
                             <td>
-                                <span class="text-danger">
-                                    Rp{{ number_format(
-                                    $tagihan->jumlah_tagihan_siswa - ($tagihan->total_bayar ?? 0),
-                                    0, ',', '.'
-                                    ) }}
-                                </span>
+                                <div class="fw-medium fs-12 text-danger">
+                                    Rp{{ number_format($tagihan->jumlah_tagihan_siswa - ($tagihan->total_bayar ?? 0), 0, ',', '.' ) }}
+                                </div>
                             </td>
                         </tr>
                         <tr>
@@ -69,7 +63,7 @@
                             <td>
                                 <div class="input-group input-group-sm">
                                     <span class="input-group-text">Rp</span>
-                                    <input type="number" class="form-control @error('jumlah_bayar') is-invalid @enderror"
+                                    <input type="text" class="form-control fw-medium fs-12 @error('jumlah_bayar') is-invalid @enderror"
                                         wire:model.defer="jumlah_bayar"
                                         onkeyup="formatTagihan(this)"
                                         aria-label="Amount">
@@ -91,7 +85,7 @@
                 @if($tagihan)
                 <button type="button" class="btn btn-primary rounded-pill px-4" wire:click="masukKeranjang({{ $tagihan->ms_tagihan_siswa_id }})">
                     <i class="ri-save-3-line me-1"></i>
-                    Simpan
+                    Keranjang
                 </button>
                 @endif
             </div>

@@ -23,6 +23,8 @@ class TransaksiPengeluaran extends Model
         'deskripsi',
 
         'akuntansi_jurnal_id',
+        'akuntansi_jurnal_reversal_id',
+
         'status_transaksi'
     ];
 
@@ -55,5 +57,9 @@ class TransaksiPengeluaran extends Model
     public function akuntansi_jurnal()
     {
         return $this->belongsTo(AkuntansiJurnal::class, 'akuntansi_jurnal_id', 'akuntansi_jurnal_id');
+    }
+    public function akuntansi_jurnal_reversal()
+    {
+        return $this->belongsTo(AkuntansiJurnal::class, 'akuntansi_jurnal_reversal_id', 'akuntansi_jurnal_id');
     }
 }

@@ -319,13 +319,12 @@
 
                                     {{-- Cicilan --}}
                                     @if ($item['cicilan_status'] === 'Aktif')
-
                                         <li class="list-inline-item">
                                             <button type="button"
                                                 class="btn btn-soft-secondary btn-sm rounded-pill px-3"
                                                 title="Pembayaran Cicilan"
                                                 data-bs-toggle="modal"
-                                                data-bs-target="#ModalAksiBayar"
+                                                data-bs-target="#ModalCicilan"
                                                 wire:click="$emit('loadCicilan', {{ $item['ms_tagihan_siswa_id'] }})">
 
                                                 <i class="ri-money-dollar-circle-line me-1"></i>
@@ -334,7 +333,6 @@
                                         </li>
 
                                     @else
-
                                         <li class="list-inline-item">
                                             <button type="button"
                                                 class="btn btn-light btn-sm rounded-pill px-3"
@@ -344,9 +342,7 @@
                                                 Non Cicil
                                             </button>
                                         </li>
-
                                     @endif
-
                                     {{-- Edit --}}
                                     <li class="list-inline-item">
                                         <button type="button"

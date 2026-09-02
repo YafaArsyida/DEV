@@ -48,6 +48,7 @@ class InputTransaksi extends Component
     {
         $this->totalPengeluaran = TransaksiPengeluaran::query()
             ->where('ms_jenjang_id', $this->selectedJenjang)
+            ->where('status_transaksi', '!=', 'dibatalkan')
             ->sum('nominal');
     }
 

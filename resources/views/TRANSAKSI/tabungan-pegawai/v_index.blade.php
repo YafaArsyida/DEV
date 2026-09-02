@@ -23,6 +23,7 @@
             <div class="col-xxl-8">
                 @livewire('transaksi-tabungan-pegawai.data-tabungan')
                 @livewire('transaksi-tabungan-siswa.delete')
+                @livewire('transaksi-tabungan-siswa.detail')
                 @livewire('transaksi-tabungan-siswa.edit')
             </div>
         </div>

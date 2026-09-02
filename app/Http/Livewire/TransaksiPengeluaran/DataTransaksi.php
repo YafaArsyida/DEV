@@ -105,6 +105,7 @@ class DataTransaksi extends Component
                     fn($q) =>
                     $q->where('kode_rekening', $this->selectedRekening)
                 )
+                ->where('status_transaksi', '!=', 'dibatalkan')
                 ->whereDate('tanggal', '<', $this->startDate)
                 ->sum('nominal');
         }
@@ -139,9 +140,16 @@ class DataTransaksi extends Component
             ->orderBy('tanggal', 'ASC')
             ->get()            
 
-            ->map(function ($item) use (&$saldo) {
-                $saldo += $item->nominal;
+             ->map(function ($item) use (&$saldo) {
+
+                // Transaksi dibatalkan tetap ditampilkan,
+                // tetapi tidak memengaruhi saldo.
+                if ($item->status_transaksi !== 'dibatalkan') {
+                    $saldo += $item->nominal;
+                }
+
                 $item->saldo = $saldo;
+
                 return $item;
             });
 

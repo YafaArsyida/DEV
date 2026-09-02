@@ -260,15 +260,16 @@ class Index extends Component
                 // AGREGASI
                 ->withCount([
                     'ms_tagihan_siswa as jumlah_item' => function ($q) {
-                        $q->where( 'status_transaksi', '!=', 'dibatalkan' )->select(DB::raw('COUNT(DISTINCT ms_jenis_tagihan_siswa_id)'));
+                        $q->select(
+                            DB::raw(
+                                'COUNT(DISTINCT ms_jenis_tagihan_siswa_id)'
+                            )
+                        );
                     }
                 ])
-                ->withSum('ms_tagihan_siswa as total_tagihan', 'jumlah_tagihan_siswa')
-                ->withSum([ 
-                    'ms_tagihan_siswa as total_tagihan' => function ($q) { 
-                        $q->where( 'status_transaksi', '!=', 'dibatalkan' );
-                    }, 
-                ], 'jumlah_tagihan_siswa')
+                ->withSum(
+                    'ms_tagihan_siswa as total_tagihan', 'jumlah_tagihan_siswa'
+                )
                 ->withSum('dt_transaksi_tagihan_siswa as total_bayar', 'jumlah_bayar');
                 
             if ($this->selectedKelas) {

@@ -3,9 +3,7 @@
 namespace App\Http\Livewire\TransaksiTagihanSiswa;
 
 use App\Models\AkuntansiJurnal;
-use App\Models\AkuntansiJurnalDetail;
 use App\Models\TransaksiTagihanSiswa;
-use App\Services\AccountingService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;

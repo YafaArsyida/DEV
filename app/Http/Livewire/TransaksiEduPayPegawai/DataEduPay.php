@@ -206,6 +206,7 @@ class DataEduPay extends Component
 
         if ($this->ms_pegawai_id && $this->startDate) {
             $result = (clone $baseQuery)
+                ->where('status_transaksi', '!=', 'dibatalkan')
                 ->where('tanggal', '<', $this->startDate)
                 ->selectRaw("
                 SUM(CASE 
@@ -237,15 +238,6 @@ class DataEduPay extends Component
                     $this->startDate . ' 00:00:00',
                     $this->endDate . ' 23:59:59'
                 ]))
-                // ->when($this->selectedJenis, fn($q) => $q->where('jenis_transaksi', $this->selectedJenis))
-                // ->when($this->search, function ($q) {
-                //     $q->where(function ($sub) {
-                //         $sub->where('deskripsi', 'like', '%' . $this->search . '%')
-                //             ->orWhereHas('ms_pengguna', function ($u) {
-                //                 $u->where('nama', 'like', '%' . $this->search . '%');
-                //             });
-                //     });
-                // })
                 ->orderBy('tanggal')
                 ->orderBy('ms_transaksi_edupay_id')
                 ->get();
@@ -254,14 +246,17 @@ class DataEduPay extends Component
             $saldo = $summary['saldoAwal'];
 
             $transaksiEduPay = $transaksiEduPay->map(function ($item) use (&$saldo) {
+                if ($item->status_transaksi !== 'dibatalkan') {
+                    $isMasuk = in_array($item->jenis_transaksi, [
+                        'topup tunai',
+                        'topup online',
+                        'pengembalian dana',
+                    ]);
 
-                $isMasuk = in_array($item->jenis_transaksi, [
-                    'topup tunai',
-                    'topup online',
-                    'pengembalian dana'
-                ]);
-
-                $saldo += $isMasuk ? $item->nominal : -$item->nominal;
+                    $saldo += $isMasuk
+                        ? $item->nominal
+                        : -$item->nominal;
+                }
 
                 $item->saldo = $saldo;
 

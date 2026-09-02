@@ -103,7 +103,7 @@
                         <label class="form-label">Nominal</label>
                         <div class="input-group">
                             <span class="input-group-text">Rp</span>
-                            <input type="number" class="form-control" placeholder="Nominal debit"
+                            <input type="text" class="form-control" placeholder="Nominal debit"
                                 wire:model.defer="nominal_debit"
                                 onkeyup="formatTagihan(this)">
                         </div>

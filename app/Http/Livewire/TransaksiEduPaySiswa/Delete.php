@@ -101,9 +101,7 @@ class Delete extends Component
             $transaksi->akuntansi_jurnal_id,
             [
                 'tanggal' => now(),
-
                 'deskripsi' => $deskripsiJurnal,
-
                 'ms_pengguna_id' => auth()->user()->ms_pengguna_id,
             ]
         );

@@ -22,9 +22,9 @@ class TagihanSiswa extends Model
         'deskripsi',
 
         'akuntansi_jurnal_id',
-        'akuntansi_jurnal_reversal_id',
+        // 'akuntansi_jurnal_reversal_id',
 
-        'status_transaksi'
+        // 'status_transaksi'
     ];
 
     /**
@@ -113,9 +113,11 @@ class TagihanSiswa extends Model
      */
     public function jumlah_sudah_dibayar()
     {
-        return $this->dt_transaksi_tagihan_siswa()->sum('jumlah_bayar');
+        return $this->dt_transaksi_tagihan_siswa()
+            ->where('status_transaksi', '!=', 'dibatalkan')
+            ->sum('jumlah_bayar');
     }
-    
+
     public function jumlah_kekurangan()
     {
         return $this->jumlah_tagihan_siswa - ($this->jumlah_sudah_dibayar ?? 0);
@@ -131,8 +133,8 @@ class TagihanSiswa extends Model
         return $this->belongsTo(AkuntansiJurnal::class, 'akuntansi_jurnal_id', 'akuntansi_jurnal_id');
     }
 
-    public function akuntansi_jurnal_reversal()
-    {
-        return $this->belongsTo(AkuntansiJurnal::class, 'akuntansi_jurnal_reversal_id', 'akuntansi_jurnal_id');
-    }
+    // public function akuntansi_jurnal_reversal()
+    // {
+    //     return $this->belongsTo(AkuntansiJurnal::class, 'akuntansi_jurnal_reversal_id', 'akuntansi_jurnal_id');
+    // }
 }

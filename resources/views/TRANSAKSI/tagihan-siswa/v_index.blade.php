@@ -21,12 +21,11 @@
                 @livewire('tagihan-siswa.delete')
     
                 @livewire('transaksi-tagihan-siswa.aksi-tambah')
-    
                 @livewire('transaksi-tagihan-siswa.index')
-    
                 @livewire('transaksi-tagihan-siswa.cicilan')
     
                 @livewire('transaksi-tagihan-siswa.edit')
+                @livewire('transaksi-tagihan-siswa.detail')
                 @livewire('transaksi-tagihan-siswa.delete')
                 @livewire('transaksi-tagihan-siswa.histori')
     

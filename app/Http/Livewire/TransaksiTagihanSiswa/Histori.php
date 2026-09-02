@@ -140,22 +140,52 @@ class Histori extends Component
     }
     public function render()
     {
-        // Query Transaksi dengan relasi
+        // =========================================================
+        // QUERY TRANSAKSI
+        // =========================================================
         $query = TransaksiTagihanSiswa::with([
             'ms_pengguna',
             'ms_penempatan_siswa',
-            'dt_transaksi_tagihan_siswa.ms_tagihan_siswa' // Include relasi detail dan tagihan jika dibutuhkan
+            'dt_transaksi_tagihan_siswa.ms_tagihan_siswa',
         ])
-            ->withSum('dt_transaksi_tagihan_siswa as total_jumlah_dibayarkan', 'jumlah_bayar') // 👈 ini dia
+            ->withSum(
+                [
+                    'dt_transaksi_tagihan_siswa as total_jumlah_dibayarkan' => function ($query) {
+                        $query->where(
+                            'status_transaksi',
+                            '!=',
+                            'dibatalkan'
+                        );
+                    },
+                ],
+                'jumlah_bayar'
+            )
+            // ->where(
+            //     'status_transaksi',
+            //     '!=',
+            //     'dibatalkan'
+            // )
             ->whereHas('ms_penempatan_siswa', function ($q) {
-                $q->where('ms_penempatan_siswa_id', $this->ms_penempatan_siswa_id);
+                $q->where(
+                    'ms_penempatan_siswa_id',
+                    $this->ms_penempatan_siswa_id
+                );
             });
 
-        // Filter berdasarkan pencarian nama jenis tagihan
+        // =========================================================
+        // FILTER PENCARIAN NAMA JENIS TAGIHAN
+        // =========================================================
         if ($this->search) {
-            $query->whereHas('ms_tagihan_siswa.ms_jenis_tagihan_siswa', function ($q) {
-                $q->where('nama_jenis_tagihan_siswa', 'like', '%' . $this->search . '%');
-            });
+            $query->whereHas(
+                'dt_transaksi_tagihan_siswa.ms_tagihan_siswa.ms_jenis_tagihan_siswa',
+                function ($q) {
+                    $q->where(
+                        'nama_jenis_tagihan_siswa',
+                        'like',
+                        '%' . $this->search . '%'
+                    );
+                }
+            );
         }
 
         // Paginasi dan urutan berdasarkan kategori tagihan

@@ -93,11 +93,12 @@ class Detail extends Component
                 'ms_penempatan_siswa.ms_kelas'
             ])
             ->where('ms_penempatan_siswa_id', $this->ms_penempatan_siswa_id)
-            ->where('status_transaksi', '!=', 'dibatalkan')
-            ->withSum(
-                'dt_transaksi_tagihan_siswa as total_bayar', 
-                'jumlah_bayar'
-            );
+             ->withSum([
+                'dt_transaksi_tagihan_siswa as total_bayar' => function ($query) {
+                    $query->where('status_transaksi', '!=', 'dibatalkan');
+                }
+            ], 'jumlah_bayar');
+
 
         // FILTER KATEGORI
         if ($this->selectedKategori) {

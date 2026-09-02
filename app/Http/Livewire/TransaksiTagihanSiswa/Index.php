@@ -140,49 +140,104 @@ class Index extends Component
 
     protected function updateTagihan()
     {
-        if (!$this->ms_penempatan_siswa_id) return;
+        if (!$this->ms_penempatan_siswa_id) {
+            return;
+        }
 
-        $tagihans = TagihanSiswa::where('ms_penempatan_siswa_id', $this->ms_penempatan_siswa_id)
-            ->withSum('dt_transaksi_tagihan_siswa as total_bayar', 'jumlah_bayar')
+        $tagihans = TagihanSiswa::where(
+            'ms_penempatan_siswa_id',
+            $this->ms_penempatan_siswa_id
+        )
+            ->withSum(
+                [
+                    'dt_transaksi_tagihan_siswa as total_bayar' => function ($query) {
+                        $query->where(
+                            'status_transaksi',
+                            '!=',
+                            'dibatalkan'
+                        );
+                    },
+                ],
+                'jumlah_bayar'
+            )
             ->get();
 
-        $this->totalEstimasi = $tagihans->sum('jumlah_tagihan_siswa');
+        $this->totalEstimasi = $tagihans->sum(
+            'jumlah_tagihan_siswa'
+        );
 
-        $this->totalDibayarkan = $tagihans->sum(fn($t) => $t->total_bayar ?? 0);
+        $this->totalDibayarkan = $tagihans->sum(
+            fn($t) => $t->total_bayar ?? 0
+        );
 
-        $this->totalKekurangan = $this->totalEstimasi - $this->totalDibayarkan;
+        $this->totalKekurangan =
+            $this->totalEstimasi - $this->totalDibayarkan;
     }
 
     // TAGIHAN
     public function loadTagihan()
     {
         $tagihans = TagihanSiswa::query()
-            ->with(['ms_jenis_tagihan_siswa.ms_kategori_tagihan_siswa'])
-            ->where('ms_penempatan_siswa_id', $this->ms_penempatan_siswa_id)
-            ->withSum('dt_transaksi_tagihan_siswa as total_bayar', 'jumlah_bayar')
+            ->with([
+                'ms_jenis_tagihan_siswa.ms_kategori_tagihan_siswa',
+            ])
+            ->where(
+                'ms_penempatan_siswa_id',
+                $this->ms_penempatan_siswa_id
+            )
+            ->withSum(
+                [
+                    'dt_transaksi_tagihan_siswa as total_bayar' => function ($query) {
+                        $query->where(
+                            'status_transaksi',
+                            '!=',
+                            'dibatalkan'
+                        );
+                    },
+                ],
+                'jumlah_bayar'
+            )
             ->orderBy('ms_jenis_tagihan_siswa_id')
             ->get();
 
-        $keranjangIds = KeranjangTagihanSiswa::where('ms_penempatan_siswa_id', $this->ms_penempatan_siswa_id)
-            ->whereIn('ms_tagihan_siswa_id', $tagihans->pluck('ms_tagihan_siswa_id'))
+        $keranjangIds = KeranjangTagihanSiswa::where(
+            'ms_penempatan_siswa_id',
+            $this->ms_penempatan_siswa_id
+        )
+            ->whereIn(
+                'ms_tagihan_siswa_id',
+                $tagihans->pluck('ms_tagihan_siswa_id')
+            )
             ->pluck('ms_tagihan_siswa_id')
             ->flip();
 
-        $this->tagihans = $tagihans->map(function ($item) use ($keranjangIds) {
-            $totalBayar = $item->total_bayar ?? 0;
+        $this->tagihans = $tagihans
+            ->map(function ($item) use ($keranjangIds) {
+                $totalBayar = $item->total_bayar ?? 0;
 
-            return [
-                'ms_tagihan_siswa_id' => $item->ms_tagihan_siswa_id,
-                'nama_jenis' => $item->ms_jenis_tagihan_siswa->nama_jenis_tagihan_siswa,
-                'nama_kategori' => $item->ms_jenis_tagihan_siswa->ms_kategori_tagihan_siswa->nama_kategori_tagihan_siswa,
-                'jumlah_tagihan_siswa' => $item->jumlah_tagihan_siswa,
-                'total_bayar' => $totalBayar,
-                'kekurangan' => $item->jumlah_tagihan_siswa - $totalBayar,
-                'cicilan_status' => $item->ms_jenis_tagihan_siswa->cicilan_status,
-                'status' => $item->status,
-                'in_keranjang' => isset($keranjangIds[$item->ms_tagihan_siswa_id]),
-            ];
-        })->values()->toArray(); // 🔥 WAJIB
+                return [
+                    'ms_tagihan_siswa_id' => $item->ms_tagihan_siswa_id,
+                    'nama_jenis' => $item
+                        ->ms_jenis_tagihan_siswa
+                        ->nama_jenis_tagihan_siswa,
+                    'nama_kategori' => $item
+                        ->ms_jenis_tagihan_siswa
+                        ->ms_kategori_tagihan_siswa
+                        ->nama_kategori_tagihan_siswa,
+                    'jumlah_tagihan_siswa' => $item->jumlah_tagihan_siswa,
+                    'total_bayar' => $totalBayar,
+                    'kekurangan' => $item->jumlah_tagihan_siswa - $totalBayar,
+                    'cicilan_status' => $item
+                        ->ms_jenis_tagihan_siswa
+                        ->cicilan_status,
+                    'status' => $item->status,
+                    'in_keranjang' => isset(
+                        $keranjangIds[$item->ms_tagihan_siswa_id]
+                    ),
+                ];
+            })
+            ->values()
+            ->toArray();
     }
 
     public function tambahKeranjang($tagihanId)
@@ -196,8 +251,18 @@ class Index extends Component
 
             $tagihan = TagihanSiswa::query()
                 ->where('ms_tagihan_siswa_id', $tagihanId)
-                ->where('ms_penempatan_siswa_id', $this->ms_penempatan_siswa_id)
-                ->withSum('dt_transaksi_tagihan_siswa as total_bayar', 'jumlah_bayar')
+                ->where(
+                    'ms_penempatan_siswa_id',
+                    $this->ms_penempatan_siswa_id
+                )
+                ->withSum(
+                    [
+                        'dt_transaksi_tagihan_siswa as total_bayar' => function ($query) {
+                            $query->where('status_transaksi', '!=', 'dibatalkan');
+                        },
+                    ],
+                    'jumlah_bayar'
+                )
                 ->first();
 
             if (!$tagihan) {
@@ -206,7 +271,8 @@ class Index extends Component
 
             $jumlahBayar = max(
                 0,
-                ($tagihan->jumlah_tagihan_siswa ?? 0) - ($tagihan->total_bayar ?? 0)
+                ($tagihan->jumlah_tagihan_siswa ?? 0)
+                    - ($tagihan->total_bayar ?? 0)
             );
 
             if ($jumlahBayar <= 0) {

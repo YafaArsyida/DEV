@@ -196,13 +196,14 @@ class Create extends Component
             $jenisTagihans = JenisTagihanSiswa::whereIn(
                 'ms_jenis_tagihan_siswa_id',
                 $this->tagihanSelected
-            )->get()->keyBy('ms_jenis_tagihan_siswa_id');
+            )
+                ->get()
+                ->keyBy('ms_jenis_tagihan_siswa_id');
 
             // 🔥 Ambil existing (anti duplicate)
             $existing = TagihanSiswa::lockForUpdate()
                 ->whereIn('ms_penempatan_siswa_id', $this->siswaSelected)
                 ->whereIn('ms_jenis_tagihan_siswa_id', $this->tagihanSelected)
-                ->where('status_transaksi', '!=', 'dibatalkan')
                 ->get()
                 ->groupBy('ms_penempatan_siswa_id');
 
@@ -278,7 +279,7 @@ class Create extends Component
                         'ms_pengguna_id'            => $ms_pengguna_id,
                         'jumlah_tagihan_siswa'      => $jumlah,
                         'status'                    => 'Belum Dibayar',
-                        'deskripsi'                 => 'Tagihan',
+                        'deskripsi'                 => 'Tagihan Baru',
                         'akuntansi_jurnal_id'       => $jurnal->akuntansi_jurnal_id,
                         'created_at'                => now(),
                         'updated_at'                => now(),

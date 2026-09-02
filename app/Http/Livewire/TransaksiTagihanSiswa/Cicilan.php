@@ -104,7 +104,7 @@ class Cicilan extends Component
             ]);
 
             $this->dispatchBrowserEvent('hide-modal', [
-                'modalId' => 'ModalAksiBayar'
+                'modalId' => 'ModalCicilan'
             ]);
 
             $this->emit('keranjangUpdated');
@@ -133,6 +133,7 @@ class Cicilan extends Component
             'tagihan' => $this->tagihan,
         ]);
     }
+    
     private function normalizeAmount($value)
     {
         if ($value === null || $value === '') {

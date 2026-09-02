@@ -223,6 +223,7 @@ class AksiTambah extends Component
             $kode_rekening_pendapatan = 41001;
 
             foreach ($this->tagihanSelected as $id) {
+                
                 if (in_array($id, $existing)) {
                     $existingIds[] = $id;
                     continue;
@@ -282,15 +283,15 @@ class AksiTambah extends Component
                 // DATA TAGIHAN
                 // =========================================================
                 $insertData[] = [
-                    'ms_penempatan_siswa_id' => $this->ms_penempatan_siswa_id,
+                    'ms_penempatan_siswa_id'    => $this->ms_penempatan_siswa_id,
                     'ms_jenis_tagihan_siswa_id' => $id,
-                    'ms_pengguna_id' => $ms_pengguna_id,
-                    'jumlah_tagihan_siswa' => $jumlah,
-                    'status' => 'Belum Dibayar',
-                    'deskripsi' => 'Tagihan baru',
-                    'akuntansi_jurnal_id' => $jurnal->akuntansi_jurnal_id,
-                    'created_at' => now(),
-                    'updated_at' => now(),
+                    'ms_pengguna_id'            => $ms_pengguna_id,
+                    'jumlah_tagihan_siswa'      => $jumlah,
+                    'status'                    => 'Belum Dibayar',
+                    'deskripsi'                 => 'Tagihan baru',
+                    'akuntansi_jurnal_id'       => $jurnal->akuntansi_jurnal_id,
+                    'created_at'                => now(),
+                    'updated_at'                => now(),
                 ];
             }
 
