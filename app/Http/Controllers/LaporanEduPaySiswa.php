@@ -40,6 +40,7 @@ class LaporanEduPaySiswa extends Controller
         $query = TransaksiEduPay::with(['ms_siswa', 'ms_pengguna', 'ms_penempatan_siswa.ms_kelas'])
             ->join('ms_siswa', 'ms_siswa.ms_siswa_id', '=', 'ms_transaksi_edupay.user_id')
             ->join('ms_penempatan_siswa', 'ms_penempatan_siswa.ms_penempatan_siswa_id', '=', 'ms_transaksi_edupay.ms_penempatan_siswa_id')
+            ->where('status_transaksi', '!=', 'dibatalkan')
             ->where('ms_penempatan_siswa.ms_jenjang_id', $selectedJenjang)
             ->where('ms_penempatan_siswa.ms_tahun_ajar_id', $selectedTahunAjar);
 

@@ -48,6 +48,11 @@ class LaporanPembayaranTagihanSiswa extends Controller
             'ms_tagihan_siswa.ms_jenis_tagihan_siswa.ms_kategori_tagihan_siswa',
         ])
             ->join('ms_transaksi_tagihan_siswa', 'dt_transaksi_tagihan_siswa.ms_transaksi_tagihan_siswa_id', '=', 'ms_transaksi_tagihan_siswa.ms_transaksi_tagihan_siswa_id')
+            ->where(
+                'dt_transaksi_tagihan_siswa.status_transaksi',
+                '!=',
+                'dibatalkan'
+            )
             ->whereHas('ms_transaksi_tagihan_siswa.ms_penempatan_siswa', function ($q) use ($selectedTahunAjar, $selectedJenjang) {
                 $q->where('ms_tahun_ajar_id', $selectedTahunAjar)
                     ->where('ms_jenjang_id', $selectedJenjang);

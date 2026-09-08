@@ -145,34 +145,88 @@ class Index extends Component
         }
 
         $pendapatan = AkuntansiJurnalDetail::query()
-            ->join('akuntansi_jurnal', 'akuntansi_jurnal_detail.akuntansi_jurnal_id', '=', 'akuntansi_jurnal.akuntansi_jurnal_id')
-            ->join('akuntansi_rekening', 'akuntansi_jurnal_detail.kode_rekening', '=', 'akuntansi_rekening.kode_rekening')
+            ->join(
+                'akuntansi_jurnal',
+                'akuntansi_jurnal_detail.akuntansi_jurnal_id',
+                '=',
+                'akuntansi_jurnal.akuntansi_jurnal_id'
+            )
+            ->join(
+                'akuntansi_rekening',
+                'akuntansi_jurnal_detail.kode_rekening',
+                '=',
+                'akuntansi_rekening.kode_rekening'
+            )
             ->where('akuntansi_jurnal.ms_jenjang_id', $this->selectedJenjang)
             ->where('akuntansi_jurnal.ms_departemen_id', 'SEKOLAH')
-            ->where('akuntansi_jurnal_detail.posisi', 'kredit')
             ->where('akuntansi_rekening.kode_rekening', 'like', '4%')
             ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
-                $query->whereBetween('akuntansi_jurnal.tanggal_transaksi', [$startDate, $endDate]);
+                $query->whereBetween(
+                    'akuntansi_jurnal.tanggal_transaksi',
+                    [$startDate, $endDate]
+                );
             })
             ->when($endDate && !$startDate, function ($query) use ($endDate) {
-                $query->where('akuntansi_jurnal.tanggal_transaksi', '<=', $endDate);
+                $query->where(
+                    'akuntansi_jurnal.tanggal_transaksi',
+                    '<=',
+                    $endDate
+                );
             })
-            ->sum('akuntansi_jurnal_detail.nominal');
+            ->selectRaw("
+                COALESCE(SUM(
+                    CASE
+                        WHEN akuntansi_jurnal_detail.posisi = 'kredit'
+                            THEN akuntansi_jurnal_detail.nominal
+                        WHEN akuntansi_jurnal_detail.posisi = 'debit'
+                            THEN -akuntansi_jurnal_detail.nominal
+                        ELSE 0
+                    END
+                ), 0) AS total
+            ")
+            ->value('total');
 
         $beban = AkuntansiJurnalDetail::query()
-            ->join('akuntansi_jurnal', 'akuntansi_jurnal_detail.akuntansi_jurnal_id', '=', 'akuntansi_jurnal.akuntansi_jurnal_id')
-            ->join('akuntansi_rekening', 'akuntansi_jurnal_detail.kode_rekening', '=', 'akuntansi_rekening.kode_rekening')
+            ->join(
+                'akuntansi_jurnal',
+                'akuntansi_jurnal_detail.akuntansi_jurnal_id',
+                '=',
+                'akuntansi_jurnal.akuntansi_jurnal_id'
+            )
+            ->join(
+                'akuntansi_rekening',
+                'akuntansi_jurnal_detail.kode_rekening',
+                '=',
+                'akuntansi_rekening.kode_rekening'
+            )
             ->where('akuntansi_jurnal.ms_jenjang_id', $this->selectedJenjang)
             ->where('akuntansi_jurnal.ms_departemen_id', 'SEKOLAH')
-            ->where('akuntansi_jurnal_detail.posisi', 'debit')
             ->where('akuntansi_rekening.kode_rekening', 'like', '5%')
             ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
-                $query->whereBetween('akuntansi_jurnal.tanggal_transaksi', [$startDate, $endDate]);
+                $query->whereBetween(
+                    'akuntansi_jurnal.tanggal_transaksi',
+                    [$startDate, $endDate]
+                );
             })
             ->when($endDate && !$startDate, function ($query) use ($endDate) {
-                $query->where('akuntansi_jurnal.tanggal_transaksi', '<=', $endDate);
+                $query->where(
+                    'akuntansi_jurnal.tanggal_transaksi',
+                    '<=',
+                    $endDate
+                );
             })
-            ->sum('akuntansi_jurnal_detail.nominal');
+            ->selectRaw("
+                COALESCE(SUM(
+                    CASE
+                        WHEN akuntansi_jurnal_detail.posisi = 'debit'
+                            THEN akuntansi_jurnal_detail.nominal
+                        WHEN akuntansi_jurnal_detail.posisi = 'kredit'
+                            THEN -akuntansi_jurnal_detail.nominal
+                        ELSE 0
+                    END
+                ), 0) AS total
+            ")
+            ->value('total');
 
         $this->labaRugi = (float) $pendapatan - (float) $beban;
 

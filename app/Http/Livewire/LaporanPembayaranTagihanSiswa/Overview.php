@@ -64,6 +64,11 @@ class Overview extends Component
             ")
             ->where('ms_penempatan_siswa.ms_tahun_ajar_id', $this->selectedTahunAjar)
             ->where('ms_penempatan_siswa.ms_jenjang_id', $this->selectedJenjang)
+            ->where(
+                'dt_transaksi_tagihan_siswa.status_transaksi',
+                '!=',
+                'dibatalkan'
+            )
             ->when($this->startDate && $this->endDate, function ($query) {
                 $startDate = Carbon::createFromFormat('Y-m-d', $this->startDate)->startOfDay();
                 $endDate = Carbon::createFromFormat('Y-m-d', $this->endDate)->endOfDay();
@@ -83,11 +88,16 @@ class Overview extends Component
             ->join('ms_penempatan_siswa', 'ms_tagihan_siswa.ms_penempatan_siswa_id', '=', 'ms_penempatan_siswa.ms_penempatan_siswa_id')
             ->join('ms_kelas', 'ms_penempatan_siswa.ms_kelas_id', '=', 'ms_kelas.ms_kelas_id')
             ->selectRaw("
-            ms_kelas.nama_kelas,
-            SUM(dt_transaksi_tagihan_siswa.jumlah_bayar) as total
-        ")
+                ms_kelas.nama_kelas,
+                SUM(dt_transaksi_tagihan_siswa.jumlah_bayar) as total
+            ")
             ->where('ms_penempatan_siswa.ms_tahun_ajar_id', $this->selectedTahunAjar)
             ->where('ms_penempatan_siswa.ms_jenjang_id', $this->selectedJenjang)
+            ->where(
+                'dt_transaksi_tagihan_siswa.status_transaksi',
+                '!=',
+                'dibatalkan'
+            )
             ->when($this->startDate && $this->endDate, function ($query) {
                 $startDate = Carbon::createFromFormat('Y-m-d', $this->startDate)->startOfDay();
                 $endDate = Carbon::createFromFormat('Y-m-d', $this->endDate)->endOfDay();
@@ -106,11 +116,16 @@ class Overview extends Component
             ->join('ms_tagihan_siswa', 'dt_transaksi_tagihan_siswa.ms_tagihan_siswa_id', '=', 'ms_tagihan_siswa.ms_tagihan_siswa_id')
             ->join('ms_penempatan_siswa', 'ms_tagihan_siswa.ms_penempatan_siswa_id', '=', 'ms_penempatan_siswa.ms_penempatan_siswa_id')
             ->selectRaw("
-            DATE_FORMAT(ms_transaksi_tagihan_siswa.tanggal_transaksi, '%Y-%m') as bulan,
-            SUM(dt_transaksi_tagihan_siswa.jumlah_bayar) as total
-        ")
+                DATE_FORMAT(ms_transaksi_tagihan_siswa.tanggal_transaksi, '%Y-%m') as bulan,
+                SUM(dt_transaksi_tagihan_siswa.jumlah_bayar) as total
+            ")
             ->where('ms_penempatan_siswa.ms_tahun_ajar_id', $this->selectedTahunAjar)
             ->where('ms_penempatan_siswa.ms_jenjang_id', $this->selectedJenjang)
+            ->where(
+                'dt_transaksi_tagihan_siswa.status_transaksi',
+                '!=',
+                'dibatalkan'
+            )
             ->when($this->startDate && $this->endDate, function ($query) {
                 $startDate = Carbon::createFromFormat('Y-m-d', $this->startDate)->startOfDay();
                 $endDate = Carbon::createFromFormat('Y-m-d', $this->endDate)->endOfDay();

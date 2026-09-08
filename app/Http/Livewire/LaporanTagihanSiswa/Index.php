@@ -270,7 +270,16 @@ class Index extends Component
                 $q->with([
                     'ms_jenis_tagihan_siswa'
                 ])
-                    ->withSum('dt_transaksi_tagihan_siswa as jumlah_sudah_dibayar', 'jumlah_bayar')
+                    // ->withSum('dt_transaksi_tagihan_siswa as jumlah_sudah_dibayar', 'jumlah_bayar')
+                    ->withSum([
+                        'dt_transaksi_tagihan_siswa as jumlah_sudah_dibayar' => function ($q) {
+                            $q->where(
+                                'dt_transaksi_tagihan_siswa.status_transaksi',
+                                '!=',
+                                'dibatalkan'
+                            );
+                        }
+                    ], 'jumlah_bayar')
                     ->where('status', '!=', 'Lunas')
                     ->whereHas('ms_jenis_tagihan_siswa', function ($q2) use ($endDate) {
                         $q2->where('tanggal_jatuh_tempo', '<=', $endDate);

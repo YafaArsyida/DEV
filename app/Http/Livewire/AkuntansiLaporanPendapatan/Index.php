@@ -94,14 +94,12 @@ class Index extends Component
     public function render()
     {
         $pendapatanPerBulan = AkuntansiJurnal::with([
-            'akuntansi_jurnal_detail.akuntansi_rekening',
-        ])
+                'akuntansi_jurnal_detail.akuntansi_rekening',
+            ])
             ->where('ms_jenjang_id', $this->selectedJenjang)
             ->where('ms_departemen_id', 'SEKOLAH')
 
-            // ==============================
             // FILTER TANGGAL
-            // ==============================
             ->when(
                 $this->startDate && $this->endDate,
                 fn ($q) => $q->whereBetween('tanggal_transaksi', [
@@ -110,50 +108,43 @@ class Index extends Component
                 ])
             )
 
-            // ==============================
-            // HANYA JURNAL PENDAPATAN
-            // ==============================
+            // HANYA JURNAL YANG MEMILIKI REKENING PENDAPATAN
             ->whereHas('akuntansi_jurnal_detail', function ($query) {
-                $query
-                    ->where('posisi', 'kredit')
-                    ->whereHas('akuntansi_rekening', function ($query) {
-                        $query->where('kode_rekening', 'like', '4%');
-                    });
+                $query->whereHas('akuntansi_rekening', function ($query) {
+                    $query->where('kode_rekening', 'like', '4%');
+                });
             })
 
             ->get()
 
-            // ==============================
-            // FLATTEN DETAIL JURNAL
-            // ==============================
+            // AMBIL DETAIL REKENING PENDAPATAN
             ->flatMap(function ($jurnal) {
 
                 return $jurnal->akuntansi_jurnal_detail
                     ->filter(function ($detail) {
-                        return $detail->posisi === 'kredit'
-                            && str_starts_with(
-                                (string) $detail->akuntansi_rekening->kode_rekening,
-                                '4'
-                            );
+
+                        return str_starts_with(
+                            (string) $detail->akuntansi_rekening->kode_rekening,
+                            '4'
+                        );
                     })
                     ->map(function ($detail) use ($jurnal) {
 
+                        // Kredit = pendapatan bertambah
+                        // Debit  = pendapatan berkurang/reversal
+                        $nominal = strtolower($detail->posisi) === 'kredit'
+                            ? $detail->nominal
+                            : -$detail->nominal;
+
                         return [
-                            'nama_rekening' =>
-                                $detail->akuntansi_rekening->nama_rekening,
-
-                            'tanggal_transaksi' =>
-                                $jurnal->tanggal_transaksi,
-
-                            'nominal' =>
-                                $detail->nominal,
+                            'nama_rekening' => $detail->akuntansi_rekening->nama_rekening,
+                            'tanggal_transaksi' => $jurnal->tanggal_transaksi,
+                            'nominal' => $nominal,
                         ];
                     });
             })
 
-            // ==============================
             // GROUP REKENING → BULAN
-            // ==============================
             ->groupBy([
                 'nama_rekening',
                 fn ($item) =>

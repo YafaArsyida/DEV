@@ -57,6 +57,8 @@ class Index extends Component
         $this->selectedKelas = $filters['selectedKelas'] ?? [];
         $this->selectedKategoriTagihanSiswa = $filters['selectedKategoriTagihanSiswa'] ?? [];
         $this->selectedJenisTagihanSiswa = $filters['selectedJenisTagihanSiswa'] ?? [];
+
+        $this->resetPage(); // Reset halaman ke 1 saat filter diterapkan
     }
 
     public function clearFilters()
@@ -64,6 +66,8 @@ class Index extends Component
         $this->selectedKelas = [];
         $this->selectedKategoriTagihanSiswa = [];
         $this->selectedJenisTagihanSiswa = [];
+
+        $this->resetPage(); // Reset halaman ke 1 saat filter diterapkan
     }
 
     public function updatedJenisRekapitulasi()
@@ -93,7 +97,14 @@ class Index extends Component
                 'ms_kelas',
                 'ms_tagihan_siswa' => function ($q) {
                     $q->with('ms_jenis_tagihan_siswa')
-                        ->withSum('dt_transaksi_tagihan_siswa as jumlah_sudah_dibayar', 'jumlah_bayar')
+                        ->withSum([
+                            'dt_transaksi_tagihan_siswa as jumlah_sudah_dibayar' => function ($q) {
+                                $q->where(function ($q) {
+                                    $q->whereNull('status_transaksi')
+                                    ->orWhere('status_transaksi', '!=', 'dibatalkan');
+                                });
+                            }
+                        ], 'jumlah_bayar')
                         ->when(!empty($this->selectedKategoriTagihanSiswa), function ($q) {
                             $q->whereHas('ms_jenis_tagihan_siswa', function ($q) {
                                 $q->whereIn('ms_kategori_tagihan_siswa_id', $this->selectedKategoriTagihanSiswa);

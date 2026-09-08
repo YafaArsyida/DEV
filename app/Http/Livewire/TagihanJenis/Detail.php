@@ -96,7 +96,11 @@ class Detail extends Component
             ->join('ms_siswa', 'ms_siswa.ms_siswa_id', '=', 'ms_penempatan_siswa.ms_siswa_id')
             ->join('ms_kelas', 'ms_kelas.ms_kelas_id', '=', 'ms_penempatan_siswa.ms_kelas_id')
             ->where('ms_tagihan_siswa.ms_jenis_tagihan_siswa_id', $this->ms_jenis_tagihan_siswa_id)
-            ->withSum('dt_transaksi_tagihan_siswa as total_bayar', 'jumlah_bayar');
+            ->withSum([
+                'dt_transaksi_tagihan_siswa as total_bayar' => function ($query) {
+                    $query->where('status_transaksi', '!=', 'dibatalkan');
+                }
+            ], 'jumlah_bayar');
 
         // FILTER tetap pakai relation (clean)
         if ($this->selectedKelas) {

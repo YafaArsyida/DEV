@@ -44,6 +44,7 @@ class LaporanTabunganSiswa extends Controller
                 'ms_penempatan_siswa.ms_tahun_ajar_id',
                 'ms_penempatan_siswa.ms_kelas_id'
             )
+            ->where('status_transaksi', '!=', 'dibatalkan')
             ->where('ms_penempatan_siswa.ms_jenjang_id', $selectedJenjang)
             ->where('ms_penempatan_siswa.ms_tahun_ajar_id', $selectedTahunAjar)
             ->where('ms_transaksi_tabungan.user_type', 'siswa')

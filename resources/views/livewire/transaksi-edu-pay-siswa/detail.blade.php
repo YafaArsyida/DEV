@@ -6,7 +6,7 @@
     aria-labelledby="detailTransaksiEduPayLabel"
     aria-hidden="true"
 >
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
 
             {{-- HEADER --}}

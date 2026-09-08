@@ -135,23 +135,33 @@ class Index extends Component
                 // Simpan tanggal jurnal ke detail
                 $detail->tanggal_transaksi = $jurnal->tanggal_transaksi;
 
-                // ------------------------------
-                // PENDAPATAN
-                // ------------------------------
-                if (
-                    $detail->posisi === 'kredit' &&
-                    str_starts_with($detail->kode_rekening, '4')
-                ) {
+                // ==========================================
+                // PENDAPATAN (4xxx)
+                // ==========================================
+                if (str_starts_with($detail->kode_rekening, '4')) {
+
+                    // Kredit = pendapatan bertambah
+                    // Debit  = pendapatan berkurang / reversal
+                    $detail->nominal_laporan =
+                        $detail->posisi === 'kredit'
+                            ? $detail->nominal
+                            : -$detail->nominal;
+
                     $pendapatanDetails->push($detail);
                 }
 
-                // ------------------------------
-                // BEBAN
-                // ------------------------------
-                if (
-                    $detail->posisi === 'debit' &&
-                    str_starts_with($detail->kode_rekening, '5')
-                ) {
+                // ==========================================
+                // BEBAN (5xxx)
+                // ==========================================
+                if (str_starts_with($detail->kode_rekening, '5')) {
+
+                    // Debit  = beban bertambah
+                    // Kredit = beban berkurang / reversal
+                    $detail->nominal_laporan =
+                        $detail->posisi === 'debit'
+                            ? $detail->nominal
+                            : -$detail->nominal;
+
                     $bebanDetails->push($detail);
                 }
             }
@@ -238,7 +248,8 @@ class Index extends Component
 
             $totalPendapatanRekening[$namaRekening] =
                 $dataPerBulan->sum(function ($details) {
-                    return $details->sum('nominal');
+                    // return $details->sum('nominal');
+                    return $details->sum('nominal_laporan');
                 });
         }
 
@@ -252,7 +263,8 @@ class Index extends Component
 
             $totalBebanRekening[$namaRekening] =
                 $dataPerBulan->sum(function ($details) {
-                    return $details->sum('nominal');
+                    // return $details->sum('nominal');
+                    return $details->sum('nominal_laporan');
                 });
         }
 
@@ -269,7 +281,7 @@ class Index extends Component
 
                     return optional(
                         $dataPerBulan[$bulan] ?? null
-                    )->sum('nominal');
+                    )->sum('nominal_laporan');
                 });
         }
 
@@ -286,7 +298,7 @@ class Index extends Component
 
                     return optional(
                         $dataPerBulan[$bulan] ?? null
-                    )->sum('nominal');
+                    )->sum('nominal_laporan');
                 });
         }
 
@@ -298,68 +310,52 @@ class Index extends Component
 
         foreach ($bulanHeaders as $bulan) {
 
-            $pendapatan =
-                $totalPendapatanPerBulan[$bulan] ?? 0;
+            $pendapatan = $totalPendapatanPerBulan[$bulan] ?? 0;
 
-            $beban =
-                $totalBebanPerBulan[$bulan] ?? 0;
+            $beban = $totalBebanPerBulan[$bulan] ?? 0;
 
-            $labaRugiPerBulan[$bulan] =
-                $pendapatan - $beban;
+            $labaRugiPerBulan[$bulan] = $pendapatan - $beban;
         }
 
 
         // ==========================================
         // GRAND TOTAL
         // ==========================================
-        $totalPendapatan =
-            array_sum($totalPendapatanPerBulan);
+        $totalPendapatan = array_sum($totalPendapatanPerBulan);
 
-        $totalBeban =
-            array_sum($totalBebanPerBulan);
+        $totalBeban = array_sum($totalBebanPerBulan);
 
-        $totalLabaRugi =
-            array_sum($labaRugiPerBulan);
+        $totalLabaRugi =  array_sum($labaRugiPerBulan);
 
 
         // ==========================================
         // VIEW
         // ==========================================
-        return view(
-            'livewire.akuntansi-laporan-laba-rugi.index',
-            [
+        return view('livewire.akuntansi-laporan-laba-rugi.index', [
                 // DATA UTAMA
                 'pendapatanPerBulan' => $pendapatanPerBulan,
                 'bebanPerBulan' => $bebanPerBulan,
                 'bulanIndo' => $bulanIndo,
 
                 // TOTAL REKENING
-                'totalPendapatanRekening' =>
-                    $totalPendapatanRekening,
+                'totalPendapatanRekening' => $totalPendapatanRekening,
 
-                'totalBebanRekening' =>
-                    $totalBebanRekening,
+                'totalBebanRekening' => $totalBebanRekening,
 
                 // TOTAL BULANAN
-                'totalPendapatanPerBulan' =>
-                    $totalPendapatanPerBulan,
+                'totalPendapatanPerBulan' => $totalPendapatanPerBulan,
 
-                'totalBebanPerBulan' =>
-                    $totalBebanPerBulan,
+                'totalBebanPerBulan' => $totalBebanPerBulan,
 
                 // LABA / RUGI
-                'labaRugiPerBulan' =>
-                    $labaRugiPerBulan,
+                'labaRugiPerBulan' => $labaRugiPerBulan,
 
                 // GRAND TOTAL
-                'totalPendapatan' =>
-                    $totalPendapatan,
+                'totalPendapatan' => $totalPendapatan,
 
-                'totalBeban' =>
-                    $totalBeban,
+                'totalBeban' => $totalBeban,
 
-                'totalLabaRugi' =>
-                    $totalLabaRugi,
+                'totalLabaRugi' => $totalLabaRugi,
             ]
         );
     }

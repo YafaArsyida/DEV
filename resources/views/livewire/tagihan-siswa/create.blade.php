@@ -270,7 +270,7 @@
                                                         <div class="input-group input-group-sm">
                                                             <span class="input-group-text">RP</span>
                                                             <input type="text" 
-                                                                class="form-control" 
+                                                                class="form-control fw-medium fs-12" 
                                                                 wire:model.defer="jumlahTagihan.{{ $item->ms_jenis_tagihan_siswa_id }}" 
                                                                 aria-label="Amount"
                                                                 onkeyup="formatTagihan(this)">

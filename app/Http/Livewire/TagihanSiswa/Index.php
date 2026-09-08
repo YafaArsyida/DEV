@@ -270,7 +270,19 @@ class Index extends Component
                 ->withSum(
                     'ms_tagihan_siswa as total_tagihan', 'jumlah_tagihan_siswa'
                 )
-                ->withSum('dt_transaksi_tagihan_siswa as total_bayar', 'jumlah_bayar');
+                ->withSum([
+                    'dt_transaksi_tagihan_siswa as total_bayar' => function ($q) {
+                        $q->where(
+                            'dt_transaksi_tagihan_siswa.status_transaksi',
+                            '!=',
+                            'dibatalkan'
+                        )->where(
+                            'ms_transaksi_tagihan_siswa.status_transaksi',
+                            '!=',
+                            'dibatalkan'
+                        );
+                    }
+                ], 'jumlah_bayar');
                 
             if ($this->selectedKelas) {
                 $query->where('ms_penempatan_siswa.ms_kelas_id', $this->selectedKelas);

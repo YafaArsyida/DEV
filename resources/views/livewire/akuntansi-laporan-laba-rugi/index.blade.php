@@ -147,7 +147,7 @@
 
                                             <td class="text-end text-nowrap">
                                                 Rp{{ number_format(
-                                                    optional($dataPerBulan[$key] ?? null)->sum('nominal'),
+                                                    optional($dataPerBulan[$key] ?? null)->sum('nominal_laporan'),
                                                     0,
                                                     ',',
                                                     '.'
@@ -225,7 +225,7 @@
 
                                             <td class="text-end text-nowrap">
                                                 Rp{{ number_format(
-                                                    optional($dataPerBulan[$key] ?? null)->sum('nominal'),
+                                                    optional($dataPerBulan[$key] ?? null)->sum('nominal_laporan'),
                                                     0,
                                                     ',',
                                                     '.'

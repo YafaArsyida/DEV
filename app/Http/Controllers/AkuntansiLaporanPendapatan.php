@@ -47,14 +47,11 @@ class AkuntansiLaporanPendapatan extends Controller
             )
 
             // ==============================
-            // HANYA JURNAL PENDAPATAN
+            // HANYA JURNAL YANG MEMILIKI
+            // REKENING PENDAPATAN (4xxx)
             // ==============================
-            ->whereHas('akuntansi_jurnal_detail', function ($query) {
-                $query
-                    ->where('posisi', 'kredit')
-                    ->whereHas('akuntansi_rekening', function ($query) {
-                        $query->where('kode_rekening', 'like', '4%');
-                    });
+            ->whereHas('akuntansi_jurnal_detail.akuntansi_rekening', function ($query) {
+                $query->where('kode_rekening', 'like', '4%');
             })
 
             ->get()
@@ -65,27 +62,33 @@ class AkuntansiLaporanPendapatan extends Controller
             ->flatMap(function ($jurnal) {
 
                 return $jurnal->akuntansi_jurnal_detail
+
                     ->filter(function ($detail) {
-                        return $detail->posisi === 'kredit'
-                            && str_starts_with(
-                                (string) $detail->akuntansi_rekening->kode_rekening,
-                                '4'
-                            );
+
+                        return str_starts_with(
+                            (string) $detail->akuntansi_rekening->kode_rekening,
+                            '4'
+                        );
+
                     })
+
                     ->map(function ($detail) use ($jurnal) {
 
+                        // Pendapatan:
+                        // kredit = +
+                        // debit  = -
+                        $nominal = $detail->posisi === 'kredit'
+                            ? (float) $detail->nominal
+                            : -(float) $detail->nominal;
+
                         return [
-                            'nama_rekening' =>
-                                $detail->akuntansi_rekening->nama_rekening,
-
-                            'tanggal_transaksi' =>
-                                $jurnal->tanggal_transaksi,
-
-                            'nominal' =>
-                                $detail->nominal,
+                            'nama_rekening' => $detail->akuntansi_rekening->nama_rekening,
+                            'tanggal_transaksi' => $jurnal->tanggal_transaksi,
+                            'nominal' => $nominal,
                         ];
                     });
             })
+
 
             // ==============================
             // GROUP REKENING → BULAN

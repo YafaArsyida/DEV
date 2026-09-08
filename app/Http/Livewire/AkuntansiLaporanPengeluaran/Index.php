@@ -96,6 +96,7 @@ class Index extends Component
         $bebanPerBulan = AkuntansiJurnal::with([
             'akuntansi_jurnal_detail.akuntansi_rekening',
         ])
+
             // ==========================================
             // FILTER HEADER JURNAL
             // ==========================================
@@ -116,19 +117,21 @@ class Index extends Component
             )
 
             // ==========================================
-            // HANYA JURNAL BEBAN
+            // HANYA JURNAL YANG MEMILIKI REKENING BEBAN
             // ==========================================
             ->whereHas(
                 'akuntansi_jurnal_detail',
                 function ($query) {
-                    $query
-                        ->where('posisi', 'debit')
-                        ->whereHas(
-                            'akuntansi_rekening',
-                            function ($query) {
-                                $query->where('kode_rekening', 'like', '5%');
-                            }
-                        );
+                    $query->whereHas(
+                        'akuntansi_rekening',
+                        function ($query) {
+                            $query->where(
+                                'kode_rekening',
+                                'like',
+                                '5%'
+                            );
+                        }
+                    );
                 }
             )
 
@@ -140,28 +143,35 @@ class Index extends Component
             ->flatMap(function ($jurnal) {
 
                 return $jurnal->akuntansi_jurnal_detail
+
                     ->filter(function ($detail) {
 
-                        return $detail->posisi === 'debit'
-                            && str_starts_with(
-                                (string) $detail
-                                    ->akuntansi_rekening
-                                    ->kode_rekening,
-                                '5'
-                            );
+                        return str_starts_with(
+                            (string) $detail
+                                ->akuntansi_rekening
+                                ->kode_rekening,
+                            '5'
+                        );
                     })
+
                     ->map(function ($detail) use ($jurnal) {
+
+                        // Beban:
+                        // DEBIT  = menambah beban (+)
+                        // KREDIT = mengurangi beban (-)
+                        $nominal = strtolower($detail->posisi) === 'debit'
+                            ? $detail->nominal
+                            : -$detail->nominal;
 
                         return [
                             'nama_rekening' =>
-                                $detail->akuntansi_rekening
-                                    ->nama_rekening,
+                                $detail->akuntansi_rekening->nama_rekening,
 
                             'tanggal_transaksi' =>
                                 $jurnal->tanggal_transaksi,
 
                             'nominal' =>
-                                $detail->nominal,
+                                $nominal,
                         ];
                     });
             })

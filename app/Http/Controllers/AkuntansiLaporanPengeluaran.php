@@ -52,19 +52,9 @@ class AkuntansiLaporanPengeluaran extends Controller
             // ==========================================
             // HANYA JURNAL BEBAN
             // ==========================================
-            ->whereHas(
-                'akuntansi_jurnal_detail',
-                function ($query) {
-                    $query
-                        ->where('posisi', 'debit')
-                        ->whereHas(
-                            'akuntansi_rekening',
-                            function ($query) {
-                                $query->where('kode_rekening', 'like', '5%');
-                            }
-                        );
-                }
-            )
+            ->whereHas('akuntansi_jurnal_detail.akuntansi_rekening', function ($query) {
+                $query->where('kode_rekening', 'like', '5%');
+            })
 
             ->get()
 
@@ -74,31 +64,33 @@ class AkuntansiLaporanPengeluaran extends Controller
             ->flatMap(function ($jurnal) {
 
                 return $jurnal->akuntansi_jurnal_detail
+
                     ->filter(function ($detail) {
 
-                        return $detail->posisi === 'debit'
-                            && str_starts_with(
-                                (string) $detail
-                                    ->akuntansi_rekening
-                                    ->kode_rekening,
-                                '5'
-                            );
+                        return str_starts_with(
+                            (string) $detail->akuntansi_rekening->kode_rekening,
+                            '5'
+                        );
+
                     })
+
                     ->map(function ($detail) use ($jurnal) {
 
+                        // Beban:
+                        // debit  = +
+                        // kredit = -
+                        $nominal = $detail->posisi === 'debit'
+                            ? (float) $detail->nominal
+                            : -(float) $detail->nominal;
+
                         return [
-                            'nama_rekening' =>
-                                $detail->akuntansi_rekening
-                                    ->nama_rekening,
-
-                            'tanggal_transaksi' =>
-                                $jurnal->tanggal_transaksi,
-
-                            'nominal' =>
-                                $detail->nominal,
+                            'nama_rekening' => $detail->akuntansi_rekening->nama_rekening,
+                            'tanggal_transaksi' => $jurnal->tanggal_transaksi,
+                            'nominal' => $nominal,
                         ];
                     });
             })
+
 
             // ==========================================
             // GROUP REKENING → BULAN
@@ -106,9 +98,8 @@ class AkuntansiLaporanPengeluaran extends Controller
             ->groupBy([
                 'nama_rekening',
                 function ($item) {
-                    return Carbon::parse(
-                        $item['tanggal_transaksi']
-                    )->format('Y-m');
+                    return Carbon::parse($item['tanggal_transaksi'])
+                    ->format('Y-m');
                 },
             ]);
 

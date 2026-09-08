@@ -14,90 +14,128 @@ class LaporanTagihanSiswa extends Controller
     {
         return view('LAPORAN.tagihan-siswa.v_index');
     }
+    
     public function generatePDF($msPenempatanSiswaId)
     {
-        // Ambil parameter dari query string
+        // ================================
+        // 1. Ambil parameter dari query string
+        // ================================
         $selectedJenjang = request()->query('selectedJenjang');
+
         $selectedJenisTagihan = request()->query('selectedJenisTagihan')
-            ? json_decode(request()->query('selectedJenisTagihan'), true) : [];
+            ? json_decode(request()->query('selectedJenisTagihan'), true)
+            : [];
 
         $selectedKategoriTagihan = request()->query('selectedKategoriTagihan')
-            ? json_decode(request()->query('selectedKategoriTagihan'), true) : [];
+            ? json_decode(request()->query('selectedKategoriTagihan'), true)
+            : [];
 
         $endDate = request()->query('endDate');
 
-        // Validasi endDate
         if (!empty($endDate) && Carbon::hasFormat($endDate, 'Y-m-d')) {
             $endDate = Carbon::createFromFormat('Y-m-d', $endDate)->endOfDay();
         } else {
-            $endDate = null;
+            $endDate = Carbon::now()->endOfMonth();
         }
 
+        // ================================
+        // 2. Ambil penempatan siswa
+        // ================================
         $penempatanSiswa = PenempatanSiswa::with([
             'ms_siswa',
             'ms_kelas',
-            'ms_tagihan_siswa' => function ($query) use ($selectedJenisTagihan, $selectedKategoriTagihan, $endDate) {
 
-                // Join ke tabel ms_jenis_tagihan_siswa
-                $query->join(
+            'ms_tagihan_siswa' => function ($q) use (
+                $selectedJenisTagihan,
+                $selectedKategoriTagihan,
+                $endDate
+            ) {
+                $q->with([
                     'ms_jenis_tagihan_siswa',
-                    'ms_jenis_tagihan_siswa.ms_jenis_tagihan_siswa_id',
-                    '=',
-                    'ms_tagihan_siswa.ms_jenis_tagihan_siswa_id'
-                );
-                // Filter jenis tagihan
-                if (!empty($selectedJenisTagihan)) {
-                    $query->whereIn('ms_jenis_tagihan_siswa_id', $selectedJenisTagihan);
-                }
+                ])
 
-                // Filter kategori tagihan
-                if (!empty($selectedKategoriTagihan)) {
-                    $query->whereHas('ms_jenis_tagihan_siswa', function ($q) use ($selectedKategoriTagihan) {
-                        $q->whereIn('ms_kategori_tagihan_siswa_id', $selectedKategoriTagihan);
-                    });
-                }
-
-                // Hanya pakai endDate
-                if (!empty($endDate)) {
-                    $query->whereDate('tanggal_jatuh_tempo', '<=', $endDate);
-                }
+                // Total pembayaran tanpa transaksi N+1
+                ->withSum([
+                    'dt_transaksi_tagihan_siswa as jumlah_sudah_dibayar' => function ($q) {
+                        $q->where(
+                            'dt_transaksi_tagihan_siswa.status_transaksi',
+                            '!=',
+                            'dibatalkan'
+                        );
+                    }
+                ], 'jumlah_bayar')
 
                 // Hanya tagihan belum lunas
-                $query->where('status', '!=', 'Lunas');
+                ->where('status', '!=', 'Lunas')
 
-                // Urutkan berdasarkan jatuh tempo
-                $query->orderBy('tanggal_jatuh_tempo', 'ASC');
+                // Jatuh tempo sampai tanggal laporan
+                ->whereHas('ms_jenis_tagihan_siswa', function ($q) use (
+                    $selectedKategoriTagihan,
+                    $endDate
+                ) {
+                    $q->where('tanggal_jatuh_tempo', '<=', $endDate);
+
+                    if (!empty($selectedKategoriTagihan)) {
+                        $q->whereIn(
+                            'ms_kategori_tagihan_siswa_id',
+                            $selectedKategoriTagihan
+                        );
+                    }
+                });
+
+                // Filter jenis tagihan
+                if (!empty($selectedJenisTagihan)) {
+                    $q->whereIn(
+                        'ms_jenis_tagihan_siswa_id', $selectedJenisTagihan
+                    );
+                }
             },
-            'ms_tagihan_siswa.ms_jenis_tagihan_siswa',
-            'ms_tagihan_siswa.dt_transaksi_tagihan_siswa'
         ])->find($msPenempatanSiswaId);
 
-        // Hitung total tagihan
-        $totalTagihan = $penempatanSiswa->ms_tagihan_siswa->sum(function ($tagihan) {
-            return $tagihan->jumlah_tagihan_siswa - $tagihan->jumlah_sudah_dibayar();
-        });
 
-        $surat = SuratTagihanSiswa::where('ms_jenjang_id', $selectedJenjang)->first();
-        // Pastikan transaksi ditemukan
+        // ================================
+        // 3. Validasi
+        // ================================
         if (!$penempatanSiswa) {
-            return response()->json(['error' => 'Penempatan Siswa tidak ditemukan'], 404);
-        }
-        if (!$surat) {
-            return response()->json(['error' => 'Template surat tidak ditemukan'], 404);
+            return response()->json([
+                'error' => 'Penempatan Siswa tidak ditemukan'
+            ], 404);
         }
 
+
+        // ================================
+        // 4. Ambil template surat
+        // ================================
+        $surat = SuratTagihanSiswa::where(
+            'ms_jenjang_id',
+            $selectedJenjang
+        )->first();
+
+        if (!$surat) {
+            return response()->json([
+                'error' => 'Template surat tidak ditemukan'
+            ], 404);
+        }
+
+       // ================================
+        // 5. Hitung total tagihan
+        // ================================
+        $totalTagihan = $penempatanSiswa->ms_tagihan_siswa->sum(
+            function ($tagihan) {
+                $dibayar = (float) ($tagihan->jumlah_sudah_dibayar ?? 0);
+
+                return max(
+                    0,
+                    (float) $tagihan->jumlah_tagihan_siswa - $dibayar
+                );
+            }
+        );
+
+        // ================================
+        // 6. Data siswa
+        // ================================
         $namaSiswa = $penempatanSiswa->ms_siswa->nama_siswa ?? 'N/A';
         $namaKelas = $penempatanSiswa->ms_kelas->nama_kelas ?? 'N/A';
-
-        // Lakukan proses pembuatan PDF (contoh respons)
-        // return response()->json([
-        //     'selectedJenjang' => $selectedJenjang,
-        //     'msPenempatanSiswaId' => $msPenempatanSiswaId,
-        //     'selectedJenisTagihan' => $selectedJenisTagihan,
-        //     'selectedKategoriTagihan' => $selectedKategoriTagihan,
-        //     'startDate' => $startDate,
-        //     'endDate' => $endDate,
-        // ]);
 
         // Inisialisasi TCPDF
         // $pdf = new TCPDF();
@@ -334,7 +372,7 @@ class LaporanTagihanSiswa extends Controller
         $totalTagihan = 0;
 
         foreach ($penempatanSiswa->ms_tagihan_siswa as $tagihan) {
-            $kekurangan = $tagihan->jumlah_tagihan_siswa - $tagihan->jumlah_sudah_dibayar();
+            $kekurangan = $tagihan->jumlah_tagihan_siswa - $tagihan->jumlah_sudah_dibayar;
 
             if ($kekurangan <= 0) {
                 continue; // Skip tagihan yang sudah lunas
@@ -350,7 +388,7 @@ class LaporanTagihanSiswa extends Controller
             $htmlTagihan .= "<tr>
                         <td>{$namaTagihan}</td>
                         <td>Rp" . number_format($tagihan->jumlah_tagihan_siswa, 0, ',', '.') . "</td>
-                        <td>Rp" . number_format($tagihan->jumlah_sudah_dibayar(), 0, ',', '.') . "</td>
+                        <td>Rp" . number_format($tagihan->jumlah_sudah_dibayar, 0, ',', '.') . "</td>
                         <td>Rp" . number_format($kekurangan, 0, ',', '.') . "</td>
                      </tr>";
             $totalTagihan += $kekurangan;
@@ -399,16 +437,29 @@ class LaporanTagihanSiswa extends Controller
 
     public function generatePDFByClass($ms_kelas_id)
     {
+        // ================================
+        // 1. Ambil parameter dari query string
+        // ================================
         $selectedJenjang = request()->query('selectedJenjang');
-        $selectedJenisTagihan = json_decode(request()->query('selectedJenisTagihan', '[]'), true);
-        $selectedKategoriTagihan = json_decode(request()->query('selectedKategoriTagihan', '[]'), true);
 
-        $endDate = request()->query('endDate')
-            ? Carbon::parse(request()->query('endDate'))->endOfDay()
-            : Carbon::now()->endOfMonth();
+        $selectedJenisTagihan = request()->query('selectedJenisTagihan')
+            ? json_decode(request()->query('selectedJenisTagihan'), true)
+            : [];
+
+        $selectedKategoriTagihan = request()->query('selectedKategoriTagihan')
+            ? json_decode(request()->query('selectedKategoriTagihan'), true)
+            : [];
+
+        $endDate = request()->query('endDate');
+
+        if (!empty($endDate) && Carbon::hasFormat($endDate, 'Y-m-d')) {
+            $endDate = Carbon::createFromFormat('Y-m-d', $endDate)->endOfDay();
+        } else {
+            $endDate = Carbon::now()->endOfMonth();
+        }
 
         // ==========================================================
-        // 1) Ambil seluruh siswa dalam kelas
+        // 2) Ambil seluruh siswa dalam kelas
         // ==========================================================
         $penempatanSiswaList = PenempatanSiswa::with([
             'ms_siswa',
@@ -439,47 +490,80 @@ class LaporanTagihanSiswa extends Controller
             $penempatanSiswa = PenempatanSiswa::with([
                 'ms_siswa',
                 'ms_kelas',
-                'ms_tagihan_siswa' => function ($query) use ($selectedJenisTagihan, $selectedKategoriTagihan, $endDate) {
 
-                    // Join ke tabel ms_jenis_tagihan_siswa
-                    $query->join(
+                'ms_tagihan_siswa' => function ($q) use (
+                    $selectedJenisTagihan,
+                    $selectedKategoriTagihan,
+                    $endDate
+                ) {
+                    $q->with([
                         'ms_jenis_tagihan_siswa',
-                        'ms_jenis_tagihan_siswa.ms_jenis_tagihan_siswa_id',
-                        '=',
-                        'ms_tagihan_siswa.ms_jenis_tagihan_siswa_id'
+                    ])
+
+                    // Total pembayaran, tidak termasuk transaksi dibatalkan
+                    ->withSum([
+                        'dt_transaksi_tagihan_siswa as jumlah_sudah_dibayar' => function ($q) {
+                            $q->where(
+                                'dt_transaksi_tagihan_siswa.status_transaksi',
+                                '!=',
+                                'dibatalkan'
+                            );
+                        }
+                    ], 'jumlah_bayar')
+
+                    // Hanya tagihan yang belum lunas
+                    ->where('status', '!=', 'Lunas')
+
+                    // Filter jatuh tempo dan kategori
+                    ->whereHas('ms_jenis_tagihan_siswa', function ($q) use (
+                        $selectedKategoriTagihan,
+                        $endDate
+                    ) {
+                        $q->where('tanggal_jatuh_tempo', '<=', $endDate);
+
+                        if (!empty($selectedKategoriTagihan)) {
+                            $q->whereIn(
+                                'ms_kategori_tagihan_siswa_id',
+                                $selectedKategoriTagihan
+                            );
+                        }
+                    });
+
+                    // Filter jenis tagihan
+                    if (!empty($selectedJenisTagihan)) {
+                        $q->whereIn(
+                            'ms_jenis_tagihan_siswa_id', $selectedJenisTagihan
+                        );
+                    }
+                },
+            ])->find($msPenempatanSiswaId);
+
+
+            // Jika penempatan tidak ditemukan
+            if (!$penempatanSiswa) {
+                continue;
+            }
+
+
+            // Hitung total kekurangan
+            $totalTagihan = $penempatanSiswa->ms_tagihan_siswa->sum(
+                function ($tagihan) {
+
+                    $dibayar = (float) (
+                        $tagihan->jumlah_sudah_dibayar ?? 0
                     );
 
-                    if (!empty($selectedJenisTagihan)) {
-                        $query->whereIn('ms_jenis_tagihan_siswa_id', $selectedJenisTagihan);
-                    }
+                    return max(
+                        0,
+                        (float) $tagihan->jumlah_tagihan_siswa - $dibayar
+                    );
+                }
+            );
 
-                    if (!empty($selectedKategoriTagihan)) {
-                        $query->whereHas('ms_jenis_tagihan_siswa', function ($q) use ($selectedKategoriTagihan) {
-                            $q->whereIn('ms_kategori_tagihan_siswa_id', $selectedKategoriTagihan);
-                        });
-                    }
 
-                    // Hanya pakai endDate
-                    if (!empty($endDate)) {
-                        $query->whereDate('tanggal_jatuh_tempo', '<=', $endDate);
-                    }
-
-                    $query->where('status', '!=', 'Lunas');
-
-                    // Urutkan berdasarkan jatuh tempo
-                    $query->orderBy('tanggal_jatuh_tempo', 'ASC');
-                },
-                'ms_tagihan_siswa.ms_jenis_tagihan_siswa',
-                'ms_tagihan_siswa.dt_transaksi_tagihan_siswa'
-            ])->find($msPenempatanSiswaId);
-            // Hitung total tagihan
-            $totalTagihan = $penempatanSiswa->ms_tagihan_siswa->sum(function ($tagihan) {
-                return $tagihan->jumlah_tagihan_siswa - $tagihan->jumlah_sudah_dibayar();
-            });
-
-            // Jika total tagihan 0, skip cetak siswa ini
+            // Jika tidak ada tunggakan, jangan cetak surat
             if ($totalTagihan <= 0) {
-                continue; // langsung ke siswa berikutnya
+                continue;
             }
 
             $surat = SuratTagihanSiswa::where('ms_jenjang_id', $selectedJenjang)->first();
@@ -736,7 +820,7 @@ class LaporanTagihanSiswa extends Controller
             $totalTagihan = 0;
 
             foreach ($penempatanSiswa->ms_tagihan_siswa as $tagihan) {
-                $kekurangan = $tagihan->jumlah_tagihan_siswa - $tagihan->jumlah_sudah_dibayar();
+                $kekurangan = $tagihan->jumlah_tagihan_siswa - $tagihan->jumlah_sudah_dibayar;
 
                 if ($kekurangan <= 0) {
                     continue; // Skip tagihan yang sudah lunas
@@ -752,7 +836,7 @@ class LaporanTagihanSiswa extends Controller
                 $htmlTagihan .= "<tr>
                         <td>{$namaTagihan}</td>
                         <td>Rp" . number_format($tagihan->jumlah_tagihan_siswa, 0, ',', '.') . "</td>
-                        <td>Rp" . number_format($tagihan->jumlah_sudah_dibayar(), 0, ',', '.') . "</td>
+                        <td>Rp" . number_format($tagihan->jumlah_sudah_dibayar, 0, ',', '.') . "</td>
                         <td>Rp" . number_format($kekurangan, 0, ',', '.') . "</td>
                      </tr>";
                 $totalTagihan += $kekurangan;

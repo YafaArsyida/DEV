@@ -115,7 +115,6 @@ class Index extends Component
                 );
             }
         )
-        // ->where('status', 'active')
         ->when(
             $this->startDate && $this->endDate,
             function ($query) {

@@ -140,6 +140,11 @@ class Index extends Component
             'ms_tagihan_siswa.ms_jenis_tagihan_siswa.ms_kategori_tagihan_siswa', // Relasi kategori tagihan
         ])
             ->join('ms_transaksi_tagihan_siswa', 'dt_transaksi_tagihan_siswa.ms_transaksi_tagihan_siswa_id', '=', 'ms_transaksi_tagihan_siswa.ms_transaksi_tagihan_siswa_id')
+            ->where(
+                'dt_transaksi_tagihan_siswa.status_transaksi',
+                '!=',
+                'dibatalkan'
+            )
             ->whereHas('ms_transaksi_tagihan_siswa.ms_penempatan_siswa', function ($q) {
                 $q->where('ms_tahun_ajar_id', $this->selectedTahunAjar)
                     ->where('ms_jenjang_id', $this->selectedJenjang);
