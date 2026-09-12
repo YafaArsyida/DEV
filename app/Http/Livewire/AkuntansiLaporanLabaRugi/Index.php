@@ -103,19 +103,12 @@ class Index extends Component
             ->when(
                 $this->startDate && $this->endDate,
                 function ($query) {
-                    $startDate = Carbon::createFromFormat(
-                        'Y-m-d',
-                        $this->startDate
-                    )->startOfDay();
+                    $startDate = Carbon::createFromFormat('Y-m-d', $this->startDate)->startOfDay();
 
-                    $endDate = Carbon::createFromFormat(
-                        'Y-m-d',
-                        $this->endDate
-                    )->endOfDay();
+                    $endDate = Carbon::createFromFormat('Y-m-d', $this->endDate)->endOfDay();
 
                     $query->whereBetween(
-                        'tanggal_transaksi',
-                        [$startDate, $endDate]
+                        'tanggal_transaksi', [$startDate, $endDate]
                     );
                 }
             )
@@ -145,7 +138,7 @@ class Index extends Component
                     $detail->nominal_laporan =
                         $detail->posisi === 'kredit'
                             ? $detail->nominal
-                            : -$detail->nominal;
+                            : - $detail->nominal;
 
                     $pendapatanDetails->push($detail);
                 }
@@ -160,7 +153,7 @@ class Index extends Component
                     $detail->nominal_laporan =
                         $detail->posisi === 'debit'
                             ? $detail->nominal
-                            : -$detail->nominal;
+                            : - $detail->nominal;
 
                     $bebanDetails->push($detail);
                 }
@@ -173,26 +166,19 @@ class Index extends Component
         // ==========================================
         $pendapatanPerBulan = $pendapatanDetails
             ->groupBy([
-                fn ($item) =>
-                    $item->akuntansi_rekening->nama_rekening,
+                fn ($item) => $item->akuntansi_rekening->nama_rekening,
 
-                fn ($item) =>
-                    Carbon::parse($item->tanggal_transaksi)
-                        ->format('Y-m'),
+                fn ($item) => Carbon::parse($item->tanggal_transaksi)
+                    ->format('Y-m'),
             ]);
 
 
         // ==========================================
         // GROUP BEBAN PER REKENING & BULAN
         // ==========================================
-        $bebanPerBulan = $bebanDetails
-            ->groupBy([
-                fn ($item) =>
-                    $item->akuntansi_rekening->nama_rekening,
-
-                fn ($item) =>
-                    Carbon::parse($item->tanggal_transaksi)
-                        ->format('Y-m'),
+        $bebanPerBulan = $bebanDetails->groupBy([
+                fn ($item) => $item->akuntansi_rekening->nama_rekening,
+                fn ($item) => Carbon::parse($item->tanggal_transaksi)->format('Y-m'),
             ]);
 
 
@@ -248,7 +234,6 @@ class Index extends Component
 
             $totalPendapatanRekening[$namaRekening] =
                 $dataPerBulan->sum(function ($details) {
-                    // return $details->sum('nominal');
                     return $details->sum('nominal_laporan');
                 });
         }
@@ -263,7 +248,6 @@ class Index extends Component
 
             $totalBebanRekening[$namaRekening] =
                 $dataPerBulan->sum(function ($details) {
-                    // return $details->sum('nominal');
                     return $details->sum('nominal_laporan');
                 });
         }

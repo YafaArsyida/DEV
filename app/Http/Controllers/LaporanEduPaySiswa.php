@@ -108,14 +108,14 @@ class LaporanEduPaySiswa extends Controller
         $no = 1;
         foreach ($laporan as $item) {
             $html .= '<tr>
-                <td align="center">' . $no++ . '.</td>
-                <td>' . HelperController::formatTanggalIndonesia($item->tanggal) . '</td>
-                <td>' . ucfirst($item->ms_siswa->nama_siswa) . '</td>
-                <td>' . ($item->ms_penempatan_siswa->ms_kelas->nama_kelas ?? '-') . '</td>
-                <td>' . ucfirst($item->jenis_transaksi) . '</td>
-                <td>' . ($item->ms_pengguna->nama ?? '-') . '</td>
-                <td align="right">' . (in_array($item->jenis_transaksi, $pemasukanJenis) ? 'Rp' . number_format($item->nominal, 0, ',', '.') : '-') . '</td>
-                <td align="right">' . (in_array($item->jenis_transaksi, $pengeluaranJenis) ? 'Rp' . number_format($item->nominal, 0, ',', '.') : '-') . '</td>
+                <td  width="4%" align="center">' . $no++ . '.</td>
+                <td  width="14%">' . HelperController::formatTanggalIndonesia($item->tanggal) . '</td>
+                <td  width="20%">' . ucfirst($item->ms_siswa->nama_siswa) . '</td>
+                <td  width="12%">' . ($item->ms_penempatan_siswa->ms_kelas->nama_kelas ?? '-') . '</td>
+                <td  width="10%">' . ucfirst($item->jenis_transaksi) . '</td>
+                <td  width="10%">' . ($item->ms_pengguna->nama ?? '-') . '</td>
+                <td  width="15%" align="right">' . (in_array($item->jenis_transaksi, $pemasukanJenis) ? 'Rp' . number_format($item->nominal, 0, ',', '.') : '-') . '</td>
+                <td  width="15%" align="right">' . (in_array($item->jenis_transaksi, $pengeluaranJenis) ? 'Rp' . number_format($item->nominal, 0, ',', '.') : '-') . '</td>
             </tr>';
         }
         $html .= '

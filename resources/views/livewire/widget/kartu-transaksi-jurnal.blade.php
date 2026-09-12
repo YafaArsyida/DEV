@@ -1,28 +1,57 @@
- <div class="col-xl-4">
-    <div class="card card-height-100">
-        <div class="card-header align-items-center border-0 d-flex">
-            <h4 class="card-title mb-0 flex-grow-1">Transaksi Jurnal</h4>
-            <div class="flex-shrink-0">
-                <ul class="nav justify-content-end nav-tabs-custom rounded card-header-tabs border-bottom-0" role="tablist">
-                    <li class="nav-item">
-                        <a class="nav-link active" data-bs-toggle="tab" href="#tab-transaksi-pendapatan" role="tab" aria-selected="false">Pendapatan</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" href="#tab-transaksi-pengeluaran" role="tab" aria-selected="true">Pengeluaran</a>
-                    </li>
-                </ul><!-- end ul -->
-            </div>
-        </div><!-- end cardheader -->
-        <div class="card-body p-0">
-            <div class="tab-content p-0">
-                <div class="tab-pane active" id="tab-transaksi-pendapatan" role="tabpanel">
-                    @livewire('widget.kartu-transaksi-pendapatan-lainnya')   
-                </div><!-- end tabpane -->
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    {{-- HEADER --}}
+    <div class="card-header">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+            {{-- TITLE --}}
+            <div>
+                <div class="d-flex align-items-center gap-3">
 
-                <div class="tab-pane" id="tab-transaksi-pengeluaran" role="tabpanel">
-                    @livewire('widget.kartu-transaksi-pengeluaran')   
-                </div><!-- end tab pane -->
-            </div><!-- end tab pane -->
-        </div><!-- end card body -->
-    </div><!-- end card -->
-</div><!-- end col -->
+                    <div class="avatar-sm">
+                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                            <i class="ri-booklet-line"></i>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h5 class="fw-bold mb-1">
+                            Transaksi Jurnal
+                        </h5>
+                    </div>
+                </div>
+            </div>
+
+            {{-- TABS --}}
+            <div class="flex-shrink-0">
+
+                <ul class="nav nav-tabs-custom rounded card-header-tabs border-bottom-0" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#tab-transaksi-pendapatan" role="tab" aria-selected="true">
+                            Pendapatan
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#tab-transaksi-pengeluaran" role="tab" aria-selected="false">
+                            Pengeluaran
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    {{-- BODY --}}
+    <div class="card-body p-0">
+        <div class="tab-content p-0">
+            {{-- PENDAPATAN --}}
+            <div class="tab-pane active" id="tab-transaksi-pendapatan" role="tabpanel">
+                @livewire('widget.kartu-transaksi-pendapatan-lainnya')
+            </div>
+
+            {{-- PENGELUARAN --}}
+            <div class="tab-pane" id="tab-transaksi-pengeluaran" role="tabpanel">
+                @livewire('widget.kartu-transaksi-pengeluaran')
+            </div>
+        </div>
+    </div>
+</div>

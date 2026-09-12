@@ -50,20 +50,39 @@ class AkuntansiLaporanLabaRugi extends Controller
         $bebanDetails = collect();
 
         foreach ($jurnals as $jurnal) {
+
             foreach ($jurnal->akuntansi_jurnal_detail as $detail) {
+
+                // Simpan tanggal jurnal ke detail
                 $detail->tanggal_transaksi = $jurnal->tanggal_transaksi;
 
-                if (
-                    $detail->posisi === 'kredit' &&
-                    str_starts_with((string) $detail->kode_rekening, '4')
-                ) {
+                // ==========================================
+                // PENDAPATAN (4xxx)
+                // ==========================================
+                if (str_starts_with($detail->kode_rekening, '4')) {
+
+                    // Kredit = pendapatan bertambah
+                    // Debit  = pendapatan berkurang / reversal
+                    $detail->nominal_laporan =
+                        $detail->posisi === 'kredit'
+                            ? $detail->nominal
+                            : - $detail->nominal;
+
                     $pendapatanDetails->push($detail);
                 }
 
-                if (
-                    $detail->posisi === 'debit' &&
-                    str_starts_with((string) $detail->kode_rekening, '5')
-                ) {
+                // ==========================================
+                // BEBAN (5xxx)
+                // ==========================================
+                if (str_starts_with($detail->kode_rekening, '5')) {
+
+                    // Debit  = beban bertambah
+                    // Kredit = beban berkurang / reversal
+                    $detail->nominal_laporan =
+                        $detail->posisi === 'debit'
+                            ? $detail->nominal
+                            : - $detail->nominal;
+
                     $bebanDetails->push($detail);
                 }
             }
@@ -71,13 +90,22 @@ class AkuntansiLaporanLabaRugi extends Controller
 
         $pendapatanPerBulan = $pendapatanDetails->groupBy([
             fn($item) => $item->akuntansi_rekening->nama_rekening,
-            fn($item) => Carbon::parse($item->tanggal_transaksi)->format('Y-m'),
+            
+            fn($item) => Carbon::parse($item->tanggal_transaksi)
+                ->format('Y-m'),
         ]);
 
         $bebanPerBulan = $bebanDetails->groupBy([
             fn($item) => $item->akuntansi_rekening->nama_rekening,
             fn($item) => Carbon::parse($item->tanggal_transaksi)->format('Y-m'),
         ]);
+
+        $bulanHeaders = $pendapatanPerBulan
+            ->keys()
+            ->merge($bebanPerBulan->keys())
+            ->unique()
+            ->sort()
+            ->values();
 
         $bulanHeaders = $pendapatanPerBulan
             ->merge($bebanPerBulan)
@@ -88,29 +116,103 @@ class AkuntansiLaporanLabaRugi extends Controller
             ->sort()
             ->values();
 
+
+        // ==========================================
+        // FORMAT BULAN INDONESIA
+        // ==========================================
         $bulanIndo = $bulanHeaders->mapWithKeys(function ($bulan) {
+
             return [
-                $bulan => HelperController::formatTanggalIndonesia($bulan . '-01', 'F Y'),
+                $bulan => HelperController::formatTanggalIndonesia(
+                    $bulan . '-01',
+                    'F Y'
+                ),
             ];
         });
 
+        // ==========================================
+        // TOTAL PENDAPATAN PER REKENING
+        // ==========================================
+        $totalPendapatanRekening = [];
+
+        foreach ($pendapatanPerBulan as $namaRekening => $dataPerBulan) {
+
+            $totalPendapatanRekening[$namaRekening] =
+                $dataPerBulan->sum(function ($details) {
+                    return $details->sum('nominal_laporan');
+                });
+        }
+
+        // ==========================================
+        // TOTAL BEBAN PER REKENING
+        // ==========================================
+        $totalBebanRekening = [];
+
+        foreach ($bebanPerBulan as $namaRekening => $dataPerBulan) {
+
+            $totalBebanRekening[$namaRekening] =
+                $dataPerBulan->sum(function ($details) {
+                    return $details->sum('nominal_laporan');
+                });
+        }
+
+
+        // ==========================================
+        // TOTAL PENDAPATAN PER BULAN
+        // ==========================================
         $totalPendapatanPerBulan = [];
+
         foreach ($bulanHeaders as $bulan) {
-            $totalPendapatanPerBulan[$bulan] = $pendapatanPerBulan->sum(function ($dataPerBulan) use ($bulan) {
-                return optional($dataPerBulan[$bulan] ?? null)->sum('nominal');
-            });
+
+            $totalPendapatanPerBulan[$bulan] =
+                $pendapatanPerBulan->sum(function ($dataPerBulan) use ($bulan) {
+
+                    return optional(
+                        $dataPerBulan[$bulan] ?? null
+                    )->sum('nominal_laporan');
+                });
         }
 
+
+        // ==========================================
+        // TOTAL BEBAN PER BULAN
+        // ==========================================
         $totalBebanPerBulan = [];
+
         foreach ($bulanHeaders as $bulan) {
-            $totalBebanPerBulan[$bulan] = $bebanPerBulan->sum(function ($dataPerBulan) use ($bulan) {
-                return optional($dataPerBulan[$bulan] ?? null)->sum('nominal');
-            });
+
+            $totalBebanPerBulan[$bulan] =
+                $bebanPerBulan->sum(function ($dataPerBulan) use ($bulan) {
+
+                    return optional(
+                        $dataPerBulan[$bulan] ?? null
+                    )->sum('nominal_laporan');
+                });
         }
 
+        // ==========================================
+        // LABA / RUGI PER BULAN
+        // ==========================================
+        $labaRugiPerBulan = [];
+
+        foreach ($bulanHeaders as $bulan) {
+
+            $pendapatan = $totalPendapatanPerBulan[$bulan] ?? 0;
+
+            $beban = $totalBebanPerBulan[$bulan] ?? 0;
+
+            $labaRugiPerBulan[$bulan] = $pendapatan - $beban;
+        }
+
+
+        // ==========================================
+        // GRAND TOTAL
+        // ==========================================
         $totalPendapatan = array_sum($totalPendapatanPerBulan);
+
         $totalBeban = array_sum($totalBebanPerBulan);
-        $totalLabaRugi = $totalPendapatan - $totalBeban;
+
+        $totalLabaRugi =  array_sum($labaRugiPerBulan);
 
         $judul = 'Laporan Laba Rugi';
         $yayasan = 'Yayasan Drul Khukama Unit ' . ($jenjang->nama_jenjang ?? '-');
@@ -149,7 +251,7 @@ class AkuntansiLaporanLabaRugi extends Controller
             $html .= '<tr><td>' . htmlspecialchars($nama) . '</td>';
 
             foreach ($bulanIndo as $key => $_) {
-                $sum = optional($perBulan[$key] ?? null)->sum('nominal');
+                $sum = optional($perBulan[$key] ?? null)->sum('nominal_laporan');
                 $total += $sum;
                 $html .= '<td>Rp' . number_format($sum, 0, ',', '.') . '</td>';
             }
@@ -160,7 +262,7 @@ class AkuntansiLaporanLabaRugi extends Controller
         $html .= '<tr style="background-color:#d1d1d1;"><td><strong>Total Pendapatan</strong></td>';
         foreach ($bulanIndo as $key => $_) {
             $bulanSum = $pendapatanPerBulan->reduce(function ($carry, $dataPerBulan) use ($key) {
-                return $carry + optional($dataPerBulan[$key] ?? null)->sum('nominal');
+                return $carry + optional($dataPerBulan[$key] ?? null)->sum('nominal_laporan');
             }, 0);
             $html .= '<td><strong>Rp' . number_format($bulanSum, 0, ',', '.') . '</strong></td>';
         }
@@ -172,7 +274,7 @@ class AkuntansiLaporanLabaRugi extends Controller
             $html .= '<tr><td>' . htmlspecialchars($nama) . '</td>';
 
             foreach ($bulanIndo as $key => $_) {
-                $sum = optional($perBulan[$key] ?? null)->sum('nominal');
+                $sum = optional($perBulan[$key] ?? null)->sum('nominal_laporan');
                 $total += $sum;
                 $html .= '<td>Rp' . number_format($sum, 0, ',', '.') . '</td>';
             }
@@ -183,7 +285,7 @@ class AkuntansiLaporanLabaRugi extends Controller
         $html .= '<tr style="background-color:#d1d1d1;"><td><strong>Total Beban</strong></td>';
         foreach ($bulanIndo as $key => $_) {
             $bulanSum = $bebanPerBulan->reduce(function ($carry, $dataPerBulan) use ($key) {
-                return $carry + optional($dataPerBulan[$key] ?? null)->sum('nominal');
+                return $carry + optional($dataPerBulan[$key] ?? null)->sum('nominal_laporan');
             }, 0);
             $html .= '<td><strong>Rp' . number_format($bulanSum, 0, ',', '.') . '</strong></td>';
         }

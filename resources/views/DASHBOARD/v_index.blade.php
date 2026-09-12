@@ -46,17 +46,24 @@
             </div> <!-- end col-->
             <div class="col-xxl-7">
                 <div class="row h-100">
-                    @livewire('widget.overview-tagihan-siswa')   
-                    @livewire('widget.progres-tagihan-siswa')   
+                    <div class="col-xl-8">
+                        @livewire('widget.overview-tagihan-siswa')   
+                    </div>
+                    <div class="col-xl-4">
+                        @livewire('widget.progres-tagihan-siswa')   
+                    </div>
                 </div> <!-- end row-->
             </div><!-- end col -->
         </div>
          <div class="row">
-            @livewire('widget.kartu-transaksi-jurnal')   
-            @livewire('widget.kartu-jurnal-detail')   
+            <div class="col-xl-4">
+                @livewire('widget.kartu-transaksi-jurnal')   
+            </div>
+            <div class="col-xl-8">
+                @livewire('widget.kartu-jurnal-detail')   
+            </div>
         </div><!-- end row -->
     </div>
 </div>
-
 @endsection
 

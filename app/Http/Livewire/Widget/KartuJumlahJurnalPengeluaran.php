@@ -85,19 +85,36 @@ class KartuJumlahJurnalPengeluaran extends Component
             return;
         }
 
-        $this->totalPengeluaran = AkuntansiJurnalDetail::where('posisi', 'debit')
+        $startDate = Carbon::parse($this->startDate)->startOfDay();
+        $endDate = Carbon::parse($this->endDate)->endOfDay();
+
+        $this->totalPengeluaran = AkuntansiJurnalDetail::query()
             ->whereHas('akuntansi_rekening', function ($query) {
                 $query->where('kode_rekening', 'like', '5%');
             })
-            ->whereHas('akuntansi_jurnal', function ($query) {
+            ->whereHas('akuntansi_jurnal', function ($query) use ($startDate, $endDate) {
                 $query->where('ms_jenjang_id', $this->selectedJenjang)
                     ->where('ms_departemen_id', 'SEKOLAH')
                     ->whereBetween('tanggal_transaksi', [
-                        $this->startDate,
-                        $this->endDate
+                        $startDate,
+                        $endDate
                     ]);
             })
-            ->sum('nominal');
+            ->selectRaw("
+                COALESCE(
+                    SUM(
+                        CASE
+                            WHEN posisi = 'debit' THEN nominal
+                            WHEN posisi = 'kredit' THEN -nominal
+                            ELSE 0
+                        END
+                    ),
+                    0
+                ) AS total
+            ")
+            ->value('total');
+
+        $this->totalPengeluaran = (float) $this->totalPengeluaran;
     }
 
     public function render()

@@ -137,7 +137,6 @@
                                 </tr>
 
                                 @foreach ($pendapatanPerBulan as $namaRekening => $dataPerBulan)
-
                                     <tr>
                                         <td class="text-start ps-4">
                                             {{ $namaRekening }}

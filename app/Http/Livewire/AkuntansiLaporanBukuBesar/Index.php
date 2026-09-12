@@ -77,6 +77,26 @@ class Index extends Component
         $this->resetPage();
     }
 
+    public function cetakLaporan()
+    {
+        if (!$this->selectedJenjang) {
+            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Jenjang dan Tahun Ajar wajib dipilih']);
+            return;
+        }
+
+        $this->dispatchBrowserEvent('alertify-success', ['message' => 'Laporan diproses.']);
+
+        $url = route('akuntansi.laporan-buku-besar.pdf', [
+            'jenjang' => $this->selectedJenjang,
+            'rekening' => $this->selectedRekening,
+            'start_date' => $this->startDate,
+            'end_date' => $this->endDate,
+            'search' => $this->search
+        ]);
+
+        $this->emit('openNewTab', $url);
+    }
+
     public function render()
     {
         $jenisAkunRekening = AkuntansiRekening::orderBy('kode_rekening')->get();

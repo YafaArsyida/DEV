@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\TransaksiTagihanSiswa;
 
 use App\Models\AkuntansiJurnal;
+use App\Models\TransaksiEduPay;
 use App\Models\TransaksiTagihanSiswa;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -103,13 +104,20 @@ class Edit extends Component
 
         // Update header jurnal
         if ($this->transaksi->akuntansi_jurnal_id && $tanggalJurnal) {
-
             AkuntansiJurnal::where(
-                'akuntansi_jurnal_id',
-                $this->transaksi->akuntansi_jurnal_id
+                'akuntansi_jurnal_id', $this->transaksi->akuntansi_jurnal_id
             )->update([
                 'tanggal_transaksi' => $tanggalJurnal,
             ]);
+
+            // Khusus transaksi dengan metode pembayaran EduPay
+            if ($this->transaksi->metode_pembayaran === 'EduPay') {
+                TransaksiEduPay::where(
+                    'akuntansi_jurnal_id', $this->transaksi->akuntansi_jurnal_id
+                )->update([
+                    'tanggal' => $tanggalJurnal,
+                ]);
+            }
         }
     }
 

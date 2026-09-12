@@ -48,6 +48,7 @@ class KartuTransaksiPendapatanLainnya extends Component
     {
         $this->totalPendapatanLainnya = TransaksiPendapatanLainnya::query()
             ->where('ms_jenjang_id', $this->selectedJenjang)
+            ->where('status_transaksi', '!=', 'dibatalkan')
             ->sum('nominal');
     }
 
@@ -100,13 +101,9 @@ class KartuTransaksiPendapatanLainnya extends Component
             // =====================================================
             $jurnal = AccountingService::create([
                 'tanggal' => now(),
-
                 'deskripsi' => $deskripsi,
-
                 'ms_pengguna_id' => auth()->user()->ms_pengguna_id,
-
                 'ms_tahun_ajaran_id' => NULL,
-
                 'ms_jenjang_id' => $this->selectedJenjang,
 
                 'ms_departemen_id' => 'SEKOLAH',

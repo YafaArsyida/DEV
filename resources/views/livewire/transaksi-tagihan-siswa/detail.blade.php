@@ -145,7 +145,7 @@
 
                                     <td>
                                         {{ \App\Http\Controllers\HelperController::formatTanggalIndonesia(
-                                            $transaksi->tanggal,
+                                            $transaksi->tanggal_transaksi,
                                             'd F Y H:i:s'
                                         ) }}
                                     </td>

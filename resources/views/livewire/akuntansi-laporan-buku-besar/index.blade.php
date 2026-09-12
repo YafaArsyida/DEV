@@ -79,6 +79,14 @@
                                 <i class="ri-file-excel-2-line me-1"></i>
                                 Excel
                             </button>
+                            {{-- CETAK --}}
+                            @if ($selectedJenjang)
+                                <button type="button" wire:click="cetakLaporan"
+                                    class="btn btn-danger rounded-pill px-4 d-inline-flex align-items-center gap-1">
+                                    <i class="ri-printer-line"></i>
+                                    <span>Cetak</span>
+                                </button>
+                            @endif
                         </div>
                     </div>
                 </div>

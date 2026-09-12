@@ -43,26 +43,45 @@ class KartuJumlahTagihanSiswa extends Component
 
     public function hitungJumlah()
     {
-        if ($this->selectedJenjang && $this->selectedTahunAjar) {
-            $tagihan = TagihanSiswa::with('dt_transaksi_tagihan_siswa', 'ms_penempatan_siswa')
-                ->whereHas('ms_penempatan_siswa', function ($query) {
-                    $query->where('ms_jenjang_id', $this->selectedJenjang)
-                        ->where('ms_tahun_ajar_id', $this->selectedTahunAjar);
-                })->get();
-
-            switch ($this->jenisRekapitulasi) {
-                case 'dibayar':
-                    $this->totalTagihan = $tagihan->sum(fn($item) => $item->jumlah_sudah_dibayar());
-                    break;
-                case 'kekurangan':
-                    $this->totalTagihan = $tagihan->sum(fn($item) => $item->jumlah_kekurangan());
-                    break;
-                default:
-                    $this->totalTagihan = $tagihan->sum('jumlah_tagihan_siswa');
-                    break;
-            }
-        } else {
+        if (!$this->selectedJenjang || !$this->selectedTahunAjar) {
             $this->totalTagihan = 0;
+            return;
+        }
+
+        $tagihan = TagihanSiswa::query()
+            ->withSum([
+                'dt_transaksi_tagihan_siswa as jumlah_sudah_dibayar' => function ($query) {
+                    $query->where(
+                        'dt_transaksi_tagihan_siswa.status_transaksi',
+                        '!=',
+                        'dibatalkan'
+                    );
+                }
+            ], 'jumlah_bayar')
+            ->whereHas('ms_penempatan_siswa', function ($query) {
+                $query->where('ms_jenjang_id', $this->selectedJenjang)
+                    ->where('ms_tahun_ajar_id', $this->selectedTahunAjar);
+            })
+            ->get();
+
+        switch ($this->jenisRekapitulasi) {
+            case 'dibayar':
+                $this->totalTagihan = $tagihan->sum(
+                    fn ($item) => $item->jumlah_sudah_dibayar ?? 0
+                );
+                break;
+
+            case 'kekurangan':
+                $this->totalTagihan = $tagihan->sum(
+                    fn ($item) =>
+                        $item->jumlah_tagihan_siswa
+                        - ($item->jumlah_sudah_dibayar ?? 0)
+                );
+                break;
+
+            default:
+                $this->totalTagihan = $tagihan->sum('jumlah_tagihan_siswa');
+                break;
         }
     }
 

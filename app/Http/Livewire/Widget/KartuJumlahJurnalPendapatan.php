@@ -84,8 +84,8 @@ class KartuJumlahJurnalPendapatan extends Component
             $this->totalPendapatan = 0;
             return;
         }
-        
-        $this->totalPendapatan = AkuntansiJurnalDetail::where('posisi', 'kredit')
+
+        $this->totalPendapatan = AkuntansiJurnalDetail::query()
             ->whereHas('akuntansi_rekening', function ($query) {
                 $query->where('kode_rekening', 'like', '4%');
             })
@@ -97,7 +97,19 @@ class KartuJumlahJurnalPendapatan extends Component
                         $this->endDate
                     ]);
             })
-            ->sum('nominal');
+            ->selectRaw("
+                COALESCE(
+                    SUM(
+                        CASE
+                            WHEN posisi = 'kredit' THEN nominal
+                            WHEN posisi = 'debit' THEN -nominal
+                            ELSE 0
+                        END
+                    ),
+                    0
+                ) as total
+            ")
+            ->value('total');
     }
 
     public function render()
