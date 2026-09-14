@@ -25,7 +25,7 @@
                     </div>
 
                     {{-- Dropdown Petugas (hanya non-kantin) --}}
-                    @if(auth()->user()->peran !== 'kantin')
+                    {{-- @if(auth()->user()->peran !== 'kantin')
                     <div class="mb-2">
                         <select class="form-select form-select-sm" wire:model="selectedPetugas">
                             <option value="">Semua Petugas Kantin</option>
@@ -36,9 +36,9 @@
                             @endforeach
                         </select>
                     </div>
-                    @endif
+                    @endif --}}
 
-                    <h2 class="mt-3 ff-secondary fw-semibold text-info">
+                    <h2 class="mt-4 ff-secondary fw-semibold text-info">
                         {{ number_format($jumlahTransaksi) }}
                         <span class="fs-6 text-muted">transaksi</span>
                     </h2>

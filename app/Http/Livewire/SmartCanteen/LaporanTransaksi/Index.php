@@ -124,7 +124,8 @@ class Index extends Component
 
     public function render()
     {
-        $query = TransaksiSmartCanteen::where('ms_kantin_id', $this->selectedKantin);
+        $query = TransaksiSmartCanteen::where('ms_kantin_id', $this->selectedKantin)
+            ->where('status_transaksi', '!=', 'dibatalkan');
 
         if ($this->startDate && $this->endDate) {
             $query->whereBetween('tanggal_transaksi', [

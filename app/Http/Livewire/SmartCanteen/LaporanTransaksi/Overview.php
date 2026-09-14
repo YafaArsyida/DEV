@@ -39,8 +39,8 @@ class Overview extends Component
     public function render()
     {
         // base query
-        $query = TransaksiSmartCanteen::where('ms_kantin_id', $this->selectedKantin);
-
+        $query = TransaksiSmartCanteen::where('ms_kantin_id', $this->selectedKantin) 
+            ->where('status_transaksi', '!=', 'dibatalkan');
         // build periode range dengan start/end yang jelas
         $start = null;
         $end = null;

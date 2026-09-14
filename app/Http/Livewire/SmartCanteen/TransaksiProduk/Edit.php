@@ -457,9 +457,7 @@ class Edit extends Component
 
             // * DESKRIPSI
             $deskripsiJurnal =
-                'Pembatalan transaksi kantin ' .
-                ($this->nama_user ?: 'Umum') .
-                " metode {$transaksi->metode_pembayaran}: " .
+                'Pembatalan transaksi, '.
                 ($transaksi->deskripsi ?? '');
 
             // * MAPPING AKUN PEMBALIK
@@ -574,7 +572,8 @@ class Edit extends Component
                     ->lockForUpdate()
                     ->update([
                         'status_transaksi' => 'dibatalkan',
-                        'deskripsi' => 'Dibatalkan - ' .($transaksi->deskripsi ?? ''),
+                        'akuntansi_jurnal_reversal_id' => $jurnalPembatalan->akuntansi_jurnal_id,
+                        // 'deskripsi' => 'Dibatalkan - ' .($transaksi->deskripsi ?? ''),
                     ]);
             }
 

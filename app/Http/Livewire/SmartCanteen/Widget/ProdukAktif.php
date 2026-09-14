@@ -22,6 +22,7 @@ class ProdukAktif extends Component
     public function mount()
     {
         // default kosong
+        $this->selectedKantin = null;
         $this->kategoriList = [];
     }
 
@@ -44,6 +45,9 @@ class ProdukAktif extends Component
     {
         $this->selectedKantin = $kantin;
 
+        // Reset kategori
+        $this->selectKategoriProduk = '';
+        
         // filter kategori berdasar kantin
         $this->kategoriList = KategoriProdukSmartCanteen::where('ms_kantin_id', $kantin)->get();
 
@@ -52,6 +56,13 @@ class ProdukAktif extends Component
 
     private function loadProduk()
     {
+        // Jangan load produk sebelum kantin diterima
+        if (!$this->selectedKantin) {
+            return ProdukSmartCanteen::query()
+                ->whereRaw('1 = 0')
+                ->paginate(8);
+        }
+
         return ProdukSmartCanteen::with('ms_kategori_produk_kantin')
             ->where('status', 1)
             ->when($this->selectedKantin, function ($q) {
@@ -61,7 +72,7 @@ class ProdukAktif extends Component
                 $q->where('ms_kategori_produk_kantin_id', $this->selectKategoriProduk);
             })
             ->orderBy('nama_produk_kantin')
-            ->paginate(8);
+            ->paginate(10);
     }
 
     public function render()

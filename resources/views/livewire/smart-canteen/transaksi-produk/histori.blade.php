@@ -103,19 +103,51 @@
                             <thead class="table-light">
                                 <tr>
                                     <th class="ps-3" style="width: 50px;">No</th>
+                                    <th class="text-center" style="width: 80px;">Aksi</th>
                                     <th>Tanggal</th>
                                     <th>Pelanggan</th>
                                     <th>Pembayaran</th>
                                     <th class="text-end pe-3">Total</th>
-                                    <th class="text-center" style="width: 80px;">Aksi</th>
                                 </tr>
                             </thead>
 
                             <tbody>
                             @foreach ($riwayat as $i => $d)
-                                <tr>
+                                <tr class="{{ $d->status_transaksi === 'dibatalkan' ? 'table-danger' : '' }}">
+
+                                    {{-- No --}}
                                     <td class="ps-3 text-muted">
                                         {{ $riwayat->firstItem() + $i }}
+                                    </td>
+
+                                    {{-- Aksi --}}
+                                    <td class="text-center">
+                                        @if (
+                                            $d->status_transaksi !== 'dibatalkan' &&
+                                            \Carbon\Carbon::parse($d->tanggal_transaksi)->isToday() &&
+                                            in_array($d->status_settlement, ['belum', null], true)
+                                        )
+                                            <button
+                                                type="button"
+                                                class="btn btn-danger btn-sm rounded-pill px-3"
+                                                wire:click.prevent="$emit('loadKoreksiTransaksi', {{ $d->ms_transaksi_kantin_id }})"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalKoreksi"
+                                                title="Koreksi Transaksi"
+                                                aria-label="Koreksi Transaksi"
+                                            >
+                                                <i class="ri-mark-pen-line me-1"></i>Koreksi
+                                            </button>
+                                        @else
+                                            <span
+                                                class="text-muted"
+                                                title="{{ $d->status_transaksi === 'dibatalkan'
+                                                    ? 'Transaksi sudah dibatalkan'
+                                                    : 'Transaksi tidak dapat dikoreksi' }}"
+                                            >
+                                                <i class="ri-lock-line"></i>
+                                            </span>
+                                        @endif
                                     </td>
 
                                     {{-- Tanggal --}}
@@ -126,18 +158,16 @@
                                                 'd F Y'
                                             ) }}
                                         </div>
-
                                         <small class="text-muted">
                                             {{ \Carbon\Carbon::parse($d->tanggal_transaksi)->format('H:i') }}
                                         </small>
-
                                     </td>
 
                                     {{-- Pelanggan --}}
                                     <td>
                                         <div class="fw-semibold text-dark">
-                                            @if ($d->user_type === 'siswa')
 
+                                            @if ($d->user_type === 'siswa')
                                                 <span class="badge bg-primary-subtle text-primary rounded-pill me-1">
                                                     Siswa
                                                 </span>
@@ -150,13 +180,22 @@
                                                 </span>
 
                                                 {{ $d->ms_pegawai->nama_pegawai ?? '-' }}
+
                                             @else
-                                                <span class="badge bg-secondary-subtle text-secondary rounded-pill">
+                                                <span class="badge bg-secondary-subtle text-secondary rounded-pill me-1">
                                                     {{ ucfirst($d->user_type ?? 'Umum') }}
                                                 </span>
                                             @endif
+
+                                            @if ($d->status_transaksi === 'dibatalkan')
+                                                <span class="badge bg-danger-subtle text-danger ms-1">
+                                                    Dibatalkan
+                                                </span>
+                                            @endif
+
                                         </div>
 
+                                        {{-- Produk --}}
                                         @if ($d->dt_transaksi_kantin->count())
                                             <small class="text-muted d-block mt-1">
                                                 {{ $d->dt_transaksi_kantin
@@ -167,62 +206,54 @@
                                                     })
                                                     ->join(', ') }}
                                             </small>
-
                                         @endif
                                     </td>
 
-                                    {{-- Produk --}}
+                                    {{-- Metode Pembayaran --}}
                                     <td>
-                                        {{ $d->metode_pembayaran ?? '-' }}
+                                        <span class="{{ $d->status_transaksi === 'dibatalkan'
+                                            ? 'text-muted text-decoration-line-through'
+                                            : '' }}">
+                                            {{ $d->metode_pembayaran ?? '-' }}
+                                        </span>
                                     </td>
 
                                     {{-- Total --}}
                                     <td class="text-end pe-3">
-                                        {{-- Sudah Settlement --}}
+
+                                        {{-- Status Settlement --}}
                                         @if ($d->status_settlement === 'sudah')
-                                            <i class="ri-check-fill text-primary me-1"
+                                            <i
+                                                class="ri-checkbox-circle-fill text-success me-1"
                                                 title="Sudah Settlement"
                                                 aria-label="Sudah Settlement"
                                             ></i>
 
-                                            {{-- Transaksi Kas Kantin --}}
                                         @elseif ($d->status_settlement === null)
-                                            <i class="ri-check-double-fill text-primary me-1"
+                                            <i
+                                                class="ri-check-double-fill text-primary me-1"
                                                 title="Kas Kantin"
                                                 aria-label="Kas Kantin"
                                             ></i>
 
-                                            {{-- Belum Settlement --}}
                                         @elseif ($d->status_settlement === 'belum')
-                                            <i class="ri-time-fill text-danger me-1"
+                                            <i
+                                                class="ri-time-fill text-danger me-1"
                                                 title="Menunggu Settlement"
                                                 aria-label="Menunggu Settlement"
                                             ></i>
                                         @endif
 
-                                        <span class="fw-medium fs-12">
+                                        <span class="fw-medium fs-12
+                                            {{ $d->status_transaksi === 'dibatalkan'
+                                                ? 'text-muted text-decoration-line-through'
+                                                : '' }}"
+                                        >
                                             Rp{{ number_format($d->total_transaksi, 0, ',', '.') }}
                                         </span>
-                                    </td>
-                                    {{-- Aksi --}}
-                                    <td class="text-center">
-                                        @if ( $d->status_transaksi !== 'dibatalkan' && \Carbon\Carbon::parse($d->tanggal_transaksi)->isToday() && in_array($d->status_settlement, ['belum', null], true))
-                                            <button type="button" class="btn btn-danger btn-sm rounded-pill px-3"
-                                                wire:click.prevent="$emit('loadKoreksiTransaksi', {{ $d->ms_transaksi_kantin_id }})" 
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#modalKoreksi"
-                                                title="Koreksi Transaksi" aria-label="Koreksi Transaksi">
-                                                <i class="ri-mark-pen-line me-1"></i>Koreksi
-                                            </button>
 
-                                        @else
-                                            <span
-                                                class="text-muted"
-                                                title="Transaksi tidak dapat dikoreksi">
-                                                <i class="ri-lock-line"></i>
-                                            </span>
-                                        @endif
                                     </td>
+
                                 </tr>
                             @endforeach
                             </tbody>

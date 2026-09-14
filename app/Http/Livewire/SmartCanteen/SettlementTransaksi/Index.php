@@ -41,7 +41,7 @@ class Index extends Component
 
     public function updatedEndDate()
     {
-        $this->$this->getDataTransaksi();
+        $this->getDataTransaksi();
     }
 
 
@@ -95,6 +95,8 @@ class Index extends Component
             'ms_jenjang',
             'ms_pegawai'
         ])
+            // Hanya transaksi aktif 
+            ->where('status_transaksi', '!=', 'dibatalkan')
             ->where('status_settlement', 'belum')
             ->where('ms_kantin_id', $this->selectedKantin)
 
@@ -137,14 +139,15 @@ class Index extends Component
     private function queryTotalSettlement()
     {
         return TransaksiSmartCanteen::query()
+            ->where('status_transaksi', '!=', 'dibatalkan')
             ->where('status_settlement', 'belum')
             ->where('ms_kantin_id', $this->selectedKantin)
-            ->when(
-                $this->selectedJenjang, fn ($q) => $q->where(
-                    'ms_jenjang_id', $this->selectedJenjang
+            ->when($this->selectedJenjang,
+                    fn ($q) => $q->where('ms_jenjang_id', $this->selectedJenjang
                 )
             );
     }
+
 
     public function getDataTransaksi()
     {
@@ -326,8 +329,7 @@ class Index extends Component
             foreach ($transaksi as $transaksiKantin) {
                 $transaksiKantin->update([
                     'status_settlement' => 'sudah',
-                    'ms_settlement_kantin_id' =>
-                        $settlement->ms_settlement_kantin_id,
+                    'ms_settlement_kantin_id' => $settlement->ms_settlement_kantin_id,
                 ]);
             }
 

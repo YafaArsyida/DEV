@@ -87,7 +87,8 @@ class KartuPendapatan extends Component
     {
         $user = Auth::user();
 
-        $query = TransaksiSmartCanteen::where('ms_kantin_id', $this->selectedKantin);
+        $query = TransaksiSmartCanteen::where('ms_kantin_id', $this->selectedKantin)
+            ->where('status_transaksi', '!=', 'dibatalkan');
 
         // Filter tanggal
         $query->whereBetween('tanggal_transaksi', [

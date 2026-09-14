@@ -21,6 +21,12 @@ class ProdukTerlaris extends Component
         'parameterUpdated' => 'updateParameters',
     ];
 
+    public function mount()
+    {
+        // default kosong
+        $this->selectedKantin = null;
+    }
+
     public function updatingSelectedPeriode()
     {
         $this->dispatchBrowserEvent('alertify-success', [
@@ -81,8 +87,15 @@ class ProdukTerlaris extends Component
     /**
      * Query Produk Terlaris
      */
-    private function queryProdukTerlaris()
+    private function loadProdukTerlaris()
     {
+        // Jangan load produk sebelum kantin diterima
+        if (!$this->selectedKantin) {
+            return DetailTransaksiSmartCanteen::query()
+                ->whereRaw('1 = 0')
+                ->paginate(8);
+        }
+
         [$start, $end] = $this->getDateRange();
 
         return DetailTransaksiSmartCanteen::query()
@@ -104,12 +117,13 @@ class ProdukTerlaris extends Component
                 $q->whereBetween('ms_transaksi_kantin.tanggal_transaksi', [$start, $end])
             )
             ->groupBy('dt_transaksi_kantin.ms_produk_kantin_id')
-            ->orderByDesc('total_terjual');
+            ->orderByDesc('total_terjual')
+            ->paginate(10);
     }
 
     public function render()
     {
-        $produk = $this->queryProdukTerlaris()->paginate(10);
+        $produk = $this->loadProdukTerlaris();
 
         return view('livewire.smart-canteen.widget.produk-terlaris', [
             'produks' => $produk

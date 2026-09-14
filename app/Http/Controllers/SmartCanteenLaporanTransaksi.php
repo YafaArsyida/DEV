@@ -26,6 +26,9 @@ class SmartCanteenLaporanTransaksi extends Controller
 
         $query = TransaksiSmartCanteen::query();
 
+        // STATUS TRANSAKSI 
+        $query->where('status_transaksi', '!=', 'dibatalkan');
+
         // KANTIN
         if (!empty($kantin)) {
             $query->where('ms_kantin_id', $kantin);

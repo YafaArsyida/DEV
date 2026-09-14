@@ -43,7 +43,8 @@ class KartuSettlement extends Component
             return;
         }
 
-        $query = TransaksiSmartCanteen::where('ms_kantin_id', $this->selectedKantin);
+        $query = TransaksiSmartCanteen::where('ms_kantin_id', $this->selectedKantin)
+            ->where('status_transaksi', '!=', 'dibatalkan');
 
         // Filter settlement
         if ($this->jenisSaldo === 'belum') {

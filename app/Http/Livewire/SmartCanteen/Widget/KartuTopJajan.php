@@ -29,7 +29,10 @@ class KartuTopJajan extends Component
     {
         $user = Auth::user();
 
-        $query = TransaksiSmartCanteen::where('ms_kantin_id', $this->selectedKantin);
+        $query = TransaksiSmartCanteen::where('ms_kantin_id', $this->selectedKantin)
+            ->where('status_transaksi', '!=', 'dibatalkan')
+            ->where('user_type', '!=', 'umum'); // Exclude admin transactions
+
 
         // Filter periode
         $startDate = null;

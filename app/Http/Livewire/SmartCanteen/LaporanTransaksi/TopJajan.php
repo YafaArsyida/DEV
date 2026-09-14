@@ -30,6 +30,8 @@ class TopJajan extends Component
     {
 
         $query = TransaksiSmartCanteen::where('ms_kantin_id', $this->selectedKantin) 
+            // hanya transaksi aktif 
+            ->where('status_transaksi', '!=', 'dibatalkan')    
             // hanya siswa & pegawai
             ->whereNotNull('user_id')
             ->whereIn('user_type', ['siswa', 'pegawai']);;

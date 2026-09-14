@@ -95,7 +95,8 @@ class KartuVolumeTransaksi extends Component
 
     public function hitungJumlahTransaksi()
     {
-        $query = TransaksiSmartCanteen::where('ms_kantin_id', $this->selectedKantin);
+        $query = TransaksiSmartCanteen::where('ms_kantin_id', $this->selectedKantin)
+            ->where('status_transaksi', '!=', 'dibatalkan');
 
         // Filter petugas
         if ($this->selectedPetugas) {

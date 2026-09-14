@@ -22,14 +22,22 @@
             </div> <!-- end col-->
             <div class="col-xxl-7">
                 <div class="row h-100">
-                    @livewire('smart-canteen.widget.produk-terlaris')   
-                    @livewire('smart-canteen.widget.produk-aktif')   
+                    <div class="col-xl-8 col-md-6">
+                        @livewire('smart-canteen.widget.produk-terlaris')   
+                    </div>
+                    <div class="col-xl-4 col-md-6">
+                        @livewire('smart-canteen.widget.produk-aktif')   
+                    </div>
                 </div> <!-- end row-->
             </div><!-- end col -->
         </div>
          <div class="row">
-            @livewire('smart-canteen.widget.kartu-top-jajan')
-            @livewire('smart-canteen.widget.kartu-jurnal-kantin')
+            <div class="col-xxl-4">
+                @livewire('smart-canteen.widget.kartu-top-jajan')
+            </div>
+            <div class="col-xxl-8">
+                @livewire('smart-canteen.widget.kartu-jurnal-kantin')
+            </div>
         </div><!-- end row -->
     </div>
 </div>
