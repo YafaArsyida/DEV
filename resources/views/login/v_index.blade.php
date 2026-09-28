@@ -4,7 +4,7 @@
 <head>
 
     <meta charset="utf-8" />
-    <title>TemanSekolah | Advance - Sistem Administrasi Terintegrasi untuk Sekolah</title>
+    <title>TemanSekolah | {{ config('app.name') }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="Sistem Administrasi Terintegrasi untuk Sekolah" name="description" />
     <meta content="ManekaromaTeknologi" name="author" />
@@ -67,7 +67,7 @@
                                                     </div>
 
                                                     <h3 class="text-white fw-semibold">
-                                                        SD Islam Al Hidayah Karanggede
+                                                        {{ config('app.name') }}
                                                     </h3>
                                                 </div>
 

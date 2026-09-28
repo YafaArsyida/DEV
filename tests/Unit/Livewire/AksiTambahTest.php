@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Livewire;
 
-use App\Http\Livewire\TransaksiTagihanSiswa\AksiTambah;
+use App\Http\Livewire\Keuangan\TransaksiTagihanSiswa\AksiTambah;
 use Tests\TestCase;
 
 class AksiTambahTest extends TestCase

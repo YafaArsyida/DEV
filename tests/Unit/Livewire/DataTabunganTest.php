@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Livewire;
 
-use App\Http\Livewire\TransaksiTabunganSiswa\DataTabungan;
+use App\Http\Livewire\Keuangan\TransaksiTabunganSiswa\DataTabungan;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Tests\TestCase;
 

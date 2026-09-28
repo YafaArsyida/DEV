@@ -17,6 +17,7 @@ class Jenjang extends Model
     protected $primaryKey = 'ms_jenjang_id';
     protected $fillable = [
         'nama_jenjang',
+        'alamat',
         'urutan',
         'status',
         'deskripsi',

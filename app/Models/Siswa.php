@@ -6,7 +6,6 @@ use App\Models\SmartCanteen\TransaksiSmartCanteen;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
 class Siswa extends Model
 {
     use HasFactory;

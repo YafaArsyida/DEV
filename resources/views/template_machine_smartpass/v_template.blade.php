@@ -57,7 +57,7 @@
                                         </div>
                                         <!--end col-->
                                     </div> --}}
-                                    <h3 class='mb-0'>SmartPass Yayasan Pandanaran Sragen</h3>
+                                    <h3 class='mb-0'>SmartPass {{ config('app.name') }}</h3>
                                 </div>
                             </div>
                         </div>

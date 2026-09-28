@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Livewire;
 
-use App\Http\Livewire\LaporanTabunganSiswa\Withdraw;
+use App\Http\Livewire\Keuangan\LaporanTabunganSiswa\Withdraw;
 use Livewire\Livewire;
 use Tests\TestCase;
 

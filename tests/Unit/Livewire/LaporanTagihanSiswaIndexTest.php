@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Livewire;
 
-use App\Http\Livewire\LaporanTagihanSiswa\Index;
+use App\Http\Livewire\Keuangan\LaporanTagihanSiswa\Index;
 use Carbon\Carbon;
 use ReflectionMethod;
 use Tests\TestCase;

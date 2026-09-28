@@ -20,37 +20,63 @@ class LoginController extends Controller
         return view('login.v_index');
     }
 
+    // public function authenticate(Request $request)
+    // {
+    //     $credentials = $request->validate([
+    //         'email' => ['required'],
+    //         'password' => ['required'],
+    //     ]);
+    //     // dd($credentials);
+
+    //     if (Auth::attempt($credentials)) {
+    //         $user = Auth::user();
+
+    //         // Hapus sesi lama jika ada
+    //         $sessionId = session()->getId();
+    //         if ($user->current_session && $user->current_session !== $sessionId) {
+    //             $user->current_session = null;
+    //         }
+
+    //         $user->current_session = $sessionId;
+    //         $user->save();
+
+    //         $request->session()->regenerate();
+
+    //         // Redirect sesuai peran
+    //         if ($user->peran === 'KANTIN') {
+    //             return redirect()->route('smartCanteen.dashboard');
+    //         }
+
+    //         return redirect()->route('dashboard.index');
+    //     }
+
+    //     return back()->with('loginError', 'Login gagal !');
+    // }
     public function authenticate(Request $request)
     {
         $credentials = $request->validate([
             'email' => ['required'],
             'password' => ['required'],
         ]);
-        // dd($credentials);
 
-        if (Auth::attempt($credentials)) {
-            $user = Auth::user();
-
-            // Hapus sesi lama jika ada
-            $sessionId = session()->getId();
-            if ($user->current_session && $user->current_session !== $sessionId) {
-                $user->current_session = null;
-            }
-
-            $user->current_session = $sessionId;
-            $user->save();
-
-            $request->session()->regenerate();
-
-            // Redirect sesuai peran
-            if ($user->peran === 'KANTIN') {
-                return redirect()->route('smartCanteen.dashboard');
-            }
-
-            return redirect()->route('dashboard.index');
+        if (!Auth::attempt($credentials)) {
+            return back()->with('loginError', 'Login gagal !');
         }
 
-        return back()->with('loginError', 'Login gagal !');
+        $user = Auth::user();
+
+        $sessionId = session()->getId();
+
+        if ($user->current_session && $user->current_session !== $sessionId) {
+            $user->current_session = null;
+        }
+
+        $user->current_session = $sessionId;
+        $user->save();
+
+        $request->session()->regenerate();
+
+        return redirect()->intended(route('portal'));
     }
 
     public function logOut(Request $request)

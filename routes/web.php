@@ -1,38 +1,59 @@
 <?php
 
-use App\Http\Controllers\AkuntansiJurnalDetail;
-use App\Http\Controllers\AkuntansiKonfigurasi;
-use App\Http\Controllers\AkuntansiLaporanArusKas;
-use App\Http\Controllers\AkuntansiLaporanBukuBesar;
-use App\Http\Controllers\AkuntansiLaporanJurnalUmum;
-use App\Http\Controllers\AkuntansiLaporanLabaRugi;
-use App\Http\Controllers\AkuntansiLaporanNeraca;
-use App\Http\Controllers\AkuntansiLaporanPendapatan;
-use App\Http\Controllers\AkuntansiLaporanPengeluaran;
-use App\Http\Controllers\AkuntansiTransaksiPendapatan;
+// portal
+
+use App\Http\Controllers\Akademik\AkademikDashboard;
+use App\Http\Controllers\Akademik\EkstrakurikulerSiswa;
+use App\Http\Controllers\Akademik\JenjangController;
+use App\Http\Controllers\Akademik\KelasController;
+use App\Http\Controllers\Akademik\LaporanController;
+use App\Http\Controllers\Akademik\PenempatanEkstrakurikulerSiswa;
+use App\Http\Controllers\Akademik\PenempatanSiswaController;
+use App\Http\Controllers\Akademik\SiswaController;
+use App\Http\Controllers\Akademik\TahunAjaranController;
+use App\Http\Controllers\Portal\PortalController;
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\DokumenAdministrasi;
-use App\Http\Controllers\EkstrakurikulerSiswa;
+use App\Http\Controllers\Keuangan\AkuntansiJurnalDetail;
+use App\Http\Controllers\Keuangan\AkuntansiKonfigurasiJurnal;
+use App\Http\Controllers\Keuangan\AkuntansiLaporanArusKas;
+use App\Http\Controllers\Keuangan\AkuntansiLaporanBukuBesar;
+use App\Http\Controllers\Keuangan\AkuntansiLaporanJurnalUmum;
+use App\Http\Controllers\Keuangan\AkuntansiLaporanLabaRugi;
+use App\Http\Controllers\Keuangan\AkuntansiLaporanNeraca;
+use App\Http\Controllers\Keuangan\AkuntansiLaporanPendapatan;
+use App\Http\Controllers\Keuangan\AkuntansiLaporanPengeluaran;
 use App\Http\Controllers\LoginController;
-use App\Http\Controllers\JenjangTahunAjar;
-use App\Http\Controllers\KelasSiswa;
-use App\Http\Controllers\KonfigurasiTagihanSiswa;
+use App\Http\Controllers\Keuangan\DokumenAdministrasi;
+use App\Http\Controllers\Keuangan\JenisTagihanSiswa;
+use App\Http\Controllers\Keuangan\JenjangTahunAjar;
+use App\Http\Controllers\Keuangan\KelasSiswa;
+use App\Http\Controllers\Keuangan\KeuanganDashboard;
+use App\Http\Controllers\Keuangan\KonfigurasiTagihanSiswa;
+use App\Http\Controllers\Keuangan\LaporanEduPayPegawai;
+use App\Http\Controllers\Keuangan\LaporanEduPaySiswa;
+use App\Http\Controllers\Keuangan\LaporanPembayaranTagihanSiswa;
+use App\Http\Controllers\Keuangan\LaporanRekapitulasiKeuanganSiswa;
+use App\Http\Controllers\Keuangan\LaporanTabunganPegawai;
+use App\Http\Controllers\Keuangan\LaporanTabunganSiswa;
+use App\Http\Controllers\Keuangan\LaporanTagihanSiswa;
+use App\Http\Controllers\Keuangan\PenggunaJenjang;
+use App\Http\Controllers\Keuangan\TagihanSiswa;
+use App\Http\Controllers\Keuangan\TransaksiEduPayPegawai;
+use App\Http\Controllers\Keuangan\TransaksiEduPaySiswa;
+use App\Http\Controllers\Keuangan\TransaksiPendapatanLainnya;
+use App\Http\Controllers\Keuangan\TransaksiPengeluaran;
+use App\Http\Controllers\Keuangan\TransaksiTabunganPegawai;
+use App\Http\Controllers\Keuangan\TransaksiTabunganSiswa;
+use App\Http\Controllers\Keuangan\TransaksiTagihanSiswa;
 use App\Http\Controllers\KoperasiPintarAdministrasiProduk;
 use App\Http\Controllers\KoperasiPintarDashboard;
 use App\Http\Controllers\KoperasiPintarPembelianProduk;
 use App\Http\Controllers\KoperasiPintarPengembalianProduk;
 use App\Http\Controllers\KoperasiPintarPenjualanProduk;
 use App\Http\Controllers\LandingEkstrakurikuler;
-use App\Http\Controllers\LaporanEduPayPegawai;
-use App\Http\Controllers\LaporanEduPaySiswa;
-use App\Http\Controllers\LaporanPembayaranTagihanSiswa;
-use App\Http\Controllers\LaporanRekapitulasiKeuangan;
-use App\Http\Controllers\LaporanTabunganPegawai;
-use App\Http\Controllers\LaporanTabunganSiswa;
-use App\Http\Controllers\LaporanTagihanSiswa;
 use App\Http\Controllers\ManajemenKepegawaian;
-use App\Http\Controllers\PenggunaJenjang;
 use App\Http\Controllers\SmartCanteenAdministrasiKantin;
 use App\Http\Controllers\SmartCanteenAdministrasiProduk;
 use App\Http\Controllers\SmartCanteenDashboard;
@@ -44,15 +65,6 @@ use App\Http\Controllers\SmartPassDashboard;
 use App\Http\Controllers\SmartPassLaporanFingerSpotPegawai;
 use App\Http\Controllers\SmartPassLaporanPresensiPegawai;
 use App\Http\Controllers\SmartPassPresensiPegawai;
-use App\Http\Controllers\TagihanJenis;
-use App\Http\Controllers\TagihanSiswa;
-use App\Http\Controllers\TransaksiEduPayPegawai;
-use App\Http\Controllers\TransaksiEduPaySiswa;
-use App\Http\Controllers\TransaksiPendapatanLainnya;
-use App\Http\Controllers\TransaksiPengeluaran;
-use App\Http\Controllers\TransaksiTabunganPegawai;
-use App\Http\Controllers\TransaksiTabunganSiswa;
-use App\Http\Controllers\TransaksiTagihanSiswa;
 
 /*
 |--------------------------------------------------------------------------
@@ -65,27 +77,40 @@ use App\Http\Controllers\TransaksiTagihanSiswa;
 |
 */
 
+
+// LANDING
+Route::get('/landing/ekstrakurikuler', [LandingEkstrakurikuler::class, 'index'])->name('landing.ekstrakurikuler');
+
+// UNTUK MENGARAHKAN HALAMAN YG LOGIN
 // Route::get('/', function () {
-//     return view('v_home');
-// });
+//     // Jika belum login → tampilkan halaman login
+//     if (!auth()->check()) {
+//         return redirect()->route('login.index');
+//     }
 
-Route::get('/', function () {
-    // Jika belum login → tampilkan halaman login
-    if (!auth()->check()) {
-        return redirect()->route('login.index');
-    }
+//     // Jika sudah login → arahkan sesuai role
+//     $user = auth()->user();
 
-    // Jika sudah login → arahkan sesuai role
-    $user = auth()->user();
+//     if ($user->peran === 'KANTIN') {
+//         return redirect()->route('smartCanteen.dashboard');
+//     }
 
-    if ($user->peran === 'KANTIN') {
-        return redirect()->route('smartCanteen.dashboard');
-    }
+//     return redirect()->route('dashboard.index');
+// })->name('home');
 
-    return redirect()->route('dashboard.index');
-})->name('home');
+/*
+|--------------------------------------------------------------------------
+| Portal
+|--------------------------------------------------------------------------
+*/
 
-// login
+Route::get('/', [PortalController::class, 'index'])
+    ->name('portal');
+/*
+|--------------------------------------------------------------------------
+| Log-In
+|--------------------------------------------------------------------------
+*/
 Route::get('/login', [LoginController::class, 'index'])
     ->name('login.index')
     ->middleware('guest');
@@ -97,179 +122,551 @@ Route::post('/logout', [LoginController::class, 'logOut'])
     ->name('logout');
 
 
-// LANDING
-Route::get('/landing/ekstrakurikuler', [LandingEkstrakurikuler::class, 'index'])->name('landing.ekstrakurikuler');
 
-// LANDING
-Route::middleware(['auth', 'peran:SUPERADMIN,ADMINISTRASI,KANTIN'])->group(function () {
-    // SMARTCANTEEN 
-    Route::get('/smartCanteen/dashboard', [SmartCanteenDashboard::class, 'index'])->name('smartCanteen.dashboard');
+// Route::middleware(['auth', 'peran:SUPERADMIN,ADMINISTRASI,KANTIN'])->group(function () {
+//     // SMARTCANTEEN 
+//     Route::get('/smartCanteen/dashboard', [SmartCanteenDashboard::class, 'index'])->name('smartCanteen.dashboard');
 
-    Route::get('/smartCanteen/administrasi/kantin', [SmartCanteenAdministrasiKantin::class, 'index'])->name('smartCanteen.administrasi.kantin');
-    Route::get('/smartCanteen/administrasi/produk', [SmartCanteenAdministrasiProduk::class, 'index'])->name('smartCanteen.administrasi.produk');
+//     Route::get('/smartCanteen/administrasi/kantin', [SmartCanteenAdministrasiKantin::class, 'index'])->name('smartCanteen.administrasi.kantin');
+//     Route::get('/smartCanteen/administrasi/produk', [SmartCanteenAdministrasiProduk::class, 'index'])->name('smartCanteen.administrasi.produk');
 
-    Route::get('/smartCanteen/transaksi/produk', [SmartCanteenTransaksiProduk::class, 'index'])->name('smartCanteen.transaksi.produk');
+//     Route::get('/smartCanteen/transaksi/produk', [SmartCanteenTransaksiProduk::class, 'index'])->name('smartCanteen.transaksi.produk');
 
-    Route::get('/smartCanteen/laporan/transaksi',  [SmartCanteenLaporanTransaksi::class, 'index'])->name('smartCanteen.laporan.transaksi');
-    Route::get('/smartCanteen/laporan/transaksi/pdf',  [SmartCanteenLaporanTransaksi::class, 'cetakPDF'])->name('smartCanteen.laporan.transaksi.pdf');
+//     Route::get('/smartCanteen/laporan/transaksi',  [SmartCanteenLaporanTransaksi::class, 'index'])->name('smartCanteen.laporan.transaksi');
+//     Route::get('/smartCanteen/laporan/transaksi/pdf',  [SmartCanteenLaporanTransaksi::class, 'cetakPDF'])->name('smartCanteen.laporan.transaksi.pdf');
 
-    Route::get('/smartCanteen/settlement/transaksi',  [SmartCanteenSettlementTransaksi::class, 'index'])->name('smartCanteen.settlement.transaksi');
-    // END SMARTCANTEEN 
+//     Route::get('/smartCanteen/settlement/transaksi',  [SmartCanteenSettlementTransaksi::class, 'index'])->name('smartCanteen.settlement.transaksi');
+//     // END SMARTCANTEEN 
 
-    // KOPERASIPINTAR
-    // master
-    Route::get('/koperasiPintar/dashboard', [KoperasiPintarDashboard::class, 'index'])->name('koperasiPintar.dashboard');
-    Route::get('/koperasiPintar/administrasi/produk', [KoperasiPintarAdministrasiProduk::class, 'index'])->name('koperasiPintar.administrasi.produk');
+//     // KOPERASIPINTAR
+//     // master
+//     Route::get('/koperasiPintar/dashboard', [KoperasiPintarDashboard::class, 'index'])->name('koperasiPintar.dashboard');
+//     Route::get('/koperasiPintar/administrasi/produk', [KoperasiPintarAdministrasiProduk::class, 'index'])->name('koperasiPintar.administrasi.produk');
 
-    // transaksi
-    Route::get('/koperasiPintar/pembelian/produk', [KoperasiPintarPembelianProduk::class, 'index'])->name('koperasiPintar.pembelian.produk');
-    Route::get('/koperasiPintar/pengembalian/produk', [KoperasiPintarPengembalianProduk::class, 'index'])->name('koperasiPintar.pengembalian.produk');
-    Route::get('/koperasiPintar/penjualan/produk', [KoperasiPintarPenjualanProduk::class, 'index'])->name('koperasiPintar.penjualan.produk');
-    // END KOPERASIPINTAR
+//     // transaksi
+//     Route::get('/koperasiPintar/pembelian/produk', [KoperasiPintarPembelianProduk::class, 'index'])->name('koperasiPintar.pembelian.produk');
+//     Route::get('/koperasiPintar/pengembalian/produk', [KoperasiPintarPengembalianProduk::class, 'index'])->name('koperasiPintar.pengembalian.produk');
+//     Route::get('/koperasiPintar/penjualan/produk', [KoperasiPintarPenjualanProduk::class, 'index'])->name('koperasiPintar.penjualan.produk');
+//     // END KOPERASIPINTAR
 
-    // SMARTPASS
-    Route::get('/smartPass/dashboard', [SmartPassDashboard::class, 'index'])->name('smartPass.dashboard');
+//     // SMARTPASS
+//     Route::get('/smartPass/dashboard', [SmartPassDashboard::class, 'index'])->name('smartPass.dashboard');
     
-    Route::get('/smartPass/administrasi/pegawai', [SmartPassAdministrasiPegawai::class, 'index'])->name('smartPass.administrasi.pegawai');
-    Route::get('/smartPass/administrasi/siswa', [SmartPassAdministrasiPegawai::class, 'index'])->name('smartPass.administrasi.siswa');
+//     Route::get('/smartPass/administrasi/pegawai', [SmartPassAdministrasiPegawai::class, 'index'])->name('smartPass.administrasi.pegawai');
+//     Route::get('/smartPass/administrasi/siswa', [SmartPassAdministrasiPegawai::class, 'index'])->name('smartPass.administrasi.siswa');
 
-    Route::get('/smartPass/laporan/pegawai', [SmartPassLaporanPresensiPegawai::class, 'index'])->name('smartPass.laporan.pegawai');
-    Route::get('/smartPass/laporan-fingerspot/pegawai', [SmartPassLaporanFingerSpotPegawai::class, 'index'])->name('smartPass.laporan-fingerspot.pegawai');
+//     Route::get('/smartPass/laporan/pegawai', [SmartPassLaporanPresensiPegawai::class, 'index'])->name('smartPass.laporan.pegawai');
+//     Route::get('/smartPass/laporan-fingerspot/pegawai', [SmartPassLaporanFingerSpotPegawai::class, 'index'])->name('smartPass.laporan-fingerspot.pegawai');
 
-    Route::get('/smartPass/presensi/pegawai', [SmartPassPresensiPegawai::class, 'index'])->name('smartPass.presensi.pegawai');
-    // SMARTPASS
-});
+//     Route::get('/smartPass/presensi/pegawai', [SmartPassPresensiPegawai::class, 'index'])->name('smartPass.presensi.pegawai');
+//     // SMARTPASS
+// });
 
 
 // SISTEM
 // JENJANG TAHUN AJAR
-Route::middleware(['auth', 'peran:SUPERADMIN,ADMINISTRASI'])->group(function () {
-    Route::middleware(['auth'])->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+// Route::middleware(['auth', 'peran:SUPERADMIN,ADMINISTRASI'])->group(function () {
+//     Route::middleware(['auth'])->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
-    Route::get('/sistem/jenjang-tahun-ajar',  [JenjangTahunAjar::class, 'index'])->name('sistem.jenjang-tahun-ajar');
-    Route::get('/sistem/dokumen-administrasi',  [DokumenAdministrasi::class, 'index'])->name('sistem.dokumen-administrasi');
-    Route::get('/sistem/pengguna-jenjang',  [PenggunaJenjang::class, 'index'])->name('sistem.pengguna-jenjang');
+//     Route::get('/administrasi/manajemen-kepegawaian',  [ManajemenKepegawaian::class, 'index'])->name('administrasi.manajemen-kepegawaian');
 
-    Route::get('/administrasi/kelas-siswa',  [KelasSiswa::class, 'index'])->name('administrasi.kelas-siswa');
-    // ekstrakurikuler
-    Route::get('/administrasi/ekstrakurikuler-siswa',  [EkstrakurikulerSiswa::class, 'index'])->name('administrasi.ekstrakurikuler-siswa');
-    Route::get('/administrasi/ekstrakurikuler-siswa/pdf',  [EkstrakurikulerSiswa::class, 'cetakPDF'])->name('administrasi.ekstrakurikuler-siswa.pdf');
-    Route::get('/administrasi/ekstrakurikuler-siswa/siswapdf',  [EkstrakurikulerSiswa::class, 'cetakSiswaPDF'])->name('administrasi.ekstrakurikuler-siswa.siswapdf');
-    // ekstrakurikuler
+Route::middleware(['auth', 'peran:SUPERADMIN, ADMIN, KEUANGAN'])->group(function () {
 
-    Route::get('/administrasi/manajemen-kepegawaian',  [ManajemenKepegawaian::class, 'index'])->name('administrasi.manajemen-kepegawaian');
+    /*
+    |--------------------------------------------------------------------------
+    | Akademik
+    |--------------------------------------------------------------------------
+    */
 
-    Route::get('/keuangan/konfigurasi-tagihan-siswa',  [KonfigurasiTagihanSiswa::class, 'index'])->name('keuangan.konfigurasi-tagihan-siswa');
+    Route::prefix('akademik')
+        ->name('akademik.')
+        ->group(function () {
 
-    Route::get('/keuangan/tagihan-siswa',  [TagihanSiswa::class, 'index'])->name('keuangan.tagihan-siswa');
-    Route::get('/keuangan/tagihan-siswa/pdf', [TagihanSiswa::class, 'cetakPDF'])->name('keuangan.tagihan-siswa.pdf');
-    Route::get('/keuangan/tagihan-siswa/detail-pdf', [TagihanSiswa::class, 'detailPDF'])->name('keuangan.tagihan-siswa.detail-pdf');
+            /*
+            |--------------------------------------------------------------------------
+            | Dashboard
+            |--------------------------------------------------------------------------
+            */
 
-    Route::get('/keuangan/tagihan-jenis',  [TagihanJenis::class, 'index'])->name('keuangan.tagihan-jenis');
-    Route::get('/keuangan/jenis-tagihan-siswa/pdf', [TagihanJenis::class, 'cetakPDF'])
-        ->name('keuangan.jenis-tagihan-siswa.pdf');
-    Route::get('/keuangan/tagihan-jenis/detail-pdf', [TagihanJenis::class, 'detailPDF'])
-        ->name('keuangan.tagihan-jenis.detail-pdf');
+            Route::get('/', [AkademikDashboard::class, 'index'])
+                ->name('dashboard');
 
-    Route::get('/transaksi/tagihan-siswa',  [TransaksiTagihanSiswa::class, 'index'])->name('transaksi.tagihan-siswa');
-    Route::get('/transaksi/tagihan-siswa/{transaksiId}', [TransaksiTagihanSiswa::class, 'kuitansiPDF'])->name('transaksi.tagihan-siswa.kuitansiPDF');
+            Route::get('/jenjang', [JenjangController::class, 'index'])
+                ->name('jenjang');
 
-    // TRANSAKSI SISWA
-    Route::get('/transaksi/tabungan-siswa',  [TransaksiTabunganSiswa::class, 'index'])->name('transaksi.tabungan-siswa');
-    Route::get('/transaksi/tabungan-siswa/{tabunganId}', [TransaksiTabunganSiswa::class, 'kuitansiPDF'])->name('transaksi.tabungan-siswa.kuitansiPDF');
+            Route::get('/tahun-ajaran', [TahunAjaranController::class, 'index'])
+                ->name('tahun-ajaran');
 
-    Route::get('/transaksi/edupay-siswa',  [TransaksiEduPaySiswa::class, 'index'])->name('transaksi.edupay-siswa');
-    Route::get('/transaksi/edupay-siswa/{eduPayId}', [TransaksiEduPaySiswa::class, 'kuitansiPDF'])->name('transaksi.edupay-siswa.kuitansiPDF');
-    // END TRANSAKSI SISWA
+            Route::get('/kelas', [KelasController::class, 'index'])
+                ->name('kelas');
 
-    // TRANSAKSI PEGAWAI
-    Route::get('/transaksi/edupay-pegawai',  [TransaksiEduPayPegawai::class, 'index'])->name('transaksi.edupay-pegawai');
-    Route::get('/transaksi/edupay-pegawai/{eduPayId}', [TransaksiEduPayPegawai::class, 'kuitansiPDF'])->name('transaksi.edupay-pegawai.kuitansiPDF');
+            Route::get('/siswa', [SiswaController::class, 'index'])
+                ->name('siswa');
 
-    Route::get('/transaksi/tabungan-pegawai',  [TransaksiTabunganPegawai::class, 'index'])->name('transaksi.tabungan-pegawai');
-    Route::get('/transaksi/tabungan-pegawai/{tabunganId}', [TransaksiTabunganPegawai::class, 'kuitansiPDF'])->name('transaksi.tabungan-pegawai.kuitansiPDF');
-    // END TRANSAKSI PEGAWAI
-
-    // transaksi pendapatan
-    Route::get('/transaksi/pendapatan-lainnya',  [TransaksiPendapatanLainnya::class, 'index'])->name('transaksi.pendapatan-lainnya');
-    Route::get('/transaksi/pendapatan-lainnya/pdf', [TransaksiPendapatanLainnya::class, 'cetakPDF'])
-        ->name('transaksi.pendapatan-lainnya.pdf');
+            Route::get('/penempatan-siswa', [PenempatanSiswaController::class, 'index'])
+                ->name('penempatan-siswa');
 
 
-    // transaksi pengeluaran
-    Route::get('/transaksi/pengeluaran',  [TransaksiPengeluaran::class, 'index'])->name('transaksi.pengeluaran');
-    Route::get('/transaksi/pengeluaran/pdf', [TransaksiPengeluaran::class, 'cetakPDF'])
-        ->name('transaksi.pengeluaran.pdf');
+            /*
+            |--------------------------------------------------------------------------
+            | Ekstrakurikuler
+            |--------------------------------------------------------------------------
+            */
 
-    // Laporan Pembayaran
-    Route::get('/laporan/pembayaran-tagihan-siswa',  [LaporanPembayaranTagihanSiswa::class, 'index'])->name('laporan.pembayaran-tagihan-siswa');
-    Route::get('/laporan/pembayaran-tagihan-siswa/pdf', [LaporanPembayaranTagihanSiswa::class, 'cetakPDF'])->name('laporan.pembayaran-tagihan-siswa.pdf');
-    // END Laporan Pembayaran
+            Route::get('/ekstrakurikuler', [EkstrakurikulerSiswa::class, 'index'])
+                ->name('ekstrakurikuler');
 
-    Route::get('/laporan/tagihan-siswa',  [LaporanTagihanSiswa::class, 'index'])->name('laporan.tagihan-siswa');
-    Route::get('/laporan/tagihan-siswa/{msPenempatanSiswaId}', [LaporanTagihanSiswa::class, 'generatePDF'])->name('laporan.tagihan-siswa.generatePDF');
-    Route::get('/laporan/tagihan-kelas/{ms_kelas_id}', [LaporanTagihanSiswa::class, 'generatePDFByClass'])->name('laporan.tagihan-kelas.generatePDFByClass');
+            Route::get('/penempatan-ekstrakurikuler', [PenempatanEkstrakurikulerSiswa::class, 'index'])
+                ->name('penempatan-ekstrakurikuler');
 
-    // LAPORAN TABUNGAN SISWA 
-    Route::get('/laporan/tabungan-siswa',  [LaporanTabunganSiswa::class, 'index'])->name('laporan.tabungan-siswa');
-    Route::get('/laporan/tabungan-siswa/pdf',  [LaporanTabunganSiswa::class, 'cetakPDF'])->name('laporan.tabungan-siswa.pdf');
-    Route::get('/laporan/tabungan-siswa/saldo/pdf',  [LaporanTabunganSiswa::class, 'cetakSaldoPDF'])->name('laporan.tabungan-siswa.saldo.pdf');
-    // END LAPORAN TABUNGAN SISWA
+            Route::get('/ekstrakurikuler-siswa/pdf', [EkstrakurikulerSiswa::class, 'cetakPDF'])
+                ->name('ekstrakurikuler-siswa.pdf');
 
-    // LAPORAN EDUPAY SISWA
-    Route::get('/laporan/edupay-siswa',  [LaporanEduPaySiswa::class, 'index'])->name('laporan.edupay-siswa');
-    Route::get('/laporan/edupay-siswa/pdf',  [LaporanEduPaySiswa::class, 'cetakPDF'])->name('laporan.edupay-siswa.pdf');
-    Route::get('/laporan/edupay-siswa/saldo/pdf',  [LaporanEduPaySiswa::class, 'cetakSaldoPDF'])->name('laporan.edupay-siswa.saldo.pdf');
-    // END LAPORAN EDUPAY SISWA
+            Route::get('/ekstrakurikuler-siswa/siswapdf', [EkstrakurikulerSiswa::class, 'cetakSiswaPDF'])
+                ->name('ekstrakurikuler-siswa.siswapdf');
 
-    Route::get('/laporan/rekapitulasi-keuangan',  [LaporanRekapitulasiKeuangan::class, 'index'])->name('laporan.rekapitulasi-keuangan');
+            Route::get('/laporan', [LaporanController::class, 'index'])
+                ->name('laporan');
+        });
 
-    // LAPORAN TABUNGAN PEGAWAI
-    Route::get('/laporan/tabungan-pegawai',  [LaporanTabunganPegawai::class, 'index'])->name('laporan.tabungan-pegawai');
-    Route::get('/laporan/tabungan-pegawai/pdf',  [LaporanTabunganPegawai::class, 'cetakPDF'])->name('laporan.tabungan-pegawai.pdf');
-    Route::get('/laporan/tabungan-pegawai/saldo/pdf',  [LaporanTabunganPegawai::class, 'cetakSaldoPDF'])->name('laporan.tabungan-pegawai.saldo.pdf');
-    // END LAPORAN TABUNGAN PEGAWAI
+    Route::prefix('keuangan')
+        ->name('keuangan.')
+        ->group(function () {
 
-    // LAPORAN EDUPAY PEGAWAI
-    Route::get('/laporan/edupay-pegawai',  [LaporanEduPayPegawai::class, 'index'])->name('laporan.edupay-pegawai');
-    Route::get('/laporan/edupay-pegawai/pdf',  [LaporanEduPayPegawai::class, 'cetakPDF'])->name('laporan.edupay-pegawai.pdf');
-    Route::get('/laporan/edupay-pegawai/saldo/pdf',  [LaporanEduPayPegawai::class, 'cetakSaldoPDF'])->name('laporan.edupay-pegawai.saldo.pdf');
-    // END LAPORAN EDUPAY PEGAWAI
+            /*
+            |--------------------------------------------------------------------------
+            | Dashboard
+            |--------------------------------------------------------------------------
+            */
+            Route::get('/', [KeuanganDashboard::class, 'index'])
+                ->name('dashboard');
 
-    Route::get('/akuntansi/konfigurasi',  [AkuntansiKonfigurasi::class, 'index'])->name('akuntansi.konfigurasi');
-    Route::get('/akuntansi/jurnal-detail',  [AkuntansiJurnalDetail::class, 'index'])->name('akuntansi.jurnal-detail');
+             /*
+            |--------------------------------------------------------------------------
+            | Sistem
+            |--------------------------------------------------------------------------
+            */
+            Route::prefix('sistem')
+                ->name('sistem.')
+                ->group(function () {
 
-    // laporan akuntansi
-    Route::get('/akuntansi/laporan-buku-besar',  [AkuntansiLaporanBukuBesar::class, 'index'])->name('akuntansi.laporan-buku-besar');
-    Route::get('/akuntansi/laporan-buku-besar/pdf',  [AkuntansiLaporanBukuBesar::class, 'cetakPDF'])->name('akuntansi.laporan-buku-besar.pdf');
+                    Route::get('/jenjang-tahun-ajar', [JenjangTahunAjar::class, 'index'])
+                        ->name('jenjang-tahun-ajar');
 
-    // jurnal keuangan
-    Route::get('/akuntansi/laporan-jurnal-umum',  [AkuntansiLaporanJurnalUmum::class, 'index'])->name('akuntansi.laporan-jurnal-umum');
-    Route::get('/akuntansi/laporan-jurnal-umum/pdf', [AkuntansiLaporanJurnalUmum::class, 'cetakPDF'])->name('akuntansi.laporan-jurnal-umum.pdf');
-    // jurnal keuangan
+                    Route::get('/dokumen-administrasi', [DokumenAdministrasi::class, 'index'])
+                        ->name('dokumen-administrasi');
 
-    // neraca
-    Route::get('/akuntansi/laporan-neraca',  [AkuntansiLaporanNeraca::class, 'index'])->name('akuntansi.laporan-neraca');
-    Route::get('/akuntansi/laporan-neraca/pdf',  [AkuntansiLaporanNeraca::class, 'cetakPDF'])->name('akuntansi.laporan-neraca.pdf');
-    // neraca
+                    Route::get('/pengguna-jenjang', [PenggunaJenjang::class, 'index'])
+                        ->name('pengguna-jenjang');
+                });
 
-    // LAPORAN PENDAPATAN
-    Route::get('/akuntansi/laporan-pendapatan',  [AkuntansiLaporanPendapatan::class, 'index'])->name('akuntansi.laporan-pendapatan');
-    Route::get('/akuntansi/laporan-pendapatan/pdf', [AkuntansiLaporanPendapatan::class, 'cetakPDF'])->name('akuntansi.laporan-pendapatan.pdf');
+            /*
+            |--------------------------------------------------------------------------
+            | Administrasi
+            |--------------------------------------------------------------------------
+            */
+            Route::prefix('administrasi')
+                ->name('administrasi.')
+                ->group(function () {
 
-    // LAPORAN PENGELUARAN
-    Route::get('/akuntansi/laporan-pengeluaran',  [AkuntansiLaporanPengeluaran::class, 'index'])->name('akuntansi.laporan-pengeluaran');
-    Route::get('/akuntansi/laporan-pengeluaran/pdf', [AkuntansiLaporanPengeluaran::class, 'cetakPDF'])->name('akuntansi.laporan-pengeluaran.pdf');
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Kelas Siswa
+                    |--------------------------------------------------------------------------
+                    */
+                    Route::get('/kelas-siswa', [KelasSiswa::class, 'index'])
+                        ->name('kelas-siswa');
 
-    // Laba rugi
-    Route::get('/akuntansi/laporan-laba-rugi',  [AkuntansiLaporanLabaRugi::class, 'index'])->name('akuntansi.laporan-laba-rugi');
-    Route::get('/akuntansi/laporan-laba-rugi/pdf', [AkuntansiLaporanLabaRugi::class, 'cetakPDF'])->name('akuntansi.laporan-laba-rugi.pdf');
-    // Laba rugi
+                });
 
-    // Arus Kas
-    Route::get('/akuntansi/laporan-arus-kas', [AkuntansiLaporanArusKas::class, 'index'])->name('akuntansi.laporan-arus-kas');
-    Route::get('/akuntansi/laporan-arus-kas/pdf',  [AkuntansiLaporanArusKas::class, 'cetakPDF'])->name('akuntansi.laporan-arus-kas.pdf');
-    // Arus Kas
 
-    Route::get('/akuntansi/transaksi-pendapatan',  [AkuntansiTransaksiPendapatan::class, 'index'])->name('akuntansi.transaksi-pendapatan');
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Tagihan
+            |--------------------------------------------------------------------------
+            */
+            Route::prefix('tagihan')
+                ->name('tagihan.')
+                ->group(function () {
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Konfigurasi Tagihan
+                    |--------------------------------------------------------------------------
+                    */
+                    Route::get('/konfigurasi', [KonfigurasiTagihanSiswa::class, 'index'])
+                        ->name('konfigurasi');
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Tagihan Siswa
+                    |--------------------------------------------------------------------------
+                    */
+                    Route::get('/siswa', [TagihanSiswa::class, 'index'])
+                        ->name('siswa');
+
+                    Route::get('/siswa/pdf', [TagihanSiswa::class, 'cetakPDF'])
+                        ->name('siswa.pdf');
+
+                    Route::get('/siswa/detail-pdf', [TagihanSiswa::class, 'detailPDF'])
+                        ->name('siswa.detail-pdf');
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Jenis Tagihan
+                    |--------------------------------------------------------------------------
+                    */
+                    Route::get('/jenis', [JenisTagihanSiswa::class, 'index'])
+                        ->name('jenis');
+
+                    Route::get('/jenis/pdf', [JenisTagihanSiswa::class, 'cetakPDF'])
+                        ->name('jenis.pdf');
+
+                    Route::get('/jenis/detail-pdf', [JenisTagihanSiswa::class, 'detailPDF'])
+                        ->name('jenis.detail-pdf');
+                });
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Transaksi
+            |--------------------------------------------------------------------------
+            */
+            Route::prefix('transaksi')
+                ->name('transaksi.')
+                ->group(function () {
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Tagihan Siswa
+                    |--------------------------------------------------------------------------
+                    */
+                    Route::get('/tagihan-siswa', [TransaksiTagihanSiswa::class, 'index'])
+                        ->name('tagihan-siswa');
+
+                    Route::get('/tagihan-siswa/{transaksiId}', [TransaksiTagihanSiswa::class, 'kuitansiPDF'])
+                        ->name('tagihan-siswa.kuitansi');
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Transaksi Siswa
+                    |--------------------------------------------------------------------------
+                    */
+                    Route::get('/tabungan-siswa', [TransaksiTabunganSiswa::class, 'index'])
+                        ->name('tabungan-siswa');
+
+                    Route::get('/tabungan-siswa/{tabunganId}', [TransaksiTabunganSiswa::class, 'kuitansiPDF'])
+                        ->name('tabungan-siswa.kuitansi');
+
+                    Route::get('/edupay-siswa', [TransaksiEduPaySiswa::class, 'index'])
+                        ->name('edupay-siswa');
+
+                    Route::get('/edupay-siswa/{eduPayId}', [TransaksiEduPaySiswa::class, 'kuitansiPDF'])
+                        ->name('edupay-siswa.kuitansi');
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Transaksi Pegawai
+                    |--------------------------------------------------------------------------
+                    */
+                    Route::get('/edupay-pegawai', [TransaksiEduPayPegawai::class, 'index'])
+                        ->name('edupay-pegawai');
+
+                    Route::get('/edupay-pegawai/{eduPayId}', [TransaksiEduPayPegawai::class, 'kuitansiPDF'])
+                        ->name('edupay-pegawai.kuitansi');
+
+                    Route::get('/tabungan-pegawai', [TransaksiTabunganPegawai::class, 'index'])
+                        ->name('tabungan-pegawai');
+
+                    Route::get('/tabungan-pegawai/{tabunganId}', [TransaksiTabunganPegawai::class, 'kuitansiPDF'])
+                        ->name('tabungan-pegawai.kuitansi');
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Pendapatan
+                    |--------------------------------------------------------------------------
+                    */
+                    Route::get('/pendapatan-lainnya', [TransaksiPendapatanLainnya::class, 'index'])
+                        ->name('pendapatan-lainnya');
+
+                    Route::get('/pendapatan-lainnya/pdf', [TransaksiPendapatanLainnya::class, 'cetakPDF'])
+                        ->name('pendapatan-lainnya.pdf');
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Pengeluaran
+                    |--------------------------------------------------------------------------
+                    */
+                    Route::get('/pengeluaran', [TransaksiPengeluaran::class, 'index'])
+                        ->name('pengeluaran');
+
+                    Route::get('/pengeluaran/pdf', [TransaksiPengeluaran::class, 'cetakPDF'])
+                        ->name('pengeluaran.pdf');
+                });
+            
+
+            /*
+            |--------------------------------------------------------------------------
+            | Laporan
+            |--------------------------------------------------------------------------
+            */
+            Route::prefix('laporan')
+                ->name('laporan.')
+                ->group(function () {
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Pembayaran
+                    |--------------------------------------------------------------------------
+                    */
+                    Route::prefix('pembayaran')
+                        ->name('pembayaran.')
+                        ->group(function () {
+
+                            Route::get('/tagihan-siswa', [LaporanPembayaranTagihanSiswa::class, 'index'])
+                                ->name('tagihan-siswa');
+
+                            Route::get('/tagihan-siswa/pdf', [LaporanPembayaranTagihanSiswa::class, 'cetakPDF'])
+                                ->name('tagihan-siswa.pdf');
+                        });
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Tagihan
+                    |--------------------------------------------------------------------------
+                    */
+                    Route::prefix('tagihan')
+                        ->name('tagihan.')
+                        ->group(function () {
+
+                            Route::get('/siswa', [LaporanTagihanSiswa::class, 'index'])
+                                ->name('siswa');
+
+                            Route::get('/siswa/{msPenempatanSiswaId}', [LaporanTagihanSiswa::class, 'generatePDF'])
+                                ->name('siswa.pdf');
+
+                            Route::get('/kelas/{ms_kelas_id}', [LaporanTagihanSiswa::class, 'generatePDFByClass'])
+                                ->name('kelas.pdf');
+                        });
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Siswa
+                    |--------------------------------------------------------------------------
+                    */
+                    Route::prefix('siswa')
+                        ->name('siswa.')
+                        ->group(function () {
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Tabungan Siswa
+                            |--------------------------------------------------------------------------
+                            */
+                            Route::get('/tabungan', [LaporanTabunganSiswa::class, 'index'])
+                                ->name('tabungan');
+
+                            Route::get('/tabungan/pdf', [LaporanTabunganSiswa::class, 'cetakPDF'])
+                                ->name('tabungan.pdf');
+
+                            Route::get('/tabungan/saldo/pdf', [LaporanTabunganSiswa::class, 'cetakSaldoPDF'])
+                                ->name('tabungan.saldo.pdf');
+
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | EduPay Siswa
+                            |--------------------------------------------------------------------------
+                            */
+                            Route::get('/edupay', [LaporanEduPaySiswa::class, 'index'])
+                                ->name('edupay');
+
+                            Route::get('/edupay/pdf', [LaporanEduPaySiswa::class, 'cetakPDF'])
+                                ->name('edupay.pdf');
+
+                            Route::get('/edupay/saldo/pdf', [LaporanEduPaySiswa::class, 'cetakSaldoPDF'])
+                                ->name('edupay.saldo.pdf');
+                        });
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Pegawai
+                    |--------------------------------------------------------------------------
+                    */
+                    Route::prefix('pegawai')
+                        ->name('pegawai.')
+                        ->group(function () {
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Tabungan Pegawai
+                            |--------------------------------------------------------------------------
+                            */
+                            Route::get('/tabungan', [LaporanTabunganPegawai::class, 'index'])
+                                ->name('tabungan');
+
+                            Route::get('/tabungan/pdf', [LaporanTabunganPegawai::class, 'cetakPDF'])
+                                ->name('tabungan.pdf');
+
+                            Route::get('/tabungan/saldo/pdf', [LaporanTabunganPegawai::class, 'cetakSaldoPDF'])
+                                ->name('tabungan.saldo.pdf');
+
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | EduPay Pegawai
+                            |--------------------------------------------------------------------------
+                            */
+                            Route::get('/edupay', [LaporanEduPayPegawai::class, 'index'])
+                                ->name('edupay');
+
+                            Route::get('/edupay/pdf', [LaporanEduPayPegawai::class, 'cetakPDF'])
+                                ->name('edupay.pdf');
+
+                            Route::get('/edupay/saldo/pdf', [LaporanEduPayPegawai::class, 'cetakSaldoPDF'])
+                                ->name('edupay.saldo.pdf');
+                        });
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Rekapitulasi
+                    |--------------------------------------------------------------------------
+                    */
+                    Route::get('/rekapitulasi-keuangan-siswa', [LaporanRekapitulasiKeuanganSiswa::class, 'index'])
+                        ->name('rekapitulasi-keuangan-siswa');
+                });
+
+            /*
+            |--------------------------------------------------------------------------
+            | Akuntansi
+            |--------------------------------------------------------------------------
+            */
+            Route::prefix('akuntansi')
+                ->name('akuntansi.')
+                ->group(function () {
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Konfigurasi
+                    |--------------------------------------------------------------------------
+                    */
+                    Route::get('/konfigurasi', [AkuntansiKonfigurasiJurnal::class, 'index'])
+                        ->name('konfigurasi');
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Jurnal
+                    |--------------------------------------------------------------------------
+                    */
+                    Route::get('/jurnal-detail', [AkuntansiJurnalDetail::class, 'index'])
+                        ->name('jurnal-detail');
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Laporan
+                    |--------------------------------------------------------------------------
+                    */
+                    Route::prefix('laporan')
+                        ->name('laporan.')
+                        ->group(function () {
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Buku Besar
+                            |--------------------------------------------------------------------------
+                            */
+                            Route::get('/buku-besar', [AkuntansiLaporanBukuBesar::class, 'index'])
+                                ->name('buku-besar');
+
+                            Route::get('/buku-besar/pdf', [AkuntansiLaporanBukuBesar::class, 'cetakPDF'])
+                                ->name('buku-besar.pdf');
+
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Jurnal Umum
+                            |--------------------------------------------------------------------------
+                            */
+                            Route::get('/jurnal-umum', [AkuntansiLaporanJurnalUmum::class, 'index'])
+                                ->name('jurnal-umum');
+
+                            Route::get('/jurnal-umum/pdf', [AkuntansiLaporanJurnalUmum::class, 'cetakPDF'])
+                                ->name('jurnal-umum.pdf');
+
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Neraca
+                            |--------------------------------------------------------------------------
+                            */
+                            Route::get('/neraca', [AkuntansiLaporanNeraca::class, 'index'])
+                                ->name('neraca');
+
+                            Route::get('/neraca/pdf', [AkuntansiLaporanNeraca::class, 'cetakPDF'])
+                                ->name('neraca.pdf');
+
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Pendapatan
+                            |--------------------------------------------------------------------------
+                            */
+                            Route::get('/pendapatan', [AkuntansiLaporanPendapatan::class, 'index'])
+                                ->name('pendapatan');
+
+                            Route::get('/pendapatan/pdf', [AkuntansiLaporanPendapatan::class, 'cetakPDF'])
+                                ->name('pendapatan.pdf');
+
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Pengeluaran
+                            |--------------------------------------------------------------------------
+                            */
+                            Route::get('/pengeluaran', [AkuntansiLaporanPengeluaran::class, 'index'])
+                                ->name('pengeluaran');
+
+                            Route::get('/pengeluaran/pdf', [AkuntansiLaporanPengeluaran::class, 'cetakPDF'])
+                                ->name('pengeluaran.pdf');
+
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Laba Rugi
+                            |--------------------------------------------------------------------------
+                            */
+                            Route::get('/laba-rugi', [AkuntansiLaporanLabaRugi::class, 'index'])
+                                ->name('laba-rugi');
+
+                            Route::get('/laba-rugi/pdf', [AkuntansiLaporanLabaRugi::class, 'cetakPDF'])
+                                ->name('laba-rugi.pdf');
+
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Arus Kas
+                            |--------------------------------------------------------------------------
+                            */
+                            Route::get('/arus-kas', [AkuntansiLaporanArusKas::class, 'index'])
+                                ->name('arus-kas');
+
+                            Route::get('/arus-kas/pdf', [AkuntansiLaporanArusKas::class, 'cetakPDF'])
+                                ->name('arus-kas.pdf');
+                        });
+                });
+        });
 });
