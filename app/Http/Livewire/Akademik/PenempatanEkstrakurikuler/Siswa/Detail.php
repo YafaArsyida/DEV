@@ -1,11 +1,8 @@
 <?php
 
-namespace App\Http\Livewire\Akademik\PenempatanEkstrakurikuler;
+namespace App\Http\Livewire\Akademik\PenempatanEkstrakurikuler\Siswa;
 
-use App\Models\Ekstrakurikuler;
-use App\Models\PenempatanEkstrakurikuler;
 use App\Models\PenempatanSiswa;
-use App\Models\Siswa;
 use Livewire\Component;
 
 class Detail extends Component
@@ -36,6 +33,6 @@ class Detail extends Component
     }
     public function render()
     {
-        return view('livewire.akademik.penempatan-ekstrakurikuler.detail');
+        return view('livewire.akademik.penempatan-ekstrakurikuler.siswa.detail');
     }
 }

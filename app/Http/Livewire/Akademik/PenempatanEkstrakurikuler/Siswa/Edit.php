@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\Akademik\PenempatanEkstrakurikuler;
+namespace App\Http\Livewire\Akademik\PenempatanEkstrakurikuler\Siswa;
 
 use App\Models\Ekstrakurikuler;
 use App\Models\PenempatanEkstrakurikuler;
@@ -115,11 +115,14 @@ class Edit extends Component
             ]);
         }
     }
-
     public function render()
     {
-        return view('livewire.akademik.penempatan-ekstrakurikuler.edit', [
-            'select_ekstrakurikuler' => Ekstrakurikuler::get(),
+        return view('livewire.akademik.penempatan-ekstrakurikuler.siswa.edit',[
+            'select_ekstrakurikuler' => Ekstrakurikuler::query()
+                ->withCount([
+                    'ms_penempatan_ekstrakurikuler as total_peserta',
+                ])
+                ->get(),
         ]);
     }
 }

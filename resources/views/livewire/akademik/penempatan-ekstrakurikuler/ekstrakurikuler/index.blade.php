@@ -64,13 +64,12 @@
                     <table class="table table-hover table-nowrap align-middle" style="width:100%">
                         <thead class="table-light">
                             <tr class="text-uppercase">
-                                <th class="text-center" width="30px">no</th>
-                                <th class="text-center">hapus</th>
+                                <th class="text-center">no</th>
                                 <th>ekstrakurikuler</th>
                                 <th>biaya</th>
                                 <th>kuota</th>
-                                <th>jenjang</th>
-                                <th>tahun ajaran</th>
+                                <th>terisi</th>
+                                <th>tersedia</th>
                                 <th class="text-center">aksi</th>
                             </tr>
                         </thead>
@@ -78,13 +77,7 @@
                             @forelse ($data as $item)
                                 <tr>
                                     <td class="text-center">{{ $loop->iteration }}</td>
-                                    <td class="text-center">
-                                        <a href="#deleteEkstrakurikuler" data-bs-toggle="modal" class="text-danger d-inline-block remove-item-btn"
-                                            wire:click.prevent="$emit('confirmDelete', {{ $item->ms_ekstrakurikuler_id }})"
-                                            data-bs-trigger="hover" data-bs-placement="top" title="Hapus Ekstrakurikuler">
-                                            <i class="ri-delete-bin-5-fill fs-14"></i>
-                                        </a>
-                                    </td>
+                                    
                                     <td>
                                         <span class="fw-medium">
                                             {{ $item->nama_ekstrakurikuler }}
@@ -97,12 +90,8 @@
                                         </span>
                                     </td>
                                     <td>{{ $item->kuota ?? 0 }} siswa</td>
-                                    <td>
-                                        {{ $item->ms_jenjang?->nama_jenjang ?? '-' }}
-                                    </td>
-                                    <td>
-                                        {{ $item->ms_tahun_ajar?->nama_tahun_ajar ?? '-' }}
-                                    </td>
+                                    <td>{{ $item->ms_penempatan_ekstrakurikuler_count ?? 0 }} siswa</td>
+                                    <td>{{ max(0, ($item->kuota ?? 0) - ($item->ms_penempatan_ekstrakurikuler_count ?? 0)) }} siswa</td>
                                     <td>
                                         <div class="d-flex justify-content-center gap-2">
                                             {{-- Edit --}}
@@ -116,14 +105,12 @@
                                             </button>
                                              {{-- Detail --}}
                                             <button
-                                                type="button"
                                                 class="btn btn-primary btn-sm rounded-pill px-3"
-                                                data-bs-toggle="modal"
+                                                data-bs-toggle="offcanvas"
                                                 data-bs-target="#detailEkstrakurikuler"
                                                 title="Detail Ekstrakurikuler"
-                                                wire:click.prevent="$emit('detailEkstrakurikuler', {{ $item->ms_ekstrakurikuler_id }})"
-                                            >
-                                                <i class="ri-eye-line me-1"></i> Detail
+                                                wire:click.prevent="$emit('detailEkstrakurikuler', {{ $item->ms_ekstrakurikuler_id }})">
+                                                <i class="ri-user-line me-1"></i> Siswa
                                             </button>
                                         </div>
                                     </td>                                  

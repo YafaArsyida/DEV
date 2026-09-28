@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Livewire\Akademik\Ekstrakurikuler;
+namespace App\Http\Livewire\Akademik\PenempatanEkstrakurikuler\Ekstrakurikuler;
 
 use App\Models\Ekstrakurikuler;
 use App\Models\Jenjang;
@@ -45,14 +45,10 @@ class Index extends Component
     {
         $this->resetPage();
     }
-
     public function render()
     {
+        // Query hanya jika jenjang dan tahun ajar dipilih
         $data = Ekstrakurikuler::query()
-            ->with([
-                'ms_jenjang',
-                'ms_tahun_ajar',
-            ])
             ->when($this->selectedJenjang, fn ($q) =>
                 $q->where('ms_jenjang_id', $this->selectedJenjang)
             )
@@ -60,17 +56,13 @@ class Index extends Component
                 $q->where('ms_tahun_ajar_id', $this->selectedTahunAjar)
             )
             ->when($this->search, fn ($q) =>
-                $q->where(
-                    'nama_ekstrakurikuler',
-                    'like',
-                    '%' . $this->search . '%'
-                )
+                $q->where('nama_ekstrakurikuler', 'like', '%' . $this->search . '%')
             )
-            ->withCount('ms_penempatan_ekstrakurikuler')
-            ->orderByDesc('ms_ekstrakurikuler_id')
-            ->paginate(40);
-            
-        return view('livewire.akademik.ekstrakurikuler.index', [
+        ->withCount('ms_penempatan_ekstrakurikuler')
+        ->orderByDesc('ms_ekstrakurikuler_id')
+        ->paginate(40);
+
+        return view('livewire.akademik.penempatan-ekstrakurikuler.ekstrakurikuler.index',[
             'data' => $data
         ]);
     }

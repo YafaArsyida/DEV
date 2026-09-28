@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Http\Livewire\Akademik\PenempatanEkstrakurikuler;
+namespace App\Http\Livewire\Akademik\PenempatanEkstrakurikuler\Siswa;
 
 use App\Models\Jenjang;
 use App\Models\Kelas;
-use App\Models\PenempatanEkstrakurikuler;
 use App\Models\PenempatanSiswa;
 use App\Models\TahunAjar;
 use Livewire\Component;
@@ -132,7 +131,7 @@ class Index extends Component
             $this->siswasOnPage = $siswas->items();
         }
 
-        return view('livewire.akademik.penempatan-ekstrakurikuler.index', compact(
+        return view('livewire.akademik.penempatan-ekstrakurikuler.siswa.index', compact(
             'select_kelas',
             'siswas'
         ));

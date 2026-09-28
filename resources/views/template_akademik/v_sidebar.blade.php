@@ -200,8 +200,8 @@
 
                 {{-- PENEMPATAN SISWA --}}
                 <li class="nav-item">
-                    <a href="javascript:void(0);"
-                        class="nav-link menu-link">
+                     <a href="{{ route('akademik.penempatan-ekstrakurikuler') }}"
+                        class="nav-link menu-link {{ request()->routeIs('akademik.penempatan-ekstrakurikuler') ? 'active' : '' }}">
                         <i class="mdi mdi-account-multiple-plus-outline"></i>
                         <span data-key="t-penempatan-ekstrakurikuler">
                             Penempatan Ekstrakurikuler

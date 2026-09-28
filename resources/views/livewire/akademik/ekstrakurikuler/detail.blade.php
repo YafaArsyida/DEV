@@ -1,197 +1,206 @@
-<div wire:ignore.self class="offcanvas offcanvas-top bg-light" id="detailEkstrakurikuler" tabindex="-1" aria-labelledby="detailEkstrakurikulerLabel" style="min-height:100vh;">
-    <div class="offcanvas-header border-bottom px-4 py-3 shadow-sm">
-        <div class="d-flex justify-content-between align-items-start w-100">
-            <!-- Kiri -->
-            <div class="d-flex align-items-center gap-3">
-                <div class="avatar-sm">
-                    <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-18">
-                        <i class="ri-trophy-line"></i>
+<div wire:ignore.self class="modal fade" id="detailEkstrakurikuler" tabindex="-1"
+    aria-labelledby="detailEkstrakurikulerLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+
+            {{-- Header --}}
+            <div class="modal-header border-bottom px-4 py-3">
+                <div class="d-flex align-items-center">
+                    <div class="avatar-sm me-3">
+                        <span class="avatar-title bg-primary-subtle text-primary rounded-3 fs-4">
+                            <i class="ri-run-line"></i>
+                        </span>
+                    </div>
+
+                    <div>
+                        <h5 class="modal-title mb-1" id="detailEkstrakurikulerLabel">
+                            Detail Ekstrakurikuler
+                        </h5>
+
+                        <p class="text-muted mb-0">
+                            Informasi ekstrakurikuler
+                        </p>
                     </div>
                 </div>
 
-                <div>
-                    <h5 class="fw-bold mb-1">
-                        Data Ekstrakurikuler
-                    </h5>
-                    {{-- <small class="text-muted">
-                        deskripsi ekstra
-                    </small> --}}
-                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <!-- Kanan -->
-            <button type="button"
-                class="btn btn-light btn-icon rounded-circle shadow-none"
-                data-bs-dismiss="offcanvas">
-                <i class="ri-close-line fs-18"></i>
-            </button>
-        </div>
-    </div>
-    <div class="offcanvas-body">
-        <div class="row g-4">
-            <div class="col-12">
-                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-                    <div class="card-header">
-                        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4">
-                            {{-- TITLE --}}
-                            <div>
-                                <div class="d-flex align-items-center gap-3">
-                                    <div class="avatar-sm">
-                                        <div class="avatar-title bg-success-subtle text-success rounded-circle fs-20">
-                                            <i class="ri-team-line"></i>
-                                        </div>
+
+            {{-- Body --}}
+            <div class="modal-body p-4">
+
+                @if ($ekstrakurikuler)
+
+                    {{-- Profile --}}
+                    <div class="text-center mb-4">
+                        <div class="avatar-lg mx-auto mb-3">
+                            <span class="avatar-title bg-primary-subtle text-primary rounded-circle fs-2">
+                                <i class="ri-run-line"></i>
+                            </span>
+                        </div>
+
+                        <h5 class="mb-1">
+                            {{ $ekstrakurikuler->nama_ekstrakurikuler }}
+                        </h5>
+
+                        <p class="text-muted mb-0">
+                            {{ $ekstrakurikuler->deskripsi ?: 'Tidak ada deskripsi.' }}
+                        </p>
+                    </div>
+
+                    {{-- Informasi --}}
+                    <div class="row g-3">
+
+                        {{-- Jenjang --}}
+                        <div class="col-md-6">
+                            <div class="border rounded-4 p-3 h-100">
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-sm me-3">
+                                        <span class="avatar-title bg-info-subtle text-info rounded-3">
+                                            <i class="ri-school-line"></i>
+                                        </span>
                                     </div>
 
                                     <div>
-                                        <h5 class="fw-bold mb-1">
-                                            Detail Ekstrakurikuler Siswa
-                                        </h5>
-                                        <small class="text-muted">
-                                            Tampilkan siswa dari daftar berdasarkan kategori dan pencarian.
-                                        </small>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- ACTION --}}
-                            <div class="d-flex gap-2 flex-wrap">
-
-                                <button
-                                    wire:click="cetakEkstrakurikuler"
-                                    type="button"
-                                    class="btn btn-danger rounded-pill px-4 d-inline-flex align-items-center gap-1"
-                                    title="Cetak Laporan PDF">
-                                    <i class="ri-printer-line"></i>
-                                    <span>Cetak</span>
-                                </button>
-
-                                {{-- <button data-bs-toggle="modal" data-bs-target="#ModalDetailEkstrakurikuler" class="btn rounded-pill px-4 btn-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button> --}}
-                            </div>
-
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="row g-3 mb-3">
-                            <div class="col-xxl-2 col-sm-6"> 
-                                <select wire:model="selectedKelas" style="cursor: pointer" class="form-select" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Kelas">
-                                    <option value="">Semua Kelas</option>
-                                    @foreach ($select_kelas as $item)    
-                                    <option value="{{ $item->ms_kelas_id }}">{{ $item->nama_kelas }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-xxl-10 col-sm-6">
-                                <div class="search-box">
-                                    <input type="text" class="form-control search" wire:model.debounce.300ms="search" placeholder="cari nama, deskripsi atau lainnya...">
-                                    <i class="ri-search-line search-icon"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="live-preview">
-                            <!-- Jika Jenjang atau Tahun Ajar belum dipilih -->
-                            @if (!$selectedJenjang)
-                            <div class="text-center py-4">
-                                <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop"
-                                    colors="primary:#405189,secondary:#08a88a"
-                                    style="width:75px;height:75px">
-                                </lord-icon>
-                                <h5 class="mt-2">Silakan Pilih Jenjang</h5>
-                                <p class="text-muted mb-0">Untuk melihat data, harap pilih Jenjang terlebih dahulu.</p>
-                            </div>
-                            @else
-                            <div class="table-responsive">
-                                <table class="table table-hover nowrap align-middle" style="width:100%">
-                                    <thead class="table-light">
-                                        <tr class="text-uppercase">
-                                            <th style="width: 50px;">NO</th>
-                                            <th>Siswa</th>
-                                            <th>Kelas</th>
-                                            <th>Ekstrakurikuler</th>
-                                            <th>Biaya</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse ($siswa as $key => $item)
-                                            <tr>
-                                                <td>{{ $siswa->firstItem() + $key }}.</td>
-                                                <td>
-                                                    <span class="fw-medium">
-                                                        {{ $item->ms_siswa->nama_siswa }}
-                                                    </span>
-                                                    <p class="text-muted mb-0">{{ $item->deskripsi }}</p>
-                                                </td>
-                                                <td>{{ $item->ms_kelas->nama_kelas ?? '-' }}</td>
-                                                <td>
-                                                    @if ($item->ms_penempatan_ekstrakurikuler)
-                                                        <span class="">
-                                                            <i class="ri-trophy-line me-1"></i>
-                                                            {{ $item->ms_penempatan_ekstrakurikuler->ms_ekstrakurikuler->nama_ekstrakurikuler ?? '-' }}
-                                                        </span>
-                                                    @else
-                                                        <em>Belum memilih</em>
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    @if ($item->ms_penempatan_ekstrakurikuler)
-                                                        <span class="fs-12 fw-semibold">
-                                                            Rp{{ number_format($item->ms_penempatan_ekstrakurikuler->ms_ekstrakurikuler->biaya ?? 0, 0, ',', '.') }}
-                                                        </span>
-                                                    @else
-                                                        <span class="text-muted">-</span>
-                                                    @endif
-                                                </td>
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="5">
-                                                    <div class="noresult text-center py-3">
-                                                        <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop" 
-                                                                colors="primary:#405189,secondary:#08a88a" 
-                                                                style="width:75px;height:75px"></lord-icon>
-                                                        <h5 class="mt-2">Maaf, Tidak Ada Data yang Ditemukan</h5>
-                                                        <p class="text-muted mb-0">Kami telah mencari keseluruhan data, namun tidak ditemukan hasil yang sesuai.</p>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                                {{-- PAGINATION --}}
-                                <div class="mt-3">
-                                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                                        <div class="text-muted fs-13">
-                                            Menampilkan
-                                            <span class="fw-semibold">
-                                                {{ $siswa->firstItem() ?? 0 }}
-                                            </span>
-                                            -
-                                            <span class="fw-semibold">
-                                                {{ $siswa->lastItem() ?? 0 }}
-                                            </span>
-                                            dari
-                                            <span class="fw-semibold">
-                                                {{ $siswa->total() }}
-                                            </span>
-                                            data siswa
+                                        <div class="text-muted fs-12 mb-1">
+                                            Jenjang
                                         </div>
-                                        <div>
-                                            {{ $siswa->links() }}
+
+                                        <div class="fw-medium">
+                                            {{ $ekstrakurikuler->ms_jenjang?->nama_jenjang ?: '-' }}
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            @endif
                         </div>
+
+                        {{-- Tahun Ajaran --}}
+                        <div class="col-md-6">
+                            <div class="border rounded-4 p-3 h-100">
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-sm me-3">
+                                        <span class="avatar-title bg-warning-subtle text-warning rounded-3">
+                                            <i class="ri-calendar-line"></i>
+                                        </span>
+                                    </div>
+
+                                    <div>
+                                        <div class="text-muted fs-12 mb-1">
+                                            Tahun Ajaran
+                                        </div>
+
+                                        <div class="fw-medium">
+                                            {{ $ekstrakurikuler->ms_tahun_ajar?->nama_tahun_ajar ?: '-' }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Biaya --}}
+                        <div class="col-md-4">
+                            <div class="border rounded-4 p-3 h-100">
+                                <div class="text-muted fs-12 mb-2">
+                                    Biaya
+                                </div>
+
+                                <div class="fw-semibold">
+                                    Rp{{ number_format($ekstrakurikuler->biaya ?? 0, 0, ',', '.') }}
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Kuota --}}
+                        <div class="col-md-4">
+                            <div class="border rounded-4 p-3 h-100">
+                                <div class="text-muted fs-12 mb-2">
+                                    Kuota
+                                </div>
+
+                                <div class="fw-semibold">
+                                    {{ $ekstrakurikuler->kuota ?? 0 }} siswa
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Terdaftar --}}
+                        <div class="col-md-4">
+                            <div class="border rounded-4 p-3 h-100">
+                                <div class="text-muted fs-12 mb-2">
+                                    Terdaftar
+                                </div>
+
+                                <div class="fw-semibold text-primary">
+                                    {{ $ekstrakurikuler->total_peserta ?? 0 }} siswa
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Tersedia --}}
+                        <div class="col-12">
+                            <div class="border rounded-4 p-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="text-muted fs-12 mb-1">
+                                            Sisa Kuota
+                                        </div>
+
+                                        <div class="fw-semibold">
+                                            {{ max(0, ($ekstrakurikuler->kuota ?? 0) - ($ekstrakurikuler->total_peserta ?? 0)) }}
+                                            siswa
+                                        </div>
+                                    </div>
+
+                                    <div class="avatar-sm">
+                                        <span class="avatar-title bg-success-subtle text-success rounded-3">
+                                            <i class="ri-user-add-line"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
-                </div>
+
+                @else
+                    <div class="text-center py-5">
+                        <div class="avatar-lg mx-auto mb-3">
+                            <span class="avatar-title bg-light text-muted rounded-circle fs-2">
+                                <i class="ri-information-line"></i>
+                            </span>
+                        </div>
+
+                        <h5>Data Tidak Ditemukan</h5>
+
+                        <p class="text-muted mb-0">
+                            Data ekstrakurikuler tidak tersedia.
+                        </p>
+                    </div>
+                @endif
             </div>
-            <div class="col-12">
-                <div class="d-flex flex-column flex-sm-row gap-2 justify-content-end">
-                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="offcanvas">
-                        <i class="ri-close-line me-1"></i>
-                        Tutup
+
+            {{-- Footer --}}
+            <div class="modal-footer border-top px-4 py-3">
+                <button
+                    type="button"
+                    class="btn btn-light rounded-pill px-4"
+                    data-bs-dismiss="modal"
+                >
+                    Tutup
+                </button>
+
+                @if ($ekstrakurikuler)
+                    <button
+                        type="button"
+                        class="btn btn-primary rounded-pill px-4"
+                        wire:click="cetakEkstrakurikuler"
+                    >
+                        <i class="ri-printer-line me-1"></i>
+                        Cetak
                     </button>
-                </div>
+                @endif
             </div>
+
         </div>
     </div>
 </div>

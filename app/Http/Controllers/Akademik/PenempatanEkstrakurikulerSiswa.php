@@ -9,6 +9,6 @@ class PenempatanEkstrakurikulerSiswa extends Controller
 {
     public function index()
     {
-        return view('keuangan.administrasi.ekstrakurikuler-siswa');
+        return view('akademik.penempatan-ekstrakurikuler');
     }
 }

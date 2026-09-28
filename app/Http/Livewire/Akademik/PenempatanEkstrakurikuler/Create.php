@@ -8,6 +8,6 @@ class Create extends Component
 {
     public function render()
     {
-        return view('livewire.keuangan.siswa-ekstrakurikuler.create');
+        return view('livewire.akademik.penempatan-ekstrakurikuler.create');
     }
 }

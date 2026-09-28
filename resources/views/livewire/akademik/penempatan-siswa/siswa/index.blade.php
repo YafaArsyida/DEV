@@ -133,7 +133,7 @@
                 <table id="DataIndexSiswa" class="table table-hover table-nowrap align-middle" style="width:100%">
                     <thead class="table-light">
                         <tr>
-                            <th class="text-uppercase" width="50px">no</th>
+                            <th class="text-uppercase">no</th>
                             <th class="text-uppercase" style="width: 50px;">Hapus</th>
                             <th class="text-uppercase">siswa</th>
                             <th class="text-uppercase">jenjang</th>
