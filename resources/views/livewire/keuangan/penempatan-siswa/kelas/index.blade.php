@@ -16,22 +16,12 @@
                             Data Kelas
                         </h5>
                         <small>
-                            Kelola penempatan siswa dalam kelas 
+                            Kelola informasi tagihan siswa pada kelas
                         </small>
                     </div>
                 </div>
             </div>
-    
-            {{-- ACTION --}}
-            @if ($selectedJenjang && $selectedTahunAjar)
-            <div class="d-flex gap-2 flex-wrap">
-                {{-- TAMBAH --}}
-                <button type="button" class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#ModalAddKelas"
-                        wire:click.prevent="$emit('showCreateKelas', {{ $selectedJenjang }}, {{ $selectedTahunAjar }})">
-                    <i class="ri-add-line me-1"></i>Kelas Baru
-                </button>
-            </div>
-            @endif
+
         </div>
     </div>
     <div class="card-body">
@@ -67,69 +57,73 @@
                                 <th class="text-uppercase" width="30px">no</th>
                                 <th class="text-uppercase">kelas</th>
                                 <th class="text-uppercase">siswa</th>
+                                <th class="text-uppercase text-center">Lunas</th>
+                                {{-- <th class="text-uppercase text-end">Lunas</th> --}}
                                 <th class="text-uppercase text-center">aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse ($kelass as $item)
+                            @php
+                                $totalTagihan = $item->ms_tagihan_siswa_sum_jumlah_tagihan_siswa ?? 0;
+                                $totalDibayarkan = $item->total_dibayarkan ?? 0;
+
+                                $persentaseLunas = $totalTagihan > 0
+                                    ? round(($totalDibayarkan / $totalTagihan) * 100, 1)
+                                    : 0;
+                                $progressLunas = min(max($persentaseLunas, 0), 100);
+                            @endphp
                                 <tr>
+
+                                    {{-- NO --}}
                                     <td>
                                         {{ ($kelass->firstItem() ?? 0) + $loop->index }}.
                                     </td>
+
+                                    {{-- KELAS --}}
                                     <td>
                                         <span class="fw-medium">
                                             {{ $item->nama_kelas }}
                                         </span>
-                                        <p class="text-muted mb-0">{{ $item->deskripsi }}</p>
-                                    </td>
-                                    <td>{{ $item->ms_penempatan_siswa_count }} siswa</td>
-                                    <td>
-                                        <div class="d-flex justify-content-center gap-2">
 
+                                        @if ($item->deskripsi)
+                                            <p class="text-muted mb-0">
+                                                {{ $item->deskripsi }}
+                                            </p>
+                                        @endif
+                                    </td>
+
+                                    <td>
+                                        {{ $item->ms_penempatan_siswa_count }} siswa
+                                    </td>
+
+                                    <td>
+                                        <div class="d-flex flex-column align-items-center gap-1" style="min-width: 90px">
+                                            <span class="fw-semibold">{{ $persentaseLunas }}%</span>
+                                            <div class="progress w-100" role="progressbar"
+                                                aria-label="Persentase pelunasan {{ $item->nama_kelas }}"
+                                                aria-valuenow="{{ $progressLunas }}" aria-valuemin="0" aria-valuemax="100"
+                                                style="height: 6px">
+                                                <div class="progress-bar bg-success" style="width: {{ $progressLunas }}%"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    {{-- AKSI --}}
+                                    <td>
+                                        <div class="d-flex justify-content-center">
                                             {{-- DETAIL --}}
-                                            <a href="#ModalDetailKelas"
+                                            <a href="#modalDetailKelas"
                                                 data-bs-toggle="modal"
                                                 class="btn btn-soft-primary btn-sm rounded-pill px-3"
                                                 title="Detail Kelas"
-                                                wire:click.prevent="$emit('loadDetailKelas', {
-                                                    kelasId: {{ $item->ms_kelas_id }},
-                                                    namaKelas: '{{ addslashes($item->nama_kelas) }}',
-                                                    jenjang: {{ $item->ms_jenjang_id }},
-                                                    tahunAjar: {{ $item->ms_tahun_ajar_id }}
-                                                })">
+                                                wire:click.prevent="$emit('loadDetailKelas',{{ $item->ms_kelas_id }})">
                                                 <i class="ri-eye-line me-1"></i>
                                                 Detail
                                             </a>
-
-                                            {{-- PINDAH --}}
-                                            <a href="#ModalChangeKelas"
-                                                data-bs-toggle="modal"
-                                                class="btn btn-primary btn-sm rounded-pill px-3"
-                                                title="Pindah Siswa"
-                                                wire:click.prevent="$emit('showKelas', {
-                                                    jenjang: {{ $item->ms_jenjang_id }},
-                                                    tahunAjar: {{ $item->ms_tahun_ajar_id }},
-                                                    kelasId: {{ $item->ms_kelas_id }}
-                                                })">
-                                                <i class="ri-arrow-left-right-line me-1"></i>
-                                                Pindah
-                                            </a>
-
-                                            {{-- NAIK --}}
-                                            <a href="#ModalPromoteKelas"
-                                                data-bs-toggle="modal"
-                                                class="btn btn-success btn-sm rounded-pill px-3"
-                                                title="Naik Kelas"
-                                                wire:click.prevent="$emit('showPromote', {
-                                                    jenjang: {{ $item->ms_jenjang_id }},
-                                                    tahunAjar: {{ $item->ms_tahun_ajar_id }},
-                                                    kelasId: {{ $item->ms_kelas_id }}
-                                                })">
-                                                <i class="ri-graduation-cap-line me-1"></i>
-                                                Naik
-                                            </a>
                                         </div>
                                     </td>
+
                                 </tr>
                             @empty
                                 <!-- Jika Tidak Ada Data Kelas -->

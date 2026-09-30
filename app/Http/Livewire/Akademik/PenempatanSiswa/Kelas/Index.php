@@ -76,7 +76,7 @@ class Index extends Component
         $rataRataSiswa = $totalKelas > 0 ? round($totalSiswa / $totalKelas, 1) : 0;
 
         return view('livewire.akademik.penempatan-siswa.kelas.index',[
-             'kelass' => $kelass,
+            'kelass' => $kelass,
             'totalKelas' => $totalKelas,
             'totalSiswa' => $totalSiswa,
             'rataRataSiswa' => $rataRataSiswa,

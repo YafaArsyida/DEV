@@ -42,11 +42,26 @@ class Kelas extends Model
         return $this->belongsTo(Jenjang::class, 'ms_jenjang_id', 'ms_jenjang_id');
     }
 
+
     public function ms_penempatan_siswa()
     {
-        return $this->hasMany(PenempatanSiswa::class, 'ms_kelas_id');
+        return $this->hasMany(
+            PenempatanSiswa::class, 'ms_kelas_id', 'ms_kelas_id'
+        );
     }
 
+
+    public function ms_tagihan_siswa()
+    {
+        return $this->hasManyThrough(
+            TagihanSiswa::class,
+            PenempatanSiswa::class,
+            'ms_kelas_id',
+            'ms_penempatan_siswa_id',
+            'ms_kelas_id',
+            'ms_penempatan_siswa_id'
+        );
+    }
     public function jumlah_siswa()
     {
         return $this->ms_penempatan_siswa()->count();

@@ -6,18 +6,17 @@
                 <div class="d-flex align-items-center gap-3">
                     <div class="avatar-sm">
                         <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
-                            <i class="ri-calendar-event-line">
-                            </i>
+                            <i class="ri-price-tag-3-line"></i>
                         </div>
                     </div>
-    
+
                     <div>
                         <h5 class="fw-bold mb-1">
                             Data Kategori Tagihan
                         </h5>
-                        {{-- <small>
-                            Kelola laporan kegiatan generus 
-                        </small> --}}
+                        <small>
+                            Kelola kategori tagihan siswa
+                        </small>
                     </div>
                 </div>
             </div>
@@ -62,13 +61,23 @@
                     <thead class="table-light">
                         <tr>
                             <th class="text-uppercase" width="30px">NO</th>
-                            <th class="text-uppercase" style="width: 50px;">Hapus</th>
+                            <th class="text-uppercase text-center">hapus</th>
                             <th class="text-uppercase">kategori</th>
+                            <th class="text-uppercase text-center">Tagihan</th>
+                            <th class="text-uppercase text-center">lunas</th>
                             <th class="text-uppercase text-center">aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse ($kategoris as $key => $item)
+                        @php
+                            $totalTagihan = $item->total_tagihan ?? 0;
+                            $totalDibayarkan = $item->total_dibayarkan ?? 0;
+                            $persentaseLunas = $totalTagihan > 0
+                                ? round(($totalDibayarkan / $totalTagihan) * 100, 2)
+                                : 0;
+                            $progressLunas = min(max($persentaseLunas, 0), 100);
+                        @endphp
                         <tr>
                             <td>{{ $kategoris->firstItem() + $key }}.</td>
                             <td class="text-center">
@@ -84,17 +93,35 @@
                                 </span>
                                 <p class="text-muted mb-0">{{ $item->deskripsi }}</p>
                             </td>
-                            <td class="text-center">
-                                {{-- edit --}}
-                                <a href="#ModalEditKategoriTagihan" data-bs-toggle="modal" class="btn btn-primary btn-sm rounded-pill px-3" title="Edit Kategori" 
-                                    wire:click="$emit('loadDataKategoriTagihan', {{ $item->ms_kategori_tagihan_siswa_id }})">
-                                    <i class="ri-mark-pen-line me-1"></i> Edit
-                                </a>
-                            </td>                
+                            <td class="text-center">{{ $item->jumlah_jenis ?? 0 }} Jenis Tagihan</td>
+                            <td>
+                                <div class="d-flex flex-column align-items-center gap-1" style="min-width: 90px">
+                                    <span class="fw-semibold">{{ number_format($persentaseLunas, 2) }}%</span>
+                                    <div class="progress w-100" role="progressbar"
+                                        aria-label="Pelunasan kategori {{ $item->nama_kategori_tagihan_siswa }}"
+                                        aria-valuenow="{{ $progressLunas }}" aria-valuemin="0" aria-valuemax="100"
+                                        style="height: 5px">
+                                        <div class="progress-bar bg-success" style="width: {{ $progressLunas }}%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex justify-content-center gap-2">
+                                    {{-- Detail/Transfer --}}
+                                    <a href="#modalDetailKategoriTagihan" data-bs-toggle="modal" class="btn btn-soft-primary btn-sm rounded-pill px-3"
+                                        title="Detail Kategori" wire:click.prevent="$emit('loadDetailKategoriTagihan', {{ $item->ms_kategori_tagihan_siswa_id }} )">
+                                        <i class="ri-eye-line me-1"></i> Detail
+                                    </a>
+                                    <a href="#ModalEditKategoriTagihan" data-bs-toggle="modal" class="btn btn-primary btn-sm rounded-pill px-3" title="Edit Kategori"
+                                        wire:click="$emit('loadDataKategoriTagihan', {{ $item->ms_kategori_tagihan_siswa_id }})">
+                                        <i class="ri-mark-pen-line me-1"></i> Edit
+                                    </a>
+                                </div>
+                            </td>
                         </tr>
                         @empty
                             <tr>
-                                <td colspan="6">
+                                <td colspan="9">
                                     <div class="noresult text-center py-3">
                                         <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop" 
                                                 colors="primary:#405189,secondary:#08a88a" 

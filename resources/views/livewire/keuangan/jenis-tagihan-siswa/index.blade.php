@@ -6,15 +6,17 @@
                 <div class="d-flex align-items-center gap-3">
                     <div class="avatar-sm">
                         <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
-                            <i class="ri-calendar-event-line">
-                            </i>
+                            <i class="ri-file-list-3-line"></i>
                         </div>
                     </div>
-    
+
                     <div>
                         <h5 class="fw-bold mb-1">
                             Data Jenis Tagihan
                         </h5>
+                        <small>
+                            Kelola jenis tagihan siswa
+                        </small>
                     </div>
                 </div>
             </div>
@@ -76,17 +78,27 @@
                     <thead class="table-light">
                         <tr>
                             <th class="text-uppercase" width="30px">NO</th>
-                            <th class="text-uppercase" style="width: 50px;">Hapus</th>
-                            <th class="text-uppercase text-center" width="50px">cicilan</th>
+                            <th class="text-uppercase text-center">hapus</th>
                             <th class="text-uppercase">tagihan</th>
                             <th class="text-uppercase">kategori</th>
-                            <th class="text-uppercase">cicilan</th>
                             <th class="text-uppercase">jatuh tempo</th>
+                            <th class="text-uppercase text-center">Tagihan</th>
+                            <th class="text-uppercase text-center">lunas</th>
+                            <th class="text-uppercase text-center">cicilan</th>
                             <th class="text-uppercase text-center">aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse ($jenis_tagihans as $key => $item)
+                        @php
+                            $totalTagihan = $item->total_tagihan ?? 0;
+                            $totalDibayarkan = $item->total_dibayarkan ?? 0;
+                            $sisaTagihan = max(0, $totalTagihan - $totalDibayarkan);
+                            $persentaseLunas = $totalTagihan > 0
+                                ? round(($totalDibayarkan / $totalTagihan) * 100, 2)
+                                : 0;
+                            $progressLunas = min(max($persentaseLunas, 0), 100);
+                        @endphp
                         <tr>
                             <td>{{ $jenis_tagihans->firstItem() + $key }}.</td>
                             <td class="text-center">
@@ -96,32 +108,49 @@
                                     <i class="ri-delete-bin-5-fill fs-14"></i>
                                 </a>
                             </td>
-                            <td class="text-center">
-                                <div class="form-check ps-3 form-switch form-switch-md" dir="ltr" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Ubah Status Cicilan">
-                                    <input type="checkbox" class="form-check-input" id="customSwitchsizemd-{{ $item->ms_jenis_tagihan_siswa_id }}" 
-                                        {{ $item->cicilan_status == 'Aktif' ? 'checked' : '' }}
-                                        wire:change="toggleStatus('{{ $item->ms_jenis_tagihan_siswa_id }}', $event.target.checked)">
-                                </div>
-                            </td>
                             <td>
                                 <span class="fw-medium">
                                     {{ $item->nama_jenis_tagihan_siswa }}
                                 </span>
                                 <p class="text-muted mb-0">{{ $item->deskripsi }}</p>
-                            <td>{{ $item->ms_kategori_tagihan_siswa->nama_kategori_tagihan_siswa }}</td>
-                            <td class="{{ $item->cicilan_status == 'Aktif' ? 'text-success' : 'text-danger' }}"><i class="ri-{{ $item->cicilan_status == 'Aktif' ? 'checkbox' : 'close' }}-circle-line fs-17 align-middle"></i> {{ $item->cicilan_status }}</td>
+                            </td>
+                            <td>{{ $item->ms_kategori_tagihan_siswa->nama_kategori_tagihan_siswa ?? '-' }}</td>
                             <td>{{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($item->tanggal_jatuh_tempo, 'd F Y') }}</td>
+                            <td class="text-center">{{ $item->jumlah_item ?? 0 }} Item Tagihan</td>
+                            <td>
+                                <div class="d-flex flex-column align-items-center gap-1" style="min-width: 90px">
+                                    <span class="fw-semibold">{{ number_format($persentaseLunas, 2) }}%</span>
+                                    <div class="progress w-100" role="progressbar"
+                                        aria-label="Pelunasan jenis tagihan {{ $item->nama_jenis_tagihan_siswa }}"
+                                        aria-valuenow="{{ $progressLunas }}" aria-valuemin="0" aria-valuemax="100"
+                                        style="height: 5px">
+                                        <div class="progress-bar bg-success" style="width: {{ $progressLunas }}%"></div>
+                                    </div>
+                                </div>
+                            </td>
                             <td class="text-center">
-                                {{-- edit --}}
-                                <a href="#ModalEditJenisTagihan" data-bs-toggle="modal" class="btn btn-primary btn-sm rounded-pill px-3" title="Edit Jenis Tagihan" 
-                                    wire:click="$emit('loadDataJenisTagihan', {{ $item->ms_jenis_tagihan_siswa_id }})">
-                                    <i class="ri-mark-pen-line me-1"></i> Edit
-                                </a>
-                            </td>                                   
+                                <div class="form-check form-switch d-inline-flex justify-content-center m-0" dir="ltr" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Ubah Status Cicilan">
+                                    <input type="checkbox" class="form-check-input" id="customSwitchsizemd-{{ $item->ms_jenis_tagihan_siswa_id }}"
+                                        {{ $item->cicilan_status == 'Aktif' ? 'checked' : '' }}
+                                        wire:change="toggleStatus('{{ $item->ms_jenis_tagihan_siswa_id }}', $event.target.checked)">
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center gap-2">
+                                    <a href="#modalDetailJenisTagihan" data-bs-toggle="modal" class="btn btn-soft-primary btn-sm rounded-pill px-3" title="Detail Jenis Tagihan"
+                                        wire:click.prevent="$emit('loadDetailJenisTagihan', {{ $item->ms_jenis_tagihan_siswa_id }})">
+                                        <i class="ri-eye-line me-1"></i> Detail
+                                    </a>
+                                    <a href="#ModalEditJenisTagihan" data-bs-toggle="modal" class="btn btn-primary btn-sm rounded-pill px-3" title="Edit Jenis Tagihan"
+                                        wire:click="$emit('loadDataJenisTagihan', {{ $item->ms_jenis_tagihan_siswa_id }})">
+                                        <i class="ri-mark-pen-line me-1"></i> Edit
+                                    </a>
+                                </div>
+                            </td>
                         </tr>
                         @empty
                             <tr>
-                                <td colspan="8">
+                                <td colspan="11">
                                     <div class="noresult text-center py-3">
                                         <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop" 
                                                 colors="primary:#405189,secondary:#08a88a" 

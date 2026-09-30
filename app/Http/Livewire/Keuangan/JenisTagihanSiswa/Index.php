@@ -87,7 +87,20 @@ class Index extends Component
         if ($this->selectedJenjang && $this->selectedTahunAjar) {
             $query = JenisTagihanSiswa::with(['ms_kategori_tagihan_siswa', 'ms_tahun_ajar', 'ms_jenjang'])
                 ->where('ms_jenjang_id', $this->selectedJenjang)
-                ->where('ms_tahun_ajar_id', $this->selectedTahunAjar);
+                ->where('ms_tahun_ajar_id', $this->selectedTahunAjar)
+                ->withCount(['ms_tagihan_siswa as jumlah_item'])
+                ->withSum(['ms_tagihan_siswa as total_tagihan'], 'jumlah_tagihan_siswa')
+                ->withSum([
+                    'dt_transaksi_tagihan_siswa as total_dibayarkan' => function ($query) {
+                        $query->where(
+                            'dt_transaksi_tagihan_siswa.status_transaksi',
+                            '!=',
+                            'dibatalkan'
+                        )->whereHas('ms_transaksi_tagihan_siswa', function ($transaksi) {
+                            $transaksi->where('status_transaksi', '!=', 'dibatalkan');
+                        });
+                    },
+                ], 'jumlah_bayar');
 
             if ($this->selectedKategoriTagihan) {
                 $query->where('ms_kategori_tagihan_siswa_id', $this->selectedKategoriTagihan);

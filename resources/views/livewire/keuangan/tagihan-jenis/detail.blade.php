@@ -11,18 +11,12 @@
                     </div>
 
                     <div>
-                        <h5 class="fw-bold mb-1">
-                            Detail Jenis Tagihan
-                        </h5>
-                        <small class="text-muted">
-                            {{ $nama_tagihan }}
-                        </small>
+                        <h5 class="fw-bold mb-1">Detail Jenis Tagihan</h5>
+                        <small class="text-muted">{{ $nama_tagihan }}</small>
                     </div>
                 </div>
                 <!-- Kanan -->
-                <button type="button"
-                    class="btn btn-light btn-icon rounded-circle shadow-none"
-                    data-bs-dismiss="offcanvas">
+                <button type="button" class="btn btn-light btn-icon rounded-circle shadow-none" data-bs-dismiss="offcanvas">
                     <i class="ri-close-line fs-18"></i>
                 </button>
             </div>

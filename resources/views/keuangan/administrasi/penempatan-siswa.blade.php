@@ -5,12 +5,12 @@
         <div class="row">
             <div class="col-12">
                 <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                    <h4 class="mb-sm-0">Konfigurasi Keuangan Siswa</h4>
+                    <h4 class="mb-sm-0">Penempatan Siswa</h4>
 
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">Keuangan</a></li>
-                            <li class="breadcrumb-item active">Konfigurasi Keuangan Siswa</li>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">Akademik</a></li>
+                            <li class="breadcrumb-item active">Penempatan Siswa</li>
                         </ol>
                     </div>
 
@@ -53,23 +53,17 @@
             </div>
         </div>
         <div class="row">
-            <!--end col-->
             <div class="col-xxl-4">
                 <div class="sticky-side-div">
-                    @livewire('keuangan.kategori-tagihan-siswa.index')   
+                    @livewire('keuangan.penempatan-siswa.kelas.index')   
                 </div>
-                @livewire('keuangan.kategori-tagihan-siswa.create')   
-                @livewire('keuangan.kategori-tagihan-siswa.edit')   
-                @livewire('keuangan.kategori-tagihan-siswa.delete')   
-                @livewire('keuangan.kategori-tagihan-siswa.detail')
+                @livewire('keuangan.penempatan-siswa.kelas.detail')
             </div>
             <div class="col-xxl-8">
-                @livewire('keuangan.jenis-tagihan-siswa.index')   
-                @livewire('keuangan.jenis-tagihan-siswa.create')   
-                @livewire('keuangan.jenis-tagihan-siswa.edit')   
-                @livewire('keuangan.jenis-tagihan-siswa.delete')   
-                @livewire('keuangan.jenis-tagihan-siswa.import')   
-                @livewire('keuangan.jenis-tagihan-siswa.detail')
+                @livewire('keuangan.penempatan-siswa.siswa.index') 
+                @livewire('keuangan.penempatan-siswa.siswa.detail')    
+                @livewire('akademik.siswa.create')    
+                @livewire('akademik.siswa.edit')                    
             </div>
         </div>        
     </div>

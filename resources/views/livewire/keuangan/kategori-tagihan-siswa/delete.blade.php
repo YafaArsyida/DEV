@@ -32,7 +32,7 @@
                         </span>
 
                         <h3 class="fw-bold mb-2" id="deleteRecordLabel">
-                            Hapus Data Katgeori Tagihan
+                            Hapus Data Kategori Tagihan
                         </h3>
 
                         <p class="text-muted mb-0 lh-lg px-lg-4">

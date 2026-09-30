@@ -6,38 +6,51 @@
                 <div class="d-flex align-items-center gap-3">
                     <div class="avatar-sm">
                         <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
-                            <i class="ri-file-list-3-line"></i>
+                            <i class="ri-group-line"></i>
                         </div>
                     </div>
+    
                     <div>
                         <h5 class="fw-bold mb-1">
-                            Tagihan Siswa
+                            Data Siswa
                         </h5>
-                        <small>
-                            Kelola tagihan dan pembayaran siswa
-                        </small>
+                        <small> Kelola data siswa dan informasi keuangan berdasarkan kelas. </small>
                     </div>
                 </div>
             </div>
     
             {{-- ACTION --}}
-            <div class="d-flex gap-2 flex-wrap">
-                @if ($selectedJenjang && $selectedTahunAjar && $selectedKelas)
-                <button wire:click="cetakLaporanTagihan" class="btn rounded-pill px-4 btn-danger d-inline-flex align-items-center gap-1">
-                    <i class="ri-printer-line align-bottom"></i>
-                    <span>Cetak Laporan</span>
-                </button>
-                @endif
-                <button data-bs-toggle="offcanvas" id="create-btn" data-bs-target="#offcanvasAddTagihan" wire:click.prevent="$emit('showCreateTagihan', {{ $selectedJenjang }}, {{ $selectedTahunAjar }})" class="btn rounded-pill px-4 btn-primary"><i class="ri-play-list-add-line"></i> Tagihan Baru</button>
-                <button data-bs-toggle="modal" data-bs-target="#ModalIndex" class="btn rounded-pill px-4 btn-success"><i class="ri-file-excel-2-line pb-0"></i> Export</button>
-            </div>
+            @if ($selectedJenjang && $selectedTahunAjar)
+                <div class="d-flex align-items-center flex-wrap gap-2">
+
+                    {{-- TAMBAH SISWA --}}
+                    <button
+                        data-bs-toggle="modal"
+                        data-bs-target="#ModalAddSiswa"
+                        wire:click.prevent="$emit('showCreateSiswa', {{ $selectedJenjang }}, {{ $selectedTahunAjar }})"
+                        class="btn btn-primary rounded-pill px-4">
+                        <i class="ri-user-add-line me-1"></i>
+                        Tambah Siswa
+                    </button>
+
+                    {{-- EXPORT --}}
+                    <button
+                        data-bs-toggle="modal"
+                        data-bs-target="#ModalIndexSiswa"
+                        class="btn btn-soft-success rounded-pill px-4">
+                        <i class="ri-file-excel-2-line me-1"></i>
+                        Export
+                    </button>
+
+                </div>
+            @endif
         </div>
     </div>
     <div class="card-body">
         <div class="row g-3 align-items-end mb-3">
             <!-- Input Pencarian -->
             <div class="col-12 col-lg-6">
-                <label class="form-label small text-muted text-uppercase fw-medium mb-2">Pencarian</label>
+                <label for="searchData" class="form-label small text-muted text-uppercase fw-medium mb-2">Pencarian</label>
                 <div class="search-box">
                     <input type="text" id="searchData" class="form-control search" wire:model.debounce.300ms="search"
                         placeholder="Cari nama, deskripsi, atau lainnya...">
@@ -84,65 +97,40 @@
                 </div>
             @else
             <div class="table-responsive">
-                <table id="DataIndexTagihan" class="table table-hover table-nowrap align-middle" style="width:100%">
+                <table id="DataIndexSiswa" class="table table-hover table-nowrap align-middle" style="width:100%">
                     <thead class="table-light">
-                        <tr class="text-uppercase" style="white-space: nowrap;">
-                            <th style="width: 50px;">NO</th>
-                            <th>Siswa</th>
-                            <th>Kelas</th>
-                            <th>Tagihan</th>
-                            <th>Estimasi</th>
-                            <th>Dibayarkan</th>
-                            <th>Kekurangan</th>
-                            <th class="text-center">Lunas</th>
-                            <th class="text-center">Aksi</th>
+                        <tr>
+                            <th class="text-uppercase">no</th>
+                            <th class="text-uppercase">siswa</th>
+                            <th class="text-uppercase">kelas</th>
+                            <th class="text-uppercase text-center">Tagihan</th>
+                            {{-- <th class="text-uppercase text-end">Estimasi</th> --}}
+                            <th class="text-uppercase text-center">Lunas</th>
+                            <th class="text-uppercase text-center">aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($tagihans as $key => $item)
+                        {{-- @forelse ($siswas as $item) --}}
+                        @forelse ($siswas as $key => $item)
+                        @php
+                            $totalTagihan = $item->total_tagihan ?? 0;
+                            $totalBayar = $item->total_bayar ?? 0;
+                            $persentaseLunas = $totalTagihan > 0
+                                ? round(($totalBayar / $totalTagihan) * 100, 2)
+                                : 0;
+                            $progressLunas = min(max($persentaseLunas, 0), 100);
+                        @endphp
                         <tr>
-                            <td>{{ $tagihans->firstItem() + $key }}.</td>
-                            <td class="text-start">
-                                <span class="fw-medium">
-                                    {{ $item->ms_siswa->nama_siswa }}
-                                </span>
-                                {{-- <p class="text-muted mb-0">{{ $item->ms_siswa->deskripsi }}</p> --}}
+                            <td>{{ $siswas->firstItem() + $key }}.</td>
+                            <td class="fw-medium">
+                                {{ $item->ms_siswa->nama_siswa ?? '-' }}
                             </td>
-                            <td>{{ $item->ms_kelas->nama_kelas }}</td>
-                            <td>{{ $item->jumlah_item }} item</td>
-                            
+                            <td>{{ $item->ms_kelas->nama_kelas ?? '-' }}</td>
+                            <td class="text-center fw-medium">{{ $item->jumlah_item ?? 0 }} item</td>
+                            {{-- <td class="text-end fw-medium">Rp{{ number_format($totalTagihan, 0, ',', '.') }}</td> --}}
                             <td>
-                                <span class="fw-medium fs-12">
-                                    Rp{{ number_format($item->total_tagihan, 0, ',', '.') }}
-                                </span>
-                            </td>
-                            
-                            <td>
-                                <span class="fw-medium fs-12 text-success">
-                                    Rp{{ number_format($item->total_bayar, 0, ',', '.') }}
-                                </span>
-                            </td>
-                            
-                            <td>
-                                <span class="fw-medium fs-12 text-danger">
-                                    Rp{{ number_format($item->total_tagihan - $item->total_bayar, 0, ',', '.') }}
-                                </span>
-                            </td>
-                            
-                            <td>
-                                @php
-                                $estimasi = $item->total_tagihan;
-                                $dibayarkan = $item->total_bayar;
-                                @endphp
-                            
-                                @php
-                                    $persentaseLunas = $estimasi > 0
-                                        ? round(($dibayarkan / $estimasi) * 100, 2)
-                                        : 0;
-                                    $progressLunas = min(max($persentaseLunas, 0), 100);
-                                @endphp
                                 <div class="d-flex flex-column align-items-center gap-1" style="min-width: 60px">
-                                    <span class="fw-semibold">{{ $estimasi > 0 ? number_format($persentaseLunas, 2) . '%' : '-' }}</span>
+                                    <span class="fw-semibold">{{ number_format($persentaseLunas, 2) }}%</span>
                                     <div class="progress w-100" role="progressbar"
                                         aria-label="Persentase pelunasan {{ $item->ms_siswa->nama_siswa ?? 'siswa' }}"
                                         aria-valuenow="{{ $progressLunas }}" aria-valuemin="0" aria-valuemax="100"
@@ -150,54 +138,26 @@
                                         <div class="progress-bar bg-success" style="width: {{ $progressLunas }}%"></div>
                                     </div>
                                 </div>
-                            </td>   
-                                            
+                            </td>
                             <td>
                                 <div class="d-flex justify-content-center gap-2">
-                                    {{-- detail tagihan --}}
-                                    <button class="btn btn-soft-primary btn-sm rounded-pill px-3"
-                                            data-bs-toggle="offcanvas"
-                                            data-bs-target="#offcanvasDetailTagihan"
-                                            title="Detail Tagihan"
-                                            wire:click.prevent="$emit('showDetailTagihan', {
-                                                ms_penempatan_siswa_id: {{ $item->ms_penempatan_siswa_id }},
-                                                jenjang: {{ $item->ms_jenjang_id }},
-                                                tahunAjar: {{ $item->ms_tahun_ajar_id }},
-                                                nama_siswa: '{{ addslashes($item->ms_siswa->nama_siswa) }}'
-                                            })">
-                                        <i class="ri-eye-line align-bottom me-1"></i> Detail
-                                    </button>
-                                    
-                                    {{-- kelola tagihan --}}
-                                    <button class="btn btn-primary btn-sm rounded-pill px-3"
-                                            data-bs-toggle="offcanvas" data-bs-target="#offcanvasManage"
-                                            aria-controls="offcanvasManage"
-                                            title="Kelola Tagihan"
-                                            wire:click.prevent="$emit('manageTagihan', {{ $item->ms_penempatan_siswa_id }})">
-                                        <i class="ri-settings-3-line align-bottom me-1"></i> Kelola
-                                    </button>
-
-                                    {{-- riwayat transaksi --}}
-                                    <a href="javascript:void(0);"
-                                       class="btn btn-soft-success btn-sm rounded-pill px-3"
-                                       data-bs-toggle="offcanvas"
-                                       data-bs-target="#offcanvasHistori"
-                                       aria-controls="offcanvasHistori"
-                                       title="Riwayat Transaksi"
-                                       wire:click.prevent="$emit('showHistoriTagihan', {
-                                            ms_penempatan_siswa_id: {{ $item->ms_penempatan_siswa_id }},
-                                            jenjang: {{ $item->ms_jenjang_id }},
-                                            tahunAjar: {{ $item->ms_tahun_ajar_id }},
-                                            nama_siswa: '{{ addslashes($item->ms_siswa->nama_siswa) }}'
-                                       })">
-                                        <i class="ri-history-line align-bottom"></i> Riwayat
+                                    {{-- Detail/Transfer --}}
+                                    <a href="#ModalDetailSiswa" data-bs-toggle="modal" class="btn btn-soft-primary btn-sm rounded-pill px-3"
+                                        title="Detail Siswa" wire:click.prevent="$emit('showDetailSiswa', {{ $item->ms_penempatan_siswa_id }})">
+                                        <i class="ri-eye-line me-1"></i> Detail
                                     </a>
+                                    {{-- edit --}}
+                                    {{-- <a href="#ModalEditSiswa" data-bs-toggle="modal" class="btn btn-primary btn-sm rounded-pill px-3" title="Edit Siswa" 
+                                        wire:click="$emit('loadDataSiswa', {{ $item->ms_penempatan_siswa_id }})">
+                                        <i class="ri-mark-pen-line me-1"></i> Edit
+                                    </a> --}}
                                 </div>
-                            </td>                         
+                            </td>
                         </tr>
                         @empty
+                            <!-- Jika Tidak Ada Data Kelas -->
                             <tr>
-                                <td colspan="9">
+                                <td colspan="7">
                                     <div class="noresult text-center py-3">
                                         <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop"
                                             colors="primary:#405189,secondary:#08a88a"
@@ -210,73 +170,37 @@
                             </tr>
                         @endforelse
                     </tbody>
-                    <tfoot>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td class="text-start"><strong>TOTAL</strong></td>
-                            <td>
-                                {{ $jumlahTagihan }} item
-                            </td>
-                            <td>
-                                <span class="fs-12 fw-medium">
-                                    Rp{{ number_format($totalTagihan, 0, ',', '.') }}
-                                </span>
-                            </td>
-                            <td>
-                                <span class="fs-12 fw-medium text-success">
-                                    Rp{{ number_format($totalDibayarkan, 0, ',', '.') }}
-                                </span>
-                            </td>
-                            <td>
-                                <span class="fs-12 fw-medium text-danger">
-                                    Rp{{ number_format($totalKekurangan, 0, ',', '.') }}
-                                </span>
-                            </td>
-                            <td>
-                                <div class="d-flex flex-column align-items-center gap-1" style="min-width: 60px">
-                                    <span class="fw-semibold">{{ number_format($totalPersen, 2) }}%</span>
-                                    <div class="progress w-100" role="progressbar" aria-label="Persentase pelunasan total tagihan"
-                                        aria-valuenow="{{ min(max($totalPersen, 0), 100) }}" aria-valuemin="0" aria-valuemax="100"
-                                        style="height: 5px">
-                                        <div class="progress-bar bg-success" style="width: {{ min(max($totalPersen, 0), 100) }}%"></div>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    </tfoot>
                 </table>
                 {{-- PAGINATION --}}
                 <div class="mt-3">
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                         <div class="text-muted fs-13">
                             Menampilkan
-                            <span class="fw-medium">
-                                {{ $tagihans->firstItem() ?? 0 }}
+                            <span class="fw-semibold">
+                                {{ $siswas->firstItem() ?? 0 }}
                             </span>
                             -
-                            <span class="fw-medium">
-                                {{ $tagihans->lastItem() ?? 0 }}
+                            <span class="fw-semibold">
+                                {{ $siswas->lastItem() ?? 0 }}
                             </span>
                             dari
-                            <span class="fw-medium">
-                                {{ $tagihans->total() }}
+                            <span class="fw-semibold">
+                                {{ $siswas->total() }}
                             </span>
-                            data tagihan
+                            data siswa
                         </div>
                         <div>
-                            {{ $tagihans->links() }}
+                            {{ $siswas->links() }}
                         </div>
                     </div>
                 </div>
             </div>
-
             @endif
         </div>
-        {{-- end data --}}
+        {{-- DATA --}}
     </div>
     {{-- MODAL --}}
-    <div class="modal fade zoomIn" id="ModalIndex" tabindex="-1" aria-labelledby="exportRecordLabel" aria-hidden="true">
+    <div class="modal fade" id="ModalIndexSiswa" tabindex="-1" aria-labelledby="exportRecordLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
                 {{-- CLOSE BUTTON --}}
@@ -307,7 +231,7 @@
                         </span>
 
                         <h3 class="fw-bold mb-2" id="exportRecordLabel">
-                            Export Administrasi Tagihan Siswa?
+                            Export Administrasi Siswa?
                         </h3>
 
                         <p class="text-muted mb-0 lh-lg px-lg-4">
@@ -346,7 +270,7 @@
                     </button>
 
                     <button type="button" class="btn btn-primary rounded-pill px-4"
-                        id="konfirmasiExportIndex" data-bs-dismiss="modal">
+                        id="ExportIndexSiswa" data-bs-dismiss="modal">
                         <i class="ri-download-2-line me-1"></i>
                         Ya, Export
                     </button>
@@ -355,15 +279,15 @@
         </div>
     </div>
     <script>
-        document.getElementById('konfirmasiExportIndex').addEventListener('click', function () {
+        document.getElementById('ExportIndexSiswa').addEventListener('click', function () {
             alertify.success("Menyiapkan Dokumen");
 
             setTimeout(function () {
-                var table = document.getElementById("DataIndexTagihan");
+                var table = document.getElementById("DataIndexSiswa");
 
                 var data = [];
-                // Kolom yang ingin diexport (NO=0, Siswa=1, Kelas=2, Tagihan=3, Estimasi=4, Dibayarkan=5, Kekurangan=6, Lunas=7)
-                var exportCols = [0,1,2,3,4,5,6,7];
+                // Export ringkasan finansial siswa tanpa nomor dan aksi.
+                var exportCols = [1,2,3,4,5];
 
                 // Ambil header
                 var headers = [];
@@ -399,7 +323,7 @@
                 var ws = XLSX.utils.aoa_to_sheet(data);
                 XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
 
-                XLSX.writeFile(wb, "Laporan-Administrasi-Tagihan-Siswa.xlsx");
+                XLSX.writeFile(wb, "Laporan-Administrasi-Siswa.xlsx");
 
             }, 1000);
         });

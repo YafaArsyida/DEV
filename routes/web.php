@@ -1,6 +1,6 @@
 <?php
 
-// portal
+use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Akademik\AkademikDashboard;
 use App\Http\Controllers\Akademik\EkstrakurikulerSiswa;
@@ -13,8 +13,6 @@ use App\Http\Controllers\Akademik\SiswaController;
 use App\Http\Controllers\Akademik\TahunAjaranController;
 use App\Http\Controllers\Portal\PortalController;
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Keuangan\AkuntansiJurnalDetail;
 use App\Http\Controllers\Keuangan\AkuntansiKonfigurasiJurnal;
 use App\Http\Controllers\Keuangan\AkuntansiLaporanArusKas;
@@ -28,7 +26,6 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\Keuangan\DokumenAdministrasi;
 use App\Http\Controllers\Keuangan\JenisTagihanSiswa;
 use App\Http\Controllers\Keuangan\JenjangTahunAjar;
-use App\Http\Controllers\Keuangan\KelasSiswa;
 use App\Http\Controllers\Keuangan\KeuanganDashboard;
 use App\Http\Controllers\Keuangan\KonfigurasiTagihanSiswa;
 use App\Http\Controllers\Keuangan\LaporanEduPayPegawai;
@@ -65,6 +62,11 @@ use App\Http\Controllers\SmartPassDashboard;
 use App\Http\Controllers\SmartPassLaporanFingerSpotPegawai;
 use App\Http\Controllers\SmartPassLaporanPresensiPegawai;
 use App\Http\Controllers\SmartPassPresensiPegawai;
+
+
+
+// KEUANGAN
+use App\Http\Controllers\Keuangan\PenempatanSiswaController as KeuanganPenempatanSiswaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -271,11 +273,11 @@ Route::middleware(['auth', 'peran:SUPERADMIN, ADMIN, KEUANGAN'])->group(function
 
                     /*
                     |--------------------------------------------------------------------------
-                    | Kelas Siswa
+                    | Penempatan Siswa
                     |--------------------------------------------------------------------------
                     */
-                    Route::get('/kelas-siswa', [KelasSiswa::class, 'index'])
-                        ->name('kelas-siswa');
+                    Route::get('/penempatan-siswa', [KeuanganPenempatanSiswaController::class, 'index'])
+                        ->name('penempatan-siswa');
 
                 });
 

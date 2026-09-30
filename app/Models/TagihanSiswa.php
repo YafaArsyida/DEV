@@ -22,9 +22,6 @@ class TagihanSiswa extends Model
         'deskripsi',
 
         'akuntansi_jurnal_id',
-        // 'akuntansi_jurnal_reversal_id',
-
-        // 'status_transaksi'
     ];
 
     /**

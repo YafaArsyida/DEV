@@ -1,4 +1,4 @@
-@extends('template_machine.v_template')
+@extends('template_keuangan.v_template')
 @section('content') 
 <div class="page-content">
     <div class="container-fluid" style="max-width: 100%">
@@ -9,15 +9,15 @@
                         <h4 class="fs-16 mb-1">Laporan Rekapitulasi Keuangan</h4>
                         <p class="text-muted mb-0">Laporan > Rekapitulasi Keuangan</p>
                     </div>
-                    @livewire('parameter.jenjang-tahun-ajar')   
+                    @livewire('keuangan.parameter.jenjang-tahun-ajar')   
                 </div><!-- end card header -->
             </div>
             <!--end col-->
         </div>
         <div class="row">
             <div class="col-xxl-12">
-                @livewire('parameter.filter-rekapitulasi-keuangan-siswa')   
-                @livewire('laporan-rekapitulasi-keuangan.index')   
+                @livewire('keuangan.parameter.filter-rekapitulasi-keuangan-siswa')   
+                @livewire('keuangan.laporan-rekapitulasi-keuangan.index')   
             </div>  
         </div>
     </div>

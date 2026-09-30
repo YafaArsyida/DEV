@@ -5,6 +5,7 @@ namespace App\Http\Livewire\Keuangan\KategoriTagihanSiswa;
 use App\Models\Jenjang;
 use App\Models\KategoriTagihanSiswa;
 use App\Models\TahunAjar;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -48,7 +49,40 @@ class Index extends Component
     public function render()
     {
         // Query kelas hanya jika jenjang dan tahun ajar dipilih
-        $kategoris = KategoriTagihanSiswa::query();
+        $kategoris = KategoriTagihanSiswa::query()
+            ->withCount('ms_jenis_tagihan_siswa as jumlah_jenis')
+            ->withSum('ms_tagihan_siswa as total_tagihan', 'jumlah_tagihan_siswa')
+            ->selectSub(function ($query) {
+                $query->from('dt_transaksi_tagihan_siswa')
+                    ->join(
+                        'ms_transaksi_tagihan_siswa',
+                        'dt_transaksi_tagihan_siswa.ms_transaksi_tagihan_siswa_id',
+                        '=',
+                        'ms_transaksi_tagihan_siswa.ms_transaksi_tagihan_siswa_id'
+                    )
+                    ->join(
+                        'ms_tagihan_siswa',
+                        'dt_transaksi_tagihan_siswa.ms_tagihan_siswa_id',
+                        '=',
+                        'ms_tagihan_siswa.ms_tagihan_siswa_id'
+                    )
+                    ->join(
+                        'ms_jenis_tagihan_siswa',
+                        'ms_tagihan_siswa.ms_jenis_tagihan_siswa_id',
+                        '=',
+                        'ms_jenis_tagihan_siswa.ms_jenis_tagihan_siswa_id'
+                    )
+                    ->whereColumn(
+                        'ms_jenis_tagihan_siswa.ms_kategori_tagihan_siswa_id',
+                        'ms_kategori_tagihan_siswa.ms_kategori_tagihan_siswa_id'
+                    )
+                    ->where('dt_transaksi_tagihan_siswa.status_transaksi', '!=', 'dibatalkan')
+                    ->where('ms_transaksi_tagihan_siswa.status_transaksi', '!=', 'dibatalkan')
+                    ->whereNull('dt_transaksi_tagihan_siswa.deleted_at')
+                    ->whereNull('ms_transaksi_tagihan_siswa.deleted_at')
+                    ->whereNull('ms_tagihan_siswa.deleted_at')
+                    ->selectRaw('COALESCE(SUM(dt_transaksi_tagihan_siswa.jumlah_bayar), 0)');
+            }, 'total_dibayarkan');
 
         // Filter berdasarkan Jenjang
         if ($this->selectedJenjang) {

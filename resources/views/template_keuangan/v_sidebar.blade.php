@@ -74,17 +74,10 @@
                     </li>
                     <!-- Single Menus -->
                     <li class="nav-item">
-                        <a href="{{ route('keuangan.administrasi.kelas-siswa') }}"
-                        class="nav-link menu-link {{ request()->routeIs('keuangan.administrasi.kelas-siswa') ? 'active' : '' }}">
+                        <a href="{{ route('keuangan.administrasi.penempatan-siswa') }}"
+                        class="nav-link menu-link {{ request()->routeIs('keuangan.administrasi.penempatan-siswa') ? 'active' : '' }}">
                             <i class="mdi mdi-school-outline"></i>
-                            <span data-key="t-kelas-siswa">Kelas Siswa</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('keuangan.administrasi.ekstrakurikuler-siswa') }}"
-                        class="nav-link menu-link {{ request()->routeIs('keuangan.administrasi.ekstrakurikuler-siswa') ? 'active' : '' }}">
-                            <i class="mdi mdi-trophy-outline"></i>
-                            <span data-key="t-kelas-siswa">Ekstrakurikuler Siswa</span>
+                            <span data-key="t-kelas-siswa">Penempatan Siswa</span>
                         </a>
                     </li>
                     <li class="nav-item">

@@ -1,4 +1,4 @@
-@extends('template_machine.v_template')
+@extends('template_keuangan.v_template')
 @section('content') 
 <div class="page-content">
     <div class="container-fluid" style="max-width: 100%">
@@ -9,21 +9,21 @@
                         <h4 class="fs-16 mb-1">Kelola Jenis Tagihan</h4>
                         <p class="text-muted mb-0">Keuangan > Kelola Jenis Tagihan</p>
                     </div>
-                    @livewire('parameter.jenjang-tahun-ajar')   
+                    @livewire('keuangan.parameter.jenjang-tahun-ajar')   
                 </div><!-- end card header -->
             </div>
             <!--end col-->
         </div>
         <div class="row">
             <div class="col-xxl-12">
-                @livewire('tagihan-siswa.edit')   
-                @livewire('tagihan-siswa.create')  
+                @livewire('keuangan.tagihan-siswa.edit')   
+                @livewire('keuangan.tagihan-siswa.create')  
 
-                @livewire('tagihan-jenis.index')   
-                @livewire('tagihan-jenis.detail')   
-                @livewire('tagihan-jenis.manage')  
+                @livewire('keuangan.tagihan-jenis.index')   
+                @livewire('keuangan.tagihan-jenis.detail')   
+                @livewire('keuangan.tagihan-jenis.manage')  
                 
-                @livewire('tagihan-siswa.delete')   
+                @livewire('keuangan.tagihan-siswa.delete')   
             </div>  
         </div>
     </div>
