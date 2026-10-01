@@ -36,7 +36,7 @@
                             <div>
                                 <div class="d-flex align-items-center gap-3">
                                     <div class="avatar-sm">
-                                        <div class="avatar-title bg-success-subtle text-success rounded-circle fs-20">
+                                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
                                             <i class="ri-team-line"></i>
                                         </div>
                                     </div>
@@ -176,7 +176,7 @@
                             <div>
                                 <div class="d-flex align-items-center gap-3">
                                     <div class="avatar-sm">
-                                        <div class="avatar-title bg-warning-subtle text-warning rounded-circle fs-20">
+                                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
                                             <i class="ri-bank-card-line"></i>
                                         </div>
                                     </div>

@@ -6,18 +6,16 @@
                 <div class="d-flex align-items-center gap-3">
                     <div class="avatar-sm">
                         <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
-                            <i class="ri-calendar-event-line">
-                            </i>
+                            <i class="ri-file-list-3-line"></i>
                         </div>
                     </div>
-    
                     <div>
                         <h5 class="fw-bold mb-1">
-                            Data Jenis Tagihan
+                            Jenis Tagihan Siswa
                         </h5>
-                        {{-- <small>
-                            Kelola data jenis tagihan siswa berdasarkan jenjang dan tahun ajar yang dipilih.
-                        </small> --}}
+                        <small>
+                            Kelola tagihan dan pembayaran siswa
+                        </small>
                     </div>
                 </div>
             </div>
@@ -98,11 +96,11 @@
                             <th>Jenis Tagihan</th>
                             <th>Kategori</th>
                             {{-- <th>cicilan</th> --}}
-                            <th>Tagihan</th>
-                            <th>Estimasi</th>
-                            <th>Dibayarkan</th>
-                            <th>Kekurangan</th>
-                            <th>Lunas</th>
+                            <th class="text-center">Tagihan</th>
+                            <th class="text-end">Estimasi</th>
+                            <th class="text-end">Dibayarkan</th>
+                            <th class="text-end">Kekurangan</th>
+                            <th class="text-center">Lunas</th>
                             <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
@@ -121,40 +119,47 @@
                                 {{ $item->ms_kategori_tagihan_siswa->nama_kategori_tagihan_siswa ?? '-' }}
                             </td>
                             
-                            <td>
+                            <td class="text-center">
                                 {{ $item->jumlah_item ?? 0 }} item
                             </td>
                             
-                            <td>
+                            <td class="text-end">
                                 <span class="fs-12 fw-medium">
                                     Rp{{ number_format($item->total_tagihan ?? 0, 0, ',', '.') }}
                                 </span>
                             </td>
                             
-                            <td>
+                            <td class="text-end">
                                 <span class="fs-12 fw-medium text-success">
                                     Rp{{ number_format($item->total_bayar ?? 0, 0, ',', '.') }}
                                 </span>
                             </td>
                             
-                            <td>
+                            <td class="text-end">
                                 <span class="fs-12 fw-medium text-danger">
                                     Rp{{ number_format(($item->total_tagihan ?? 0) - ($item->total_bayar ?? 0), 0, ',', '.') }}
                                 </span>
                             </td>
                             
-                            <td class="fs-12 fw-medium text-start">
+                            <td class="text-center">
                                 @php
                                 $estimasi = $item->total_tagihan ?? 0;
                                 $dibayarkan = $item->total_bayar ?? 0;
+
+                                $persentaseLunas = $estimasi > 0
+                                    ? round(($dibayarkan / $estimasi) * 100, 2)
+                                    : 0;
+                                $progressLunas = min(max($persentaseLunas, 0), 100);
                                 @endphp
-                            
-                                @if ($estimasi > 0)
-                                {{ number_format(($dibayarkan / $estimasi) * 100, 2) }}%
-                                <i class="ri-bar-chart-fill text-success fs-12 align-middle ms-2"></i>
-                                @else
-                                -
-                                @endif
+                                <div class="d-flex flex-column align-items-center gap-1 mx-4" style="min-width: 60px">
+                                    <span class="fw-semibold">{{ $estimasi > 0 ? number_format($persentaseLunas, 2) . '%' : '-' }}</span>
+                                    <div class="progress w-100" role="progressbar"
+                                        aria-label="Persentase pelunasan {{ $item->nama_jenis_tagihan_siswa }}"
+                                        aria-valuenow="{{ $progressLunas }}" aria-valuemin="0" aria-valuemax="100"
+                                        style="height: 5px">
+                                        <div class="progress-bar bg-success" style="width: {{ $progressLunas }}%"></div>
+                                    </div>
+                                </div>
                             </td>
                             <td>
                                 <div class="d-flex justify-content-center gap-2">
@@ -201,27 +206,32 @@
                         <tr>
                             <td></td>
                             <td></td>
-                            <td class="text-start"><strong>TOTAL</strong></td>
-                            <td>{{ $totalSiswa }} item</td>
-                            <td>
+                            <td class="text-end"><strong>TOTAL</strong></td>
+                            <td class="text-center">{{ $totalSiswa }} item</td>
+                            <td class="text-end">
                                 <span class="fs-12 fw-medium">
                                     Rp{{ number_format($totalEstimasi, 0, ',', '.') }}
                                 </span>
                             </td>
-                            <td>
+                            <td class="text-end">
                                 <span class="fs-12 fw-medium text-success">
                                     Rp{{ number_format($totalDibayarkan, 0, ',', '.') }}
                                 </span>
                             </td>
-                            <td>
+                            <td class="text-end">
                                 <span class="fs-12 fw-medium text-danger">
                                     Rp{{ number_format($totalKekurangan, 0, ',', '.') }}
                                 </span>
                             </td>
                             <td>
-                                <span class="fs-12 fw-medium">
-                                    {{ number_format($totalPersen, 2) }}% <i class="ri-bar-chart-fill text-success fs-12 align-middle ms-2"></i>
-                                </span>
+                                <div class="d-flex flex-column align-items-center gap-1 mx-4" style="min-width: 60px">
+                                    <span class="fw-semibold">{{ number_format($totalPersen, 2) }}%</span>
+                                    <div class="progress w-100" role="progressbar" aria-label="Persentase pelunasan total tagihan"
+                                        aria-valuenow="{{ min(max($totalPersen, 0), 100) }}" aria-valuemin="0" aria-valuemax="100"
+                                        style="height: 5px">
+                                        <div class="progress-bar bg-success" style="width: {{ min(max($totalPersen, 0), 100) }}%"></div>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                     </tfoot>

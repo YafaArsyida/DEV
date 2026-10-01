@@ -64,6 +64,7 @@
                 @livewire('keuangan.transaksi-tagihan-siswa.edit')   
                 @livewire('keuangan.transaksi-tagihan-siswa.delete')   
                 @livewire('keuangan.transaksi-tagihan-siswa.histori')   
+                @livewire('keuangan.transaksi-tagihan-siswa.detail')
             </div>  
         </div>
     </div>

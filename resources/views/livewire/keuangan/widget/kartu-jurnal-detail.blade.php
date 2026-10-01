@@ -40,7 +40,7 @@
                         <th>Nomor Jurnal</th>
                         <th class="text-start">Deskripsi</th>
                         <th class="text-start">Petugas</th>
-                        <th class="text-center">Nominal</th>
+                        <th class="text-end">Nominal</th>
                     </tr>
                 </thead>
 
@@ -71,7 +71,7 @@
                                 {{ $jurnal->ms_pengguna->nama ?? '-' }}
                             </td>
 
-                            <td class="text-center">
+                            <td class="text-end">
                                 <span class="fs-12 fw-medium">
                                     Rp{{ number_format($nominal, 0, ',', '.') }}
                                 </span>

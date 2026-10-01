@@ -116,9 +116,9 @@
                             </td>
                             <td>{{ $item->ms_kategori_tagihan_siswa->nama_kategori_tagihan_siswa ?? '-' }}</td>
                             <td>{{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($item->tanggal_jatuh_tempo, 'd F Y') }}</td>
-                            <td class="text-center">{{ $item->jumlah_item ?? 0 }} Item Tagihan</td>
+                            <td class="text-center">{{ $item->jumlah_item ?? 0 }} Item</td>
                             <td>
-                                <div class="d-flex flex-column align-items-center gap-1" style="min-width: 90px">
+                                <div class="d-flex flex-column align-items-center gap-1 mx-4" style="min-width: 60px">
                                     <span class="fw-semibold">{{ number_format($persentaseLunas, 2) }}%</span>
                                     <div class="progress w-100" role="progressbar"
                                         aria-label="Pelunasan jenis tagihan {{ $item->nama_jenis_tagihan_siswa }}"

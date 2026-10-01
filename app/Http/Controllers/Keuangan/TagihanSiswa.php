@@ -9,6 +9,7 @@ use App\Models\PenempatanSiswa;
 use App\Models\TagihanSiswa as ModelsTagihanSiswa;
 use App\Models\TahunAjar;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 use Elibyy\TCPDF\Facades\TCPDF;
 
@@ -30,20 +31,37 @@ class TagihanSiswa extends Controller
             return response()->json(['error' => 'Filter jenjang dan tahun ajar wajib diisi'], 400);
         }
 
-        // Ambil data siswa dengan filter
+        // Ambil data siswa beserta agregasi tagihan dalam query, seperti index Livewire.
         $query = PenempatanSiswa::with(['ms_siswa', 'ms_kelas'])
             ->join('ms_siswa', 'ms_penempatan_siswa.ms_siswa_id', '=', 'ms_siswa.ms_siswa_id')
             ->where('ms_penempatan_siswa.ms_jenjang_id', $selectedJenjang)
-            ->where('ms_penempatan_siswa.ms_tahun_ajar_id', $selectedTahunAjar);
+            ->where('ms_penempatan_siswa.ms_tahun_ajar_id', $selectedTahunAjar)
+            ->withCount([
+                'ms_tagihan_siswa as jumlah_item' => function ($query) {
+                    $query->select(DB::raw('COUNT(DISTINCT ms_jenis_tagihan_siswa_id)'));
+                },
+            ])
+            ->withSum('ms_tagihan_siswa as total_tagihan', 'jumlah_tagihan_siswa')
+            ->withSum([
+                'dt_transaksi_tagihan_siswa as total_bayar' => function ($query) {
+                    $query->where(
+                        'dt_transaksi_tagihan_siswa.status_transaksi',
+                        '!=',
+                        'dibatalkan'
+                    )->where(
+                        'ms_transaksi_tagihan_siswa.status_transaksi',
+                        '!=',
+                        'dibatalkan'
+                    );
+                },
+            ], 'jumlah_bayar');
 
         if ($selectedKelas) {
-            $query->where('ms_kelas_id', $selectedKelas);
+            $query->where('ms_penempatan_siswa.ms_kelas_id', $selectedKelas);
         }
 
         if ($search) {
-            $query->whereHas('ms_siswa', function ($q) use ($search) {
-                $q->where('nama_siswa', 'like', '%' . $search . '%');
-            });
+            $query->where('ms_siswa.nama_siswa', 'like', '%' . $search . '%');
         }
 
         $tagihans = $query->orderBy('ms_penempatan_siswa.ms_kelas_id')
@@ -107,9 +125,9 @@ class TagihanSiswa extends Controller
         foreach ($tagihans as $item) {
             $nama = $item->ms_siswa->nama_siswa;
             $kelas = $item->ms_kelas->nama_kelas ?? '-';
-            $jumlah = $item->jumlah_jenis_tagihan_siswa();
-            $tagihan = $item->total_tagihan_siswa();
-            $dibayar = $item->total_dibayarkan();
+            $jumlah = $item->jumlah_item ?? 0;
+            $tagihan = $item->total_tagihan ?? 0;
+            $dibayar = $item->total_bayar ?? 0;
             $kekurangan = $tagihan - $dibayar;
             $persen = $tagihan > 0 ? round(($dibayar / $tagihan) * 100, 2) : 0;
 

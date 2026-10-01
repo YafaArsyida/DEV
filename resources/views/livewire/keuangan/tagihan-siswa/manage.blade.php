@@ -128,9 +128,9 @@
                                                 <th>Kelas</th>
                                                 <th>Jenis Tagihan</th>
                                                 <th>Kategori</th>
-                                                <th class="text-center">Estimasi</th>
-                                                <th class="text-center">Dibayarkan</th>
-                                                <th class="text-center">Kekurangan</th>
+                                                <th class="text-end">Estimasi</th>
+                                                <th class="text-end">Dibayarkan</th>
+                                                <th class="text-end">Kekurangan</th>
                                                 <th class="text-center">Jatuh Tempo</th>
                                                 <th class="text-center">Status</th>
                                                 <th class="text-center">Edit</th>
@@ -163,17 +163,17 @@
                                                 <td>{{ $item->ms_penempatan_siswa->ms_kelas->nama_kelas }}</td>
                                                 <td>{{ $item->ms_jenis_tagihan_siswa->nama_jenis_tagihan_siswa }}</td>
                                                 <td>{{ $item->ms_jenis_tagihan_siswa->ms_kategori_tagihan_siswa->nama_kategori_tagihan_siswa }}</td>
-                                                <td class="text-center">
+                                                <td class="text-end">
                                                     <span class="fs-12 fw-medium">
                                                     Rp{{ number_format($item->jumlah_tagihan_siswa, 0, ',', '.') }}
                                                 </td>
-                                                <td class="text-center">
+                                                <td class="text-end">
                                                     <span class="fs-12 fw-medium text-success">
                                                     Rp{{ number_format($item->total_bayar ?? 0, 0, ',', '.') }}
                                                     </span>
                                                 </td>
                                                 </td>
-                                                <td class="text-center">
+                                                <td class="text-end">
                                                     <span class="fs-12 fw-medium text-danger">
                                                     Rp{{ number_format($item->jumlah_tagihan_siswa - ($item->total_bayar ?? 0), 0, ',', '.') }}
                                                     </span>
@@ -208,17 +208,17 @@
                                         <tfoot>
                                             <tr>
                                                 <td colspan="7" class="text-end">TOTAL</td>
-                                                <td class="text-center">
+                                                <td class="text-end">
                                                     <span class="fs-12 fw-medium">
                                                         Rp{{ number_format($totalEstimasi, 0, ',', '.') }}
                                                     </span>
                                                 </td>
-                                                <td class="text-center">
+                                                <td class="text-end">
                                                     <span class="fs-12 fw-medium text-success">
                                                         Rp{{ number_format($totalDibayarkan, 0, ',', '.') }}
                                                     </span>
                                                 </td>
-                                                <td class="text-center">
+                                                <td class="text-end">
                                                     <span class="fs-12 fw-medium text-danger">
                                                         Rp{{ number_format($totalKekurangan, 0, ',', '.') }}
                                                     </span>
@@ -260,15 +260,18 @@
                         <div class="card-header">
                             <div class="d-flex align-items-center gap-3">
                                 <div class="avatar-sm">
-                                    <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
-                                        <i class="ri-calendar-event-line">
-                                        </i>
+                                    <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-18">
+                                        <i class="ri-file-list-3-line"></i>
                                     </div>
                                 </div>
+
                                 <div>
                                     <h5 class="fw-bold mb-1">
-                                        Edit Nominal Tagihan by Check
+                                        Edit Nominal by Check
                                     </h5>
+                                    <small class="text-muted">
+                                        Pilih tagihan, lalu perbarui nominal tagihan secara bersamaan.
+                                    </small>
                                 </div>
                             </div>
                         </div><!-- end card header -->
@@ -381,29 +384,16 @@
 
                 {{-- FOOTER --}}
                 <div class="modal-footer border-0 pt-0 px-4 pb-4 justify-content-center">
-
-                    <button
-                        type="button"
-                        class="btn btn-light rounded-pill px-4"
-                        data-bs-dismiss="modal">
-
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">
                         <i class="ri-close-line me-1"></i>
                         Batal
-
                     </button>
 
-                    <button
-                        type="button"
-                        class="btn btn-danger rounded-pill px-4"
-                        wire:click="HapusTagihan">
-
+                    <button type="button" class="btn btn-danger rounded-pill px-4" wire:click="HapusTagihan">
                         <i class="ri-delete-bin-2-line me-1"></i>
                         Ya, Hapus Semua
-
                     </button>
-
                 </div>
-
             </div>
         </div>
     </div>

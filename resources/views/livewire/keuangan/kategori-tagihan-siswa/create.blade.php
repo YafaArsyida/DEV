@@ -13,9 +13,9 @@
                         <h5 class="fw-bold mb-1">
                             Kategori Baru
                         </h5>
-                        {{-- <small>
-                            Tambahkan agenda kegiatan generasi penerus dengan pengaturan tingkat, jadwal, dan lokasi.
-                        </small> --}}
+                        <small>
+                            Tambahkan kategori untuk mengelompokkan jenis tagihan.
+                        </small>
                     </div>
                 </div>
                 <button type="button" class="btn btn-light btn-icon rounded-circle" data-bs-dismiss="modal">

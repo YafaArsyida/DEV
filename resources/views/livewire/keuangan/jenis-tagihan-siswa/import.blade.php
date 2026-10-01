@@ -10,7 +10,12 @@
                         </div>
                     </div>
                     <div>
-                        <h5 class="modal-title">Import Jenis Tagihan</h5>
+                        <h5 class="fw-bold mb-1">
+                            Import Data Jenis Tagihan
+                        </h5>
+                        <small>
+                            Tambahkan data jenis tagihan melalui file Excel.
+                        </small>
                     </div>
                 </div>
                 <button type="button" class="btn btn-light btn-icon rounded-circle" data-bs-dismiss="modal">

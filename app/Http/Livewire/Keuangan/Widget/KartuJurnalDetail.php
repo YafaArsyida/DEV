@@ -14,7 +14,7 @@ class KartuJurnalDetail extends Component
 
     protected $paginationTheme = 'bootstrap'; // Gunakan tema Bootstrap
 
-    public $perPage = 2;
+    public $perPage = 10;
 
     public $selectedJenjang = null;
 

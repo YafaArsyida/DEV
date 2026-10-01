@@ -5,7 +5,7 @@
             <div class="d-flex align-items-center gap-3">
                 <div class="avatar-sm">
                     <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-18">
-                        <i class="ri-file-chart-line"></i>
+                        <i class="ri-file-list-3-line"></i>
                     </div>
                 </div>
 

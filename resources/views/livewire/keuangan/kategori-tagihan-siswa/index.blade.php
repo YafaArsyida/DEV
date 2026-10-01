@@ -95,7 +95,7 @@
                             </td>
                             <td class="text-center">{{ $item->jumlah_jenis ?? 0 }} Jenis Tagihan</td>
                             <td>
-                                <div class="d-flex flex-column align-items-center gap-1" style="min-width: 90px">
+                                <div class="d-flex flex-column align-items-center gap-1 mx-4" style="min-width: 60px">
                                     <span class="fw-semibold">{{ number_format($persentaseLunas, 2) }}%</span>
                                     <div class="progress w-100" role="progressbar"
                                         aria-label="Pelunasan kategori {{ $item->nama_kategori_tagihan_siswa }}"

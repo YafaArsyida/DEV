@@ -13,9 +13,9 @@
                         <h5 class="fw-bold mb-1">
                             Perbarui Data Jenis Tagihan
                         </h5>
-                        {{-- <small>
-                            Tambahkan agenda kegiatan generasi penerus dengan pengaturan tingkat, jadwal, dan lokasi.
-                        </small> --}}
+                        <small>
+                            Perbarui informasi jenis tagihan, kategori, dan nominal.
+                        </small>
                     </div>
                 </div>
                 <button type="button" class="btn btn-light btn-icon rounded-circle" data-bs-dismiss="modal">
@@ -87,7 +87,7 @@
                     </button>
                     <button type="submit" class="btn btn-primary rounded-pill px-4">
                         <i class="ri-save-3-line me-1"></i>
-                        Simpan
+                        Simpan Perubahan
                     </button>
                 </div>
             </form>
