@@ -13,9 +13,7 @@
                     <h5 class="fw-bold mb-1">
                         Data Ekstrakurikuler
                     </h5>
-                    {{-- <small class="text-muted">
-                        deskripsi ekstra
-                    </small> --}}
+                    <small class="text-muted">Kelola kegiatan ekstrakurikuler pada jenjang terpilih.</small>
                 </div>
             </div>
             <!-- Kanan -->
@@ -36,7 +34,7 @@
                             <div>
                                 <div class="d-flex align-items-center gap-3">
                                     <div class="avatar-sm">
-                                        <div class="avatar-title bg-success-subtle text-success rounded-circle fs-20">
+                                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
                                             <i class="ri-team-line"></i>
                                         </div>
                                     </div>
@@ -70,8 +68,38 @@
                         </div>
                     </div>
                     <div class="card-body">
+                        @if ($ms_ekstrakurikuler_id)
+                            <div class="row g-3 mb-4 pb-3 border-bottom">
+                                <div class="col-4">
+                                    <div class="small text-muted">Kuota</div>
+                                    <div class="fw-semibold">{{ $kuota }} siswa</div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="small text-muted">Terisi</div>
+                                    <div class="fw-semibold">{{ $jumlahTerdaftar }} siswa</div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="small text-muted">Tersedia</div>
+                                    <div class="fw-semibold">{{ $sisaKuota }} siswa</div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between small text-muted mb-1">
+                                        <span>Kapasitas terpakai</span>
+                                        <span>{{ $persentaseKuota }}%</span>
+                                    </div>
+                                    <div class="progress" role="progressbar"
+                                        aria-label="Kapasitas ekstrakurikuler"
+                                        aria-valuenow="{{ $persentaseKuota }}" aria-valuemin="0" aria-valuemax="100"
+                                        style="height: 8px">
+                                        <div class="progress-bar bg-success" style="width: {{ $persentaseKuota }}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+
                         <div class="row g-3 mb-3">
                             <div class="col-xxl-2 col-sm-6"> 
+                                <label for="filterKelas" class="form-label small text-muted text-uppercase fw-medium mb-2">Kelas</label>
                                 <select wire:model="selectedKelas" style="cursor: pointer" class="form-select" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Kelas">
                                     <option value="">Semua Kelas</option>
                                     @foreach ($select_kelas as $item)    
@@ -80,8 +108,9 @@
                                 </select>
                             </div>
                             <div class="col-xxl-10 col-sm-6">
+                                <label for="searchData" class="form-label small text-muted text-uppercase fw-medium mb-2">Pencarian</label>
                                 <div class="search-box">
-                                    <input type="text" class="form-control search" wire:model.debounce.300ms="search" placeholder="cari nama, deskripsi atau lainnya...">
+                                    <input type="text" id="searchData" class="form-control search" wire:model.debounce.300ms="search" placeholder="Cari nama, deskripsi, atau lainnya...">
                                     <i class="ri-search-line search-icon"></i>
                                 </div>
                             </div>

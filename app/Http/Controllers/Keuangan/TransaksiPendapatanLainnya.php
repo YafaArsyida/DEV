@@ -3,146 +3,37 @@
 namespace App\Http\Controllers\Keuangan;
 
 use App\Http\Controllers\Controller;
-use App\Models\AkuntansiRekening;
-use App\Models\Jenjang;
-use App\Models\TahunAjar;
-use App\Models\TransaksiPendapatanLainnya as ModelsTransaksiPendapatanLainnya;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
+use App\Services\Reports\TransaksiPendapatanLainnyaReportService;
+use Barryvdh\DomPDF\Facade\Pdf;
 
-use Elibyy\TCPDF\Facades\TCPDF;
+use Illuminate\Http\Request;
 
 class TransaksiPendapatanLainnya extends Controller
 {
+    protected TransaksiPendapatanLainnyaReportService $reportService;
+
+    public function __construct(TransaksiPendapatanLainnyaReportService $reportService)
+    {
+        $this->reportService = $reportService;
+    }
+
     public function index()
     {
         return view('keuangan.transaksi.pendapatan-lainnya');
     }
+
     public function cetakPDF(Request $request)
     {
-        $selectedJenjang = $request->jenjang;
-        $selectedTahunAjar = $request->tahun;
-        $selectedRekening = $request->rekening;
-        $startDate = $request->start_date;
-        $endDate = $request->end_date;
-        $search = $request->search;
-
-        $jenjang = Jenjang::find($selectedJenjang);
-        $tahunAjar = TahunAjar::find($selectedTahunAjar);
-
-        if (!$selectedJenjang || !$selectedTahunAjar) {
-            return response()->json(['error' => 'Jenjang dan Tahun Ajar wajib dipilih'], 400);
+        if (!$request->input('jenjang')) {
+            return response()->json(['error' => 'Jenjang wajib dipilih'], 400);
         }
 
-        $query = ModelsTransaksiPendapatanLainnya::with(['akuntansi_rekening', 'ms_pengguna'])
-            ->where('ms_jenjang_id', $selectedJenjang)
-            ->where('ms_tahun_ajar_id', $selectedTahunAjar)
-            ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
-                $start = Carbon::createFromFormat('Y-m-d', $startDate)->startOfDay();
-                $end   = Carbon::createFromFormat('Y-m-d', $endDate)->endOfDay();
-                $query->whereBetween('tanggal', [$start, $end]);
-            });
+        $data = $this->reportService->getData($request);
 
-        if (!empty($selectedRekening)) {
-            $query->where('kode_rekening', $selectedRekening);
-        }
-
-        if (!empty($search)) {
-            $query->where(function ($q) use ($search) {
-                $q->where('deskripsi', 'like', '%' . $search . '%')
-                    ->orWhereHas('akuntansi_rekening', function ($qr) use ($search) {
-                        $qr->where('nama_rekening', 'like', '%' . $search . '%');
-                    });
-            });
-        }
-
-        $data = $query->orderBy('tanggal', 'ASC')->get();
-        $total = $data->sum('nominal');
-
-        $rekening = $selectedRekening ? AkuntansiRekening::where('kode_rekening', $selectedRekening)->first() : null;
-
-        $judul = 'Laporan Transaksi Pendapatan Lainnya';
-        $yayasan = 'Yayasan Drul Khukama Unit ' . ($jenjang->nama_jenjang ?? '-') . ' Tahun Ajaran ' . ($tahunAjar->nama_tahun_ajar ?? '-');
-
-        if ($request->start_date && $request->end_date) {
-            $periode = 'Periode ' . \App\Http\Controllers\HelperController::formatTanggalIndonesia($request->start_date, 'd F Y') .
-                ' sampai ' . \App\Http\Controllers\HelperController::formatTanggalIndonesia($request->end_date, 'd F Y');
-        } else {
-            $periode = 'Semua Periode';
-        }
-
-        // Init PDF
-        $pdf = new TCPDF('L', 'mm', 'A4', true, 'UTF-8', false);
-        $pdf::SetTitle($judul);
-        $pdf::AddPage('L');
-
-        $pdf::SetFont('times', 'B', 13);
-        $pdf::Cell(0, 5, $judul, 0, 1, 'C');
-        $pdf::SetFont('times', '', 11);
-        $pdf::Cell(0, 5, $yayasan, 0, 1, 'C');
-        $pdf::SetFont('times', '', 10);
-        $pdf::MultiCell(0, 6, ($jenjang->deskripsi ?? '-'), 0, 'C');
-        $pdf::Cell(0, 5, $periode, 0, 1, 'C');
-        $pdf::Ln(3);
-
-        $pdf::SetFont('times', '', 9);
-        $pdf::setCellHeightRatio(1.2);
-
-        $html = '
-            <table border="0.5" cellpadding="1" cellspacing="0" style="width:100%;">
-                <thead>
-                    <tr style="background-color: #f5f5f5;">
-                        <th width="3%">No</th>
-                        <th width="10%">Tanggal</th>
-                        <th width="55%">Transaksi</th>
-                        <th width="10%">Petugas</th>
-                        <th width="10%" align="right">Nominal</th>
-                        <th width="12%" align="right">Total</th>
-                    </tr>
-                </thead>
-                <tbody>';
-
-        $saldo = 0;
-        foreach ($data as $i => $item) {
-            $tanggal = \App\Http\Controllers\HelperController::formatTanggalIndonesia($item->tanggal, 'd F Y');
-            $rekening = $item->akuntansi_rekening->nama_rekening ?? '-';
-            $deskripsi = $item->deskripsi ?? '-';
-            $metode = $item->metode_pembayaran;
-            $petugas = $item->ms_pengguna->nama ?? '-';
-            $nominal = $item->nominal;
-            $saldo += $nominal;
-
-            $html .= '
-                <tr>
-                    <td width="3%" align="center">' . ($i + 1) . '.</td>
-                    <td width="10%">' . $tanggal . '</td>
-                    <td width="55%">
-                        <span style="margin:0;padding:0;">
-                            <strong style="color:green;">RP' . number_format($nominal, 0, ',', '.') . '</strong> 
-                            <em>– ' . htmlspecialchars($judul) . '</em><br>
-                            <span style="font-size:9px;color:#888;">' . htmlspecialchars($deskripsi) . '</span>
-                        </span>
-                    </td>
-                    <td width="10%">
-                        <span style="margin:0;padding:0;">
-                            ' . htmlspecialchars($metode) . '<br>
-                            <span style="font-size:9px;color:#888;">' . htmlspecialchars($petugas) . '</span>
-                        </span>
-                    </td>
-                    <td width="10%" align="right">
-                        <span style="color:green;">RP' . number_format($nominal, 0, ',', '.') . '</span>
-                    </td>
-                    <td width="12%" align="right">
-                        <span style="color:green;">RP' . number_format($saldo, 0, ',', '.') . '</span>
-                    </td>
-                </tr>';
-        }
-
-        $html .= '
-            </tbody>
-            </table>';
-
-        $pdf::writeHTML($html, true, false, true, false, '');
-        $pdf::Output('laporan_pendapatan_lainnya.pdf', 'I');
+        return Pdf::loadView('reports.keuangan.transaksi-pendapatan-lainnya',
+            $data
+        )
+            ->setPaper('a4', 'landscape')
+            ->stream('laporan_pendapatan_lainnya.pdf');
     }
 }

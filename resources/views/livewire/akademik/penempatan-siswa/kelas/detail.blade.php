@@ -5,7 +5,7 @@
                 <div class="d-flex align-items-center gap-3">
                     <div class="avatar-sm">
                         <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
-                            <i class="ri-calendar-event-line">
+                            <i class="ri-building-4-line">
                             </i>
                         </div>
                     </div>
@@ -29,7 +29,7 @@
                         <!-- Pencarian dan Aksi -->
                         <div class="row g-3 mb-3">
                             <div class="col-lg-12">
-                                <label class="form-label">Cari Siswa</label>
+                                <label for="searchData" class="form-label small text-muted text-uppercase fw-medium mb-2">Pencarian</label>
                                 <div class="search-box">
                                     <input type="text" id="searchSiswaDetail" class="form-control" 
                                         wire:model.debounce.300ms="searchSiswaDetail"

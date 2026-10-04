@@ -68,7 +68,7 @@
                         <label class="form-label">Nominal</label>
                         <div class="input-group">
                             <span class="input-group-text">Rp</span>
-                            <input type="text" class="form-control" placeholder="Minimal Rp 1.000"
+                            <input type="text" class="form-control form-control fw-medium fs-12 @error('nominal_topup') is-invalid @enderror" placeholder="Minimal Rp 1.000"
                                 wire:model.defer="nominal_topup"
                                 onkeyup="formatTagihan(this)">
                         </div>
@@ -108,7 +108,7 @@
                         <label class="form-label">Nominal</label>
                         <div class="input-group">
                             <span class="input-group-text">Rp</span>
-                            <input type="text" class="form-control" placeholder="Nominal penarikan"
+                            <input type="text" class="form-control form-control fw-medium fs-12 @error('nominal_penarikan') is-invalid @enderror" placeholder="Nominal penarikan"
                                 wire:model.defer="nominal_penarikan"
                                 onkeyup="formatTagihan(this)">
                         </div>

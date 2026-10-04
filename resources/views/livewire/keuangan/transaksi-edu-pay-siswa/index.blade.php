@@ -35,11 +35,11 @@
                     <div class="tab-pane active" id="tabSiswaKelas" role="tabpanel">
                         <div class="row">
                             <div class="col-xxl-4 col-md-4 sticky-side-div">
-                                @livewire('transaksi-edu-pay-siswa.data-siswa')    
+                                @livewire('keuangan.transaksi-edu-pay-siswa.data-siswa')    
                             </div>
                             <!--end col-->
                             <div class="col-xxl-8 col-md-8">
-                                @livewire('transaksi-edu-pay-siswa.data-edu-pay')
+                                @livewire('keuangan.transaksi-edu-pay-siswa.data-edu-pay')
                             </div>
                         </div>
                         <!--end row-->

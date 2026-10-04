@@ -353,7 +353,7 @@ class DataKeranjang extends Component
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Kuitansi sedang diproses.']);
 
         // Menggunakan route untuk mengarahkan ke controller cetak
-        $url = route('transaksi.tagihan-siswa.kuitansiPDF', [
+        $url = route('keuangan.transaksi.tagihan-siswa.kuitansi', [
             'selectedJenjang' => $this->ms_jenjang_id,
             'transaksiId' => $currentTransaksiId
         ]);

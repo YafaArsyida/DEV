@@ -369,8 +369,13 @@
                                         colors="primary:#405189,secondary:#08a88a"
                                         style="width:75px;height:75px">
                                     </lord-icon>
-                                    <h5 class="mt-2">Silakan Pilih Siswa</h5>
-                                    <p class="text-muted mb-0">Untuk melakukan transaksi, harap pilih Siswa terlebih dahulu.</p>
+                                    @if ($ms_penempatan_siswa_id)
+                                        <h5 class="mt-2">Siswa ini belum memiliki tagihan</h5>
+                                        <p class="text-muted mb-0">Tambahkan tagihan baru untuk memulai transaksi.</p>
+                                    @else
+                                        <h5 class="mt-2">Silakan Pilih Siswa</h5>
+                                        <p class="text-muted mb-0">Untuk melakukan transaksi, harap pilih Siswa terlebih dahulu.</p>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

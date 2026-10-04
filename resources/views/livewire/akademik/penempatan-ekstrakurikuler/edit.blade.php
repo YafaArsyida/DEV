@@ -5,8 +5,8 @@
             <div class="modal-header border-0 pb-0 p-4">
                 <div class="d-flex align-items-center gap-3">
                     <div class="avatar-sm">
-                        <div class="avatar-title bg-info-subtle text-info rounded-circle">
-                            <i class="ri-football-line fs-20"></i>
+                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
+                            <i class="ri-trophy-line fs-20"></i>
                         </div>
                     </div>
 

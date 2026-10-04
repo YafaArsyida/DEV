@@ -212,9 +212,7 @@
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td></td>
-                            <td></td>
-                            <td class="text-start"><strong>TOTAL</strong></td>
+                            <td colspan="3" class="text-end">TOTAL</td>
                             <td class="text-center">
                                 {{ $jumlahTagihan }} item
                             </td>

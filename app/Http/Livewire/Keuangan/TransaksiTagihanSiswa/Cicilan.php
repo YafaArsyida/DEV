@@ -20,7 +20,14 @@ class Cicilan extends Component
 
     public function loadCicilan($ms_tagihan_siswa_id)
     {
-        $this->tagihan = TagihanSiswa::withSum('dt_transaksi_tagihan_siswa as total_bayar', 'jumlah_bayar')
+        $this->tagihan = TagihanSiswa::withSum(
+            [
+                'dt_transaksi_tagihan_siswa as total_bayar' => function ($query) {
+                    $query->where('status_transaksi', '!=', 'dibatalkan');
+                },
+            ],
+            'jumlah_bayar'
+        )
             ->where('ms_tagihan_siswa_id', $ms_tagihan_siswa_id)
             ->first();
 
@@ -52,7 +59,14 @@ class Cicilan extends Component
 
             // 🔒 Ambil ulang + lock
             $tagihan = TagihanSiswa::lockForUpdate()
-                ->withSum('dt_transaksi_tagihan_siswa as total_bayar', 'jumlah_bayar')
+                ->withSum(
+                    [
+                        'dt_transaksi_tagihan_siswa as total_bayar' => function ($query) {
+                            $query->where('status_transaksi', '!=', 'dibatalkan');
+                        },
+                    ],
+                    'jumlah_bayar'
+                )
                 ->find($ms_tagihan_siswa_id);
 
             if (!$tagihan) {

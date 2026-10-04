@@ -16,9 +16,9 @@
                         <h5 class="fw-bold mb-1">
                             Data Kelas
                         </h5>
-                        {{-- <small>
-                            Kelola laporan kegiatan generus 
-                        </small> --}}
+                        <small>
+                            Kelola informasi kelas, termasuk penempatan akademik dan ringkasan data siswa.
+                        </small>
                     </div>
                 </div>
             </div>

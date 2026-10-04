@@ -6,17 +6,16 @@
                 <div class="d-flex align-items-center gap-3">
                     <div class="avatar-sm">
                         <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
-                            <i class="ri-calendar-event-line">
-                            </i>
+                            <i class="ri-edit-2-line"></i>
                         </div>
                     </div>
                     <div>
                         <h5 class="fw-bold mb-1">
                             Perbarui Data Transaksi
                         </h5>
-                        {{-- <small>
-                            Tambahkan agenda kegiatan generasi penerus dengan pengaturan tingkat, jadwal, dan lokasi.
-                        </small> --}}
+                        <small class="text-muted">
+                            Perbarui informasi transaksi sesuai kebutuhan.
+                        </small>
                     </div>
                 </div>
                 <button type="button" class="btn btn-light btn-icon rounded-circle" data-bs-dismiss="modal">
@@ -37,7 +36,7 @@
                         <tr>
                             <th scope="row">Nominal</th>
                             <td>
-                                <span class="text-success fs-12 fw-medium ">
+                                <span class="fs-12 fw-medium ">
                                     Rp{{ number_format($transaksi->nominal, 0, ',', '.') }} - {{ $transaksi->metode_pembayaran }}
                                 </span>
                             </td>
@@ -62,7 +61,7 @@
                         </tr>
 
                         <tr>
-                            <th scope="row" class="text-primary">Perubahan Tanggal</th>
+                            <th scope="row">Perubahan Tanggal</th>
                             <td>
                                 <div class="input-group input-group-sm">
                                     <input type="date" class="form-control" wire:model.defer="tanggal">
@@ -72,7 +71,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <th scope="row" class="text-primary">Perubahan Deskripsi</th>
+                            <th scope="row">Perubahan Deskripsi</th>
                             <td>
                                 <div class="input-group input-group-sm">
                                     <input type="text" class="form-control" wire:model.defer="deskripsi" placeholder="Ubah keterangan (opsional)">

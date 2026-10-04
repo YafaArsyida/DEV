@@ -14,9 +14,9 @@
                         <h5 class="fw-bold mb-1">
                             Riwayat Pembayaran Siswa
                         </h5>
-                        {{-- <small>
-                            Kelola dan cetak riwayat pembayaran siswa
-                        </small> --}}
+                        <small>
+                            Lihat riwayat pembayaran dan transaksi siswa
+                        </small>
                     </div>
                 </div>
             </div>
@@ -100,7 +100,7 @@
                             {{-- <th class="text-uppercase">Katgeori</th> --}}
                             <th class="text-uppercase text-center">Petugas</th>
                             <th class="text-uppercase text-center">Metode</th>
-                            <th class="text-uppercase text-start">Dibayarkan</th>
+                            <th class="text-uppercase text-end">Dibayarkan</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -116,7 +116,7 @@
                                 {{-- <td>{{ $item->ms_tagihan_siswa->ms_jenis_tagihan_siswa->ms_kategori_tagihan_siswa->nama_kategori_tagihan_siswa }}</td> --}}
                                 <td class="text-center">{{ $item->ms_transaksi_tagihan_siswa->ms_pengguna->nama ?? '-' }}</td>
                                 <td class="text-center">{{ $item->ms_transaksi_tagihan_siswa->metode_pembayaran }}</td>
-                                <td class="text-start">
+                                <td class="text-end">
                                     <span class="fs-12 fw-medium">
                                         RP{{ number_format($item->jumlah_bayar, 0, ',', '.') }}
                                     </span>
@@ -146,7 +146,7 @@
                             <td></td>
                             <td></td>
                             <td class="text-start"><strong>TOTAL</strong></td>
-                            <td class="text-start">
+                            <td class="text-end">
                                 <span class="fs-12">RP{{ number_format($totalPembayaran, 0, ',', '.') }}</span>
                             </td>
                         </tr>

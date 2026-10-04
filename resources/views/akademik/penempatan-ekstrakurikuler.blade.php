@@ -54,7 +54,7 @@
         </div>
         <div class="row">
             <!--end col-->
-            <div class="col-xxl-6">
+            <div class="col-xxl-5">
                 <div class="sticky-side-div">
                     @livewire('akademik.penempatan-ekstrakurikuler.ekstrakurikuler.index')
                 </div>
@@ -62,7 +62,7 @@
                 @livewire('akademik.ekstrakurikuler.create')   
                 @livewire('akademik.ekstrakurikuler.edit')   
             </div>
-            <div class="col-xxl-6">
+            <div class="col-xxl-7">
                 @livewire('akademik.penempatan-ekstrakurikuler.siswa.index')
                 @livewire('akademik.penempatan-ekstrakurikuler.siswa.detail')
                 @livewire('akademik.penempatan-ekstrakurikuler.siswa.edit')

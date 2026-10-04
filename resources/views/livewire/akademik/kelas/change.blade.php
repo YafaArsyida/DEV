@@ -5,7 +5,7 @@
                 <div class="d-flex align-items-center gap-3">
                     <div class="avatar-sm">
                         <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
-                            <i class="ri-calendar-event-line">
+                            <i class="ri-arrow-left-right-line">
                             </i>
                         </div>
                     </div>
@@ -13,9 +13,7 @@
                         <h5 class="fw-bold mb-1">
                             Pindahkan Siswa
                         </h5>
-                        {{-- <small>
-                            Kelas {{ $namaKelasCurrent ?? 'Kelas' }}
-                        </small> --}}
+                        <small class="text-muted">Pilih siswa dan kelas tujuan pemindahan.</small>
                     </div>
                 </div>
                 <button type="button" class="btn btn-light btn-icon rounded-circle" data-bs-dismiss="modal">
@@ -31,7 +29,7 @@
                         
                             <!-- Kotak Pencarian -->
                             <div class="col-xxl-8 col-sm-6">
-                                <label for="searchSiswa" class="form-label">Pencarian Siswa</label>
+                                <label for="searchSiswa" class="form-label small text-muted text-uppercase fw-medium mb-2">Pencarian Siswa</label>
                                 <div class="search-box">
                                     <input type="text" id="searchSiswa" class="form-control search" wire:model.debounce.300ms="searchSiswa"
                                         placeholder="Cari nama siswa...">

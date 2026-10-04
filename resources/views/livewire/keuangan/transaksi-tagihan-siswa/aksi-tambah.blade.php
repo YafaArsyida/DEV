@@ -37,7 +37,7 @@
                             <div>
                                 <div class="d-flex align-items-center gap-3">
                                     <div class="avatar-sm">
-                                        <div class="avatar-title bg-info-subtle text-info rounded-circle fs-20">
+                                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
                                             <i class="ri-file-list-3-line"></i>
                                         </div>
                                     </div>
@@ -150,22 +150,25 @@
                                             </td>
                                             <td>{{ \App\Http\Controllers\HelperController::formatTanggalIndonesia($item['tanggal_jatuh_tempo'], 'd F Y') }}</td>
                                             <td class="text-center">{{ $item['cicilan_status'] }}</td>
-                                            <td style="width: 100px;" class="text-center">
-                                                @if(!$item['sudah_ditetapkan'])
-                                                <span class="badge bg-warning-subtle text-warning">
-                                                    Belum Ditambahkan
-                                                </span>
-
-                                                @elseif($item['status_tagihan'] == 'Belum Dibayar')
-                                                    <span class="badge bg-danger-subtle text-danger">
+                                            <td style="width: 140px;" class="text-center">
+                                                @if (!$item['sudah_ditetapkan'])
+                                                    <span class="text-body">
+                                                        <i class="ri-add-circle-line fs-17 align-middle me-1"></i>
+                                                        Belum Ditambahkan
+                                                    </span>
+                                                @elseif ($item['status_tagihan'] === 'Belum Dibayar')
+                                                    <span class="text-warning">
+                                                        <i class="ri-time-line fs-17 align-middle me-1"></i>
                                                         Belum Dibayar
                                                     </span>
-                                                @elseif($item['status_tagihan'] == 'Masih Dicicil')
-                                                    <span class="badge bg-info-subtle text-info">
+                                                @elseif ($item['status_tagihan'] === 'Masih Dicicil')
+                                                    <span class="text-primary">
+                                                        <i class="ri-money-dollar-circle-line fs-17 align-middle me-1"></i>
                                                         Masih Dicicil
                                                     </span>
                                                 @else
-                                                    <span class="badge bg-success-subtle text-success">
+                                                    <span class="text-success">
+                                                        <i class="ri-check-double-line fs-17 align-middle me-1"></i>
                                                         Lunas
                                                     </span>
                                                 @endif

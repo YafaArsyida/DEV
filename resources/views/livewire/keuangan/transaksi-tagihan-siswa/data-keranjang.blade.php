@@ -5,7 +5,7 @@
             <div class="d-flex align-items-center gap-3">
                 <div class="avatar-sm">
                     <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
-                        <i class="ri-calendar-event-line"></i>
+                        <i class="ri-shopping-cart-2-line"></i>
                     </div>
                 </div>
 
@@ -15,7 +15,7 @@
                     </h5>
 
                     <small class="text-muted">
-                        Kelola item dalam keranjang transaksi
+                        Kelola transaksi sebelum dilakukan pembayaran
                     </small>
                 </div>
 
@@ -46,11 +46,8 @@
                                         <i class="ri-delete-bin-5-fill fs-14"></i>
                                     </a>
                                 </th>
-                                <td>
-                                    <span class="fw-medium">{{ $item->ms_tagihan_siswa->ms_jenis_tagihan_siswa->nama_jenis_tagihan_siswa ?? '-'  }}</span>
-                                    <p class="text-muted mb-0">
-                                        Rp{{ number_format($item->ms_tagihan_siswa->jumlah_tagihan_siswa ?? 0, 0, ',', '.') }}
-                                    </p>
+                                <td class="fw-medium">
+                                    {{ $item->ms_tagihan_siswa->ms_jenis_tagihan_siswa->nama_jenis_tagihan_siswa ?? '-'  }}
                                 </td>
                         
                                 {{-- Dibayar Sekarang (di keranjang) --}}

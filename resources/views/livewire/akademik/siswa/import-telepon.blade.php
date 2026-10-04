@@ -5,12 +5,14 @@
                 <div class="d-flex align-items-center gap-3">
                     <div class="avatar-sm">
                         <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
-                            <i class="ri-calendar-event-line">
-                            </i>
+                            <i class="ri-smartphone-line"></i>
                         </div>
                     </div>
                     <div>
-                        <h5 class="modal-title">Import Telepon Siswa {{ $namaKelas }}</h5>
+                        <div>
+                            <h5 class="modal-title mb-1">Import Telepon Siswa {{ $namaKelas }}</h5>
+                            <small class="text-muted">Unggah dan tinjau nomor telepon sebelum diperbarui.</small>
+                        </div>
                     </div>
                 </div>
                 <button type="button" class="btn btn-light btn-icon rounded-circle" data-bs-dismiss="modal">
@@ -35,6 +37,7 @@
                                 <h6 class="card-title mb-0">
                                     Langkah Pembaruan
                                 </h6>
+                                <small class="text-muted">Ikuti langkah berikut sebelum mengunggah data.</small>
                             </div>
 
                             <div class="card-body">
@@ -102,6 +105,7 @@
                                 <h6 class="card-title mb-0">
                                     Upload Dokumen Pembaruan
                                 </h6>
+                                <small class="text-muted">Pilih file Excel berisi nomor telepon terbaru.</small>
                             </div>
 
                             <div class="card-body">
@@ -137,6 +141,7 @@
                         <h5 class="mb-0">
                             Preview Perubahan Nomor Telepon
                         </h5>
+                        <small class="text-muted">Periksa perubahan nomor sebelum diterapkan.</small>
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">

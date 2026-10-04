@@ -18,9 +18,9 @@
                         <h5 class="fw-bold mb-1">
                             Detail Peserta
                         </h5>
-                        <p class="text-muted mb-0">
+                        <small class="text-muted d-block">
                             Informasi siswa dan ekstrakurikuler
-                        </p>
+                        </small>
                     </div>
 
                 </div>

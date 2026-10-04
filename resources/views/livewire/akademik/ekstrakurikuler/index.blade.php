@@ -15,9 +15,7 @@
                         <h5 class="fw-bold mb-1">
                             Data Ekstrakurikuler
                         </h5>
-                        {{-- <small class="text-muted">
-                            Kelola daftar ekstrakurikuler pada jenjang yang dipilih.
-                        </small> --}}
+                        <small class="text-muted">Kelola kegiatan yang tersedia pada jenjang terpilih.</small>
                     </div>
                 </div>
             </div>
@@ -37,7 +35,7 @@
     <div class="card-body">
         <div class="row g-3 mb-3">
             <div class="col-xxl-12 col-sm-12">
-                <label for="searchEkstrakurikuler" class="form-label">Pencarian</label>
+                <label for="searchEkstrakurikuler" class="form-label small text-muted text-uppercase fw-medium mb-2">Pencarian</label>
                 <div class="search-box">
                     <input type="text" id="searchEkstrakurikuler" class="form-control search" wire:model.debounce.300ms="search"
                         placeholder="Cari Ekstrakurikuler...">

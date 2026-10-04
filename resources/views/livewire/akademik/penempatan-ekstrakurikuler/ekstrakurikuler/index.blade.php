@@ -15,9 +15,7 @@
                         <h5 class="fw-bold mb-1">
                             Data Ekstrakurikuler
                         </h5>
-                        {{-- <small class="text-muted">
-                            Kelola daftar ekstrakurikuler pada jenjang yang dipilih.
-                        </small> --}}
+                        <small class="text-muted">Kelola daftar ekstrakurikuler pada jenjang terpilih.</small>
                     </div>
                 </div>
             </div>
@@ -37,7 +35,7 @@
     <div class="card-body">
         <div class="row g-3 mb-3">
             <div class="col-xxl-12 col-sm-12">
-                <label for="searchEkstrakurikuler" class="form-label">Pencarian</label>
+                <label for="searchEkstrakurikuler" class="form-label small text-muted text-uppercase fw-medium mb-2">Pencarian</label>
                 <div class="search-box">
                     <input type="text" id="searchEkstrakurikuler" class="form-control search" wire:model.debounce.300ms="search"
                         placeholder="Cari Ekstrakurikuler...">
@@ -67,9 +65,7 @@
                                 <th class="text-center">no</th>
                                 <th>ekstrakurikuler</th>
                                 <th>biaya</th>
-                                <th>kuota</th>
-                                <th>terisi</th>
-                                <th>tersedia</th>
+                                <th class="text-center">kuota</th>
                                 <th class="text-center">aksi</th>
                             </tr>
                         </thead>
@@ -89,9 +85,24 @@
                                             Rp{{ number_format($item->biaya, 0, ',', '.') }}
                                         </span>
                                     </td>
-                                    <td>{{ $item->kuota ?? 0 }} siswa</td>
-                                    <td>{{ $item->ms_penempatan_ekstrakurikuler_count ?? 0 }} siswa</td>
-                                    <td>{{ max(0, ($item->kuota ?? 0) - ($item->ms_penempatan_ekstrakurikuler_count ?? 0)) }} siswa</td>
+                                    <td>
+                                        @php
+                                            $kuota = max((int) ($item->kuota ?? 0), 0);
+                                            $terisi = (int) ($item->ms_penempatan_ekstrakurikuler_count ?? 0);
+                                            $progressKuota = $kuota > 0
+                                                ? min((int) round(($terisi / $kuota) * 100), 100)
+                                                : 0;
+                                        @endphp
+                                        <div class="d-flex flex-column gap-1 mx-4" style="min-width: 60px">
+                                            <span class="small fw-semibold text-end">{{ $progressKuota }}%</span>
+                                            <div class="progress" role="progressbar"
+                                                aria-label="Kapasitas {{ $item->nama_ekstrakurikuler }}"
+                                                aria-valuenow="{{ $progressKuota }}" aria-valuemin="0" aria-valuemax="100"
+                                                style="height: 6px">
+                                                <div class="progress-bar bg-primary" style="width: {{ $progressKuota }}%"></div>
+                                            </div>
+                                        </div>
+                                    </td>
                                     <td>
                                         <div class="d-flex justify-content-center gap-2">
                                             {{-- Edit --}}
@@ -110,7 +121,7 @@
                                                 data-bs-target="#detailEkstrakurikuler"
                                                 title="Detail Ekstrakurikuler"
                                                 wire:click.prevent="$emit('detailEkstrakurikuler', {{ $item->ms_ekstrakurikuler_id }})">
-                                                <i class="ri-user-line me-1"></i> Siswa
+                                                <i class="ri-user-line me-1"></i> Detail
                                             </button>
                                         </div>
                                     </td>                                  

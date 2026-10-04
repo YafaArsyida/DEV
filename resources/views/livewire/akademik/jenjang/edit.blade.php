@@ -13,9 +13,7 @@
                             Perbarui Jenjang
                         </h5>
 
-                        {{-- <p class="text-muted mb-0 fs-13">
-                            Tambahkan periode tahun ajaran baru.
-                        </p> --}}
+                        <small class="text-muted">Perbarui informasi jenjang pendidikan.</small>
                     </div>
                 </div>
 

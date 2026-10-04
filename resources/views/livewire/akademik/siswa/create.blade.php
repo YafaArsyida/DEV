@@ -1,218 +1,402 @@
-<div wire:ignore.self class="modal fade" id="ModalAddSiswa" tabindex="-1" aria-labelledby="ModalAddSiswa"
+<div wire:ignore.self
+    class="modal fade"
+    id="ModalAddSiswa"
+    tabindex="-1"
+    aria-labelledby="ModalAddSiswaLabel"
     aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl">
+
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-            <div class="modal-header border-0">
+            {{-- HEADER --}}
+            <div class="modal-header border-0 px-4 pt-4 pb-3">
                 <div class="d-flex align-items-center gap-3">
-                    <div class="avatar-sm">
+                    <div class="avatar-sm flex-shrink-0">
                         <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
-                            <i class="ri-calendar-event-line">
-                            </i>
+                            <i class="ri-user-add-line"></i>
                         </div>
                     </div>
+
                     <div>
-                        <h5 class="fw-bold mb-1">
+                        <h5 class="fw-bold mb-1" id="ModalAddSiswaLabel">
                             Tambah Siswa Baru
                         </h5>
-                        {{-- <small>
-                            Tambahkan agenda kegiatan generasi penerus dengan pengaturan tingkat, jadwal, dan lokasi.
-                        </small> --}}
+
+                        <small class="text-muted">
+                            Tambahkan data siswa untuk tahun ajaran aktif.
+                        </small>
                     </div>
+
                 </div>
-                <button type="button" class="btn btn-light btn-icon rounded-circle" data-bs-dismiss="modal">
-                    <i class="ri-close-line fs-18">
-                    </i>
+
+                <button type="button"
+                    class="btn btn-light btn-icon rounded-circle"
+                    data-bs-dismiss="modal"
+                    aria-label="Tutup">
+
+                    <i class="ri-close-line fs-18"></i>
+
                 </button>
+
             </div>
+
+
             <form wire:submit.prevent="save">
-                <div class="modal-body">
-                    <div class="row g-3">
-                    
-                        <!-- LEFT: SYSTEM INFO -->
-                        <div class="col-xl-4 col-md-4">
-                            <div class="card border-0 shadow-sm h-100">
-                                <div class="card-header bg-primary border-0">
-                                    <h6 class="mb-0 text-white">Personalisasi Aplikasi</h6>
-                                    <small class="text-white">Informasi sistem siswa</small>
-                                </div>
-                    
-                                <div class="card-body">
-                                    <!-- SYSTEM INFO -->
-                                    <div class="mb-3">
-                                        <div class="text-uppercase text-muted small mb-2">
-                                            Pengaturan Cepat
-                                        </div>
-                    
-                                        <div class="mb-3">
-                                            <label class="form-label small text-muted">Kelas</label>
-                                            <select wire:model.defer="form.ms_kelas_id" class="form-select @error('form.ms_kelas_id') is-invalid @enderror">
-                                                <option value="">Pilih Kelas</option>
-                    
-                                                @foreach ($selectKelas as $item)
-                                                <option value="{{ $item->ms_kelas_id }}">
-                                                    {{ $item->nama_kelas }}
-                                                </option>
-                                                @endforeach
-                                            </select>
-                                            @error('form.ms_kelas_id')
-                                            <div class="text-danger small">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                    
-                                        <div class="mb-3">
-                                            <label class="form-label small text-muted">Telepon</label>
-                                            <input type="text" wire:model.defer="form.telepon" class="form-control @error('form.telepon') is-invalid @enderror"
-                                                placeholder="08xxxxxxxxxx">
-                                            @error('form.telepon')
-                                            <div class="text-danger small">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                    
-                                        <div class="mb-0">
-                                            <label class="form-label small text-muted">EduCard</label>
-                                            <input type="text" wire:model.defer="form.educard" class="form-control" placeholder="ID kartu">
-                                            @error('form.educard')
-                                            <div class="text-danger small">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
-                    
-                                    <hr>
-                    
-                                    <!-- EDITABLE QUICK SETTINGS -->
-                                    <div>
-                                        <div class="text-uppercase text-muted small mb-2">
-                                            Informasi Sistem
-                                        </div>
-                    
-                                        <div class="list-group list-group-flush">
-                                        
-                                            <div class="list-group-item px-0 d-flex justify-content-between">
-                                                <div>
-                                                    <div class="text-muted small">Jenjang</div>
-                                                    <div class="fw-semibold">
-                                                        {{ $nama_jenjang ?? '-' }}
-                                                    </div>
-                                                </div>
-                                                <i class="ri-book-2-line text-info fs-5"></i>
-                                            </div>
-                                        
-                                            <div class="list-group-item px-0 d-flex justify-content-between">
-                                                <div>
-                                                    <div class="text-muted small">Tahun Ajar</div>
-                                                    <div class="fw-semibold">
-                                                        {{ $nama_tahun_ajar ?? '-' }}
-                                                    </div>
-                                                </div>
-                                                <i class="ri-calendar-fill text-warning fs-5"></i>
-                                            </div>
-                                        
-                                            <div class="list-group-item px-0 d-flex justify-content-between">
-                                                <div>
-                                                    <div class="text-muted small">Petugas</div>
-                                                    <div class="fw-semibold">
-                                                        {{ auth()->user()->nama ?? '-' }}
-                                                    </div>
-                                                </div>
-                                                <i class="ri-user-3-fill text-secondary fs-5"></i>
-                                            </div>
-                                        
-                                            <div class="list-group-item px-0 d-flex justify-content-between">
-                                                <div>
-                                                    <div class="text-muted small">Tanggal Input</div>
-                                                    <div class="fw-semibold">
-                                                        {{ now()->format('d M Y H:i') }}
-                                                    </div>
-                                                </div>
-                                                <i class="ri-time-fill text-success fs-5"></i>
-                                            </div>
-                                        
-                                        </div>
-                                    </div>
-                    
-                                </div>
-                            </div>
+
+                {{-- BODY --}}
+                <div class="modal-body px-4 pt-2 pb-4">
+
+                    {{-- CONTEXT --}}
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4 pb-3 border-bottom">
+
+                        <div class="d-flex align-items-center gap-2">
+
+                            <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">
+                                {{ $nama_jenjang ?? '-' }}
+                            </span>
+
+                            <span class="text-muted">
+                                {{ $nama_tahun_ajar ?? '-' }}
+                            </span>
+
                         </div>
-                    
-                        <!-- RIGHT: MAIN FORM -->
-                        <div class="col-xl-8 col-md-8">
-                    
-                            <div class="card shadow-sm border-0">
-                    
-                                <div class="card-header bg-white border-bottom">
-                                    <h6 class="mb-0">Informasi Siswa</h6>
-                                    <small class="text-muted">Data pribadi & akademik</small>
-                                </div>
-                    
-                                <div class="card-body">
-                    
-                                    <div class="row g-3">
-                    
-                                        <div class="col-lg-6">
-                                            <label class="form-label">Nama Siswa</label>
-                                            <input type="text" autofocus wire:model.defer="form.nama_siswa" class="form-control @error('form.nama_siswa') is-invalid @enderror">
-                                            @error('form.nama_siswa')
-                                            <div class="text-danger small">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                    
-                                        <div class="col-lg-6">
-                                            <label class="form-label">NISN</label>
-                                            <input type="text" wire:model.defer="form.nisn" class="form-control">
-                                        </div>
-                    
-                                        <div class="col-lg-6">
-                                            <label class="form-label">Tempat Lahir</label>
-                                            <input type="text" wire:model.defer="form.tempat_lahir" class="form-control">
-                                        </div>
-                    
-                                        <div class="col-lg-6">
-                                            <label class="form-label">Tanggal Lahir</label>
-                                            <input type="date" wire:model.defer="form.tanggal_lahir" class="form-control">
-                                            @error('form.tanggal_lahir')
-                                            <div class="text-danger small">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                    
-                                        <div class="col-lg-6">
-                                            <label class="form-label">Nama Ayah</label>
-                                            <input type="text" wire:model.defer="form.nama_ayah" class="form-control">
-                                        </div>
-                    
-                                        <div class="col-lg-6">
-                                            <label class="form-label">Nama Ibu</label>
-                                            <input type="text" wire:model.defer="form.nama_ibu" class="form-control">
-                                        </div>
-                    
-                                        <div class="col-12">
-                                            <label class="form-label">Alamat</label>
-                                            <textarea wire:model.defer="form.alamat" class="form-control" rows="2"></textarea>
-                                        </div>
-                    
-                                        <div class="col-12">
-                                            <label class="form-label">Catatan Siswa</label>
-                                            <textarea wire:model.defer="form.deskripsi" class="form-control" rows="3"></textarea>
-                                        </div>
-                    
-                                    </div>
-                    
-                                </div>
-                            </div>
-                        </div>
-                    
+
+                        <small class="text-muted">
+                            <span class="text-danger">*</span>
+                            Wajib diisi
+                        </small>
+
                     </div>
+
+
+                    {{-- DATA UTAMA --}}
+                    <section class="mb-4">
+
+                        <div class="mb-3">
+                            <h6 class="fw-semibold mb-1">
+                                Data Utama
+                            </h6>
+
+                            <small class="text-muted">
+                                Informasi dasar dan penempatan siswa.
+                            </small>
+                        </div>
+
+
+                        <div class="row g-3">
+
+                            {{-- NAMA --}}
+                            <div class="col-md-8">
+
+                                <label class="form-label">
+                                    Nama Siswa
+                                    <span class="text-danger">*</span>
+                                </label>
+
+                                <input type="text"
+                                    autofocus
+                                    wire:model.defer="form.nama_siswa"
+                                    class="form-control @error('form.nama_siswa') is-invalid @enderror">
+
+                                @error('form.nama_siswa')
+                                    <div class="invalid-feedback">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+
+                            </div>
+
+
+                            {{-- NISN --}}
+                            <div class="col-md-4">
+
+                                <label class="form-label">
+                                    NISN
+                                </label>
+
+                                <input type="text"
+                                    wire:model.defer="form.nisn"
+                                    class="form-control">
+
+                            </div>
+
+
+                            {{-- KELAS --}}
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Kelas
+                                    <span class="text-danger">*</span>
+                                </label>
+
+                                <select wire:model.defer="form.ms_kelas_id"
+                                    class="form-select @error('form.ms_kelas_id') is-invalid @enderror">
+
+                                    <option value="">
+                                        Pilih Kelas
+                                    </option>
+
+                                    @foreach ($selectKelas as $item)
+                                        <option value="{{ $item->ms_kelas_id }}">
+                                            {{ $item->nama_kelas }}
+                                        </option>
+                                    @endforeach
+
+                                </select>
+
+                                @error('form.ms_kelas_id')
+                                    <div class="invalid-feedback">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+
+                            </div>
+
+
+                            {{-- TELEPON --}}
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Telepon
+                                    <span class="text-danger">*</span>
+                                </label>
+
+                                <input type="text"
+                                    wire:model.defer="form.telepon"
+                                    class="form-control @error('form.telepon') is-invalid @enderror"
+                                    placeholder="08xxxxxxxxxx">
+
+                                @error('form.telepon')
+                                    <div class="invalid-feedback">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+
+                            </div>
+
+
+                            {{-- TEMPAT LAHIR --}}
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Tempat Lahir
+                                </label>
+
+                                <input type="text"
+                                    wire:model.defer="form.tempat_lahir"
+                                    class="form-control">
+
+                            </div>
+
+
+                            {{-- TANGGAL LAHIR --}}
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Tanggal Lahir
+                                </label>
+
+                                <input type="date"
+                                    wire:model.defer="form.tanggal_lahir"
+                                    class="form-control @error('form.tanggal_lahir') is-invalid @enderror">
+
+                                @error('form.tanggal_lahir')
+                                    <div class="invalid-feedback">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    {{-- DATA KELUARGA --}}
+                    <section class="mb-4 pt-1">
+
+                        <div class="mb-3">
+
+                            <h6 class="fw-semibold mb-1">
+                                Data Keluarga
+                            </h6>
+
+                            <small class="text-muted">
+                                Informasi orang tua dan alamat siswa.
+                            </small>
+
+                        </div>
+
+
+                        <div class="row g-3">
+
+                            {{-- AYAH --}}
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Nama Ayah
+                                </label>
+
+                                <input type="text"
+                                    wire:model.defer="form.nama_ayah"
+                                    class="form-control">
+
+                            </div>
+
+
+                            {{-- IBU --}}
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Nama Ibu
+                                </label>
+
+                                <input type="text"
+                                    wire:model.defer="form.nama_ibu"
+                                    class="form-control">
+
+                            </div>
+
+
+                            {{-- ALAMAT --}}
+                            <div class="col-12">
+
+                                <label class="form-label">
+                                    Alamat
+                                </label>
+
+                                <textarea wire:model.defer="form.alamat"
+                                    class="form-control"
+                                    rows="2"></textarea>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    {{-- INFORMASI TAMBAHAN --}}
+                    <section>
+
+                        <div class="mb-3">
+
+                            <h6 class="fw-semibold mb-1">
+                                Informasi Tambahan
+                            </h6>
+
+                            <small class="text-muted">
+                                Informasi pendukung administrasi siswa.
+                            </small>
+
+                        </div>
+
+
+                        <div class="row g-3">
+
+                            {{-- EDUCARD --}}
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    EduCard
+                                </label>
+
+                                <input type="text"
+                                    wire:model.defer="form.educard"
+                                    class="form-control @error('form.educard') is-invalid @enderror"
+                                    placeholder="ID kartu">
+
+                                @error('form.educard')
+                                    <div class="invalid-feedback">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+
+                            </div>
+
+
+                            {{-- PETUGAS --}}
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Petugas
+                                </label>
+
+                                <input type="text"
+                                    class="form-control bg-light"
+                                    value="{{ auth()->user()->nama ?? '-' }}"
+                                    disabled>
+
+                            </div>
+
+
+                            {{-- CATATAN --}}
+                            <div class="col-12">
+
+                                <label class="form-label">
+                                    Catatan Siswa
+                                </label>
+
+                                <textarea wire:model.defer="form.deskripsi"
+                                    class="form-control"
+                                    rows="2"></textarea>
+
+                            </div>
+
+                        </div>
+
+
+                        {{-- SYSTEM INFO --}}
+                        <div class="mt-3 pt-3 border-top">
+
+                            <div class="d-flex flex-wrap justify-content-between gap-2">
+
+                                <small class="text-muted">
+                                    <i class="ri-user-line me-1"></i>
+                                    Petugas:
+                                    <span class="fw-medium text-body">
+                                        {{ auth()->user()->nama ?? '-' }}
+                                    </span>
+                                </small>
+
+                                <small class="text-muted">
+                                    <i class="ri-time-line me-1"></i>
+                                    {{ now()->format('d M Y H:i') }}
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
                 </div>
-                <div class="modal-footer border-0 px-4 pb-4 pt-0">
-                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">
+
+
+                {{-- FOOTER --}}
+                <div class="modal-footer border-0 px-4 pb-4 pt-2">
+
+                    <button type="button"
+                        class="btn btn-light rounded-pill px-4"
+                        data-bs-dismiss="modal">
+
                         <i class="ri-close-line me-1"></i>
                         Tutup
+
                     </button>
-                    <button type="submit" class="btn btn-primary rounded-pill px-4">
+
+                    <button type="submit"
+                        class="btn btn-primary rounded-pill px-4">
+
                         <i class="ri-save-3-line me-1"></i>
                         Simpan
+
                     </button>
+
                 </div>
+
             </form>
+
         </div>
     </div>
 </div>

@@ -180,14 +180,7 @@
                             </ul>
                         </div>
                     </li>
-                
-                    <!-- Penggajian Pegawai -->
-                    <li class="nav-item">
-                        <a class="nav-link menu-link" href="#">
-                            <i class="mdi mdi-cash-check"></i>
-                            <span data-key="t-gaji-pegawai">Pennggajian Pegawai</span>
-                        </a>
-                    </li>
+            
                     <li class="nav-item">
                                 <a class="nav-link menu-link {{ request()->routeIs('keuangan.transaksi.pendapatan-lainnya') ? 'active' : '' }}"
                                     href="{{ route('keuangan.transaksi.pendapatan-lainnya') }}">

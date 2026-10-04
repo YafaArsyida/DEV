@@ -14,9 +14,7 @@
                         <h5 class="fw-bold mb-1">
                             Ekstrakurikuler Baru
                         </h5>
-                        {{-- <small>
-                            Tambahkan agenda kegiatan generasi penerus dengan pengaturan tingkat, jadwal, dan lokasi.
-                        </small> --}}
+                        <small class="text-muted">Tambahkan kegiatan yang dapat dipilih siswa.</small>
                     </div>
                 </div>
                 <button type="button" class="btn btn-light btn-icon rounded-circle" data-bs-dismiss="modal">

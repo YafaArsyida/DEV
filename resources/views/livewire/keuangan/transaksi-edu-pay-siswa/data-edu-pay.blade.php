@@ -10,14 +10,13 @@
                             <i class="ri-bank-card-line"></i>
                         </div>
                     </div>
-
                     <div>
                         <h5 class="fw-bold mb-1">
                             Riwayat Transaksi EduPay Siswa
                         </h5>
-                        {{-- <small class="text-muted">
-                            Riwayat transaksi tabungan siswa berdasarkan periode yang dipilih.
-                        </small> --}}
+                        <small class="text-muted">
+                            Lihat riwayat transaksi EduPay siswa berdasarkan periode yang dipilih.
+                        </small>
                     </div>
                 </div>
             </div>
@@ -52,10 +51,10 @@
                         <th class="text-start" scope="col" style="width: 150px;">tanggal</th>
                         <th class="text-start" scope="col">transaksi</th>
                         <th class="text-center" scope="col">petugas</th>
-                        <th class="text-center" scope="col">pemasukan</th>
-                        <th class="text-center" scope="col">pengeluaran</th>
-                        <th class="text-center" scope="col" class="">saldo</th>
-                        <th class="text-start">aksi</th>
+                        <th class="text-end" scope="col">pemasukan</th>
+                        <th class="text-end" scope="col">pengeluaran</th>
+                        <th class="text-end" scope="col" class="">saldo</th>
+                        <th class="text-center">aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -64,9 +63,9 @@
                             <i class="ri-wallet-3-line me-1"></i>
                             Saldo Sebelum Periode
                         </td>
-                        <td class="fs-12 text-success">Rp{{ number_format($totalMasukSebelum, 0, ',', '.') }}</td>
-                        <td class="fs-12 text-danger">Rp{{ number_format($totalKeluarSebelum, 0, ',', '.') }}</td>
-                        <td class="fs-12">Rp{{ number_format($saldoAwal, 0, ',', '.') }}</td>
+                        <td class="fs-12 text-end text-success">Rp{{ number_format($totalMasukSebelum, 0, ',', '.') }}</td>
+                        <td class="fs-12 text-end text-danger">Rp{{ number_format($totalKeluarSebelum, 0, ',', '.') }}</td>
+                        <td class="fs-12 text-end">Rp{{ number_format($saldoAwal, 0, ',', '.') }}</td>
                         <td></td>
                     </tr>
                     @forelse ($transaksiEduPay as $item)
@@ -142,21 +141,21 @@
                             </p>
                         </td>
                         <td class="text-center">{{ $item->ms_pengguna->nama }}</td>
-                        <td class="text-center">
+                        <td class="text-end">
                             <span class="fs-12 fw-medium {{ $item->status_transaksi === 'dibatalkan' ? 'text-muted text-decoration-line-through' : 'text-success' }}">
                                 {{ in_array($item->jenis_transaksi, ['topup tunai', 'topup online', 'pengembalian dana'])
                                     ? 'Rp' . number_format($item->nominal, 0, ',', '.')
                                     : '-' }}
                             </span>
                         </td>
-                        <td class="text-center">
+                        <td class="text-end">
                             <span class="fs-12 fw-medium {{ $item->status_transaksi === 'dibatalkan' ? 'text-muted text-decoration-line-through' : 'text-danger' }}">
                                 {{ in_array($item->jenis_transaksi, ['penarikan', 'pembayaran', 'kantin'])
                                     ? 'Rp' . number_format($item->nominal, 0, ',', '.')
                                     : '-' }}
                             </span>
                         </td>
-                        <td class="text-center">
+                        <td class="text-end">
                             <span class="fs-12 fw-medium">
                                 Rp{{ number_format($item->saldo, 0, ',', '.') }}
                             </span>

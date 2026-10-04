@@ -6,8 +6,7 @@
                 <div class="d-flex align-items-center gap-3">
                     <div class="avatar-sm">
                         <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
-                            <i class="ri-calendar-event-line">
-                            </i>
+                            <i class="ri-user-line"></i>
                         </div>
                     </div>
     
@@ -15,9 +14,7 @@
                         <h5 class="fw-bold mb-1">
                             Data Siswa
                         </h5>
-                        {{-- <small>
-                            Kelola laporan kegiatan generus 
-                        </small> --}}
+                        <small class="text-muted">Kelola data siswa dan informasi akademik.</small>
                     </div>
                 </div>
             </div>

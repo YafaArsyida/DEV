@@ -20,12 +20,111 @@
     <!-- App Css-->
     <link href="{{asset('assets')}}/css/app.min.css" rel="stylesheet" type="text/css" />
 
+    <style>
+        #splash-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            background: linear-gradient(135deg, #183b72 0%, #2456a6 58%, #147d78 100%);
+            color: #fff;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        #splash-screen .splash-title,
+        #splash-screen .splash-subtitle {
+            opacity: 0;
+            transform: translateY(18px);
+        }
+
+        html.splash-active #splash-screen {
+            display: flex;
+            visibility: visible;
+            animation: splash-background-in .4s ease-out forwards;
+        }
+
+        html.splash-active #splash-screen .splash-title {
+            animation: splash-brand-in .55s ease-out .4s forwards;
+        }
+
+        html.splash-active #splash-screen .splash-subtitle {
+            animation: splash-brand-in .55s ease-out .78s forwards;
+        }
+
+        #splash-screen.is-leaving {
+            animation: splash-exit .65s ease-in forwards;
+        }
+
+        @keyframes splash-background-in {
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes splash-brand-in {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes splash-exit {
+            to {
+                opacity: 0;
+                transform: translateY(-100%);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            #splash-screen,
+            #splash-screen .splash-title,
+            #splash-screen .splash-subtitle,
+            #auth-page-wrapper {
+                transition: none;
+                animation: none;
+            }
+        }
+
+        html.splash-active #auth-page-wrapper {
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(.99);
+        }
+
+        #auth-page-wrapper {
+            transition: opacity .45s ease, transform .45s ease, visibility .45s ease;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            #auth-page-wrapper {
+                transition: none;
+            }
+        }
+    </style>
+
+    <script>
+        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            document.documentElement.classList.add('splash-active');
+        }
+    </script>
+
 </head>
 
 <body>
 
+    <div id="splash-screen" aria-hidden="true">
+        <div class="splash-brand text-center px-3">
+            <h1 class="splash-title display-3 fw-bold text-white mb-2">TemanSekolah</h1>
+            <p class="splash-subtitle fs-5 text-white-75 mb-0">Sistem Administrasi Terintegrasi</p>
+        </div>
+    </div>
+
      <!-- auth-page wrapper -->
-    <div class="auth-page-wrapper auth-bg-cover py-5 d-flex justify-content-center align-items-center min-vh-100">
+    <div id="auth-page-wrapper" class="auth-page-wrapper auth-bg-cover py-5 d-flex justify-content-center align-items-center min-vh-100">
         <div class="bg-overlay"></div>
 
         <!-- auth page content -->
@@ -262,6 +361,21 @@
     <script src="{{asset('assets')}}/js/pages/particles.app.js"></script>
     <!-- password-addon init -->
     <script src="{{asset('assets')}}/js/pages/password-addon.init.js"></script>
+    
+    <script>
+        const splashScreen = document.getElementById('splash-screen');
+
+        if (document.documentElement.classList.contains('splash-active') && splashScreen) {
+            window.setTimeout(() => {
+                splashScreen.classList.add('is-leaving');
+
+                window.setTimeout(() => {
+                    document.documentElement.classList.remove('splash-active');
+                    splashScreen.remove();
+                }, 650);
+            }, 1900);
+        }
+    </script>
 </body>
 
 </html>

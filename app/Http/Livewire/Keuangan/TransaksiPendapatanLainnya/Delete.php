@@ -4,6 +4,7 @@ namespace App\Http\Livewire\Keuangan\TransaksiPendapatanLainnya;
 
 use App\Models\TransaksiPendapatanLainnya;
 use App\Services\AccountingService;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
@@ -61,6 +62,12 @@ class Delete extends Component
             // ==========================================
             if ($transaksi->status_transaksi === 'dibatalkan') {
                 throw new \Exception('Transaksi sudah dibatalkan.');
+            }
+
+            if (!Carbon::parse($transaksi->tanggal)->isToday()) {
+                throw new \Exception(
+                    'Transaksi hanya dapat dibatalkan pada hari transaksi.'
+                );
             }
 
             // ==========================================

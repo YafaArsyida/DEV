@@ -192,7 +192,7 @@
                                         </tbody>
                                         <tfoot>
                                             <tr>
-                                                <td colspan="6" class="fw-medium text-end">TOTAL</td>
+                                                <td colspan="6" class="text-end">TOTAL</td>
                                                 <td class="fs-12 text-end fw-medium">
                                                     Rp{{ number_format($totalEstimasi, 0, ',', '.') }}
                                                 </td>

@@ -60,6 +60,7 @@
                 @livewire('akademik.penempatan-siswa.kelas.change')   
                 @livewire('akademik.penempatan-siswa.kelas.promote')   
                 @livewire('akademik.penempatan-siswa.kelas.detail')   
+                @livewire('akademik.kelas.create')    
             </div>
             <div class="col-xxl-8">
                 @livewire('akademik.penempatan-siswa.siswa.index')    

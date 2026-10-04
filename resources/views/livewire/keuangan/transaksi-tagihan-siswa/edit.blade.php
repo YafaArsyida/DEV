@@ -7,17 +7,16 @@
                 <div class="d-flex align-items-center gap-3">
                     <div class="avatar-sm">
                         <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
-                            <i class="ri-calendar-event-line">
-                            </i>
+                            <i class="ri-edit-2-line"></i>
                         </div>
                     </div>
                     <div>
                         <h5 class="fw-bold mb-1">
                             Perbarui Data Transaksi
                         </h5>
-                        {{-- <small>
-                            Tambahkan agenda kegiatan generasi penerus dengan pengaturan tingkat, jadwal, dan lokasi.
-                        </small> --}}
+                        <small class="text-muted">
+                            Perbarui informasi transaksi sesuai kebutuhan.
+                        </small>
                     </div>
                 </div>
                 <button type="button" class="btn btn-light btn-icon rounded-circle" data-bs-dismiss="modal">
@@ -69,7 +68,7 @@
                         </tr>
 
                         <tr>
-                            <th class="text-primary">Perubahan Tanggal</th>
+                            <th>Perubahan Tanggal</th>
                             <td>
                                 <div class="input-group input-group-sm">
                                     <input type="date" class="form-control" wire:model.defer="tanggalTransaksi"
@@ -80,7 +79,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <th class="text-primary">Perubahan Deskripsi</th>
+                            <th>Perubahan Deskripsi</th>
                             <td>
                                 <div class="input-group input-group-sm">
                                     <input type="text" class="form-control" wire:model.defer="deskripsi"

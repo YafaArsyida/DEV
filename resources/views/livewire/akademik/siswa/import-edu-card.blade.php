@@ -5,12 +5,14 @@
                 <div class="d-flex align-items-center gap-3">
                     <div class="avatar-sm">
                         <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
-                            <i class="ri-calendar-event-line">
-                            </i>
+                            <i class="ri-bank-card-line"></i>
                         </div>
                     </div>
                     <div>
-                        <h5 class="modal-title">Import EduCard Siswa {{ $namaKelas }}</h5>
+                        <div>
+                            <h5 class="modal-title mb-1">Import EduCard Siswa {{ $namaKelas }}</h5>
+                            <small class="text-muted">Unggah dan periksa data kartu sebelum diperbarui.</small>
+                        </div>
                     </div>
                 </div>
                 <button type="button" class="btn btn-light btn-icon rounded-circle" data-bs-dismiss="modal">
@@ -41,6 +43,7 @@
                                 <h6 class="card-title mb-0">
                                     Petunjuk Import
                                 </h6>
+                                <small class="text-muted">Ikuti langkah berikut agar data kartu terbaca dengan benar.</small>
                             </div>
 
                             <div class="card-body">
@@ -107,6 +110,7 @@
                                 <h6 class="card-title mb-0">
                                     Upload Dokumen Pembaruan
                                 </h6>
+                                <small class="text-muted">Pilih file Excel berisi data EduCard terbaru.</small>
                             </div>
 
                             <div class="card-body">
@@ -142,6 +146,7 @@
                         <h5 class="mb-0">
                             Preview Perubahan EduCard
                         </h5>
+                        <small class="text-muted">Periksa perubahan sebelum diterapkan.</small>
                     </div>
 
                     <div class="card-body p-0">

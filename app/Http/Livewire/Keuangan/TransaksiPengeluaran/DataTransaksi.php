@@ -74,7 +74,7 @@ class DataTransaksi extends Component
 
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Laporan diproses.']);
 
-        $url = route('transaksi.pengeluaran.pdf', [
+        $url = route('keuangan.transaksi.pengeluaran.pdf', [
             'jenjang' => $this->selectedJenjang,
             'rekening' => $this->selectedRekening,
             'start_date' => $this->startDate,

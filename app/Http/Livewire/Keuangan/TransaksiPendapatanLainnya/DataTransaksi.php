@@ -11,6 +11,7 @@ class DataTransaksi extends Component
 {
     public $selectedJenjang = null;
     public $selectedRekening = null;
+    public $selectedTahunAjar = null;
 
     public $startDate = null;
     public $endDate = null;
@@ -36,10 +37,10 @@ class DataTransaksi extends Component
             ->get();
     }
 
-    public function parameterUpdated($jenjang)
+    public function parameterUpdated($jenjang, $tahunAjar = null)
     {
-        // Update nilai selectedJenjang
         $this->selectedJenjang = $jenjang;
+        $this->selectedTahunAjar = $tahunAjar;
     }
     
     public function updatedStartDate()
@@ -73,13 +74,19 @@ class DataTransaksi extends Component
 
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Laporan diproses.']);
 
-        $url = route('transaksi.pendapatan-lainnya.pdf', [
+        $params = [
             'jenjang' => $this->selectedJenjang,
             'rekening' => $this->selectedRekening,
             'start_date' => $this->startDate,
             'end_date' => $this->endDate,
             'search' => $this->search,
-        ]);
+        ];
+
+        if ($this->selectedTahunAjar) {
+            $params['tahun'] = $this->selectedTahunAjar;
+        }
+
+        $url = route('keuangan.transaksi.pendapatan-lainnya.pdf', $params);
 
         $this->emit('openNewTab', $url);
     }

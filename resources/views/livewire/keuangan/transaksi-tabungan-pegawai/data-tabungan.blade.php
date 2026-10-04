@@ -52,10 +52,10 @@
                         <th class="text-start" scope="col" style="width: 150px;">tanggal</th>
                         <th class="text-start" scope="col">transaksi</th>
                         <th scope="col" class="text-center">petugas</th>
-                        <th scope="col" class="text-center">kredit</th>
-                        <th scope="col" class="text-center">debit</th>
-                        <th scope="col" class="text-center">saldo</th>
-                        <th class="text-start">aksi</th>
+                        <th scope="col" class="text-end">kredit</th>
+                        <th scope="col" class="text-end">debit</th>
+                        <th scope="col" class="text-end">saldo</th>
+                        <th class="text-center">aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -65,15 +65,15 @@
                             Saldo Sebelum Periode
                         </td>
 
-                        <td class="fs-12 text-success">
+                        <td class="fs-12 text-end text-success">
                             Rp{{ number_format($totalSetoranSebelum, 0, ',', '.') }}
                         </td>
 
-                        <td class="fs-12 text-danger">
+                        <td class="fs-12 text-end text-danger">
                             Rp{{ number_format($totalPenarikanSebelum, 0, ',', '.') }}
                         </td>
 
-                        <td class="fs-12">
+                        <td class="fs-12 text-end">
                             Rp{{ number_format($saldoAwal, 0, ',', '.') }}
                         </td>
 
@@ -176,7 +176,7 @@
                             </td>
 
                             {{-- SETORAN --}}
-                            <td class="text-center">
+                            <td class="text-end">
                                 <span
                                     class="fs-12 fw-medium {{ $item->status_transaksi === 'dibatalkan'
                                         ? 'text-muted text-decoration-line-through'
@@ -189,7 +189,7 @@
                             </td>
 
                             {{-- PENARIKAN --}}
-                            <td class="text-center">
+                            <td class="text-end">
                                 <span
                                     class="fs-12 fw-medium {{ $item->status_transaksi === 'dibatalkan'
                                         ? 'text-muted text-decoration-line-through'
@@ -202,14 +202,14 @@
                             </td>
 
                             {{-- SALDO --}}
-                            <td class="text-center">
+                            <td class="text-end">
                                 <span class="fs-12 fw-medium">
                                     Rp{{ number_format($item->saldo, 0, ',', '.') }}
                                 </span>
                             </td>
 
                             {{-- AKSI --}}
-                            <td class="text-start">
+                            <td class="text-center">
                                 <ul class="list-inline hstack gap-2 mb-0">
 
                                     {{-- DETAIL --}}

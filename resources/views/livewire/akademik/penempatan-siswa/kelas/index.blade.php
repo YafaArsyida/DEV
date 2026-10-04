@@ -7,7 +7,7 @@
                 <div class="d-flex align-items-center gap-3">
                     <div class="avatar-sm">
                         <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
-                            <i class="ri-community-line"></i>
+                            <i class="ri-building-4-line"></i>
                         </div>
                     </div>
     

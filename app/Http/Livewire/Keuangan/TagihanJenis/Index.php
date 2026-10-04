@@ -62,7 +62,7 @@ class Index extends Component
 
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Laporan sedang diproses...']);
 
-        $url = route('keuangan.jenis-tagihan-siswa.pdf', [
+        $url = route('keuangan.tagihan.jenis.pdf', [
             'jenjang' => $this->selectedJenjang,
             'tahun' => $this->selectedTahunAjar,
             'kategori' => $this->selectedKategoriTagihan,

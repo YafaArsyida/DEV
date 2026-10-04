@@ -13,9 +13,7 @@
                             Perbarui Tahun Ajar
                         </h5>
 
-                        {{-- <p class="text-muted mb-0 fs-13">
-                            Periode periode tahun ajaran.
-                        </p> --}}
+                        <small class="text-muted">Perbarui periode dan informasi tahun ajar.</small>
                     </div>
                 </div>
 

@@ -24,24 +24,61 @@ class Detail extends Component
     public $selectedKelas;
 
     public $siswaTerdaftar = [];
+    public $kuota = 0;
+    public $jumlahTerdaftar = 0;
+    public $sisaKuota = 0;
+    public $persentaseKuota = 0;
 
     // Listener untuk Livewire
     protected $listeners = [
         'detailEkstrakurikuler',
-        'cetakEkstrakurikuler'
+        'cetakEkstrakurikuler',
+        'refreshEkstrakurikuler' => 'refreshQuota',
     ];
 
     public function detailEkstrakurikuler($ms_ekstrakurikuler_id)
     {
         $this->ms_ekstrakurikuler_id = $ms_ekstrakurikuler_id;
+        $this->selectedKelas = null;
+        $this->search = '';
+        $this->resetPage();
 
-        // Ambil data ekstrakurikuler
-        $ekskul = Ekstrakurikuler::find($ms_ekstrakurikuler_id);
+        $this->refreshQuota();
+    }
 
-        if ($ekskul) {
-            $this->selectedJenjang = $ekskul->ms_jenjang_id;
-            $this->selectedTahunAjar = $ekskul->ms_tahun_ajar_id;
+    public function refreshQuota()
+    {
+        if (!$this->ms_ekstrakurikuler_id) {
+            $this->kuota = 0;
+            $this->jumlahTerdaftar = 0;
+            $this->sisaKuota = 0;
+            $this->persentaseKuota = 0;
+
+            return;
         }
+
+        $ekskul = Ekstrakurikuler::withCount('ms_penempatan_ekstrakurikuler')
+            ->find($this->ms_ekstrakurikuler_id);
+
+        if (!$ekskul) {
+            $this->selectedJenjang = null;
+            $this->selectedTahunAjar = null;
+            $this->kuota = 0;
+            $this->jumlahTerdaftar = 0;
+            $this->sisaKuota = 0;
+            $this->persentaseKuota = 0;
+
+            return;
+        }
+
+        $this->selectedJenjang = $ekskul->ms_jenjang_id;
+        $this->selectedTahunAjar = $ekskul->ms_tahun_ajar_id;
+        $this->kuota = max((int) $ekskul->kuota, 0);
+        $this->jumlahTerdaftar = (int) $ekskul->ms_penempatan_ekstrakurikuler_count;
+        $this->sisaKuota = max($this->kuota - $this->jumlahTerdaftar, 0);
+        $this->persentaseKuota = $this->kuota > 0
+            ? min((int) round(($this->jumlahTerdaftar / $this->kuota) * 100), 100)
+            : 0;
     }
 
     public function updatingSearch()

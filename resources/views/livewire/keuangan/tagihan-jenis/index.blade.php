@@ -204,9 +204,7 @@
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td></td>
-                            <td></td>
-                            <td class="text-end"><strong>TOTAL</strong></td>
+                            <td colspan="3" class="text-end">TOTAL</td>
                             <td class="text-center">{{ $totalSiswa }} item</td>
                             <td class="text-end">
                                 <span class="fs-12 fw-medium">

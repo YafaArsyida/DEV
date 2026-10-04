@@ -5,19 +5,19 @@
                 <div class="d-flex align-items-center gap-3">
                     <div class="avatar-sm">
                         <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
-                            <i class="ri-calendar-event-line">
+                            <i class="ri-graduation-cap-line">
                             </i>
                         </div>
                     </div>
                     <div>
-                        <h5 class="fw-bold mb-1">
-                            Naikkan Siswa
+                        <h5 class="fw-bold mb-1">Naikkan Siswa</h5>
+                        <small class="text-muted">
                             @if ($tahunAjarBerikut)
-                                <small class="text-muted">ke Tahun Ajar: {{ $tahunAjarBerikut->nama_tahun_ajar }}</small>
+                                Naikkan siswa ke tahun ajar {{ $tahunAjarBerikut->nama_tahun_ajar }}.
                             @else
-                                <small class="text-danger">(Tahun ajar berikutnya tidak ditemukan)</small>
+                                Tahun ajar berikutnya belum tersedia.
                             @endif
-                        </h5>
+                        </small>
                     </div>
                 </div>
                 <button type="button" class="btn btn-light btn-icon rounded-circle" data-bs-dismiss="modal">
@@ -34,7 +34,7 @@
                         
                             <!-- Kotak Pencarian -->
                             <div class="col-xxl-8 col-sm-6">
-                                <label for="searchSiswa" class="form-label">Pencarian Siswa</label>
+                                <label for="searchSiswa" class="form-label small text-muted text-uppercase fw-medium mb-2">Pencarian Siswa</label>
                                 <div class="search-box">
                                     <input type="text" id="searchSiswa" class="form-control search" wire:model.debounce.300ms="searchSiswa"
                                         placeholder="Cari nama, deskripsi, atau lainnya...">
@@ -44,7 +44,7 @@
                         
                             <!-- Dropdown Pilihan Kelas -->
                             <div class="col-xxl-4 col-sm-6">
-                                <label for="kelasTujuan" class="form-label">Kelas Tujuan</label>
+                                <label for="kelasTujuan" class="form-label small text-muted text-uppercase fw-medium mb-2">Kelas Tujuan</label>
                                 <select id="kelasTujuan" wire:model="kelasTujuan" style="cursor: pointer" class="form-select"
                                     data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Kelas Tujuan">
                                     <option value="">Pilih Kelas Tujuan</option>

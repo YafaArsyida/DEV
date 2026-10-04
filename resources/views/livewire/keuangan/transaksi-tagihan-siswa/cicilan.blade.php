@@ -6,17 +6,17 @@
                 <div class="d-flex align-items-center gap-3">
                     <div class="avatar-sm">
                         <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
-                            <i class="ri-calendar-event-line">
-                            </i>
+                            <i class="ri-money-dollar-circle-line"></i>
                         </div>
                     </div>
+
                     <div>
                         <h5 class="fw-bold mb-1">
                             Cicilan Tagihan Siswa
                         </h5>
-                        {{-- <small>
-                            Tambahkan agenda kegiatan generasi penerus dengan pengaturan tingkat, jadwal, dan lokasi.
-                        </small> --}}
+                        <small>
+                            Kelola pembayaran cicilan dan pelunasan tagihan siswa.
+                        </small>
                     </div>
                 </div>
                 <button type="button" class="btn btn-light btn-icon rounded-circle" data-bs-dismiss="modal">
@@ -31,7 +31,7 @@
                         <tr>
                             <th scope="row" style="width: 150px;">Jenis Tagihan</th>
                             <td>
-                                {{ $tagihan->ms_jenis_tagihan_siswa->nama_jenis_tagihan_siswa }} - <i>{{ $tagihan->nama_kategori_tagihan_siswa() }}</i>
+                                {{ $tagihan->ms_jenis_tagihan_siswa->nama_jenis_tagihan_siswa }}
                             </td>
                         </tr>
                         <tr>
@@ -44,7 +44,7 @@
                         <tr>
                             <th scope="row">Dibayarkan</th>
                             <td>
-                                <div class="fw-medium fs-12 text-success">
+                                <div class="fw-medium fs-12">
                                     Rp{{ number_format($tagihan->total_bayar ?? 0, 0, ',', '.') }}
                                 </div>
                             </td>

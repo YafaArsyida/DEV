@@ -165,7 +165,7 @@ class DataTabungan extends Component
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Kuitansi sedang diproses.']);
 
         // Menggunakan route untuk mengarahkan ke controller cetak
-        $url = route('transaksi.tabungan-siswa.kuitansiPDF', [
+        $url = route('keuangan.transaksi.tabungan-siswa.kuitansi', [
             'tabunganId' => $tabunganId,
             'selectedJenjang' => $this->selectedJenjang,
             'userId' => $this->ms_siswa_id

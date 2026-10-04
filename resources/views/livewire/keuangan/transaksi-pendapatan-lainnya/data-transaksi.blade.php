@@ -20,13 +20,10 @@
                 </div>
             </div>
             <div class="d-flex gap-2 flex-wrap">
-                {{-- <button data-bs-toggle="modal" data-bs-target="#ExportLaporan" class="btn rounded-pill px-4 btn-soft-success">
-                    <i class="ri-file-excel-2-line pb-0"></i> Export
-                </button>
-                <button wire:click="cetakLaporan" class="btn rounded-pill px-4 btn-danger">
+                <button type="button" wire:click="cetakLaporan" class="btn rounded-pill px-4 btn-danger">
                     <i class="ri-printer-line align-bottom"></i>
                     <span>Cetak Laporan</span>
-                </button> --}}
+                </button>
             </div>
             <div class="d-flex align-items-center gap-2">
                 <input type="date" class="form-control" wire:model="startDate">
@@ -72,9 +69,9 @@
                         <th class="text-start">transaksi</th>
                         <th>petugas</th>
                         <th>metode</th>
-                        <th>nominal</th>
-                        <th>total</th>
-                        <th class="text-start">aksi</th>
+                        <th class="text-end">nominal</th>
+                        <th class="text-end">total</th>
+                        <th class="text-center">aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -85,7 +82,7 @@
                         </td>
 
                         <td class="text-center text-success">-</td>
-                        <td>
+                        <td class="text-end">
                             <span class="fs-12">
                                 Rp{{ number_format($saldoAwal, 0, ',', '.') }}
                             </span>
@@ -97,28 +94,36 @@
                     @php
                         $dibatalkan = $item->status_transaksi === 'dibatalkan';
 
-                        $bolehDibatalkan = !$dibatalkan;
+                        $bolehDibatalkan = !$dibatalkan && \Carbon\Carbon::parse($item->tanggal)->isToday();
 
                         $titlePembatalan = $bolehDibatalkan
-                            ? 'Batalkan Transaksi'
-                            : 'Transaksi sudah dibatalkan';
+                            ? 'Koreksi Transaksi'
+                            : (
+                                $dibatalkan
+                                    ? 'Transaksi sudah dibatalkan'
+                                    : 'Hanya transaksi hari ini yang dapat dikoreksi'
+                            );
 
-                        $bolehEdit = !$dibatalkan;
+                        $bolehEdit = !$dibatalkan && \Carbon\Carbon::parse($item->tanggal)->isToday();
 
                         $tooltipEdit = $bolehEdit
                             ? 'Edit Transaksi'
-                            : 'Transaksi sudah dibatalkan';
+                            : (
+                                $dibatalkan
+                                    ? 'Transaksi sudah dibatalkan'
+                                    : 'Hanya transaksi hari ini yang dapat diedit'
+                            );
                     @endphp
 
                     <tr class="text-center {{ $dibatalkan ? 'table-danger' : '' }}">
 
                         {{-- Kolom nomor urut --}}
-                        <td style="width: 50px">
+                        <td class="text-center" style="width: 50px">
                             {{ $loop->iteration }}.
                         </td>
 
                         {{-- Kolom pembatalan --}}
-                        <td>
+                        <td class="text-center">
                             @if ($bolehDibatalkan)
                                 <a href="#deletePendapatanLainnya"
                                     data-bs-toggle="modal"
@@ -181,18 +186,17 @@
                         </td>
 
                         {{-- Petugas --}}
-                        <td>
+                        <td class="text-center">
                             {{ $item->ms_pengguna->nama ?? 'Tidak Diketahui' }}
                         </td>
 
                         {{-- Metode pembayaran --}}
-                        <td>
+                        <td class="text-center">
                             {{ $item->metode_pembayaran }}
                         </td>
 
                         {{-- Kolom nominal pendapatan --}}
-                        <td class="text-center">
-
+                        <td class="text-end">
                             <span class="fs-12 fw-medium
                                 {{ $dibatalkan
                                     ? 'text-muted text-decoration-line-through'
@@ -206,55 +210,62 @@
                         </td>
 
                         {{-- Saldo --}}
-                        <td>
+                        <td class="text-end">
                             <span class="fs-12 fw-medium">
                                 Rp{{ number_format($item->saldo, 0, ',', '.') }}
                             </span>
                         </td>
 
                         {{-- Kolom aksi --}}
-                        <td class="text-start">
+                        <td class="text-center">
+                            <ul class="list-inline hstack gap-2 mb-0">
+                                <li class="list-inline-item detail"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-trigger="hover"
+                                    data-bs-placement="top"
+                                    title="Detail Transaksi">
 
-                            @if ($bolehEdit)
+                                    <a href="#detailTransaksiPendapatanLainnya"
+                                        data-bs-toggle="modal"
+                                        wire:click.prevent="$emit(
+                                            'loadDetailTransaksiPendapatanLainnya',
+                                            {{ $item->transaksi_pendapatan_lainnya_id }}
+                                        )"
+                                        class="btn btn-info btn-sm rounded-pill px-3">
 
-                                <a href="#editPendapatanLainnya"
-                                    data-bs-toggle="modal"
-                                    wire:click.prevent="$emit(
-                                        'editPendapatanLainnya',
-                                        {{ $item->transaksi_pendapatan_lainnya_id }}
-                                    )"
-                                    class="btn btn-primary btn-sm rounded-pill px-3"
+                                        <i class="ri-eye-line me-1"></i>
+                                        <span>Detail</span>
+                                    </a>
+                                </li>
+
+                                <li class="list-inline-item detail"
+                                    data-bs-toggle="tooltip"
                                     data-bs-trigger="hover"
                                     data-bs-placement="top"
                                     title="{{ $tooltipEdit }}">
 
-                                    <i class="ri-mark-pen-line me-1"></i>
-                                    <span>Edit</span>
-
-                                </a>
-
-                            @else
-
-                                <a href="javascript:void(0);"
-                                    class="btn btn-secondary btn-sm rounded-pill px-3 disabled"
-                                    aria-disabled="true"
-                                    tabindex="-1"
-                                    data-bs-trigger="hover"
-                                    data-bs-placement="top"
-                                    title="{{ $tooltipEdit }}"
-                                    style="pointer-events: none;">
-
-                                    <i class="ri-mark-pen-line me-1"></i>
-                                    <span>Edit</span>
-
-                                </a>
-
-                            @endif
-
+                                    <a href="#editPendapatanLainnya"
+                                        data-bs-toggle="modal"
+                                        wire:click.prevent="$emit(
+                                            'editPendapatanLainnya',
+                                            {{ $item->transaksi_pendapatan_lainnya_id }}
+                                        )"
+                                        class="btn btn-sm rounded-pill px-3 {{ $bolehEdit
+                                            ? 'btn-primary'
+                                            : 'btn-muted disabled' }}"
+                                        @unless ($bolehEdit)
+                                            tabindex="-1"
+                                            aria-disabled="true"
+                                            style="pointer-events: none;"
+                                        @endunless>
+                                    
+                                        <i class="ri-mark-pen-line me-1"></i>
+                                        <span>Edit</span>
+                                    </a>
+                                </li>
+                            </ul>
                         </td>
-
                     </tr>
-
                 @empty
                     <tr>
                         <td colspan="9">

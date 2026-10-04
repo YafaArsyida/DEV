@@ -189,7 +189,21 @@ class TagihanSiswa extends Controller
                 'ms_penempatan_siswa.ms_kelas'
             ])
             ->where('ms_penempatan_siswa_id', $selectedSiswa)
-            ->withSum('dt_transaksi_tagihan_siswa as total_bayar', 'jumlah_bayar');
+            ->withSum([
+                'dt_transaksi_tagihan_siswa as total_bayar' => function ($query) {
+                    $query->where(
+                        'dt_transaksi_tagihan_siswa.status_transaksi',
+                        '!=',
+                        'dibatalkan'
+                    )->whereHas('ms_transaksi_tagihan_siswa', function ($transactionQuery) {
+                        $transactionQuery->where(
+                            'ms_transaksi_tagihan_siswa.status_transaksi',
+                            '!=',
+                            'dibatalkan'
+                        );
+                    });
+                }
+            ], 'jumlah_bayar');
 
         // FILTER KATEGORI
         if ($selectedKategori) {

@@ -38,7 +38,7 @@
                         <tr>
                             <th scope="row" style="width: 150px;">Jenis Tagihan</th>
                             <td>
-                                {{ $tagihan->ms_jenis_tagihan_siswa->nama_jenis_tagihan_siswa }} - <i>{{ $tagihan->nama_kategori_tagihan_siswa() }}</i>
+                                {{ $tagihan->ms_jenis_tagihan_siswa->nama_jenis_tagihan_siswa }}
                             </td>
                         </tr>
                         <tr>
@@ -50,7 +50,7 @@
                         <tr>
                             <th scope="row">Dibayarkan</th>
                             <td>
-                                <div class="fw-medium fs-12 text-success">Rp{{ number_format($tagihan->jumlah_sudah_dibayar(), 0, ',', '.') }}</div>
+                                <div class="fw-medium fs-12">Rp{{ number_format($tagihan->jumlah_sudah_dibayar(), 0, ',', '.') }}</div>
                             </td>
                         </tr>
                         <tr>

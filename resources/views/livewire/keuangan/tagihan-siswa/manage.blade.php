@@ -281,7 +281,7 @@
                                 <div class="input-group">
                                     <span class="input-group-text">Rp</span>
                                     <input type="text" 
-                                        class="form-control" 
+                                        class="form-control fw-medium fs-12" 
                                         wire:model.defer="jumlahTagihan"
                                         aria-label="Amount"
                                         onkeyup="formatTagihan(this)">

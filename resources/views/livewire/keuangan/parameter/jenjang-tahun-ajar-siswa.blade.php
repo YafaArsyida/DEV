@@ -1,6 +1,6 @@
 <div class="mt-3 mt-lg-0">
     <div class="row g-3 mb-0 align-items-center">
-        <div class="col-auto">
+        {{-- <div class="col-auto">
             <span class="fs-14 text-info">
                 Saldo Kas : Rp{{ number_format($saldoKas, 0, ',', '.') }}
             </span>
@@ -9,7 +9,7 @@
             <span class="fs-14 text-warning">
                 Saldo Bank : Rp{{ number_format($saldoBank, 0, ',', '.') }}
             </span>
-        </div>
+        </div> --}}
         <div class="col-sm-auto">
             <div class="input-group">
                 <select wire:model="selectedJenjang" style="cursor: pointer" class="form-select border-0 dash-filter-picker shadow" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Jenjang">
@@ -41,7 +41,7 @@
         <div class="col-auto">
             <div class="input-group">
                 <button type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSiswa" aria-controls="offcanvasSiswa" class="btn btn-primary shadow-none">
-                  Data Siswa
+                  Pilih Siswa
                 </button>
                 <div class="input-group-text bg-primary border-primary text-white">
                     <i class="ri-user-follow-line"></i>

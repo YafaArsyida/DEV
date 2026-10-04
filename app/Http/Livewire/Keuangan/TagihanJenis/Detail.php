@@ -65,7 +65,7 @@ class Detail extends Component
 
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'laporan diproses.']);
 
-        $url = route('keuangan.tagihan-jenis.detail-pdf', [
+        $url = route('keuangan.tagihan.jenis.detail-pdf', [
             'selectedJenisTagihan' => $this->ms_jenis_tagihan_siswa_id,
             'selectedKelas' => $this->selectedKelas,
             'search' => $this->search,

@@ -32,6 +32,20 @@ class Edit extends Component
             return;
         }
 
+        if ($transaksi->status_transaksi === 'dibatalkan') {
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Transaksi sudah dibatalkan.'
+            ]);
+            return;
+        }
+
+        if (!Carbon::parse($transaksi->tanggal)->isToday()) {
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Hanya transaksi hari ini yang dapat diedit.'
+            ]);
+            return;
+        }
+
         $this->ms_jenjang_id = $transaksi->ms_jenjang_id ?? null;
         $this->ms_tahun_ajar_id = $transaksi->ms_tahun_ajar_id ?? null;
 
@@ -134,6 +148,14 @@ class Edit extends Component
             }
 
             $this->transaksi = $transaksi;
+
+            if ($transaksi->status_transaksi === 'dibatalkan') {
+                throw new \Exception('Transaksi sudah dibatalkan.');
+            }
+
+            if (!Carbon::parse($transaksi->tanggal)->isToday()) {
+                throw new \Exception('Hanya transaksi hari ini yang dapat diedit.');
+            }
 
             $this->processUpdateTransaksi();
 

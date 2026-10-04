@@ -39,7 +39,7 @@
 
                             <div class="avatar-sm">
                                 <div class="avatar-title bg-danger-subtle text-danger rounded-circle fs-20">
-                                    <i class="ri-star-smile-line"></i>
+                                    <i class="ri-trophy-line"></i>
                                 </div>
                             </div>
 

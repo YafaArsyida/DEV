@@ -68,7 +68,7 @@
                         <label class="form-label">Nominal</label>
                         <div class="input-group">
                             <span class="input-group-text">Rp</span>
-                            <input type="text" class="form-control" placeholder="Minimal Rp 1.000"
+                            <input type="text" class="form-control form-control fw-medium fs-12 @error('nominal_kredit') is-invalid @enderror" placeholder="Minimal Rp 1.000"
                                 wire:model.defer="nominal_kredit"
                                 onkeyup="formatTagihan(this)">
                         </div>
@@ -103,7 +103,7 @@
                         <label class="form-label">Nominal</label>
                         <div class="input-group">
                             <span class="input-group-text">Rp</span>
-                            <input type="text" class="form-control" placeholder="Nominal debit"
+                            <input type="text" class="form-control form-control fw-medium fs-12 @error('nominal_debit') is-invalid @enderror" placeholder="Nominal debit"
                                 wire:model.defer="nominal_debit"
                                 onkeyup="formatTagihan(this)">
                         </div>

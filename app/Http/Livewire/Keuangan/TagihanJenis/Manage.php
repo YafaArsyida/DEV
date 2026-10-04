@@ -211,7 +211,6 @@ class Manage extends Component
             // 11. NOTIFIKASI
             // =====================================================
             if ($jumlahBerhasil > 0 && $jumlahGagal > 0) {
-
                 $this->dispatchBrowserEvent('alertify-warning', [
                     'message' =>
                         "{$jumlahBerhasil} tagihan berhasil dihapus, "
@@ -219,17 +218,13 @@ class Manage extends Component
                 ]);
 
             } elseif ($jumlahBerhasil > 0) {
-
                 $this->dispatchBrowserEvent('alertify-success', [
-                    'message' =>
-                        "{$jumlahBerhasil} tagihan berhasil dihapus."
+                    'message' => "{$jumlahBerhasil} tagihan berhasil dihapus."
                 ]);
 
             } else {
-
                 $this->dispatchBrowserEvent('alertify-error', [
-                    'message' =>
-                        'Tidak ada tagihan yang dapat dihapus.'
+                    'message' => 'Tidak ada tagihan yang dapat dihapus.'
                 ]);
             }
 

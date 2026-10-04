@@ -1,30 +1,54 @@
-@extends('template_machine.v_template')
+@extends('template_keuangan.v_template')
 @section('content')
 <div class="page-content">
     <div class="container-fluid" style="max-width: 100%">
-        <div class="row mb-3 pb-1">
-            <div class="col-12">
-                <div class="d-flex align-items-lg-center flex-lg-row flex-column">
-                    <div class="flex-grow-1">
-                        <h4 class="fs-16 mb-1">Transaksi EduPay Pegawai</h4>
-                        <p class="text-muted mb-0">Transaksi Pegawai > EduPay Pegawai</p>
+        <div class="row">
+            <div class="col-xxl-12">
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-3 p-lg-4">
+                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+                            {{-- LABEL --}}
+                            <div>
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    <div class="avatar-sm">
+                                        <div class="avatar-title bg-primary-subtle text-primary rounded-3">
+                                            <i class="ri-equalizer-line fs-5"></i>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <h6 class="mb-0 fw-semibold">
+                                            Parameter Akademik
+                                        </h6>
+
+                                        <small class="text-muted">
+                                            Pilih jenjang dan tahun ajaran
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- PARAMETER --}}
+                            <div>
+                                @livewire('keuangan.parameter.jenjang-tahun-pegawai')   
+                            </div>
+                        </div>
                     </div>
-                    @livewire('parameter.jenjang-tahun-pegawai')   
-                </div><!-- end card header -->
+                </div>
             </div>
         </div>
         <div class="row">
             <div class="col-xxl-4">
                 <div class="sticky-side-div">
-                    @livewire('transaksi-edu-pay-pegawai.data-pegawai')
+                    @livewire('keuangan.transaksi-edu-pay-pegawai.data-pegawai')
                 </div><!-- end card -->
             </div>
             <!--end col-->
             <div class="col-xxl-8">
-                @livewire('transaksi-edu-pay-pegawai.data-edu-pay')
-                @livewire('transaksi-edu-pay-siswa.detail')
-                @livewire('transaksi-edu-pay-siswa.edit')
-                @livewire('transaksi-edu-pay-siswa.delete')
+                @livewire('keuangan.transaksi-edu-pay-pegawai.data-edu-pay')
+                @livewire('keuangan.transaksi-edu-pay-siswa.detail')
+                @livewire('keuangan.transaksi-edu-pay-siswa.edit')
+                @livewire('keuangan.transaksi-edu-pay-siswa.delete')
             </div>
         </div>
     </div>

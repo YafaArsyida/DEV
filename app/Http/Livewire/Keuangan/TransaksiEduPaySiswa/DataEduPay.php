@@ -199,7 +199,7 @@ class DataEduPay extends Component
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Kuitansi sedang diproses.']);
 
         // Menggunakan route untuk mengarahkan ke controller cetak
-        $url = route('transaksi.edupay-siswa.kuitansiPDF', [
+        $url = route('keuangan.transaksi.edupay-siswa.kuitansi', [
             'eduPayId' => $eduPayId,
             'selectedJenjang' => $this->selectedJenjang,
             'userId' => $this->ms_siswa_id

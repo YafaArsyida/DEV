@@ -44,34 +44,6 @@
                     <i class="ri-file-excel-2-line me-1"></i>
                     Export
                 </button>
-
-                @if ($selectedKelas)
-                    {{-- IMPORT TELEPON --}}
-                    <button data-bs-toggle="modal" data-bs-target="#ModalImportTelepon"
-                        wire:click.prevent="$emit('showImportTelepon', {{ $selectedKelas }}, {{ $selectedJenjang }}, {{ $selectedTahunAjar }})"
-                        class="btn btn-soft-success rounded-pill px-4">
-                        <i class="ri-whatsapp-line me-1"></i>
-                        Import Telepon
-                    </button>
-
-                    {{-- IMPORT EDUCARD --}}
-                    <button data-bs-toggle="modal" data-bs-target="#ModalImportEduCard"
-                        wire:click.prevent="$emit('showImportEduCard', {{ $selectedKelas }}, {{ $selectedJenjang }}, {{ $selectedTahunAjar }})"
-                        class="btn btn-soft-warning rounded-pill px-4">
-                        <i class="ri-bank-card-line me-1"></i>
-                        Import EduCard
-                    </button>
-                @endif
-
-                {{-- DELETE --}}
-                @if ($siswaSelected)
-                    <button href="#ModalBulkDeleteSiswa" data-bs-toggle="modal"
-                        wire:click.prevent="$emit('confirmBulkDelete', {{ json_encode($siswaSelected) }})"
-                        class="btn btn-soft-danger rounded-pill px-4 ms-auto d-inline-flex align-items-center">
-                        <i class="ri-delete-bin-2-line me-1"></i>
-                        Hapus {{ count($siswaSelected) }}
-                    </button>
-                @endif
             </div>
             @endif
         </div>

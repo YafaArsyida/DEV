@@ -13,7 +13,7 @@
             <div class="modal-header border-0">
                 <div class="d-flex align-items-center gap-3">
                     <div class="avatar-sm">
-                        <div class="avatar-title bg-info-subtle text-info rounded-circle fs-20">
+                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
                             <i class="ri-eye-line"></i>
                         </div>
                     </div>
@@ -241,24 +241,20 @@
                                                 $transaksi->akuntansi_jurnal->akuntansi_jurnal_detail
                                                 as $detail
                                             )
-                                                <tr>
+                                                <tr class="fw-medium">
                                                     <td>
                                                         {{ $detail->akuntansi_rekening->nama_rekening ?? '-' }}
                                                     </td>
 
                                                     <td class="text-center">
                                                         @if ($detail->posisi === 'debit')
-                                                            <span class="text-primary">
-                                                                Debit
-                                                            </span>
+                                                            Debit    
                                                         @else
-                                                            <span class="text-danger">
-                                                                Kredit
-                                                            </span>
+                                                            Kredit
                                                         @endif
                                                     </td>
 
-                                                    <td class="text-end fs-12 fw-medium">
+                                                    <td class="text-end fs-12">
                                                         Rp{{ number_format($detail->nominal, 0, ',', '.') }}
                                                     </td>
                                                 </tr>
@@ -315,24 +311,20 @@
                                                 $transaksi->akuntansi_jurnal_reversal->akuntansi_jurnal_detail
                                                 as $detail
                                             )
-                                                <tr>
+                                                <tr class="fw-medium">
                                                     <td>
                                                         {{ $detail->akuntansi_rekening->nama_rekening ?? '-' }}
                                                     </td>
 
                                                     <td class="text-center">
                                                         @if ($detail->posisi === 'debit')
-                                                            <span class="text-primary">
-                                                                Debit
-                                                            </span>
+                                                            Debit
                                                         @else
-                                                            <span class="text-danger">
-                                                                Kredit
-                                                            </span>
+                                                            Kredit
                                                         @endif
                                                     </td>
 
-                                                    <td class="text-end fs-12 fw-medium">
+                                                    <td class="text-end fs-12 ">
                                                         Rp{{ number_format($detail->nominal, 0, ',', '.') }}
                                                     </td>
                                                 </tr>

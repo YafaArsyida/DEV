@@ -38,7 +38,7 @@
         
             <!-- Filter Kelas -->
             <div class="col-xxl-3 col-sm-6">
-                <label for="filterKelas" class="form-label">Kelas</label>
+                <label for="filterKelas" class="form-label small text-muted text-uppercase fw-medium mb-2">Kelas</label>
                 <select id="filterKelas" wire:model="selectedKelas" style="cursor: pointer" class="form-select"
                     data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Pilih Kelas">
                     <option value="">Semua Kelas</option>
@@ -50,7 +50,7 @@
         
             <!-- Pencarian -->
             <div class="col-xxl-9 col-sm-6">
-                <label for="searchData" class="form-label">Pencarian</label>
+                <label for="searchData" class="form-label small text-muted text-uppercase fw-medium mb-2">Pencarian</label>
                 <div class="search-box">
                     <input type="text" id="searchData" class="form-control search" wire:model.debounce.300ms="search"
                         placeholder="Cari nama, kelas, atau deskripsi...">

@@ -130,9 +130,9 @@
                                                 <th>Kelas</th>
                                                 <th>Jenis Tagihan</th>
                                                 <th>Kategori</th>
-                                                <th class="text-center">Estimasi</th>
-                                                <th class="text-center">Dibayarkan</th>
-                                                <th class="text-center">Kekurangan</th>
+                                                <th class="text-end">Estimasi</th>
+                                                <th class="text-end">Dibayarkan</th>
+                                                <th class="text-end">Kekurangan</th>
                                                 <th class="text-center">Jatuh Tempo</th>
                                                 <th class="text-center">Status</th>
                                                 <th class="text-center">Edit</th>
@@ -179,19 +179,19 @@
                                                     }}
                                                 </td>
     
-                                                <td class="text-center">
+                                                <td class="text-end">
                                                     <span class="fs-12 fw-medium">
                                                         Rp{{ number_format($item->jumlah_tagihan_siswa, 0, ',', '.') }}
                                                     </span>
                                                 </td>
     
-                                                <td class="text-center">
+                                                <td class="text-end">
                                                     <span class="fs-12 fw-medium text-success">
                                                         Rp{{ number_format($item->total_bayar ?? 0, 0, ',', '.') }}
                                                     </span>
                                                 </td>
     
-                                                <td class="text-center">
+                                                <td class="text-end">
                                                     <span class="fs-12 fw-medium text-danger">
                                                         Rp{{ number_format(($item->jumlah_tagihan_siswa -
                                                         ($item->total_bayar ?? 0)), 0, ',', '.') }}
@@ -237,17 +237,17 @@
                                             <tr>
                                                 <td colspan="7" class="text-end">TOTAL</td>
                                                 <td class="text-center">
-                                                    <span class="fs-12 fw-medium">
+                                                    <span class="fs-12 text-end fw-medium">
                                                         Rp{{ number_format($totalEstimasi, 0, ',', '.') }}
                                                     </span>
                                                 </td>
                                                 <td class="text-center">
-                                                    <span class="fs-12 fw-medium text-success">
+                                                    <span class="fs-12 text-end fw-medium text-success">
                                                         Rp{{ number_format($totalDibayarkan, 0, ',', '.') }}
                                                     </span>
                                                 </td>
                                                 <td class="text-center">
-                                                    <span class="fs-12 fw-medium text-danger">
+                                                    <span class="fs-12 text-end fw-medium text-danger">
                                                         Rp{{ number_format($totalKekurangan, 0, ',', '.') }}
                                                     </span>
                                                 </td>
@@ -287,15 +287,18 @@
                         <div class="card-header">
                             <div class="d-flex align-items-center gap-3">
                                 <div class="avatar-sm">
-                                    <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
-                                        <i class="ri-calendar-event-line">
-                                        </i>
+                                    <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-18">
+                                        <i class="ri-file-list-3-line"></i>
                                     </div>
                                 </div>
+
                                 <div>
                                     <h5 class="fw-bold mb-1">
-                                        Edit Nominal Tagihan by Check
+                                        Edit Nominal by Check
                                     </h5>
+                                    <small class="text-muted">
+                                        Pilih tagihan, lalu perbarui nominal tagihan secara bersamaan.
+                                    </small>
                                 </div>
                             </div>
                         </div><!-- end card header -->
@@ -305,7 +308,7 @@
                                 <div class="input-group">
                                     <span class="input-group-text">Rp</span>
                                     <input type="text" 
-                                        class="form-control" 
+                                        class="form-control fw-medium fs-12" 
                                         wire:model.defer="jumlahTagihan"
                                         aria-label="Amount"
                                         onkeyup="formatTagihan(this)">

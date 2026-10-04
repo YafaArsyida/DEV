@@ -147,10 +147,10 @@
                                         <i class="ri-eye-line me-1"></i> Detail
                                     </a>
                                     {{-- edit --}}
-                                    {{-- <a href="#ModalEditSiswa" data-bs-toggle="modal" class="btn btn-primary btn-sm rounded-pill px-3" title="Edit Siswa" 
+                                    <a href="#ModalEditSiswa" data-bs-toggle="modal" class="btn btn-primary btn-sm rounded-pill px-3" title="Edit Siswa" 
                                         wire:click="$emit('loadDataSiswa', {{ $item->ms_penempatan_siswa_id }})">
                                         <i class="ri-mark-pen-line me-1"></i> Edit
-                                    </a> --}}
+                                    </a>
                                 </div>
                             </td>
                         </tr>

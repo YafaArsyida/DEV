@@ -1,6 +1,6 @@
 <div wire:ignore.self class="modal fade" id="detailEkstrakurikuler" tabindex="-1"
     aria-labelledby="detailEkstrakurikulerLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
 
             {{-- Header --}}
@@ -8,7 +8,7 @@
                 <div class="d-flex align-items-center">
                     <div class="avatar-sm me-3">
                         <span class="avatar-title bg-primary-subtle text-primary rounded-3 fs-4">
-                            <i class="ri-run-line"></i>
+                            <i class="ri-trophy-line"></i>
                         </span>
                     </div>
 
@@ -17,9 +17,9 @@
                             Detail Ekstrakurikuler
                         </h5>
 
-                        <p class="text-muted mb-0">
+                        <small class="text-muted d-block">
                             Informasi ekstrakurikuler
-                        </p>
+                        </small>
                     </div>
                 </div>
 
@@ -35,7 +35,7 @@
                     <div class="text-center mb-4">
                         <div class="avatar-lg mx-auto mb-3">
                             <span class="avatar-title bg-primary-subtle text-primary rounded-circle fs-2">
-                                <i class="ri-run-line"></i>
+                                <i class="ri-trophy-line"></i>
                             </span>
                         </div>
 

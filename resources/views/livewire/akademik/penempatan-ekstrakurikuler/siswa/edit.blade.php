@@ -10,7 +10,7 @@
 
                     <div class="avatar-sm flex-shrink-0">
                         <div class="avatar-title bg-info-subtle text-info rounded-circle fs-20">
-                            <i class="ri-football-line"></i>
+                            <i class="ri-trophy-line"></i>
                         </div>
                     </div>
 
@@ -18,9 +18,9 @@
                         <h5 class="fw-bold mb-1">
                             Kelola Ekstrakurikuler
                         </h5>
-                        <p class="text-muted mb-0">
+                        <small class="text-muted d-block">
                             Atur ekstrakurikuler yang diikuti siswa
-                        </p>
+                        </small>
                     </div>
 
                 </div>
