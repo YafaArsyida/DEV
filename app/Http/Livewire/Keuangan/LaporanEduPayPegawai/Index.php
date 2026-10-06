@@ -97,13 +97,15 @@ class Index extends Component
 
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Laporan diproses.']);
 
-        $url = route('laporan.edupay-pegawai.pdf', [
+        $url = route('keuangan.laporan.pegawai.edupay.pdf', [
             'jenjang' => $this->selectedJenjang,
             'tahun' => $this->selectedTahunAjar,
             'start_date' => $this->startDate,
             'end_date' => $this->endDate,
             'jabatan' => $this->selectedJabatan,
             'jenis_transaksi' => $this->selectedJenisTransaksi,
+            'petugas' => $this->selectedPetugas,
+            'search' => $this->search,
         ]);
 
         $this->emit('openNewTab', $url);
@@ -123,6 +125,7 @@ class Index extends Component
                 'ms_pegawai.ms_jabatan_id',
                 'ms_jabatan.nama_jabatan'
             )
+            ->where('status_transaksi', '!=', 'dibatalkan')
             ->where('ms_transaksi_edupay.user_type', 'pegawai')
             ->orderBy('tanggal', 'ASC');
 
@@ -138,7 +141,7 @@ class Index extends Component
 
         // Filter berdasarkan petugas (penginput transaksi)
         if ($this->selectedPetugas) {
-            $query->where('ms_transaksi_edupay.ms_pengguna_id', $this->selectedPetugas);
+            $query->whereIn('ms_transaksi_edupay.ms_pengguna_id', $this->selectedPetugas);
         }
 
         // Filter berdasarkan nama pegawai

@@ -4,7 +4,6 @@ namespace App\Http\Livewire\Keuangan\AkuntansiLaporanPengeluaran;
 
 use App\Http\Controllers\HelperController;
 use App\Models\AkuntansiJurnal;
-use App\Models\AkuntansiJurnalDetail;
 use App\Models\Jenjang;
 use Carbon\Carbon;
 use Livewire\Component;
@@ -82,7 +81,7 @@ class Index extends Component
 
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Laporan diproses.']);
 
-        $url = route('akuntansi.laporan-pengeluaran.pdf', [
+        $url = route('keuangan.akuntansi.laporan.pengeluaran.pdf', [
             'jenjang' => $this->selectedJenjang,
             'start_date' => $this->startDate,
             'end_date' => $this->endDate,

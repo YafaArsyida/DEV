@@ -25,6 +25,13 @@
                 <div class="d-flex gap-2 flex-wrap">
                     <button
                         type="button"
+                        wire:click="cetakSaldo"
+                        class="btn btn-danger rounded-pill px-4 d-inline-flex align-items-center gap-1">
+                        <i class="ri-printer-line"></i>
+                        <span>Cetak</span>
+                    </button>
+                    <button
+                        type="button"
                         class="btn btn-success rounded-pill px-4 d-inline-flex align-items-center gap-1"
                         data-bs-toggle="modal"
                         data-bs-target="#ExportSaldo">
@@ -72,7 +79,7 @@
                                 <th style="width: 30px;">NO</th>
                                 <th>Pegawai</th>
                                 <th>Jabatan</th>
-                                <th class="text-uppercase text-center">Saldo Tabungan</th>
+                                <th class="text-uppercase text-end">Saldo Tabungan</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -85,7 +92,7 @@
                                     <td>
                                         {{ $item->ms_jabatan->nama_jabatan ?? '' }}
                                     </td>
-                                    <td class="text-center">
+                                    <td class="text-end">
                                         <span class="fs-12 fw-medium">
                                             Rp{{ number_format($item->ms_saldo_tabungan->saldo_tabungan ?? 0, 0, ',',
                                             '.') }}
@@ -112,7 +119,7 @@
                                 <td></td>
                                 <td></td>
                                 <td class="text-uppercase text-start">TOTAL</td>
-                                <td class="text-center">
+                                <td class="text-end">
                                     <span class="fs-12">
                                         Rp{{ number_format($totalSaldo, 0, ',', '.') }}</span>
                                 </td>
@@ -283,4 +290,3 @@
         });
     </script>
 </div>
-

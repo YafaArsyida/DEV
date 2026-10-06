@@ -86,7 +86,7 @@
                                 <th style="width: 30px;">NO</th>
                                 <th>Siswa</th>
                                 <th>Kelas</th>
-                                <th class="text-uppercase text-center">Saldo Tabungan</th>
+                                <th class="text-uppercase text-end">Saldo Tabungan</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -99,7 +99,7 @@
                                 <td>
                                     {{ $item->ms_kelas->nama_kelas ?? '' }}
                                 </td>
-                                <td class="text-center">
+                                <td class="text-end">
                                     <span class="fs-12 fw-medium">
                                         Rp{{ number_format($item->ms_siswa->ms_saldo_tabungan->saldo_tabungan ?? 0, 0, ',',
                                         '.') }}
@@ -126,7 +126,7 @@
                                 <td></td>
                                 <td></td>
                                 <td class="text-uppercase text-start">TOTAL</td>
-                                <td class="text-center">
+                                <td class="text-end">
                                     <span class="fs-12">
                                         Rp{{ number_format($totalSaldo, 0, ',', '.') }}</span>
                                 </td>

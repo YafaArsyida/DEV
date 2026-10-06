@@ -68,10 +68,11 @@ class Saldo extends Component
             'message' => 'Laporan sedang diproses.'
         ]);
 
-        $url = route('laporan.edupay-pegawai.saldo.pdf', [
+        $url = route('keuangan.laporan.pegawai.edupay.saldo.pdf', [
             'jenjang' => $this->selectedJenjang,
             'tahun'   => $this->selectedTahunAjar,
-            'jabatan' => $this->selectedJabatan, // null jika tidak dipilih
+            'jabatan' => $this->selectedJabatan,
+            'search' => $this->search,
         ]);
 
         $this->emit('openNewTab', $url);

@@ -29,7 +29,8 @@ class Overview extends Component
 
         // Query dasar: hanya transaksi pegawai
         $query = TransaksiEduPay::with(['ms_pegawai.ms_jabatan', 'ms_pengguna'])
-            ->where('user_type', 'pegawai');
+            ->where('user_type', 'pegawai')
+            ->where('status_transaksi', '!=', 'dibatalkan');
 
         // Filter berdasarkan jenjang
         if ($this->selectedJenjang) {

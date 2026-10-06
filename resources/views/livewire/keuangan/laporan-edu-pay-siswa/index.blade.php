@@ -139,8 +139,8 @@
                             <th class="text-uppercase">Kelas</th>
                             <th class="text-uppercase" scope="col">Transaksi</th>
                             <th class="text-uppercase text-center">Petugas</th>
-                            <th class="text-uppercase text-center">Pemasukan</th>
-                            <th class="text-uppercase text-center">Pengeluaran</th>
+                            <th class="text-uppercase text-end">Pemasukan</th>
+                            <th class="text-uppercase text-end">Pengeluaran</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -154,20 +154,20 @@
                                     {{ ucfirst($item->ms_siswa->nama_siswa) }}
                                 </td>
                                 <td class="text-start">
-                                    {{ $item->ms_penempatan_siswa->ms_kelas->nama_kelas ?? ''}}
+                                    {{ $item->ms_siswa->ms_penempatan_siswa->first()?->ms_kelas->nama_kelas ?? '' }}
                                 </td>
                                 <td class="text-start fs-12 fw-medium">
                                     {!! 'Rp' . number_format($item->nominal, 0, ',', '.') . ' - <i>' . ucfirst($item->jenis_transaksi) . '</i>' !!}
                                 </td>
                                 <td>{{ $item->ms_pengguna->nama ?? '-' }}</td>
-                                <td>
+                                <td class="text-end">
                                     <span class="fs-12 fw-medium text-success">
                                         {{ in_array($item->jenis_transaksi, ['topup tunai', 'topup online', 'pengembalian dana']) 
                                             ? 'Rp' . number_format($item->nominal, 0, ',', '.') 
                                             : '-' }}
                                     </span>
                                 </td>
-                                <td>
+                                <td class="text-end">
                                     <span class="fs-12 fw-medium text-danger">
                                         {{ in_array($item->jenis_transaksi, ['penarikan', 'pembayaran', 'kantin']) 
                                             ? 'Rp' . number_format($item->nominal, 0, ',', '.') 

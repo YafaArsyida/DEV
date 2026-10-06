@@ -104,7 +104,8 @@ class Index extends Component
 
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Laporan diproses.']);
 
-        $url = route('laporan.edupay-siswa.pdf', [
+        $url = route('keuangan.laporan.siswa.edupay.pdf', [
+        
             'jenjang' => $this->selectedJenjang,
             'tahun' => $this->selectedTahunAjar,
             'start_date' => $this->startDate,
@@ -126,22 +127,33 @@ class Index extends Component
         }
 
         $query = TransaksiEduPay::query()
-            ->with(['ms_siswa', 'ms_pengguna', 'ms_penempatan_siswa'])
-            ->join('ms_siswa', 'ms_siswa.ms_siswa_id', '=', 'ms_transaksi_edupay.user_id')
-            ->join('ms_penempatan_siswa', 'ms_penempatan_siswa.ms_penempatan_siswa_id', '=', 'ms_transaksi_edupay.ms_penempatan_siswa_id')
-            ->select('ms_transaksi_edupay.*', 'ms_siswa.nama_siswa', 'ms_penempatan_siswa.ms_jenjang_id', 'ms_penempatan_siswa.ms_tahun_ajar_id')
-            ->where('status_transaksi', '!=', 'dibatalkan')
-            ->where('ms_penempatan_siswa.ms_jenjang_id', $this->selectedJenjang)
-            ->where('ms_penempatan_siswa.ms_tahun_ajar_id', $this->selectedTahunAjar)
+            ->with([
+                'ms_siswa.ms_penempatan_siswa' => function ($query) {
+                    $query->with('ms_kelas')
+                        ->where('ms_jenjang_id', $this->selectedJenjang)
+                        ->where('ms_tahun_ajar_id', $this->selectedTahunAjar);
+                },
+                'ms_pengguna',
+            ])
+            ->where('ms_transaksi_edupay.user_type', 'siswa')
+            ->where('ms_transaksi_edupay.status_transaksi', '!=', 'dibatalkan')
+            ->whereHas('ms_siswa.ms_penempatan_siswa', function ($query) {
+                $query->where('ms_jenjang_id', $this->selectedJenjang)
+                    ->where('ms_tahun_ajar_id', $this->selectedTahunAjar);
+            })
             ->orderBy('tanggal', 'ASC');
 
         // Filter berdasarkan tahun ajar
         if ($this->selectedKelas) {
-            $query->where('ms_penempatan_siswa.ms_kelas_id', $this->selectedKelas);
+            $query->whereHas('ms_siswa.ms_penempatan_siswa', function ($query) {
+                $query->where('ms_jenjang_id', $this->selectedJenjang)
+                    ->where('ms_tahun_ajar_id', $this->selectedTahunAjar)
+                    ->where('ms_kelas_id', $this->selectedKelas);
+            });
         }
 
         if ($this->selectedPetugas) {
-            $query->where('ms_transaksi_edupay.ms_pengguna_id', $this->selectedPetugas);
+            $query->whereIn('ms_transaksi_edupay.ms_pengguna_id', $this->selectedPetugas);
         }
 
         // Filter berdasarkan nama siswa jika ada

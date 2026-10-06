@@ -80,13 +80,30 @@ class Index extends Component
     public function cetakLaporan()
     {
         if (!$this->selectedJenjang) {
-            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Jenjang dan Tahun Ajar wajib dipilih']);
+            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Jenjang wajib dipilih']);
+            return;
+        }
+
+        if (!$this->selectedRekening) {
+            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Rekening wajib dipilih']);
+            return;
+        }
+
+        if (!$this->startDate || !$this->endDate) {
+            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Periode tanggal wajib dipilih']);
+            return;
+        }
+
+        if ($this->startDate > $this->endDate) {
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Tanggal mulai harus lebih awal atau sama dengan tanggal selesai.'
+            ]);
             return;
         }
 
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Laporan diproses.']);
 
-        $url = route('akuntansi.laporan-buku-besar.pdf', [
+        $url = route('keuangan.akuntansi.laporan.buku-besar.pdf', [
             'jenjang' => $this->selectedJenjang,
             'rekening' => $this->selectedRekening,
             'start_date' => $this->startDate,

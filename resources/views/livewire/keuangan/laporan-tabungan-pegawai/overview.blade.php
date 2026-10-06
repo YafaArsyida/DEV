@@ -75,13 +75,13 @@
                 <div class="p-3 border border-dashed border-end-0">
 
                     <h5 class="mb-1">
-                        <span class="fw-semibold fs-12 text-info">
+                        <span class="fw-semibold fs-12">
                             Rp{{ number_format($totalSaldo, 0, ',', '.') }}
                         </span>
                     </h5>
 
                     <p class="text-muted mb-0">
-                        <i class="ri-wallet-3-line display-8 text-info"></i>
+                        <i class="ri-wallet-3-line display-8"></i>
                         Saldo
                     </p>
 

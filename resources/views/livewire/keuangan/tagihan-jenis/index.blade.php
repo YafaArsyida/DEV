@@ -22,7 +22,7 @@
     
             {{-- ACTION --}}
             <div class="d-flex gap-2 flex-wrap">
-                @if ($selectedJenjang && $selectedTahunAjar && $selectedKategoriTagihan)
+                @if ($selectedJenjang && $selectedTahunAjar)
                 <button
                     type="button"
                     wire:click="cetakLaporanJenisTagihan"

@@ -1,4 +1,4 @@
-@extends('template_machine.v_template')
+@extends('template_keuangan.v_template')
 @section('content') 
 <div class="page-content">
     <div class="container-fluid" style="max-width: 100%">
@@ -9,12 +9,12 @@
                         <h4 class="fs-16 mb-1">Laporan Buku Besar</h4>
                         <p class="text-muted mb-0">Laporan Akuntansi > Laporan Keuangan > Laporan Buku Besar</p>
                     </div>
-                    @livewire('parameter.jenjang')   
+                    @livewire('keuangan.parameter.jenjang')   
                 </div><!-- end card header -->
             </div>
             <!--end col-->
         </div>
-        @livewire('akuntansi-laporan-buku-besar.index')   
+        @livewire('keuangan.akuntansi-laporan-buku-besar.index')   
     </div>
 </div>
 @endsection

@@ -90,13 +90,15 @@ class Index extends Component
 
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Laporan diproses.']);
 
-        $url = route('laporan.tabungan-siswa.pdf', [
+        $url = route('keuangan.laporan.pegawai.tabungan.pdf', [
             'jenjang' => $this->selectedJenjang,
             'tahun' => $this->selectedTahunAjar,
             'start_date' => $this->startDate,
             'end_date' => $this->endDate,
             'jabatan' => $this->selectedJabatan,
             'jenis_transaksi' => $this->selectedJenisTransaksi,
+            'petugas' => $this->selectedPetugas,
+            'search' => $this->search,
         ]);
 
         $this->emit('openNewTab', $url);
@@ -117,6 +119,7 @@ class Index extends Component
                 'ms_pegawai.nama_pegawai',
                 'ms_jabatan.nama_jabatan'
             )
+            ->where('status_transaksi', '!=', 'dibatalkan')
             ->where('ms_transaksi_tabungan.user_type', 'pegawai')
             ->orderBy('ms_transaksi_tabungan.tanggal', 'ASC');
         // Filter berdasarkan jabatan (misal: guru, TU, dll)

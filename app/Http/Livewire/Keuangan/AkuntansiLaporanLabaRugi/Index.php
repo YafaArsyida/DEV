@@ -67,9 +67,19 @@ class Index extends Component
             return;
         }
 
+        if (($this->startDate && !$this->endDate) || (!$this->startDate && $this->endDate)) {
+            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Tanggal mulai dan tanggal akhir harus diisi bersama']);
+            return;
+        }
+
+        if ($this->startDate && $this->endDate && $this->startDate > $this->endDate) {
+            $this->dispatchBrowserEvent('alertify-error', ['message' => 'Tanggal mulai tidak boleh setelah tanggal akhir']);
+            return;
+        }
+
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Laporan diproses.']);
 
-        $url = route('akuntansi.laporan-laba-rugi.pdf', [
+        $url = route('keuangan.akuntansi.laporan.laba-rugi.pdf', [
             'jenjang' => $this->selectedJenjang,
             'start_date' => $this->startDate,
             'end_date' => $this->endDate,

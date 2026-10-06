@@ -116,7 +116,7 @@
                                         <i class="ri-wallet-3-line me-1"></i>
                                         Saldo Awal
                                     </td>
-                                    <td class="fs-12">Rp{{ number_format($saldoAwalHalaman, 0, ',', '.') }}</td>
+                                    <td class="fs-12 text-end">Rp{{ number_format($saldoAwalHalaman, 0, ',', '.') }}</td>
                                 </tr>
 
                                 @forelse ($transaksiJurnal as $key => $transaksi)
@@ -126,17 +126,17 @@
                                         <td class="text-start">{{ $transaksi->akuntansi_jurnal->nomor_jurnal }}</td>
                                         <td class="text-start">{{ optional($transaksi->akuntansi_jurnal->ms_pengguna)->nama }}</td>
                                         <td class="text-start">{{ $transaksi->akuntansi_jurnal->deskripsi }}</td>
-                                        <td class="text-center">
+                                        <td class="text-end">
                                             <span class="fs-12 text-success">
                                                 {{ $transaksi->posisi === 'debit' ? 'Rp' . number_format($transaksi->nominal, 0, ',', '.') : '-' }}
                                             </span>
                                         </td>
-                                        <td class="text-center">
+                                        <td class="text-end">
                                             <span class="fs-12 text-danger">
                                                 {{ $transaksi->posisi === 'kredit' ? 'Rp' . number_format($transaksi->nominal, 0, ',', '.') : '-' }}
                                             </span>
                                         </td>
-                                        <td class="text-center">
+                                        <td class="text-end">
                                             @php
                                                 if ($selectedRekeningData->posisi_normal === 'debit') {
                                                     if ($transaksi->posisi === 'debit') {

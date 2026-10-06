@@ -204,7 +204,7 @@ class Index extends Component
             'message' => 'Surat sedang diproses.'
         ]);
 
-        $url = route('laporan.tagihan-siswa.generatePDF', [
+        $url = route('keuangan.laporan.tagihan.siswa.pdf', [
             'selectedJenjang' => $this->selectedJenjang,
             'msPenempatanSiswaId' => $msPenempatanSiswaId,
             'selectedJenisTagihan' => json_encode($this->selectedJenisTagihan),
@@ -229,7 +229,7 @@ class Index extends Component
             'message' => 'Surat sedang diproses.'
         ]);
 
-        $url = route('laporan.tagihan-kelas.generatePDFByClass', [
+        $url = route('keuangan.laporan.tagihan.kelas.pdf', [        
             'ms_kelas_id' => $ms_kelas_id,
             // 'penempatanSiswaList' => json_encode($this->penempatanSiswaList),
             'selectedJenjang' => $this->selectedJenjang,

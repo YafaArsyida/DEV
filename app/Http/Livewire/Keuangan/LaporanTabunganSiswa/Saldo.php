@@ -79,7 +79,7 @@ class Saldo extends Component
             'message' => 'Laporan sedang diproses.'
         ]);
 
-        $url = route('laporan.tabungan-siswa.saldo.pdf', [
+        $url = route('keuangan.laporan.siswa.tabungan.saldo.pdf', [
             'jenjang' => $this->selectedJenjang,
             'tahun'   => $this->selectedTahunAjar,
             'kelas'   => $this->selectedKelas, // null jika tidak dipilih

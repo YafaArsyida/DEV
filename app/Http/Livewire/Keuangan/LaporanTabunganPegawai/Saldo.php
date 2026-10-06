@@ -47,6 +47,28 @@ class Saldo extends Component
         $this->resetPage(); // Reset pagination ketika pencarian berubah
     }
 
+    public function cetakSaldo()
+    {
+        if (!$this->selectedJenjang || !$this->selectedTahunAjar) {
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Jenjang dan Tahun Ajar wajib dipilih'
+            ]);
+            return;
+        }
+
+        $this->dispatchBrowserEvent('alertify-success', [
+            'message' => 'Laporan sedang diproses.'
+        ]);
+
+        $url = route('keuangan.laporan.pegawai.tabungan.saldo.pdf', [
+            'jenjang' => $this->selectedJenjang,
+            'tahun' => $this->selectedTahunAjar,
+            'jabatan' => $this->selectedJabatan,
+        ]);
+
+        $this->emit('openNewTab', $url);
+    }
+
     public function updatingSelectedJabatan()
     {
         $this->namaJabatan = Jabatan::where('ms_jabatan_id', $this->selectedJabatan)

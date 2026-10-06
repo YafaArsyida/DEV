@@ -127,8 +127,8 @@
                             <th class="text-uppercase">Jabatan</th>
                             <th class="text-uppercase" scope="col">Transaksi</th>
                             <th class="text-uppercase text-center">Petugas</th>
-                            <th class="text-uppercase text-center">Pemasukan</th>
-                            <th class="text-uppercase text-center">Pengeluaran</th>
+                            <th class="text-uppercase text-end">Pemasukan</th>
+                            <th class="text-uppercase text-end">Pengeluaran</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -150,14 +150,14 @@
                                     {!! 'Rp' . number_format($item->nominal, 0, ',', '.') . ' - <i>' . ucfirst($item->jenis_transaksi) . '</i>' !!}
                                 </td>
                                 <td>{{ $item->ms_pengguna->nama ?? '-' }}</td>
-                                <td>
+                                <td class="text-end">
                                     <span class="fs-12 fw-medium text-success">
                                         {{ in_array($item->jenis_transaksi, ['topup tunai', 'topup online', 'pengembalian dana']) 
                                             ? 'RP' . number_format($item->nominal, 0, ',', '.') 
                                             : '-' }}
                                     </span>
                                 </td>
-                                <td>
+                                <td class="text-end">
                                     <span class="fs-12 fw-medium text-danger">
                                         {{ in_array($item->jenis_transaksi, ['penarikan', 'pembayaran', 'kantin']) 
                                             ? 'RP' . number_format($item->nominal, 0, ',', '.') 

@@ -103,7 +103,7 @@ class Index extends Component
 
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Laporan diproses.']);
 
-        $url = route('laporan.tabungan-siswa.pdf', [
+        $url = route('keuangan.laporan.siswa.tabungan.pdf', [
             'jenjang' => $this->selectedJenjang,
             'tahun' => $this->selectedTahunAjar,
             'start_date' => $this->startDate,

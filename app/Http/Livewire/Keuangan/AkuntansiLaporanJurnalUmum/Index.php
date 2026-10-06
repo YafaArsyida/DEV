@@ -3,8 +3,6 @@
 namespace App\Http\Livewire\Keuangan\AkuntansiLaporanJurnalUmum;
 
 use App\Models\AkuntansiJurnal;
-use App\Models\AkuntansiJurnalDetail;
-use App\Models\TahunAjar;
 use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -90,8 +88,9 @@ class Index extends Component
 
         $this->dispatchBrowserEvent('alertify-success', ['message' => 'Laporan diproses.']);
 
-        $url = route('akuntansi.laporan-jurnal-umum.pdf', [
+        $url = route('keuangan.akuntansi.laporan.jurnal-umum.pdf', [
             'jenjang' => $this->selectedJenjang,
+            'departemen' => $this->selectDepartemen,
             'start_date' => $this->startDate,
             'end_date' => $this->endDate,
             'search' => $this->search

@@ -33,18 +33,21 @@ class Overview extends Component
         }
 
         $query = TransaksiEduPay::query()
-            ->with(['ms_siswa', 'ms_pengguna', 'ms_penempatan_siswa'])
-            ->join('ms_siswa', 'ms_siswa.ms_siswa_id', '=', 'ms_transaksi_edupay.user_id')
-            ->join('ms_penempatan_siswa', 'ms_penempatan_siswa.ms_penempatan_siswa_id', '=', 'ms_transaksi_edupay.ms_penempatan_siswa_id')
-            ->select('ms_transaksi_edupay.*', 'ms_siswa.nama_siswa', 'ms_penempatan_siswa.ms_jenjang_id', 'ms_penempatan_siswa.ms_tahun_ajar_id')
-            ->where('status_transaksi', '!=', 'dibatalkan')
-            ->where('ms_penempatan_siswa.ms_jenjang_id', $this->selectedJenjang)
-            ->where('ms_penempatan_siswa.ms_tahun_ajar_id', $this->selectedTahunAjar)
+            ->where('ms_transaksi_edupay.user_type', 'siswa')
+            ->where('ms_transaksi_edupay.status_transaksi', '!=', 'dibatalkan')
+            ->whereHas('ms_siswa.ms_penempatan_siswa', function ($query) {
+                $query->where('ms_jenjang_id', $this->selectedJenjang)
+                    ->where('ms_tahun_ajar_id', $this->selectedTahunAjar);
+            })
             ->orderBy('tanggal', 'ASC');
 
         // Filter berdasarkan tahun ajar
         if ($this->selectedKelas) {
-            $query->where('ms_penempatan_siswa.ms_kelas_id', $this->selectedKelas);
+            $query->whereHas('ms_siswa.ms_penempatan_siswa', function ($query) {
+                $query->where('ms_jenjang_id', $this->selectedJenjang)
+                    ->where('ms_tahun_ajar_id', $this->selectedTahunAjar)
+                    ->where('ms_kelas_id', $this->selectedKelas);
+            });
         }
 
         // Hitung total pemasukan, pengeluaran, dan saldo untuk setiap jenis transaksi

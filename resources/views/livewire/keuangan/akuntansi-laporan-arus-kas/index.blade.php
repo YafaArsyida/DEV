@@ -10,7 +10,7 @@
                         <div class="d-flex align-items-center gap-3">
 
                             <div class="avatar-sm flex-shrink-0">
-                                <div class="avatar-title bg-info-subtle text-info rounded-circle fs-20">
+                                <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
                                     <i class="ri-exchange-funds-line"></i>
                                 </div>
                             </div>
@@ -103,8 +103,8 @@
                                     <th class="text-uppercase text-start">Akun</th>
                                     <th class="text-uppercase text-start">Petugas</th>
                                     <th class="text-uppercase text-start">Deskripsi Transaksi</th>
-                                    <th class="text-uppercase text-center">Kas Masuk</th>
-                                    <th class="text-uppercase text-center">Kas Keluar</th>
+                                    <th class="text-uppercase text-end">Kas Masuk</th>
+                                    <th class="text-uppercase text-end">Kas Keluar</th>
                                 </tr>
                             </thead>
 
@@ -144,7 +144,7 @@
                                         </td>
 
                                         {{-- KAS MASUK --}}
-                                        <td class="text-center">
+                                        <td class="text-end">
                                             @if ($trx->posisi === 'debit')
                                                 <span class="fs-12 text-success">
                                                     Rp{{ number_format($trx->nominal, 0, ',', '.') }}
@@ -155,7 +155,7 @@
                                         </td>
 
                                         {{-- KAS KELUAR --}}
-                                        <td class="text-center">
+                                        <td class="text-end">
                                             @if ($trx->posisi === 'kredit')
                                                 <span class="fs-12 text-danger">
                                                     Rp{{ number_format($trx->nominal, 0, ',', '.') }}
@@ -183,19 +183,19 @@
                             <tfoot>
 
                                 {{-- TOTAL --}}
-                                <tr class="table-light fw-bold">
+                                <tr class="table-light fw-semibold">
 
                                     <td colspan="5" class="text-end">
                                         TOTAL
                                     </td>
 
-                                    <td class="text-center">
+                                    <td class="text-end">
                                         <span class="fs-12 text-success">
                                             Rp{{ number_format($totalKasMasuk, 0, ',', '.') }}
                                         </span>
                                     </td>
 
-                                    <td class="text-center">
+                                    <td class="text-end">
                                         <span class="fs-12 text-danger">
                                             Rp{{ number_format($totalKasKeluar, 0, ',', '.') }}
                                         </span>

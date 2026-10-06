@@ -99,7 +99,7 @@
                                     <th class="text-center">Petugas</th>
                                     <th class="text-uppercase">Akun Debit</th>
                                     <th class="text-uppercase">Akun Kredit</th>
-                                    <th class="text-uppercase">Nominal</th>
+                                    <th class="text-uppercase text-end">Nominal</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -147,7 +147,7 @@
                                         </td>
 
                                         {{-- NOMINAL --}}
-                                        <td class="fs-12 fw-medium">
+                                        <td class="fs-12 text-end fw-medium">
                                             <strong>
                                                 Rp{{ number_format($totalNominal, 0, ',', '.') }}
                                             </strong>

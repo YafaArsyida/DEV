@@ -7,26 +7,33 @@
                 <div class="d-flex align-items-center gap-3">
                     <div class="avatar-sm">
                         <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
-                            <i class="ri-calendar-event-line">
-                            </i>
+                            <i class="ri-file-chart-line"></i>
                         </div>
                     </div>
     
                     <div>
                         <h5 class="fw-bold mb-1">
                             @if ($jenisRekapitulasi === 'tagihan')
-                            Rekapitulasi Tagihan Siswa
+                                Rekapitulasi Tagihan Siswa
                             @elseif ($jenisRekapitulasi === 'pembayaran')
-                            Rekapitulasi Pembayaran Tagihan Siswa
+                                Rekapitulasi Pembayaran Tagihan Siswa
                             @elseif ($jenisRekapitulasi === 'kekurangan')
-                            Rekapitulasi Kekurangan Tagihan Siswa
+                                Rekapitulasi Kekurangan Tagihan Siswa
                             @else
-                            Rekapitulasi Keuangan Siswa
+                                Rekapitulasi Keuangan Siswa
                             @endif
                         </h5>
-                        {{-- <small>
-                            Kelola laporan kegiatan generus 
-                        </small> --}}
+                        <small>
+                            @if ($jenisRekapitulasi === 'tagihan')
+                                Ringkasan tagihan siswa berdasarkan periode dan kelas.
+                            @elseif ($jenisRekapitulasi === 'pembayaran')
+                                Ringkasan pembayaran tagihan siswa.
+                            @elseif ($jenisRekapitulasi === 'kekurangan')
+                                Pantau sisa tagihan yang belum dibayarkan siswa.
+                            @else
+                                Lihat ringkasan kondisi keuangan siswa.
+                            @endif
+                        </small>
                     </div>
                 </div>
             </div>

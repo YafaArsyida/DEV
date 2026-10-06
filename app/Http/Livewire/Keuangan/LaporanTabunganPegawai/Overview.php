@@ -39,6 +39,7 @@ class Overview extends Component
                 'ms_pegawai.ms_jabatan_id',
                 'ms_jabatan.nama_jabatan'
             )
+            ->where('status_transaksi', '!=', 'dibatalkan')
             ->where('ms_transaksi_tabungan.user_type', 'pegawai')
             ->orderBy('tanggal', 'ASC');
 

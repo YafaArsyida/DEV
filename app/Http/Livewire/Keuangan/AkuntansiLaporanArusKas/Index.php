@@ -112,7 +112,7 @@ class Index extends Component
             'message' => 'Laporan sedang diproses...'
         ]);
 
-        $url = route('akuntansi.laporan-arus-kas.pdf', [
+        $url = route('keuangan.akuntansi.laporan.arus-kas.pdf', [
             'jenjang'    => $this->selectedJenjang,
             'rekening'   => $rekening,
             'start_date' => $this->startDate,

@@ -15,9 +15,9 @@
                         <h5 class="fw-bold mb-1">
                             Laporan Piutang Siswa
                         </h5>
-                        {{-- <small>
-                            Kelola laporan piutang, surat tagihan, dan WhatsApp.
-                        </small> --}}
+                        <small>
+                            Pantau piutang, cetak surat tagihan, dan kirim pemberitahuan
+                        </small>
                     </div>
                 </div>
             </div>
@@ -170,7 +170,7 @@
                                 <p class="text-muted mb-0">{{ $laporan['nama_kelas'] }}</p>
                             </td>
 
-                            <td class="text-center bg-light">
+                            <td class="text-end bg-light">
                                 <span class="fs-12 fw-medium">
                                     Rp{{ number_format($laporan['total_tagihan'], 0, ',', '.') }}
                                 </span>
@@ -179,10 +179,10 @@
                             <td>
                                 <div class="d-flex flex-wrap gap-2">
                                     @foreach ($laporan['rincian_tagihan'] as $r)
-                                        <span class="badge bg-light text-body border px-3 py-2">
+                                        <span class="badge bg-light text-body border rounded-pill px-2 py-2 d-inline-flex align-items-center gap-2">
                                             {{ $r['nama_jenis_tagihan_siswa'] }}
-                                            <strong class="">
-                                                Rp{{ number_format($r['jumlah_kekurangan'],0,',','.') }}
+                                            <strong class="fw-medium">
+                                                Rp{{ number_format($r['jumlah_kekurangan'], 0, ',', '.') }}
                                             </strong>
                                         </span>
                                     @endforeach
@@ -217,7 +217,7 @@
                         <tr>
                             <td></td>
                             <td class="text-start"><strong>TOTAL</strong></td>
-                            <td class="text-center bg-light">
+                            <td class="text-end bg-light">
                                 <span class="fs-12 fw-semibold">
                                     Rp{{ number_format($totalTagihan, 0, ',', '.') }}
                                 </span>

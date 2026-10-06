@@ -87,7 +87,7 @@
                                 <th>Siswa</th>
                                 <th>Kelas</th>
                                 <th>EduCard</th>
-                                <th class="text-center">Saldo EduPay</th>
+                                <th class="text-end">Saldo EduPay</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -109,7 +109,7 @@
                                     <em>Belum memiliki kartu</em>
                                     @endif
                                 </td>
-                                <td class="text-center">
+                                <td class="text-end">
                                     <span class="fs-12 fw-medium">
                                         Rp{{ number_format($item->ms_siswa->ms_saldo_edupay->saldo_edupay ?? 0, 0, ',', '.') }}
                                     </span>
@@ -136,7 +136,7 @@
                                 <td></td>
                                 <td></td>
                                 <td class="text-uppercase text-start">TOTAL</td>
-                                <td class="text-center">
+                                <td class="text-end">
                                     <span class="fs-12">
                                         Rp{{ number_format($totalSaldo, 0, ',', '.') }}</span>
                                 </td>

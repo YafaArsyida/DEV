@@ -24,12 +24,13 @@
                 </div>
             </div>
             <div class="d-flex gap-2 flex-wrap">
-                {{-- @if ($selectedJabatan)
-                    <button wire:click="cetakLaporan" class="btn btn-danger d-inline-flex align-items-center gap-1">
-                        <i class="ri-printer-line align-bottom"></i>
-                        <span>Cetak Laporan</span>
-                    </button>
-                @endif --}}
+                <button
+                    type="button"
+                    wire:click="cetakLaporan"
+                    class="btn btn-danger rounded-pill px-4 d-inline-flex align-items-center gap-1">
+                    <i class="ri-printer-line"></i>
+                    <span>Cetak</span>
+                </button>
                 <button
                     type="button"
                     class="btn btn-success rounded-pill px-4 d-inline-flex align-items-center gap-1"
@@ -94,8 +95,8 @@
                             <th class="text-uppercase">Jabatan</th>
                             <th class="text-uppercase" scope="col">Transaksi</th>
                             <th class="text-uppercase text-center">Petugas</th>
-                            <th class="text-uppercase text-center">Kredit</th>
-                            <th class="text-uppercase text-center">Debit</th>
+                            <th class="text-uppercase text-end">Kredit</th>
+                            <th class="text-uppercase text-end">Debit</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -115,12 +116,12 @@
                                     {!! 'Rp' . number_format($item->nominal, 0, ',', '.') . ' - <i>' . ucfirst($item->jenis_transaksi) . '</i>' !!}
                                 </td>
                                 <td>{{ $item->ms_pengguna->nama ?? '-' }}</td>
-                                <td>
+                                <td class="text-end">
                                     <span class="fs-12 fw-medium text-success">
                                         {{ $item->jenis_transaksi === 'setoran' ? 'Rp' . number_format($item->nominal, 0, ',', '.') : '-' }}
                                     </span>
                                 </td>
-                                <td>
+                                <td class="text-end">
                                     <span class="fs-12 fw-medium text-danger">
                                         {{ $item->jenis_transaksi === 'penarikan' ? 'Rp' . number_format($item->nominal, 0, ',', '.') : '-' }}
                                     </span>
