@@ -250,7 +250,7 @@ class Index extends Component
                 ->get();
         }
 
-        return view('livewire.formulir-ekstrakurikuler.index', [
+        return view('livewire.keuangan.formulir-ekstrakurikuler.index', [
             'select_ekstrakurikuler' => $select_ekstrakurikuler,
             'siswa' => $siswas
         ]);

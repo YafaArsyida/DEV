@@ -7,7 +7,8 @@
     <title>PPDB Online 2027/2028 | {{ config('app.name') }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Informasi Penerimaan Peserta Didik Baru Tahun Ajaran 2027/2028 di {{ config('app.name') }}.">
-    <link rel="shortcut icon" href="{{ asset('assets') }}/images/favicon.ico">
+    {{-- <link rel="shortcut icon" href="{{ asset('assets') }}/images/favicon.ico"> --}}
+    <link rel="shortcut icon" href="{{asset('assets')}}/logo/hero.png">
     <script src="{{ asset('assets') }}/js/layout.js"></script>
     <link href="{{ asset('assets') }}/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assets') }}/css/icons.min.css" rel="stylesheet" type="text/css" />
@@ -249,7 +250,7 @@
             max-width: 560px;
         }
 
-        .ppdb-page .ppdb-whatsapp {
+        .ppdb-page .ppdb-help {
             z-index: 1030;
             right: 1rem;
             bottom: 1rem;
@@ -257,7 +258,7 @@
             bottom: max(1rem, env(safe-area-inset-bottom));
         }
 
-        .ppdb-page .ppdb-whatsapp i {
+        .ppdb-page .ppdb-help i {
             font-size: 1.5rem;
         }
 
@@ -968,69 +969,147 @@
         </section>
     </main>
 
-    <footer class="bg-dark text-white-50 py-5 text-center text-md-start">
+    <footer class="custom-footer bg-dark position-relative">
         <div class="container">
-            <div class="row g-4">
-                <div class="col-lg-4 col-md-6">
-                    <div class="brand-box d-flex align-items-center justify-content-center justify-content-md-start gap-3 mb-3">
-                        <img class="avatar-sm rounded-3 object-fit-cover" src="{{ asset('assets/logo/logo.jpg') }}" alt="Logo sekolah">
-                        <div>
-                            <h4 class="text-white mb-0">{{ config('app.name') }}</h4>
+
+            {{-- Main Footer --}}
+            <div class="row py-5 gy-4">
+
+                {{-- Informasi Sekolah --}}
+                <div class="col-lg-5 col-md-6">
+                    <div>
+                        {{-- Logo --}}
+                        <div class="mb-4">
+                            <img src="{{ asset('assets/logo/hero.png') }}"
+                                alt="Logo {{ config('app.name') }}"
+                                height="50"
+                                class="rounded-2">
+                        </div>
+
+                        {{-- Nama dan Deskripsi --}}
+                        <p class="text-white fs-15 fw-medium mb-2">
+                            {{ config('app.name') }}
+                        </p>
+
+                        <p class="text-white-50 ff-secondary mb-4"
+                            style="max-width: 420px;">
+                            Informasi Penerimaan Peserta Didik Baru (PPDB) tahun
+                            ajaran 2027/2028. Temukan informasi jalur pendaftaran,
+                            persyaratan, jadwal, dan proses penerimaan calon siswa
+                            melalui portal PPDB sekolah.
+                        </p>
+
+                        {{-- Alamat Sekolah --}}
+                        <div class="d-flex align-items-start gap-2 text-white-50">
+                            <i class="ri-map-pin-line text-white fs-18 mt-1"></i>
+                            <span class="ff-secondary fs-13">
+                                Dusun No. 2 RT. 04/RW. 01, Kebonan, Karanggede,<br>
+                                Boyolali, Jawa Tengah 57381
+                            </span>
                         </div>
                     </div>
-                    <p>Tempat belajar yang menumbuhkan semangat, karakter, dan prestasi bagi generasi masa depan.</p>
-                    <div class="socials d-flex justify-content-center justify-content-md-start gap-2 mt-3">
-                        <a class="btn btn-sm btn-outline-light rounded-3" href="#"><i class="ri-facebook-fill"></i></a>
-                        <a class="btn btn-sm btn-outline-light rounded-3" href="#"><i class="ri-instagram-line"></i></a>
-                        <a class="btn btn-sm btn-outline-light rounded-3" href="#"><i class="ri-youtube-line"></i></a>
+                </div>
+
+                {{-- Navigasi Informasi --}}
+                <div class="col-lg-3 col-md-3 col-6">
+                    <div>
+                        <h5 class="text-white mb-4">
+                            Informasi
+                        </h5>
+
+                        <ul class="list-unstyled ff-secondary footer-list fs-14 mb-0">
+                            <li class="mb-2">
+                                <a href="#beranda">Beranda</a>
+                            </li>
+                            <li class="mb-2">
+                                <a href="#informasi">Profil Sekolah</a>
+                            </li>
+                            <li class="mb-2">
+                                <a href="#jalur">Jalur Pendaftaran</a>
+                            </li>
+                            <li class="mb-2">
+                                <a href="#persyaratan">Persyaratan</a>
+                            </li>
+                            <li class="mb-2">
+                                <a href="#jadwal">Jadwal PPDB</a>
+                            </li>
+                            <li>
+                                <a href="#faq">Pertanyaan Umum</a>
+                            </li>
+                        </ul>
                     </div>
                 </div>
 
-                <div class="col-lg-2 col-md-6">
-                    <h4 class="text-white">Informasi</h4>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a class="link-light text-decoration-none" href="#informasi">Profil</a></li>
-                        <li class="mb-2"><a class="link-light text-decoration-none" href="#jalur">Jalur</a></li>
-                        <li class="mb-2"><a class="link-light text-decoration-none" href="#jadwal">Jadwal</a></li>
-                        <li><a class="link-light text-decoration-none" href="#faq">FAQ</a></li>
-                    </ul>
-                </div>
+                {{-- CTA PPDB --}}
+                <div class="col-lg-4 col-md-3">
+                    <div>
+                        <h5 class="text-white mb-3">
+                            Bergabung Bersama Kami
+                        </h5>
 
-                <div class="col-lg-3 col-md-6">
-                    <h4 class="text-white">PPDB</h4>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a class="link-light text-decoration-none" href="#daftar">Daftar</a></li>
-                        <li class="mb-2"><a class="link-light text-decoration-none" href="#ppdb-status">Cek Status</a></li>
-                        <li class="mb-2"><a class="link-light text-decoration-none" href="#persyaratan">Persyaratan</a></li>
-                        <li><a class="link-light text-decoration-none" href="#cara-daftar">Panduan</a></li>
-                    </ul>
-                </div>
+                        <p class="text-white-50 ff-secondary fs-14 mb-4">
+                            Siapkan persyaratan calon siswa dan ikuti proses
+                            pendaftaran PPDB secara tertib. Pantau status
+                            pendaftaran untuk mengetahui perkembangan proses
+                            penerimaan.
+                        </p>
 
-                <div class="col-lg-3 col-md-6">
-                    <h4 class="text-white">Kontak</h4>
-                    <ul class="list-unstyled">
-                        <li class="mb-2">Jl. Pendidikan No. 45</li>
-                        <li class="mb-2">+62 812-3456-7890</li>
-                        <li>ppdb@temansekolah.sch.id</li>
-                    </ul>
+                        <div class="d-flex flex-wrap gap-2">
+                            <a href="#daftar"
+                                class="btn btn-primary rounded-pill px-4">
+                                <i class="ri-pencil-line align-middle me-1"></i>
+                                Mulai Pendaftaran
+                                <i class="ri-arrow-right-line align-middle ms-1"></i>
+                            </a>
+
+                            <a href="#ppdb-status"
+                                class="btn btn-outline-light rounded-pill px-4">
+                                <i class="ri-search-line align-middle me-1"></i>
+                                Cek Status
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="text-center border-top mt-4 pt-3">
-                © 2027 TemanSekolah. All rights reserved.
+            {{-- Divider --}}
+            <div class="border-top border-secondary opacity-25"></div>
+
+            {{-- Bottom Footer --}}
+            <div class="row align-items-center py-4 gy-3">
+
+                {{-- Copyright --}}
+                <div class="col-sm-6">
+                    <p class="copy-rights mb-0 text-white-50 ff-secondary fs-13">
+                        &copy; {{ date('Y') }}
+                        {{ config('app.name') }}.
+                        Hak cipta dilindungi.
+                    </p>
+                </div>
+
+                {{-- PPDB Links --}}
+                <div class="col-sm-6">
+                    <div class="text-sm-end">
+                        <a href="{{ route('ppdb.daftar') }}" class="link-light me-3">
+                            Daftar PPDB
+                        </a>
+                        <a href="{{ route('ppdb.status') }}" class="link-light">
+                            Cek Status
+                        </a>
+                    </div>
+                </div>
             </div>
+
         </div>
     </footer>
 
     <a
-        class="btn btn-success rounded-pill shadow-lg d-inline-flex align-items-center gap-2 px-4 py-3 fw-semibold position-fixed ppdb-whatsapp"
-        href="https://wa.me/6281234567890?text={{ urlencode('Halo, saya ingin bertanya tentang PPDB Tahun Ajaran 2027/2028.') }}"
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Hubungi sekolah melalui WhatsApp tentang PPDB"
-        title="Hubungi sekolah melalui WhatsApp">
-        <i class="ri-whatsapp-fill" aria-hidden="true"></i>
-        <span>Hubungi kami</span>
+        class="btn btn-primary rounded-pill shadow-lg d-inline-flex align-items-center gap-2 px-4 py-3 fw-semibold position-fixed ppdb-help"
+        href="#faq"
+        aria-label="Lihat bantuan dan pertanyaan umum tentang PPDB"
+        title="Lihat bantuan PPDB">
+        <i class="ri-question-line" aria-hidden="true"></i>
+        <span>Bantuan PPDB</span>
     </a>
 </div>
 

@@ -35,6 +35,15 @@
             padding: 2rem clamp(1rem, 3vw, 3rem) 3rem;
         }
 
+        .application-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .application-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0.75rem 1.5rem rgba(15, 23, 42, 0.1) !important;
+        }
+
         @media (max-width: 575.98px) {
             .portal-shell {
                 padding-top: 1rem;
@@ -416,6 +425,70 @@
 
             </div>
         </div>
+
+    {{-- PUBLIC WEBSITES --}}
+    <div class="mb-4">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <div>
+                <h5 class="fw-bold mb-1">Situs Publik</h5>
+                <p class="text-muted mb-0">
+                    Halaman informasi yang dapat diakses calon siswa dan masyarakat.
+                </p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-xl-6 col-md-6">
+                <a href="{{ route('ppdb.landing') }}" class="text-decoration-none">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 application-card">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-4">
+                                <div class="avatar-md">
+                                    <div class="avatar-title bg-info-subtle text-info rounded-3 fs-4">
+                                        <i class="ri-user-add-line"></i>
+                                    </div>
+                                </div>
+                                <span class="badge bg-info-subtle text-info rounded-pill">Publik</span>
+                            </div>
+                            <h5 class="fw-bold text-dark mb-2">Landing PPDB</h5>
+                            <p class="text-muted mb-0">
+                                Tampilkan informasi penerimaan siswa baru, persyaratan,
+                                jadwal, dan akses pendaftaran online.
+                            </p>
+                            <div class="text-primary fw-medium mt-3">
+                                Buka halaman PPDB <i class="ri-arrow-right-line align-middle ms-1"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-xl-6 col-md-6">
+                <a href="{{ route('landing.ekstrakurikuler') }}" class="text-decoration-none">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 application-card">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-4">
+                                <div class="avatar-md">
+                                    <div class="avatar-title bg-warning-subtle text-warning rounded-3 fs-4">
+                                        <i class="ri-football-line"></i>
+                                    </div>
+                                </div>
+                                <span class="badge bg-warning-subtle text-warning rounded-pill">Publik</span>
+                            </div>
+                            <h5 class="fw-bold text-dark mb-2">Landing Ekstrakurikuler</h5>
+                            <p class="text-muted mb-0">
+                                Perkenalkan pilihan kegiatan ekstrakurikuler dan informasi
+                                pendaftaran kepada siswa dan orang tua.
+                            </p>
+                            <div class="text-primary fw-medium mt-3">
+                                Buka halaman ekstrakurikuler <i class="ri-arrow-right-line align-middle ms-1"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
 
     </div>
     

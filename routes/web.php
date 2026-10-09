@@ -83,7 +83,7 @@ use App\Http\Controllers\Keuangan\PenempatanSiswaController as KeuanganPenempata
 
 
 // LANDING
-Route::get('/landing/ekstrakurikuler', [LandingEkstrakurikuler::class, 'index'])->name('landing.ekstrakurikuler');
+Route::get('/ekstrakurikuler', [LandingEkstrakurikuler::class, 'index'])->name('landing.ekstrakurikuler');
 Route::get('/ppdb', [PpdbLandingController::class, 'index'])->name('ppdb.landing');
 Route::get('/ppdb/daftar', [PpdbLandingController::class, 'register'])->name('ppdb.daftar');
 Route::get('/ppdb/login', [PpdbLandingController::class, 'login'])->name('ppdb.login');
