@@ -8,7 +8,6 @@
     <body>
         <!-- Begin page -->
         <div id="layout-wrapper">
-
             <header id="page-topbar">
                 <div class="layout-width" style="max-width: 100%">
                     <div class="navbar-header">
@@ -45,18 +44,6 @@
                             <!-- App Search-->
                             <div class="app-search d-none d-md-flex header-item">
                                 <div class="position-relative">
-                                     {{-- <div class="row">
-                                        <div class="col-lg-12">
-                                            <div class="card overflow-hidden">
-                                                <div class="card-body bg-success-subtle text-success fw-semibold d-flex">
-                                                    <marquee class="fs-14">
-                                                        NFT art is a digital asset that is collectable, unique, and non-transferrable, Cortes explained. Every NFT is unique in it's creative design and cannot be duplicated, making them limited and rare. NFTs get their value because the transaction proves ownership of the art.
-                                                    </marquee>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <!--end col-->p
-                                    </div> --}}
                                     <h3 class='mb-0'>Akademik {{ config('app.name') }}</h3>
                                 </div>
                             </div>

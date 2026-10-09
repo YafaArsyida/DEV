@@ -172,6 +172,43 @@
 
                 </div>
 
+                {{-- PPDB --}}
+                <div class="col-xl-4 col-md-6">
+                    <a href="{{ route('ppdb.admin.dashboard') }}"
+                        class="text-decoration-none">
+
+                        <div class="card border-0 shadow-sm rounded-4 h-100 application-card">
+
+                            <div class="card-body p-4">
+
+                                <div class="d-flex justify-content-between align-items-start mb-4">
+
+                                    <div class="avatar-md">
+                                        <div class="avatar-title bg-info-subtle text-info rounded-3 fs-4">
+                                            <i class="ri-user-add-line"></i>
+                                        </div>
+                                    </div>
+
+                                    <i class="ri-arrow-right-line text-muted fs-5"></i>
+
+                                </div>
+
+                                <h5 class="fw-bold text-dark mb-2">
+                                    PPDB
+                                </h5>
+
+                                <p class="text-muted mb-0">
+                                    Kelola penerimaan peserta didik baru.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </a>
+
+                </div>
+
                 {{-- KEUANGAN --}}
                 <div class="col-xl-4 col-md-6">
                     <a href="{{ route('keuangan.dashboard') }}"

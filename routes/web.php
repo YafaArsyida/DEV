@@ -11,6 +11,8 @@ use App\Http\Controllers\Akademik\PenempatanEkstrakurikulerSiswa;
 use App\Http\Controllers\Akademik\PenempatanSiswaController;
 use App\Http\Controllers\Akademik\SiswaController;
 use App\Http\Controllers\Akademik\TahunAjaranController;
+use App\Http\Controllers\Ppdb\PpdbAdminController;
+use App\Http\Controllers\Ppdb\PpdbLandingController;
 use App\Http\Controllers\Portal\PortalController;
 
 use App\Http\Controllers\Keuangan\AkuntansiJurnalDetail;
@@ -82,6 +84,18 @@ use App\Http\Controllers\Keuangan\PenempatanSiswaController as KeuanganPenempata
 
 // LANDING
 Route::get('/landing/ekstrakurikuler', [LandingEkstrakurikuler::class, 'index'])->name('landing.ekstrakurikuler');
+Route::get('/ppdb', [PpdbLandingController::class, 'index'])->name('ppdb.landing');
+Route::get('/ppdb/daftar', [PpdbLandingController::class, 'register'])->name('ppdb.daftar');
+Route::get('/ppdb/login', [PpdbLandingController::class, 'login'])->name('ppdb.login');
+Route::get('/ppdb/dashboard', [PpdbLandingController::class, 'dashboard'])->name('ppdb.dashboard');
+Route::get('/ppdb/pendaftaran/data-siswa', [PpdbLandingController::class, 'dataSiswa'])->name('ppdb.pendaftaran.data-siswa');
+Route::get('/ppdb/pendaftaran/orang-tua', [PpdbLandingController::class, 'orangTua'])->name('ppdb.pendaftaran.orang-tua');
+Route::get('/ppdb/pendaftaran/alamat', [PpdbLandingController::class, 'alamat'])->name('ppdb.pendaftaran.alamat');
+Route::get('/ppdb/pendaftaran/pendidikan', [PpdbLandingController::class, 'pendidikan'])->name('ppdb.pendaftaran.pendidikan');
+Route::get('/ppdb/pendaftaran/berkas', [PpdbLandingController::class, 'berkas'])->name('ppdb.pendaftaran.berkas');
+Route::get('/ppdb/pendaftaran/review', [PpdbLandingController::class, 'review'])->name('ppdb.pendaftaran.review');
+Route::get('/ppdb/status', [PpdbLandingController::class, 'status'])->name('ppdb.status');
+Route::get('/ppdb/bukti-pendaftaran', [PpdbLandingController::class, 'buktiPendaftaran'])->name('ppdb.bukti-pendaftaran');
 
 // UNTUK MENGARAHKAN HALAMAN YG LOGIN
 // Route::get('/', function () {
@@ -231,6 +245,54 @@ Route::middleware(['auth', 'peran:SUPERADMIN, ADMIN, KEUANGAN'])->group(function
                 ->name('laporan');
         });
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | PPDB
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('ppdb/admin')
+        ->name('ppdb.admin.')
+        ->group(function () {
+
+            /*
+            |--------------------------------------------------------------------------
+            | Dashboard
+            |--------------------------------------------------------------------------
+            */
+            Route::get('/', [PpdbAdminController::class, 'index'])
+                ->name('dashboard');
+
+            Route::get('/pendaftar', [PpdbAdminController::class, 'pendaftar'])
+                ->name('pendaftar');
+
+            Route::get('/bantu-pendaftaran', [PpdbAdminController::class, 'bantuPendaftaran'])
+                ->name('bantu-pendaftaran');
+
+            Route::get('/verifikasi', [PpdbAdminController::class, 'verifikasi'])
+                ->name('verifikasi');
+
+            Route::get('/seleksi', [PpdbAdminController::class, 'seleksi'])
+                ->name('seleksi');
+
+            Route::get('/pengumuman', [PpdbAdminController::class, 'pengumuman'])
+                ->name('pengumuman');
+
+            Route::get('/daftar-ulang', [PpdbAdminController::class, 'daftarUlang'])
+                ->name('daftar-ulang');
+
+            Route::get('/laporan', [PpdbAdminController::class, 'laporan'])
+                ->name('laporan');
+
+            Route::get('/pengaturan', [PpdbAdminController::class, 'pengaturan'])
+                ->name('pengaturan');
+        });
+        
+    /*
+    |--------------------------------------------------------------------------
+    | Keuangan
+    |--------------------------------------------------------------------------
+    */
     Route::prefix('keuangan')
         ->name('keuangan.')
         ->group(function () {
