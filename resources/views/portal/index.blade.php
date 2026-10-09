@@ -5,7 +5,7 @@
 <head>
 
     <meta charset="utf-8" />
-    <title>TemanSekolah | SmartPass</title>
+    <title>{{ config('app.name') }} | Portal Sekolah</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
     <meta content="Themesbrand" name="author" />
@@ -28,10 +28,24 @@
     
     <!-- alertifyjs default themes  Css -->
     <link href="{{asset('assets')}}/libs/alertifyjs/build/css/themes/default.min.css" rel="stylesheet" type="text/css" />
+    <style>
+        .portal-shell {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 2rem clamp(1rem, 3vw, 3rem) 3rem;
+        }
+
+        @media (max-width: 575.98px) {
+            .portal-shell {
+                padding-top: 1rem;
+                padding-bottom: 1.5rem;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <div class="container-fluid">
+    <div class="container-fluid portal-shell">
 
         {{-- HEADER --}}
         <div class="card border-0 shadow-sm rounded-4 mb-4">
@@ -48,7 +62,7 @@
 
                         <div>
                             <h5 class="mb-0 fw-bold text-dark">
-                                TemanSekolah
+                                {{ config('app.name') }}
                             </h5>
                             <small class="text-muted">
                                 Portal Administrasi Sekolah
@@ -94,7 +108,7 @@
 
                         <h1 class="fw-bold text-dark mb-2">
                             Selamat Datang di
-                            <span class="text-primary">TemanSekolah</span>
+                            <span class="text-primary">{{ config('app.name') }}</span>
                         </h1>
 
                         <p class="text-muted fs-16 mb-0">
