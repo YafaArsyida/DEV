@@ -1,4 +1,4 @@
-@extends('template_machine.v_template')
+@extends('template_keuangan.v_template')
 @section('content') 
 <div class="page-content">
     <div class="container-fluid" style="max-width: 100%">
@@ -22,13 +22,13 @@
         <div class="row">
             {{-- PENGGUNA --}}
             <div class="col-xxl-10">
-                @livewire('akses-jenjang.index')   
+                @livewire('keuangan.akses-jenjang.index')   
                 {{-- @livewire('pengguna.index')    --}}
-                @livewire('pengguna.create')
-                @livewire('pengguna.edit')  
-                @livewire('pengguna.delete')  
-                @livewire('pengguna.detail')  
-                @livewire('pengguna.reset-password')  
+                @livewire('keuangan.pengguna.create')
+                @livewire('keuangan.pengguna.edit')  
+                @livewire('keuangan.pengguna.delete')  
+                @livewire('keuangan.pengguna.detail')  
+                @livewire('keuangan.pengguna.reset-password')  
             </div>
             <!--end col-->
             {{-- TAHUN AJAR --}}
