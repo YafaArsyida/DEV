@@ -5,7 +5,7 @@
     aria-labelledby="ModalAddKelasLabel"
     aria-hidden="true">
 
-    <div class="modal-dialog modal-gialog-scrollable">
+    <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
 
             {{-- HEADER --}}

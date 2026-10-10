@@ -47,18 +47,46 @@
                             <div class="dropdown ms-sm-3 header-item topbar-user">
                                 <button type="button" class="btn shadow-none" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <span class="d-flex align-items-center">
-                                        <span class="rounded-circle header-profile-user bg-primary text-white d-flex align-items-center justify-content-center fw-bold">B</span>
+                                        <span class="rounded-circle header-profile-user bg-primary text-white d-flex align-items-center justify-content-center fw-bold">
+                                            {{ strtoupper(substr(trim(Auth::user()->nama ?? 'Orang Tua'), 0, 1)) }}
+                                        </span>
                                         <span class="text-start ms-xl-2">
-                                            <span class="d-none d-xl-inline-block ms-1 fw-medium user-name-text">Budi Santoso</span>
+                                            <span class="d-none d-xl-inline-block ms-1 fw-medium user-name-text">{{ Auth::user()->nama ?? 'Orang Tua' }}</span>
                                             <span class="d-none d-xl-block ms-1 fs-12 user-name-sub-text">Orang Tua/Wali</span>
                                         </span>
                                     </span>
                                 </button>
                                 <div class="dropdown-menu dropdown-menu-end">
-                                    <h6 class="dropdown-header">Selamat datang, Budi Santoso</h6>
-                                    <a class="dropdown-item" href="#"><i class="ri-user-settings-line text-muted fs-16 align-middle me-1"></i><span class="align-middle">Akun</span></a>
-                                    <a class="dropdown-item" href="#"><i class="ri-question-line text-muted fs-16 align-middle me-1"></i><span class="align-middle">Bantuan</span></a>
-                                    <a class="dropdown-item" href="{{ route('ppdb.landing') }}"><i class="ri-logout-box-line text-muted fs-16 align-middle me-1"></i><span class="align-middle">Keluar</span></a>
+                                    {{-- Informasi Pengguna --}}
+                                    <h6 class="dropdown-header">
+                                        Selamat datang, {{ Auth::user()->nama ?? 'Orang Tua' }}!
+                                    </h6>
+
+                                    {{-- Akun --}}
+                                    <a class="dropdown-item" href="#">
+                                        <i class="ri-user-settings-line text-muted fs-16 align-middle me-1"></i>
+                                        <span class="align-middle">Akun</span>
+                                    </a>
+
+                                    {{-- Bantuan --}}
+                                    <a class="dropdown-item" href="#">
+                                        <i class="ri-question-line text-muted fs-16 align-middle me-1"></i>
+                                        <span class="align-middle">Bantuan</span>
+                                    </a>
+
+                                    <div class="dropdown-divider"></div>
+
+                                    {{-- Logout --}}
+                                    <a class="dropdown-item"
+                                        href="{{ route('ppdb.logout') }}"
+                                        onclick="event.preventDefault(); document.getElementById('logout-form-ppdb').submit();">
+                                        <i class="ri-logout-box-line text-muted fs-16 align-middle me-1"></i>
+                                        <span class="align-middle">Keluar</span>
+                                    </a>
+
+                                    <form id="logout-form-ppdb" action="{{ route('ppdb.logout') }}" method="POST" class="d-none">
+                                        @csrf
+                                    </form>
                                 </div>
                             </div>
                         </div>

@@ -21,6 +21,12 @@ class RedirectIfAuthenticated
 
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
+                // $user = Auth::guard($guard)->user();
+
+                // if ($user->peran === 'ORANG_TUA') {
+                //     return redirect()->route('ppdb.dashboard');
+                // }
+
                 return redirect(RouteServiceProvider::HOME);
             }
         }

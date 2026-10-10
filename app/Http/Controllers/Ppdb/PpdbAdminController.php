@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Ppdb;
 
 use App\Http\Controllers\Controller;
+use App\Models\PPDBGelombang;
+use App\Models\PPDBPeriode;
 
 class PpdbAdminController extends Controller
 {
@@ -48,6 +50,11 @@ class PpdbAdminController extends Controller
 
     public function pengaturan()
     {
-        return view('ppdb.admin.pengaturan');
+        $totalPeriode = PPDBPeriode::count();
+        $totalGelombang = PPDBGelombang::count();
+        return view('ppdb.admin.pengaturan', compact(
+            'totalPeriode',
+            'totalGelombang'
+        ));
     }
 }

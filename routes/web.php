@@ -69,6 +69,9 @@ use App\Http\Controllers\SmartPassPresensiPegawai;
 
 // KEUANGAN
 use App\Http\Controllers\Keuangan\PenempatanSiswaController as KeuanganPenempatanSiswaController;
+use App\Http\Controllers\PPDB\Auth\LoginController as AuthLoginController;
+use App\Http\Controllers\PPDB\Auth\RegisterController as PPDBRegisterController;
+use App\Http\Controllers\PPDB\PpdbOrangTuaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -81,39 +84,6 @@ use App\Http\Controllers\Keuangan\PenempatanSiswaController as KeuanganPenempata
 |
 */
 
-
-// LANDING
-Route::get('/ekstrakurikuler', [LandingEkstrakurikuler::class, 'index'])->name('landing.ekstrakurikuler');
-Route::get('/ppdb', [PpdbLandingController::class, 'index'])->name('ppdb.landing');
-Route::get('/ppdb/daftar', [PpdbLandingController::class, 'register'])->name('ppdb.daftar');
-Route::get('/ppdb/login', [PpdbLandingController::class, 'login'])->name('ppdb.login');
-Route::get('/ppdb/dashboard', [PpdbLandingController::class, 'dashboard'])->name('ppdb.dashboard');
-Route::get('/ppdb/pendaftaran/data-siswa', [PpdbLandingController::class, 'dataSiswa'])->name('ppdb.pendaftaran.data-siswa');
-Route::get('/ppdb/pendaftaran/orang-tua', [PpdbLandingController::class, 'orangTua'])->name('ppdb.pendaftaran.orang-tua');
-Route::get('/ppdb/pendaftaran/alamat', [PpdbLandingController::class, 'alamat'])->name('ppdb.pendaftaran.alamat');
-Route::get('/ppdb/pendaftaran/pendidikan', [PpdbLandingController::class, 'pendidikan'])->name('ppdb.pendaftaran.pendidikan');
-Route::get('/ppdb/pendaftaran/berkas', [PpdbLandingController::class, 'berkas'])->name('ppdb.pendaftaran.berkas');
-Route::get('/ppdb/pendaftaran/review', [PpdbLandingController::class, 'review'])->name('ppdb.pendaftaran.review');
-Route::get('/ppdb/status', [PpdbLandingController::class, 'status'])->name('ppdb.status');
-Route::get('/ppdb/bukti-pendaftaran', [PpdbLandingController::class, 'buktiPendaftaran'])->name('ppdb.bukti-pendaftaran');
-
-// UNTUK MENGARAHKAN HALAMAN YG LOGIN
-// Route::get('/', function () {
-//     // Jika belum login → tampilkan halaman login
-//     if (!auth()->check()) {
-//         return redirect()->route('login.index');
-//     }
-
-//     // Jika sudah login → arahkan sesuai role
-//     $user = auth()->user();
-
-//     if ($user->peran === 'KANTIN') {
-//         return redirect()->route('smartCanteen.dashboard');
-//     }
-
-//     return redirect()->route('dashboard.index');
-// })->name('home');
-
 /*
 |--------------------------------------------------------------------------
 | Portal
@@ -122,20 +92,102 @@ Route::get('/ppdb/bukti-pendaftaran', [PpdbLandingController::class, 'buktiPenda
 
 Route::get('/', [PortalController::class, 'index'])
     ->name('portal');
+
+
+
 /*
 |--------------------------------------------------------------------------
-| Log-In
+| Publik
 |--------------------------------------------------------------------------
 */
-Route::get('/login', [LoginController::class, 'index'])
-    ->name('login.index')
-    ->middleware('guest');
+Route::get('/ekstrakurikuler', [LandingEkstrakurikuler::class, 'index'])
+    ->name('landing.ekstrakurikuler');
 
-Route::post('/login', [LoginController::class, 'authenticate'])
-    ->name('login.authenticate');
+Route::get('/ppdb', [PpdbLandingController::class, 'index'])
+    ->name('ppdb.landing');
 
-Route::post('/logout', [LoginController::class, 'logOut'])
-    ->name('logout');
+// STATUS DAN BUKTI PENDAFTARAN
+Route::get('/ppdb/status', [PpdbLandingController::class, 'status'])
+    ->name('ppdb.status');
+
+Route::get('/ppdb/bukti-pendaftaran', [PpdbLandingController::class, 'buktiPendaftaran'])
+    ->name('ppdb.bukti-pendaftaran');
+/*
+|--------------------------------------------------------------------------
+| Guest Auth PPDB
+|--------------------------------------------------------------------------
+*/
+Route::prefix('ppdb')
+    ->name('ppdb.')
+    ->middleware('guest')
+    ->group(function () {
+        Route::get('/daftar', [PPDBRegisterController::class, 'index'])
+            ->name('daftar');
+
+        Route::get('/login', [AuthLoginController::class, 'index'])
+            ->name('login');
+
+        Route::post('/login', [AuthLoginController::class, 'authenticate'])
+            ->name('authenticate');
+    });
+
+/*
+|--------------------------------------------------------------------------
+| Portal Orang Tua PPDB
+|--------------------------------------------------------------------------
+*/
+Route::prefix('ppdb')
+    ->name('ppdb.')
+    ->middleware(['auth', 'peran:ORANG_TUA'])
+    ->group(function () {
+        Route::get('/dashboard', [PpdbOrangTuaController::class, 'dashboard'])
+            ->name('dashboard');
+
+        Route::get('/pendaftaran/data-siswa', [PpdbOrangTuaController::class, 'dataSiswa'])
+            ->name('pendaftaran.data-siswa');
+
+        Route::get('/pendaftaran/orang-tua', [PpdbOrangTuaController::class, 'orangTua'])
+            ->name('pendaftaran.orang-tua');
+
+        Route::get('/pendaftaran/alamat', [PpdbOrangTuaController::class, 'alamat'])
+            ->name('pendaftaran.alamat');
+
+        Route::get('/pendaftaran/pendidikan', [PpdbOrangTuaController::class, 'pendidikan'])
+            ->name('pendaftaran.pendidikan');
+
+        Route::get('/pendaftaran/berkas', [PpdbOrangTuaController::class, 'berkas'])
+            ->name('pendaftaran.berkas');
+
+        Route::get('/pendaftaran/review', [PpdbOrangTuaController::class, 'review'])
+            ->name('pendaftaran.review');
+
+        Route::post('/logout', [AuthLoginController::class, 'logOut'])
+            ->name('logout');
+    });
+
+/*
+|--------------------------------------------------------------------------
+| Guest Auth Admin
+|--------------------------------------------------------------------------
+*/
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [LoginController::class, 'index'])
+        ->name('login.index');
+
+    Route::post('/login', [LoginController::class, 'authenticate'])
+        ->name('login.authenticate');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Logout Admin
+|--------------------------------------------------------------------------
+*/
+Route::post('/logout', [
+    LoginController::class,
+    'logOut',
+])->middleware('auth')->name('logout');
+
 
 
 

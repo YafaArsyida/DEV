@@ -337,18 +337,38 @@
                     </li>
 
                     {{-- Action --}}
-                    <li class="nav-item ms-lg-3 mt-2 mt-lg-0">
-                        <a href="{{ route('ppdb.login') }}" class="btn btn-outline-dark rounded-pill px-3">
-                            Login
-                        </a>
-                    </li>
+                    @auth
+                        @if (Auth::user()->peran == 'ADMIN' || Auth::user()->peran == 'SUPERADMIN')
+                            <a href="{{ route('ppdb.admin.dashboard') }}"
+                                class="btn btn-primary rounded-pill px-3">
+                                <i class="ri-home-line me-1"></i>
+                                Dashboard Admin
+                            </a>
+                        @else
+                            <a href="{{ route('ppdb.dashboard') }}"
+                                class="btn btn-primary rounded-pill px-3">
+                                <i class="ri-home-line me-1"></i>
+                                Dashboard
+                            </a>
+                        @endif
+                    @else
+                        {{-- Pengguna Belum Login --}}
+                        <li class="nav-item ms-lg-3 mt-2 mt-lg-0">
+                            <a
+                                href="{{ route('ppdb.login') }}"
+                                class="btn btn-outline-dark rounded-pill px-3">
+                                Login
+                            </a>
+                        </li>
 
-                    <li class="nav-item mt-2 mt-lg-0">
-                        <a href="{{ route('ppdb.daftar') }}" class="btn btn-primary rounded-pill px-3">
-                            Daftar Sekarang
-                        </a>
-                    </li>
-
+                        <li class="nav-item mt-2 mt-lg-0">
+                            <a
+                                href="{{ route('ppdb.daftar') }}"
+                                class="btn btn-primary rounded-pill px-3">
+                                Daftar Sekarang
+                            </a>
+                        </li>
+                    @endauth
                 </ul>
             </div>
         </div>

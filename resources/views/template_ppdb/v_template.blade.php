@@ -94,5 +94,77 @@
             </div>
         </div>
         @include('template.v_script')
+        @livewireScripts 
+    
+        <script>
+            // notif
+            window.addEventListener('alertify-success', event => {
+                alertify.set('notifier', 'position', 'bottom-right');
+                alertify.success(event.detail.message);
+            });
+
+            window.addEventListener('alertify-error', event => {
+                alertify.set('notifier', 'position', 'bottom-right');
+                alertify.error(event.detail.message);
+            });
+            // end notif
+
+            // modal
+            window.addEventListener('hide-create-modal', (event) => {
+                let modalId = event.detail.modalId;
+                let modal = document.getElementById(modalId);
+                if (modal) {
+                    let bootstrapModal = bootstrap.Modal.getInstance(modal);
+                    if (bootstrapModal) {
+                        bootstrapModal.hide();
+                    }
+                }
+            });
+            window.addEventListener('hide-edit-modal', (event) => {
+                let modalId = event.detail.modalId;
+                let modal = document.getElementById(modalId);
+                if (modal) {
+                    let bootstrapModal = bootstrap.Modal.getInstance(modal);
+                    if (bootstrapModal) {
+                        bootstrapModal.hide();
+                    }
+                }
+            });
+            window.addEventListener('hide-delete-modal', (event) => {
+                let modalId = event.detail.modalId;
+                let modal = document.getElementById(modalId);
+                if (modal) {
+                    let bootstrapModal = bootstrap.Modal.getInstance(modal);
+                    if (bootstrapModal) {
+                        bootstrapModal.hide();
+                    }
+                }
+            });
+            window.addEventListener('hide-modal', (event) => {
+                let modalId = event.detail.modalId;
+                let modal = document.getElementById(modalId);
+                if (modal) {
+                    let bootstrapModal = bootstrap.Modal.getInstance(modal);
+                    if (bootstrapModal) {
+                        bootstrapModal.hide();
+                    }
+                }
+            });
+            window.addEventListener('show-modal', (event) => {
+                let modalId = event.detail.modalId;
+                let modal = document.getElementById(modalId);
+                if (modal) {
+                    let bootstrapModal = new bootstrap.Modal(modal);
+                    bootstrapModal.show();
+                }
+            });
+            // modal
+            Livewire.on('openNewTab', (url) => {
+                setTimeout(function() {
+                    window.open(url, '_blank');
+                }, 1000);
+            });
+
+        </script>  
     </body>
 </html>
