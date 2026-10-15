@@ -1,12 +1,29 @@
 <div class="app-menu navbar-menu">
     <div class="navbar-brand-box">
-        <a href="{{ route('ppdb.dashboard') }}" class="logo logo-dark">
+        {{-- <a href="{{ route('ppdb.dashboard') }}" class="logo logo-dark">
             <span class="logo-sm"><img src="{{ asset('assets/logo/logo.jpg') }}" alt="{{ config('app.name') }}" height="30"></span>
             <span class="logo-lg"><img src="{{ asset('assets/logo/logo.jpg') }}" alt="{{ config('app.name') }}" height="40"></span>
         </a>
         <a href="{{ route('ppdb.dashboard') }}" class="logo logo-light">
             <span class="logo-sm"><img src="{{ asset('assets/logo/logo.jpg') }}" alt="{{ config('app.name') }}" height="30"></span>
             <span class="logo-lg"><img src="{{ asset('assets/logo/logo.jpg') }}" alt="{{ config('app.name') }}" height="40"></span>
+        </a> --}}
+        <a href="index.html" class="logo logo-dark">
+            <span class="logo-sm">
+                <span class="fw-bold fs-5">Teman</span>
+            </span>
+            <span class="logo-lg">
+                <span class="fw-bold fs-4">TemanSekolah</span>
+            </span>
+        </a>
+        <!-- Light Logo-->
+        <a href="index.html" class="logo logo-light">
+            <span class="logo-sm">
+                <span class="fw-bold fs-5">Teman</span>
+            </span>
+            <span class="logo-lg">
+                <span class="fw-bold fs-4">TemanSekolah</span>
+            </span>
         </a>
         <button type="button" class="btn btn-sm p-0 fs-20 header-item float-end btn-vertical-sm-hover" id="vertical-hover" aria-label="Perkecil navigasi">
             <i class="ri-record-circle-line"></i>
@@ -24,6 +41,16 @@
                         <i class="ri-dashboard-line"></i><span>Dashboard</span>
                     </a>
                 </li>
+
+                {{-- Pilih Jalur --}}
+                <li class="nav-item">
+                    <a href="{{ route('ppdb.pendaftaran.jalur') }}"
+                        class="nav-link menu-link {{ request()->routeIs('ppdb.pendaftaran.jalur') ? 'active' : '' }}">
+                        <i class="ri-route-line"></i>
+                        <span>Pilih Jalur</span>
+                    </a>
+                </li>
+
                 <li class="nav-item">
                     <a href="{{ route('ppdb.pendaftaran.data-siswa') }}" class="nav-link menu-link {{ request()->routeIs('ppdb.pendaftaran.data-siswa') ? 'active' : '' }}">
                         <i class="ri-user-3-line"></i><span>Data Siswa</span>
@@ -51,7 +78,7 @@
                 </li>
                 <li class="nav-item">
                     <a href="{{ route('ppdb.pendaftaran.review') }}" class="nav-link menu-link {{ request()->routeIs('ppdb.pendaftaran.review') ? 'active' : '' }}">
-                        <i class="ri-clipboard-check-line"></i><span>Review</span>
+                        <i class="ri-checkbox-circle-line"></i><span>Review</span>
                     </a>
                 </li>
 

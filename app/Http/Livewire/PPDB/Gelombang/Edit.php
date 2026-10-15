@@ -10,7 +10,7 @@ use Livewire\Component;
 
 class Edit extends Component
 {
-     public $ppdb_gelombang_id;
+    public $ppdb_gelombang_id;
 
     public $ppdb_periode_id;
 

@@ -119,16 +119,18 @@
                             <div class="avatar-md">
                                 <div class="avatar-title bg-success-subtle
                                     text-success rounded-3 fs-4">
-                                    <i class="ri-file-list-3-line"></i>
+                                    <i class="ri-git-branch-line"></i>
                                 </div>
                             </div>
                             <div>
                                 <p class="text-muted mb-1">
-                                    Persyaratan
+                                    Jalur Penerimaan
                                 </p>
-                                <h4 class="mb-0 fw-bold">5</h4>
+                                <h4 class="mb-0 fw-bold">
+                                    {{ number_format($totalJalur, 0, ',', '.') }}
+                                </h4>
                                 <small class="text-muted">
-                                    Persyaratan terkonfigurasi
+                                    Jalur terkonfigurasi
                                 </small>
                             </div>
                         </div>
@@ -177,6 +179,16 @@
                             Gelombang
                         </a>
                     </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link"
+                            data-bs-toggle="tab"
+                            href="#tab-jalur"
+                            role="tab">
+                            <i class="ri-route-line"></i>
+                            Jalur
+                        </a>
+                    </li>
                 </ul>
 
                 <div class="tab-content p-3 p-lg-4">
@@ -197,6 +209,15 @@
                         @livewire('p-p-d-b.gelombang.detail')
                         @livewire('p-p-d-b.gelombang.edit')
                         @livewire('p-p-d-b.gelombang.delete')
+                    </div>
+
+                    {{-- TAB JALUR --}}
+                    <div class="tab-pane fade" id="tab-jalur" role="tabpanel">
+                        @livewire('p-p-d-b.jalur.index')
+                        @livewire('p-p-d-b.jalur.create')
+                        @livewire('p-p-d-b.jalur.detail')
+                        @livewire('p-p-d-b.jalur.edit')
+                        @livewire('p-p-d-b.jalur.delete')
                     </div>
                 </div>
             </div>

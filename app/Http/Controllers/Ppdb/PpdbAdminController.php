@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Ppdb;
 
 use App\Http\Controllers\Controller;
 use App\Models\PPDBGelombang;
+use App\Models\PPDBJalur;
 use App\Models\PPDBPeriode;
 
 class PpdbAdminController extends Controller
@@ -52,9 +53,11 @@ class PpdbAdminController extends Controller
     {
         $totalPeriode = PPDBPeriode::count();
         $totalGelombang = PPDBGelombang::count();
+        $totalJalur = PPDBJalur::count();
         return view('ppdb.admin.pengaturan', compact(
             'totalPeriode',
-            'totalGelombang'
+            'totalGelombang',
+            'totalJalur'
         ));
     }
 }

@@ -115,7 +115,7 @@
 
                 {{-- TABLE --}}
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
+                    <table class="table table-hover table-nowrap align-middle">
                         <thead class="table-light">
                             <tr class="text-uppercase">
                                 <th class="text-center" width="30px">No</th>

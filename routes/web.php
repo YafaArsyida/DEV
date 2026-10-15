@@ -136,12 +136,20 @@ Route::prefix('ppdb')
 | Portal Orang Tua PPDB
 |--------------------------------------------------------------------------
 */
+
+
 Route::prefix('ppdb')
     ->name('ppdb.')
     ->middleware(['auth', 'peran:ORANG_TUA'])
     ->group(function () {
         Route::get('/dashboard', [PpdbOrangTuaController::class, 'dashboard'])
             ->name('dashboard');
+
+        Route::get('/berkas/preview/{berkasId}', [PpdbOrangTuaController::class, 'show',])
+            ->name('berkas.preview');
+            
+        Route::get('/pendaftaran/jalur', [PpdbOrangTuaController::class, 'jalur'])
+            ->name('pendaftaran.jalur');
 
         Route::get('/pendaftaran/data-siswa', [PpdbOrangTuaController::class, 'dataSiswa'])
             ->name('pendaftaran.data-siswa');

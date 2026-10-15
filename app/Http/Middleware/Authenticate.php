@@ -12,13 +12,13 @@ class Authenticate extends Middleware
      */
     protected function redirectTo(Request $request): ?string
     {
-        // if ($request->expectsJson()) {
-        //     return null;
-        // }
+        if ($request->expectsJson()) {
+            return null;
+        }
 
-        // if ($request->is('ppdb') || $request->is('ppdb/*')) {
-        //     return route('ppdb.login');
-        // }
+        if ($request->is('ppdb') || $request->is('ppdb/*')) {
+            return route('ppdb.login');
+        }
 
         // return route('login.index');
         if (! $request->expectsJson()) {

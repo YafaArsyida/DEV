@@ -47,7 +47,7 @@
         </div>
 
         {{-- PENCARIAN --}}
-        <div class="card-body px-0 pt-2 pb-3">
+        <div class="card-body">
             <div class="row g-3 mb-3">
                 <div class="col-xxl-12 col-sm-12">
                     <label

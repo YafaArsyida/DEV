@@ -2,6 +2,8 @@
 <html data-layout="vertical" data-topbar="light" data-sidebar="light" data-bs-theme="light" data-sidebar-size="lg" data-sidebar-image="none" data-preloader="disable">
     <head>
         @include('template.v_head')
+        
+        @livewireStyles
     </head>
     <body>
         <div id="layout-wrapper">

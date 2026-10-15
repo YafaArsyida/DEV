@@ -17,340 +17,331 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-xxl-12">
-            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="row">
+            <div class="col-xxl-12">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                    {{-- HEADER --}}
+                    <div class="card-header">
+                        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4">
 
-                {{-- HEADER --}}
-                <div class="card-header">
-                    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+                            <div>
+                                <div class="d-flex align-items-center gap-3">
 
-                        <div>
-                            <div class="d-flex align-items-center gap-3">
-
-                                <div class="avatar-sm">
-                                    <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
-                                        <i class="ri-user-star-line"></i>
+                                    <div class="avatar-sm">
+                                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                                            <i class="ri-user-star-line"></i>
+                                        </div>
                                     </div>
+
+                                    <div>
+                                        <h5 class="fw-bold mb-1">
+                                            Selamat Datang, Bapak/Ibu
+                                        </h5>
+
+                                        <small class="text-muted">
+                                            Kelola pendaftaran putra-putri Anda melalui portal PPDB.
+                                        </small>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        {{-- HEADER PENDAFTARAN --}}
+                        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-start gap-3 mb-4">
+                            <div>
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <i class="ri-file-list-3-line text-primary fs-18"></i>
+
+                                    <span class="text-muted small text-uppercase fw-medium">
+                                        Pendaftaran Anak
+                                    </span>
                                 </div>
 
-                                <div>
-                                    <h5 class="fw-bold mb-1">
-                                        Selamat Datang, Bapak/Ibu
-                                    </h5>
+                                <h5 class="fw-bold mb-2">
+                                    Mulai Pendaftaran PPDB
+                                </h5>
 
-                                    <small class="text-muted">
-                                        Kelola pendaftaran putra-putri Anda melalui portal PPDB.
-                                    </small>
-                                </div>
-
+                                <p class="text-muted mb-2">
+                                    Lengkapi formulir pendaftaran putra-putri Anda
+                                    dan pantau prosesnya melalui halaman ini.
+                                </p>
                             </div>
                         </div>
 
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">
-                                <i class="ri-time-line me-1 align-middle"></i>
-                                Belum Lengkap
-                            </span>
+                        {{-- CHECKLIST TAHAPAN --}}
+                        <div class="row g-3 mb-4">
+
+                            {{-- TAHAP 1: AKUN --}}
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center gap-3 p-3 border rounded-3 h-100">
+                                    <div class="avatar-sm flex-shrink-0">
+                                        <div class="avatar-title bg-success-subtle text-success rounded-circle">
+                                            <i class="ri-check-line fs-18"></i>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <h6 class="mb-1 fw-semibold">Akun Pendaftar</h6>
+                                        <p class="text-muted small mb-0">
+                                            Akun berhasil dibuat
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- TAHAP 2: PILIH JALUR --}}
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center gap-3 p-3 border border-primary rounded-3 h-100 bg-primary-subtle">
+                                    <div class="avatar-sm flex-shrink-0">
+                                        <div class="avatar-title bg-primary text-white rounded-circle">
+                                            <i class="ri-route-line fs-18"></i>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <h6 class="mb-1 fw-semibold text-primary">
+                                            Pilih Jalur Pendaftaran
+                                        </h6>
+                                        <p class="text-primary small mb-0">
+                                            Tentukan jalur yang sesuai
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- TAHAP 3: IDENTITAS SISWA --}}
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center gap-3 p-3 border rounded-3 h-100">
+                                    <div class="avatar-sm flex-shrink-0">
+                                        <div class="avatar-title bg-light text-muted rounded-circle">
+                                            <i class="ri-user-line fs-18"></i>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <h6 class="mb-1 fw-semibold">Identitas Calon Siswa</h6>
+                                        <p class="text-muted small mb-0">
+                                            Belum diisi
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- TAHAP 4: ORANG TUA --}}
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center gap-3 p-3 border rounded-3 h-100">
+                                    <div class="avatar-sm flex-shrink-0">
+                                        <div class="avatar-title bg-light text-muted rounded-circle">
+                                            <i class="ri-parent-line fs-18"></i>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <h6 class="mb-1 fw-semibold">Data Orang Tua/Wali</h6>
+                                        <p class="text-muted small mb-0">
+                                            Belum diisi
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- TAHAP 5: ALAMAT --}}
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center gap-3 p-3 border rounded-3 h-100">
+                                    <div class="avatar-sm flex-shrink-0">
+                                        <div class="avatar-title bg-light text-muted rounded-circle">
+                                            <i class="ri-map-pin-line fs-18"></i>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <h6 class="mb-1 fw-semibold">Alamat</h6>
+                                        <p class="text-muted small mb-0">
+                                            Belum diisi
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- TAHAP 6: PENDIDIKAN --}}
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center gap-3 p-3 border rounded-3 h-100">
+                                    <div class="avatar-sm flex-shrink-0">
+                                        <div class="avatar-title bg-light text-muted rounded-circle">
+                                            <i class="ri-graduation-cap-line fs-18"></i>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <h6 class="mb-1 fw-semibold">Riwayat Pendidikan</h6>
+                                        <p class="text-muted small mb-0">
+                                            Belum diisi
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- TAHAP 7: BERKAS --}}
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center gap-3 p-3 border rounded-3 h-100">
+                                    <div class="avatar-sm flex-shrink-0">
+                                        <div class="avatar-title bg-light text-muted rounded-circle">
+                                            <i class="ri-file-upload-line fs-18"></i>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <h6 class="mb-1 fw-semibold">Berkas Persyaratan</h6>
+                                        <p class="text-muted small mb-0">
+                                            Belum diunggah
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- TAHAP 8: REVIEW --}}
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center gap-3 p-3 border rounded-3 h-100">
+                                    <div class="avatar-sm flex-shrink-0">
+                                        <div class="avatar-title bg-light text-muted rounded-circle">
+                                            <i class="ri-checkbox-circle-line fs-18"></i>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <h6 class="mb-1 fw-semibold">Review & Pengiriman</h6>
+                                        <p class="text-muted small mb-0">
+                                            Menunggu tahap sebelumnya
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
 
+                        {{-- ACTION --}}
+                        <div class="border-top pt-4">
+                            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
+
+                                <div>
+                                    <h6 class="fw-semibold mb-1">
+                                        Siap mendaftarkan putra-putri Anda?
+                                    </h6>
+
+                                    <p class="text-muted small mb-0">
+                                        Anda akan memilih jalur pendaftaran
+                                        sebelum mengisi formulir.
+                                    </p>
+                                </div>
+
+                                <a
+                                    href="{{ route('ppdb.pendaftaran.jalur') }}"
+                                    class="btn btn-primary rounded-pill px-4 flex-shrink-0">
+                                    Pilih Jalur Pendaftaran
+                                    <i class="ri-arrow-right-line ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div class="card-header">
+                        <div class="d-flex align-items-center gap-3">
 
-
-                {{-- BODY --}}
-                <div class="card-body">
-
-                    {{-- STATUS PENDAFTARAN --}}
-                    <div class="card border shadow-none rounded-4 mb-4">
-
-                        <div class="card-body p-4">
-
-                            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
-
-                                <div>
-                                    <div class="d-flex align-items-center gap-2 mb-1">
-                                        <i class="ri-file-list-3-line text-primary"></i>
-
-                                        <span class="text-muted small text-uppercase fw-medium">
-                                            Status Pendaftaran
-                                        </span>
-                                    </div>
-
-                                    <h5 class="fw-bold mb-1">
-                                        Lengkapi Data Pendaftaran
-                                    </h5>
-
-                                    <p class="text-muted mb-0">
-                                        Lengkapi data putra-putri Anda untuk melanjutkan proses PPDB.
-                                    </p>
+                            <div class="avatar-sm">
+                                <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                                    <i class="ri-information-line"></i>
                                 </div>
-
-                                <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">
-                                    Progress 40%
-                                </span>
-
                             </div>
 
+                            <div>
+                                <h5 class="fw-bold mb-1">
+                                    Informasi PPDB
+                                </h5>
 
-                            {{-- PROGRESS --}}
-                            <div class="mb-4">
-
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-
-                                    <span class="text-muted small">
-                                        Progress pendaftaran
-                                    </span>
-
-                                    <span class="fw-semibold text-primary">
-                                        40%
-                                    </span>
-
-                                </div>
-
-                                <div class="progress rounded-pill" style="height: 8px;">
-                                    <div
-                                        class="progress-bar rounded-pill"
-                                        role="progressbar"
-                                        style="width: 40%;"
-                                        aria-valuenow="40"
-                                        aria-valuemin="0"
-                                        aria-valuemax="100">
-                                    </div>
-                                </div>
-
-                            </div>
-
-
-                            {{-- CHECKLIST --}}
-                            <div class="row g-2">
-
-                                <div class="col-md-6">
-                                    <div class="d-flex align-items-center gap-2 py-2">
-                                        <span class="avatar-xs">
-                                            <span class="avatar-title bg-success-subtle text-success rounded-circle">
-                                                <i class="ri-check-line"></i>
-                                            </span>
-                                        </span>
-
-                                        <span class="text-body">
-                                            Akun Pendaftar
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <div class="d-flex align-items-center gap-2 py-2">
-                                        <span class="avatar-xs">
-                                            <span class="avatar-title bg-success-subtle text-success rounded-circle">
-                                                <i class="ri-check-line"></i>
-                                            </span>
-                                        </span>
-
-                                        <span class="text-body">
-                                            Data Calon Siswa
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <div class="d-flex align-items-center gap-2 py-2">
-                                        <span class="avatar-xs">
-                                            <span class="avatar-title bg-light text-muted rounded-circle">
-                                                <i class="ri-arrow-right-line"></i>
-                                            </span>
-                                        </span>
-
-                                        <span class="text-muted">
-                                            Data Orang Tua/Wali
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <div class="d-flex align-items-center gap-2 py-2">
-                                        <span class="avatar-xs">
-                                            <span class="avatar-title bg-light text-muted rounded-circle">
-                                                <i class="ri-arrow-right-line"></i>
-                                            </span>
-                                        </span>
-
-                                        <span class="text-muted">
-                                            Data Alamat
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <div class="d-flex align-items-center gap-2 py-2">
-                                        <span class="avatar-xs">
-                                            <span class="avatar-title bg-light text-muted rounded-circle">
-                                                <i class="ri-arrow-right-line"></i>
-                                            </span>
-                                        </span>
-
-                                        <span class="text-muted">
-                                            Berkas Persyaratan
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <div class="d-flex align-items-center gap-2 py-2">
-                                        <span class="avatar-xs">
-                                            <span class="avatar-title bg-light text-muted rounded-circle">
-                                                <i class="ri-arrow-right-line"></i>
-                                            </span>
-                                        </span>
-
-                                        <span class="text-muted">
-                                            Review & Pengiriman
-                                        </span>
-                                    </div>
-                                </div>
-
-                            </div>
-
-
-                            {{-- ACTION --}}
-                            <div class="border-top mt-3 pt-3">
-
-                                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-
-                                    <p class="text-muted mb-0 small">
-                                        Pastikan data yang Anda isi sesuai dengan dokumen resmi.
-                                    </p>
-
-                                    <a href="{{ route('ppdb.pendaftaran.data-siswa') }}"
-                                    class="btn btn-primary rounded-pill px-4">
-                                        <i class="ri-arrow-right-line me-1"></i>
-                                        Lanjutkan Pendaftaran
-                                    </a>
-
-                                </div>
-
+                                <small class="text-muted">
+                                    Informasi yang membantu Anda mempersiapkan pendaftaran.
+                                </small>
                             </div>
 
                         </div>
-
                     </div>
-
-
-                    {{-- RINGKASAN PENDAFTAR --}}
-                    <div class="row g-3">
-
-                        {{-- AKUN --}}
-                        <div class="col-lg-4 col-md-6">
-
-                            <div class="card border shadow-none rounded-4 h-100">
-
-                                <div class="card-body p-4">
-
-                                    <div class="d-flex align-items-center justify-content-between mb-3">
-
-                                        <div class="avatar-sm">
+                    {{-- BODY --}}
+                    <div class="card-body">
+                        <div class="row g-3">
+                            {{-- JADWAL --}}
+                            <div class="col-lg-4 col-md-6">
+                                <div class="card border shadow-none rounded-4 h-100">
+                                    <div class="card-body p-4">
+                                        <div class="avatar-sm mb-3">
                                             <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-18">
-                                                <i class="ri-shield-check-line"></i>
+                                                <i class="ri-calendar-event-line"></i>
                                             </div>
                                         </div>
 
-                                        <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
-                                            Aktif
-                                        </span>
+                                        <h6 class="fw-bold mb-2">
+                                            Jadwal Pendaftaran
+                                        </h6>
 
+                                        <p class="text-muted small mb-0">
+                                            Periksa periode dan batas waktu pendaftaran
+                                            agar tidak melewatkan kesempatan mendaftar.
+                                        </p>
                                     </div>
-
-                                    <h5 class="fw-bold mb-1">
-                                        Akun Pendaftar
-                                    </h5>
-
-                                    <p class="text-muted mb-0">
-                                        Akun orang tua/wali telah berhasil dibuat dan dapat digunakan untuk melanjutkan pendaftaran.
-                                    </p>
-
                                 </div>
+                            </div>
 
+                            {{-- PERSYARATAN --}}
+                            <div class="col-lg-4 col-md-6">
+                                <div class="card border shadow-none rounded-4 h-100">
+                                    <div class="card-body p-4">
+                                        <div class="avatar-sm mb-3">
+                                            <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-18">
+                                                <i class="ri-file-list-2-line"></i>
+                                            </div>
+                                        </div>
+
+                                        <h6 class="fw-bold mb-2">
+                                            Persyaratan Pendaftaran
+                                        </h6>
+
+                                        <p class="text-muted small mb-0">
+                                            Pelajari persyaratan umum dan dokumen
+                                            tambahan sesuai jalur yang dipilih.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- BANTUAN --}}
+                            <div class="col-lg-4 col-md-6">
+                                <div class="card border shadow-none rounded-4 h-100">
+                                    <div class="card-body p-4">
+                                        <div class="avatar-sm mb-3">
+                                            <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-18">
+                                                <i class="ri-customer-service-2-line"></i>
+                                            </div>
+                                        </div>
+
+                                        <h6 class="fw-bold mb-2">
+                                            Bantuan PPDB
+                                        </h6>
+
+                                        <p class="text-muted small mb-0">
+                                            Hubungi panitia PPDB sekolah apabila
+                                            mengalami kendala selama pendaftaran.
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
 
                         </div>
 
-
-                        {{-- CALON SISWA --}}
-                        <div class="col-lg-4 col-md-6">
-
-                            <div class="card border shadow-none rounded-4 h-100">
-
-                                <div class="card-body p-4">
-
-                                    <div class="d-flex align-items-center justify-content-between mb-3">
-
-                                        <div class="avatar-sm">
-                                            <div class="avatar-title bg-success-subtle text-success rounded-circle fs-18">
-                                                <i class="ri-user-star-line"></i>
-                                            </div>
-                                        </div>
-
-                                        <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
-                                            Terisi
-                                        </span>
-
-                                    </div>
-
-                                    <h5 class="fw-bold mb-1">
-                                        Ahmad Fathan Pratama
-                                    </h5>
-
-                                    <p class="text-muted mb-0">
-                                        Data calon siswa telah diisi dan dapat dilanjutkan ke tahap berikutnya.
-                                    </p>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-
-                        {{-- JALUR --}}
-                        <div class="col-lg-4 col-md-6">
-
-                            <div class="card border shadow-none rounded-4 h-100">
-
-                                <div class="card-body p-4">
-
-                                    <div class="d-flex align-items-center justify-content-between mb-3">
-
-                                        <div class="avatar-sm">
-                                            <div class="avatar-title bg-warning-subtle text-warning rounded-circle fs-18">
-                                                <i class="ri-route-line"></i>
-                                            </div>
-                                        </div>
-
-                                        <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">
-                                            Pilihan
-                                        </span>
-
-                                    </div>
-
-                                    <h5 class="fw-bold mb-1">
-                                        Jalur Reguler
-                                    </h5>
-
-                                    <p class="text-muted mb-0">
-                                        Jalur pendaftaran yang dipilih untuk Tahun Ajaran 2027/2028.
-                                    </p>
-
-                                </div>
-
-                            </div>
-
-                        </div>
 
                     </div>
-
                 </div>
-
             </div>
         </div>
     </div>
