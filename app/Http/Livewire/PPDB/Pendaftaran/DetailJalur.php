@@ -32,7 +32,7 @@ class DetailJalur extends Component
         return PPDBPendaftaran::query()
             ->with(['ppdb_jalur', 'ppdb_gelombang'])
             ->where('ppdb_pendaftaran_id', $this->pendaftaranId)
-            ->where('ms_penguna_id', Auth::id())
+            ->where('ms_pengguna_id', Auth::id())
             ->firstOrFail();
     }
 
@@ -98,7 +98,7 @@ class DetailJalur extends Component
                 ->where(
                     'ppdb_pendaftaran_id', $this->pendaftaranId
                 )
-                ->where('ms_penguna_id', Auth::id())
+                ->where('ms_pengguna_id', Auth::id())
                 ->lockForUpdate()
                 ->firstOrFail();
 

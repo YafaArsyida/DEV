@@ -54,7 +54,7 @@ class PilihJalur extends Component
 
             // Pastikan belum ada pendaftaran untuk pengguna ini.
             $sudahMendaftar = PPDBPendaftaran::query()
-                ->where('ms_penguna_id', Auth::id())
+                ->where('ms_pengguna_id', Auth::id())
                 ->where('ppdb_periode_id', $periode->ppdb_periode_id)
                 ->exists();
 
@@ -116,7 +116,7 @@ class PilihJalur extends Component
             $nomor = $this->buatNomorPendaftaran();
 
             PPDBPendaftaran::create([
-                'ms_penguna_id' => Auth::id(),
+                'ms_pengguna_id' => Auth::id(),
                 'ppdb_periode_id' => $periode->ppdb_periode_id,
                 'ppdb_gelombang_id' => $gelombang->ppdb_gelombang_id,
                 'ppdb_jalur_id' => $jalur->ppdb_jalur_id,

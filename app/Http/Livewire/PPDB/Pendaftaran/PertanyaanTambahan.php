@@ -38,7 +38,7 @@ class PertanyaanTambahan extends Component
     public function muatData()
     {
         $this->pendaftaran = PPDBPendaftaran::query()
-            ->where('ms_penguna_id', Auth::id())
+            ->where('ms_pengguna_id', Auth::id())
             ->findOrFail($this->pendaftaranId);
 
         $this->pertanyaan = PPDBPertanyaan::query()
@@ -87,7 +87,7 @@ class PertanyaanTambahan extends Component
     protected function pastikanDraft()
     {
         $this->pendaftaran = PPDBPendaftaran::query()
-            ->where('ms_penguna_id', Auth::id())
+            ->where('ms_pengguna_id', Auth::id())
             ->findOrFail($this->pendaftaranId);
 
         if ($this->pendaftaran->status !== 'draft') {
@@ -213,7 +213,7 @@ class PertanyaanTambahan extends Component
         try {
             // Kunci pendaftaran agar status diperiksa kembali.
             $pendaftaran = PPDBPendaftaran::query()
-                ->where('ms_penguna_id', Auth::id())
+                ->where('ms_pengguna_id', Auth::id())
                 ->where(
                     'ppdb_pendaftaran_id',
                     $this->pendaftaranId

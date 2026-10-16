@@ -17,7 +17,7 @@ class DetailPendidikan extends Component
     {
         return PPDBPendaftaran::query()
             ->whereKey($this->pendaftaranId)
-            ->where('ms_penguna_id', Auth::id())
+            ->where('ms_pengguna_id', Auth::id())
             ->firstOrFail();
     }
 
@@ -39,7 +39,7 @@ class DetailPendidikan extends Component
                 'ppdb_pendaftaran_id',
                 $this->pendaftaranId
             )
-            ->where('ms_penguna_id', Auth::id())
+            ->where('ms_pengguna_id', Auth::id())
             ->first();
 
         if (! $pendaftaran) {

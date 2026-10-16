@@ -65,7 +65,7 @@ class EditSiswa extends Component
     {
         return PPDBPendaftaran::query()
             ->whereKey($this->pendaftaranId)
-            ->where('ms_penguna_id', Auth::id())
+            ->where('ms_pengguna_id', Auth::id())
             ->firstOrFail();
     }
 
@@ -398,7 +398,7 @@ class EditSiswa extends Component
         DB::transaction(function () use ($data) {
             $pendaftaran = PPDBPendaftaran::query()
                 ->whereKey($this->pendaftaranId)
-                ->where('ms_penguna_id', Auth::id())
+                ->where('ms_pengguna_id', Auth::id())
                 ->lockForUpdate()
                 ->first();
 

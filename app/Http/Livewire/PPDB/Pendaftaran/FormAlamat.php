@@ -66,7 +66,7 @@ class FormAlamat extends Component
 
         $pendaftaran = PPDBPendaftaran::query()
             ->where('ppdb_pendaftaran_id', $this->pendaftaranId)
-            ->where('ms_penguna_id', Auth::id())
+            ->where('ms_pengguna_id', Auth::id())
             ->where('ppdb_periode_id', $this->periodeId)
             ->first();
 
@@ -96,7 +96,7 @@ class FormAlamat extends Component
             // Pastikan pendaftaran milik pengguna yang login.
             $pendaftaran = PPDBPendaftaran::query()
                 ->where('ppdb_pendaftaran_id', $this->pendaftaranId)
-                ->where('ms_penguna_id', Auth::id())
+                ->where('ms_pengguna_id', Auth::id())
                 ->where('ppdb_periode_id', $this->periodeId)
                 ->lockForUpdate()
                 ->first();

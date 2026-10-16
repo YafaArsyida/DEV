@@ -27,7 +27,7 @@ class PreviewBerkas extends Component
 
         abort_unless($pendaftaran, 404);
 
-        $isPemilik = (string) $pendaftaran->ms_penguna_id
+        $isPemilik = (string) $pendaftaran->ms_pengguna_id
             === (string) $user->getAuthIdentifier();
 
         $isAdmin = in_array(

@@ -43,7 +43,7 @@ class FormBerkas extends Component
     {
         return PPDBPendaftaran::query()
             ->where('ppdb_pendaftaran_id', $this->pendaftaranId)
-            ->where('ms_penguna_id', Auth::id())
+            ->where('ms_pengguna_id', Auth::id())
             ->firstOrFail();
     }
 
@@ -256,7 +256,7 @@ class FormBerkas extends Component
             ) {
                 $pendaftaranTerkunci = PPDBPendaftaran::query()
                     ->where('ppdb_pendaftaran_id', $pendaftaran->ppdb_pendaftaran_id)
-                    ->where('ms_penguna_id', Auth::id())
+                    ->where('ms_pengguna_id', Auth::id())
                     ->lockForUpdate()
                     ->firstOrFail();
 

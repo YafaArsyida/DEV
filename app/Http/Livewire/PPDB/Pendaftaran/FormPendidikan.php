@@ -74,7 +74,7 @@ class FormPendidikan extends Component
                 'ppdb_pendaftaran_id',
                 $this->pendaftaranId
             )
-            ->where('ms_penguna_id', Auth::id())
+            ->where('ms_pengguna_id', Auth::id())
             ->where('ppdb_periode_id', $this->periodeId)
             ->first();
 
@@ -106,7 +106,7 @@ class FormPendidikan extends Component
                     'ppdb_pendaftaran_id',
                     $this->pendaftaranId
                 )
-                ->where('ms_penguna_id', Auth::id())
+                ->where('ms_pengguna_id', Auth::id())
                 ->where('ppdb_periode_id', $this->periodeId)
                 ->lockForUpdate()
                 ->first();

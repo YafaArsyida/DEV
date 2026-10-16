@@ -26,7 +26,7 @@ class DetailSiswa extends Component
     {
         return PPDBPendaftaran::query()
             ->whereKey($this->pendaftaranId)
-            ->where('ms_penguna_id', Auth::id())
+            ->where('ms_pengguna_id', Auth::id())
             ->firstOrFail();
     }
 
