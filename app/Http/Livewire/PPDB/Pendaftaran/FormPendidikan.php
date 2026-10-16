@@ -5,7 +5,7 @@ namespace App\Http\Livewire\PPDB\Pendaftaran;
 use App\Models\PPDBAlamat;
 use App\Models\PPDBPendaftaran;
 use App\Models\PPDBOrangTua;
-use App\Models\PpdbPendidikan;
+use App\Models\PPDBPendidikan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -83,7 +83,7 @@ class FormPendidikan extends Component
         }
 
         // Form awal hanya digunakan jika data belum tersedia.
-        $pendidikan = PpdbPendidikan::query()
+        $pendidikan = PPDBPendidikan::query()
             ->where(
                 'ppdb_pendaftaran_id',
                 $pendaftaran->ppdb_pendaftaran_id
@@ -133,7 +133,7 @@ class FormPendidikan extends Component
             }
 
             // Cegah data pendidikan ganda.
-            $sudahAda = PpdbPendidikan::query()
+            $sudahAda = PPDBPendidikan::query()
                 ->where(
                     'ppdb_pendaftaran_id',
                     $pendaftaran->ppdb_pendaftaran_id
@@ -149,7 +149,7 @@ class FormPendidikan extends Component
 
             $tidakAdaSekolah = $this->jenjang_asal === 'TIDAK_ADA';
 
-            PpdbPendidikan::create([
+            PPDBPendidikan::create([
                 'ppdb_pendaftaran_id' =>
                     $pendaftaran->ppdb_pendaftaran_id,
 
