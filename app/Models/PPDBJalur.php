@@ -35,7 +35,7 @@ class PPDBJalur extends Model
     public function ppdb_periode(): BelongsTo
     {
         return $this->belongsTo(
-            PpdbPeriode::class,
+            PPDBPeriode::class,
             'ppdb_periode_id',
             'ppdb_periode_id'
         );
@@ -44,7 +44,7 @@ class PPDBJalur extends Model
     public function ppdb_pendaftaran(): HasMany
     {
         return $this->hasMany(
-            PpdbPendaftaran::class, 'ppdb_jalur_id', 'ppdb_jalur_id'
+            PPDBPendaftaran::class, 'ppdb_jalur_id', 'ppdb_jalur_id'
         );
     }
 }

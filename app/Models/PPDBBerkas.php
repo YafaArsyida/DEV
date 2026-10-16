@@ -40,7 +40,7 @@ class PPDBBerkas extends Model
     public function ppdb_pendaftaran(): BelongsTo
     {
         return $this->belongsTo(
-            PpdbPendaftaran::class,
+            PPDBPendaftaran::class,
             'ppdb_pendaftaran_id',
             'ppdb_pendaftaran_id'
         );

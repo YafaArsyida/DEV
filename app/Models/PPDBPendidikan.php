@@ -35,7 +35,7 @@ class PPDBPendidikan extends Model
     public function ppdb_pendaftaran(): BelongsTo
     {
         return $this->belongsTo(
-            PpdbPendaftaran::class, 'ppdb_pendaftaran_id', 'ppdb_pendaftaran_id'
+            PPDBPendaftaran::class, 'ppdb_pendaftaran_id', 'ppdb_pendaftaran_id'
         );
     }
 }
