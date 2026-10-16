@@ -283,13 +283,30 @@
 
                 {{-- FOOTER --}}
                 <div class="modal-footer border-0 px-4 pb-4 pt-0">
-                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">
+                    <button
+                        type="button"
+                        class="btn btn-light rounded-pill px-4"
+                        data-bs-dismiss="modal"
+                    >
                         <i class="ri-close-line me-1"></i>
-                        Tutup
+                        Batal
                     </button>
-                    <button type="submit" class="btn btn-primary rounded-pill px-4">
-                        <i class="ri-save-3-line me-1"></i>
-                        Simpan
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary rounded-pill px-4"
+                        wire:loading.attr="disabled"
+                        wire:target="save"
+                    >
+                        <span wire:loading.remove wire:target="save">
+                            <i class="ri-save-3-line me-1"></i>
+                            Simpan
+                        </span>
+
+                        <span wire:loading wire:target="save">
+                            <span class="spinner-border spinner-border-sm me-1"></span>
+                            Menyimpan...
+                        </span>
                     </button>
                 </div>
             </form>

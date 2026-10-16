@@ -163,24 +163,34 @@
                     }
                 }
             });
-            window.addEventListener('hide-modal', (event) => {
-                let modalId = event.detail.modalId;
-                let modal = document.getElementById(modalId);
-                if (modal) {
-                    let bootstrapModal = bootstrap.Modal.getInstance(modal);
-                    if (bootstrapModal) {
-                        bootstrapModal.hide();
-                    }
-                }
-            });
+            
             window.addEventListener('show-modal', (event) => {
-                let modalId = event.detail.modalId;
-                let modal = document.getElementById(modalId);
-                if (modal) {
-                    let bootstrapModal = new bootstrap.Modal(modal);
-                    bootstrapModal.show();
+                const modalId = event.detail.modalId;
+                const modalElement = document.getElementById(modalId);
+
+                if (!modalElement) {
+                    return;
+                }
+
+                const modalInstance = bootstrap.Modal.getOrCreateInstance(modalElement);
+                modalInstance.show();
+            });
+
+            window.addEventListener('hide-modal', (event) => {
+                const modalId = event.detail.modalId;
+                const modalElement = document.getElementById(modalId);
+
+                if (!modalElement) {
+                    return;
+                }
+
+                const modalInstance = bootstrap.Modal.getInstance(modalElement);
+
+                if (modalInstance) {
+                    modalInstance.hide();
                 }
             });
+
             // modal
             Livewire.on('openNewTab', (url) => {
                 setTimeout(function() {

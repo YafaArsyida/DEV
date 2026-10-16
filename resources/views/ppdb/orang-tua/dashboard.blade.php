@@ -3,345 +3,407 @@
 <div class="page-content">
     <div class="container-fluid" style="max-width: 100%">
         <div class="row">
-            <div class="col-12">
-                <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                    <h4 class="mb-sm-0">Dashboard</h4>
-
-                    <div class="page-title-right">
-                        <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">PPDB</a></li>
-                            <li class="breadcrumb-item active">Dashboard</li>
-                        </ol>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-        <div class="row">
             <div class="col-xxl-12">
-                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-                    {{-- HEADER --}}
-                    <div class="card-header">
-                        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4">
 
-                            <div>
-                                <div class="d-flex align-items-center gap-3">
-
-                                    <div class="avatar-sm">
-                                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
-                                            <i class="ri-user-star-line"></i>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <h5 class="fw-bold mb-1">
-                                            Selamat Datang, Bapak/Ibu
-                                        </h5>
-
-                                        <small class="text-muted">
-                                            Kelola pendaftaran putra-putri Anda melalui portal PPDB.
-                                        </small>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        {{-- HEADER PENDAFTARAN --}}
-                        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-start gap-3 mb-4">
-                            <div>
-                                <div class="d-flex align-items-center gap-2 mb-2">
-                                    <i class="ri-file-list-3-line text-primary fs-18"></i>
-
-                                    <span class="text-muted small text-uppercase fw-medium">
-                                        Pendaftaran Anak
-                                    </span>
-                                </div>
-
-                                <h5 class="fw-bold mb-2">
-                                    Mulai Pendaftaran PPDB
-                                </h5>
-
-                                <p class="text-muted mb-2">
-                                    Lengkapi formulir pendaftaran putra-putri Anda
-                                    dan pantau prosesnya melalui halaman ini.
-                                </p>
-                            </div>
-                        </div>
-
-                        {{-- CHECKLIST TAHAPAN --}}
-                        <div class="row g-3 mb-4">
-
-                            {{-- TAHAP 1: AKUN --}}
-                            <div class="col-md-6">
-                                <div class="d-flex align-items-center gap-3 p-3 border rounded-3 h-100">
-                                    <div class="avatar-sm flex-shrink-0">
-                                        <div class="avatar-title bg-success-subtle text-success rounded-circle">
-                                            <i class="ri-check-line fs-18"></i>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <h6 class="mb-1 fw-semibold">Akun Pendaftar</h6>
-                                        <p class="text-muted small mb-0">
-                                            Akun berhasil dibuat
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- TAHAP 2: PILIH JALUR --}}
-                            <div class="col-md-6">
-                                <div class="d-flex align-items-center gap-3 p-3 border border-primary rounded-3 h-100 bg-primary-subtle">
-                                    <div class="avatar-sm flex-shrink-0">
-                                        <div class="avatar-title bg-primary text-white rounded-circle">
-                                            <i class="ri-route-line fs-18"></i>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <h6 class="mb-1 fw-semibold text-primary">
-                                            Pilih Jalur Pendaftaran
-                                        </h6>
-                                        <p class="text-primary small mb-0">
-                                            Tentukan jalur yang sesuai
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- TAHAP 3: IDENTITAS SISWA --}}
-                            <div class="col-md-6">
-                                <div class="d-flex align-items-center gap-3 p-3 border rounded-3 h-100">
-                                    <div class="avatar-sm flex-shrink-0">
-                                        <div class="avatar-title bg-light text-muted rounded-circle">
-                                            <i class="ri-user-line fs-18"></i>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <h6 class="mb-1 fw-semibold">Identitas Calon Siswa</h6>
-                                        <p class="text-muted small mb-0">
-                                            Belum diisi
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- TAHAP 4: ORANG TUA --}}
-                            <div class="col-md-6">
-                                <div class="d-flex align-items-center gap-3 p-3 border rounded-3 h-100">
-                                    <div class="avatar-sm flex-shrink-0">
-                                        <div class="avatar-title bg-light text-muted rounded-circle">
-                                            <i class="ri-parent-line fs-18"></i>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <h6 class="mb-1 fw-semibold">Data Orang Tua/Wali</h6>
-                                        <p class="text-muted small mb-0">
-                                            Belum diisi
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- TAHAP 5: ALAMAT --}}
-                            <div class="col-md-6">
-                                <div class="d-flex align-items-center gap-3 p-3 border rounded-3 h-100">
-                                    <div class="avatar-sm flex-shrink-0">
-                                        <div class="avatar-title bg-light text-muted rounded-circle">
-                                            <i class="ri-map-pin-line fs-18"></i>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <h6 class="mb-1 fw-semibold">Alamat</h6>
-                                        <p class="text-muted small mb-0">
-                                            Belum diisi
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- TAHAP 6: PENDIDIKAN --}}
-                            <div class="col-md-6">
-                                <div class="d-flex align-items-center gap-3 p-3 border rounded-3 h-100">
-                                    <div class="avatar-sm flex-shrink-0">
-                                        <div class="avatar-title bg-light text-muted rounded-circle">
-                                            <i class="ri-graduation-cap-line fs-18"></i>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <h6 class="mb-1 fw-semibold">Riwayat Pendidikan</h6>
-                                        <p class="text-muted small mb-0">
-                                            Belum diisi
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- TAHAP 7: BERKAS --}}
-                            <div class="col-md-6">
-                                <div class="d-flex align-items-center gap-3 p-3 border rounded-3 h-100">
-                                    <div class="avatar-sm flex-shrink-0">
-                                        <div class="avatar-title bg-light text-muted rounded-circle">
-                                            <i class="ri-file-upload-line fs-18"></i>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <h6 class="mb-1 fw-semibold">Berkas Persyaratan</h6>
-                                        <p class="text-muted small mb-0">
-                                            Belum diunggah
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- TAHAP 8: REVIEW --}}
-                            <div class="col-md-6">
-                                <div class="d-flex align-items-center gap-3 p-3 border rounded-3 h-100">
-                                    <div class="avatar-sm flex-shrink-0">
-                                        <div class="avatar-title bg-light text-muted rounded-circle">
-                                            <i class="ri-checkbox-circle-line fs-18"></i>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <h6 class="mb-1 fw-semibold">Review & Pengiriman</h6>
-                                        <p class="text-muted small mb-0">
-                                            Menunggu tahap sebelumnya
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-
-                        {{-- ACTION --}}
-                        <div class="border-top pt-4">
-                            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
-
-                                <div>
-                                    <h6 class="fw-semibold mb-1">
-                                        Siap mendaftarkan putra-putri Anda?
-                                    </h6>
-
-                                    <p class="text-muted small mb-0">
-                                        Anda akan memilih jalur pendaftaran
-                                        sebelum mengisi formulir.
-                                    </p>
-                                </div>
-
-                                <a
-                                    href="{{ route('ppdb.pendaftaran.jalur') }}"
-                                    class="btn btn-primary rounded-pill px-4 flex-shrink-0">
-                                    Pilih Jalur Pendaftaran
-                                    <i class="ri-arrow-right-line ms-1"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-                    <div class="card-header">
+                {{-- HEADER --}}
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                    <div class="card-header bg-transparent border-bottom-0 pb-0">
                         <div class="d-flex align-items-center gap-3">
-
                             <div class="avatar-sm">
                                 <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
-                                    <i class="ri-information-line"></i>
+                                    <i class="ri-user-star-line"></i>
                                 </div>
                             </div>
 
                             <div>
                                 <h5 class="fw-bold mb-1">
-                                    Informasi PPDB
+                                    Selamat Datang, Bapak/Ibu
                                 </h5>
 
                                 <small class="text-muted">
-                                    Informasi yang membantu Anda mempersiapkan pendaftaran.
+                                    Pantau perkembangan pendaftaran putra-putri Anda melalui portal PPDB.
                                 </small>
                             </div>
-
                         </div>
                     </div>
-                    {{-- BODY --}}
-                    <div class="card-body">
-                        <div class="row g-3">
-                            {{-- JADWAL --}}
-                            <div class="col-lg-4 col-md-6">
-                                <div class="card border shadow-none rounded-4 h-100">
-                                    <div class="card-body p-4">
-                                        <div class="avatar-sm mb-3">
-                                            <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-18">
-                                                <i class="ri-calendar-event-line"></i>
-                                            </div>
-                                        </div>
 
-                                        <h6 class="fw-bold mb-2">
-                                            Jadwal Pendaftaran
-                                        </h6>
+                    <div class="card-body pt-3">
+                        @if ($pendaftaran)
+                            <div class="row align-items-center g-3">
+                                <div class="col-lg-7">
+                                    <small class="text-muted d-block mb-1">
+                                        Nomor Pendaftaran
+                                    </small>
 
-                                        <p class="text-muted small mb-0">
-                                            Periksa periode dan batas waktu pendaftaran
-                                            agar tidak melewatkan kesempatan mendaftar.
-                                        </p>
+                                    <h4 class="fw-bold text-primary mb-2">
+                                        {{ $pendaftaran->nomor_pendaftaran }}
+                                    </h4>
+
+                                    <div class="d-flex flex-wrap align-items-center gap-2">
+                                        @if ($pendaftaran->ppdb_calon_siswa)
+                                            <span class="text-muted">
+                                                <i class="ri-user-line me-1"></i>
+                                                {{ $pendaftaran->ppdb_calon_siswa->nama_siswa ?? '-' }}
+                                            </span>
+                                        @endif
+
+                                        @if ($pendaftaran->ppdb_jalur)
+                                            <span class="badge bg-light text-body border rounded-pill px-3 py-2">
+                                                {{ $pendaftaran->ppdb_jalur->nama_jalur }}
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-5 text-lg-end">
+                                    @php
+                                        $statusInfo = [
+                                            'draft' => [
+                                                'label' => 'Belum Dikirim',
+                                                'class' => 'bg-secondary-subtle text-secondary',
+                                                'icon' => 'ri-draft-line',
+                                            ],
+                                            'submitted' => [
+                                                'label' => 'Menunggu Verifikasi',
+                                                'class' => 'bg-info-subtle text-info',
+                                                'icon' => 'ri-time-line',
+                                            ],
+                                            'menunggu_verifikasi' => [
+                                                'label' => 'Menunggu Verifikasi',
+                                                'class' => 'bg-info-subtle text-info',
+                                                'icon' => 'ri-time-line',
+                                            ],
+                                            'perbaikan' => [
+                                                'label' => 'Perlu Perbaikan',
+                                                'class' => 'bg-warning-subtle text-warning',
+                                                'icon' => 'ri-edit-line',
+                                            ],
+                                            'diterima' => [
+                                                'label' => 'Diterima',
+                                                'class' => 'bg-success-subtle text-success',
+                                                'icon' => 'ri-checkbox-circle-line',
+                                            ],
+                                            'ditolak' => [
+                                                'label' => 'Tidak Diterima',
+                                                'class' => 'bg-danger-subtle text-danger',
+                                                'icon' => 'ri-close-circle-line',
+                                            ],
+                                        ];
+
+                                        $info = $statusInfo[$status] ?? [
+                                            'label' => 'Dalam Proses',
+                                            'class' => 'bg-secondary-subtle text-secondary',
+                                            'icon' => 'ri-information-line',
+                                        ];
+                                    @endphp
+
+                                    <span class="badge {{ $info['class'] }} rounded-pill px-3 py-2 fs-13">
+                                        <i class="{{ $info['icon'] }} me-1"></i>
+                                        {{ $info['label'] }}
+                                    </span>
+
+                                    <div class="mt-3">
+                                        <a href="{{ route('ppdb.pendaftaran.status') }}"
+                                            class="btn btn-outline-primary rounded-pill px-4">
+                                            <i class="ri-file-list-3-line me-1"></i>
+                                            Lihat Status
+                                        </a>
+
+                                        <a href="{{ route('ppdb.pendaftaran.review') }}"
+                                            class="btn btn-primary rounded-pill px-4">
+                                            <i class="ri-eye-line me-1"></i>
+                                            Preview Data
+                                        </a>
                                     </div>
                                 </div>
                             </div>
-
-                            {{-- PERSYARATAN --}}
-                            <div class="col-lg-4 col-md-6">
-                                <div class="card border shadow-none rounded-4 h-100">
-                                    <div class="card-body p-4">
-                                        <div class="avatar-sm mb-3">
-                                            <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-18">
-                                                <i class="ri-file-list-2-line"></i>
-                                            </div>
-                                        </div>
-
-                                        <h6 class="fw-bold mb-2">
-                                            Persyaratan Pendaftaran
-                                        </h6>
-
-                                        <p class="text-muted small mb-0">
-                                            Pelajari persyaratan umum dan dokumen
-                                            tambahan sesuai jalur yang dipilih.
-                                        </p>
+                        @else
+                            <div class="text-center py-4">
+                                <div class="avatar-lg mx-auto mb-3">
+                                    <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-1">
+                                        <i class="ri-file-add-line"></i>
                                     </div>
                                 </div>
+
+                                <h5 class="fw-bold mb-2">
+                                    Belum Ada Pendaftaran
+                                </h5>
+
+                                <p class="text-muted mb-3">
+                                    Silakan pilih jalur pendaftaran untuk memulai proses PPDB.
+                                </p>
+
+                                @if ($periode)
+                                    <a href="{{ route('ppdb.pendaftaran.jalur') }}"
+                                        class="btn btn-primary rounded-pill px-4">
+                                        <i class="ri-arrow-right-line me-1"></i>
+                                        Mulai Pendaftaran
+                                    </a>
+                                @else
+                                    <span class="text-muted small">
+                                        Belum ada periode PPDB yang dibuka saat ini.
+                                    </span>
+                                @endif
                             </div>
-
-                            {{-- BANTUAN --}}
-                            <div class="col-lg-4 col-md-6">
-                                <div class="card border shadow-none rounded-4 h-100">
-                                    <div class="card-body p-4">
-                                        <div class="avatar-sm mb-3">
-                                            <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-18">
-                                                <i class="ri-customer-service-2-line"></i>
-                                            </div>
-                                        </div>
-
-                                        <h6 class="fw-bold mb-2">
-                                            Bantuan PPDB
-                                        </h6>
-
-                                        <p class="text-muted small mb-0">
-                                            Hubungi panitia PPDB sekolah apabila
-                                            mengalami kendala selama pendaftaran.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-
-
+                        @endif
                     </div>
                 </div>
+
+                @if ($pendaftaran)
+
+                    {{-- PERINGATAN PERBAIKAN --}}
+                    @if ($perluPerbaikan)
+                        <div class="card border-0 shadow-sm rounded-4 mb-4">
+                            <div class="card-body p-4">
+                                <div class="d-flex align-items-start gap-3">
+                                    <div class="avatar-sm flex-shrink-0">
+                                        <div class="avatar-title bg-warning-subtle text-warning rounded-circle fs-20">
+                                            <i class="ri-error-warning-line"></i>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex-grow-1">
+                                        <h5 class="fw-bold mb-2">
+                                            Perbaikan Data Diperlukan
+                                        </h5>
+
+                                        <p class="text-muted mb-3">
+                                            Panitia meminta Anda memperbaiki data pendaftaran.
+                                            Silakan baca catatan berikut dan lakukan perbaikan
+                                            sebelum mengirim ulang.
+                                        </p>
+
+                                        @if (filled($pendaftaran->catatan_perbaikan))
+                                            <div class="bg-warning-subtle rounded-3 p-3 mb-3">
+                                                <small class="fw-semibold d-block mb-1">
+                                                    Catatan dari Panitia
+                                                </small>
+
+                                                <p class="mb-0 text-break">
+                                                    {{ $pendaftaran->catatan_perbaikan }}
+                                                </p>
+                                            </div>
+                                        @endif
+
+                                        <a href="{{ route('ppdb.pendaftaran.status') }}"
+                                            class="btn btn-warning rounded-pill px-4">
+                                            <i class="ri-edit-line me-1"></i>
+                                            Lihat Instruksi Perbaikan
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    {{-- PROGRES PENDAFTARAN --}}
+                    <div class="card border-0 shadow-sm rounded-4 mb-4">
+                        <div class="card-header bg-transparent">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="avatar-sm">
+                                    <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                                        <i class="ri-list-check-2"></i>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h5 class="fw-bold mb-1">
+                                        Progres Pendaftaran
+                                    </h5>
+
+                                    <small class="text-muted">
+                                        Pantau tahapan pengisian data calon siswa.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            @php
+                                $steps = [
+                                    1 => 'Jalur Pendaftaran',
+                                    2 => 'Data Calon Siswa',
+                                    3 => 'Orang Tua/Wali',
+                                    4 => 'Alamat',
+                                    5 => 'Pendidikan',
+                                    6 => 'Berkas',
+                                    7 => 'Review Data',
+                                    8 => 'Menunggu Hasil',
+                                ];
+                            @endphp
+
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted">
+                                    Tahap {{ $currentStep }} dari {{ $totalStep }}
+                                </span>
+
+                                <span class="fw-semibold text-primary">
+                                    {{ $progressPersen }}%
+                                </span>
+                            </div>
+
+                            <div class="progress rounded-pill mb-4" style="height: 8px;">
+                                <div class="progress-bar bg-primary rounded-pill"
+                                    role="progressbar"
+                                    style="width: {{ $progressPersen }}%"
+                                    aria-valuenow="{{ $progressPersen }}"
+                                    aria-valuemin="0"
+                                    aria-valuemax="100">
+                                </div>
+                            </div>
+
+                            <div class="row g-3">
+                                @foreach ($steps as $step => $label)
+                                    @php
+                                        $selesai = $step < $currentStep;
+                                        $aktif = $step === $currentStep;
+
+                                        $iconClass = $selesai
+                                            ? 'bg-success-subtle text-success'
+                                            : ($aktif
+                                                ? 'bg-primary-subtle text-primary'
+                                                : 'bg-light text-muted');
+
+                                        $icon = $selesai
+                                            ? 'ri-check-line'
+                                            : ($aktif
+                                                ? 'ri-time-line'
+                                                : 'ri-checkbox-blank-circle-line');
+                                    @endphp
+
+                                    <div class="col-12 col-sm-6 col-lg-3">
+                                        <div class="border rounded-4 p-3 h-100">
+                                            <div class="d-flex align-items-center gap-2 mb-2">
+                                                <div class="avatar-xs">
+                                                    <div class="avatar-title {{ $iconClass }} rounded-circle">
+                                                        <i class="{{ $icon }}"></i>
+                                                    </div>
+                                                </div>
+
+                                                <small class="text-muted">
+                                                    Tahap {{ $step }}
+                                                </small>
+                                            </div>
+
+                                            <div class="fw-semibold">
+                                                {{ $label }}
+                                            </div>
+
+                                            <small class="{{ $selesai ? 'text-success' : ($aktif ? 'text-primary' : 'text-muted') }}">
+                                                {{ $selesai ? 'Selesai' : ($aktif ? 'Tahap saat ini' : 'Belum dicapai') }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            @if ($status === 'draft' || $status === 'perbaikan')
+                                <div class="mt-4">
+                                    <a href="{{ route('ppdb.pendaftaran.data-siswa') }}"
+                                        class="btn btn-primary rounded-pill px-4">
+                                        <i class="ri-edit-line me-1"></i>
+                                        {{ $status === 'perbaikan' ? 'Perbaiki Data' : 'Lanjutkan Pendaftaran' }}
+                                    </a>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
+                @endif
+
+                {{-- INFORMASI JADWAL PPDB --}}
+                @if ($periode)
+                    <div class="card border-0 shadow-sm rounded-4 mb-4">
+                        <div class="card-header bg-transparent">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="avatar-sm">
+                                    <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                                        <i class="ri-calendar-event-line"></i>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h5 class="fw-bold mb-1">
+                                        Informasi PPDB
+                                    </h5>
+
+                                    <small class="text-muted">
+                                        Periode penerimaan peserta didik baru.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <h6 class="fw-bold mb-3">
+                                {{ $periode->nama_periode }}
+                            </h6>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="border rounded-3 p-3 h-100">
+                                        <small class="text-muted d-block mb-2">
+                                            <i class="ri-calendar-check-line me-1"></i>
+                                            Pendaftaran Dibuka
+                                        </small>
+
+                                        <div class="fw-semibold">
+                                            {{ $periode->tanggal_mulai
+                                                ? \Carbon\Carbon::parse($periode->tanggal_mulai)->translatedFormat('d F Y')
+                                                : '-' }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="border rounded-3 p-3 h-100">
+                                        <small class="text-muted d-block mb-2">
+                                            <i class="ri-calendar-close-line me-1"></i>
+                                            Pendaftaran Ditutup
+                                        </small>
+
+                                        <div class="fw-semibold">
+                                            {{ $periode->tanggal_selesai
+                                                ? \Carbon\Carbon::parse($periode->tanggal_selesai)->translatedFormat('d F Y')
+                                                : '-' }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @if (filled($periode->deskripsi))
+                                <p class="text-muted mb-0 mt-3">
+                                    {{ $periode->deskripsi }}
+                                </p>
+                            @endif
+                        </div>
+                    </div>
+                @endif
+
+                {{-- BANTUAN PANITIA --}}
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex flex-column flex-md-row align-items-md-center gap-3">
+                            <div class="avatar-sm flex-shrink-0">
+                                <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                                    <i class="ri-customer-service-2-line"></i>
+                                </div>
+                            </div>
+
+                            <div class="flex-grow-1">
+                                <h6 class="fw-bold mb-1">
+                                    Butuh Bantuan?
+                                </h6>
+
+                                <p class="text-muted mb-0">
+                                    Hubungi panitia PPDB jika Anda membutuhkan informasi
+                                    atau bantuan terkait pendaftaran.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>

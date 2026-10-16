@@ -78,14 +78,31 @@
 
                 {{-- FOOTER --}}
                 <div class="modal-footer border-0 pt-0 px-4 pb-4 justify-content-center">
-                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">
+                    <button
+                        type="button"
+                        class="btn btn-light rounded-pill px-4"
+                        data-bs-dismiss="modal"
+                    >
                         <i class="ri-close-line me-1"></i>
                         Batal
                     </button>
 
-                    <button type="button" class="btn btn-danger rounded-pill px-4" wire:click="deletePeriode">
-                        <i class="ri-delete-bin-6-line me-1"></i>
-                        Ya, Hapus
+                    <button
+                        type="button"
+                        class="btn btn-danger rounded-pill px-4"
+                        wire:click="deletePeriode"
+                        wire:loading.attr="disabled"
+                        wire:target="deletePeriode"
+                    >
+                        <span wire:loading.remove wire:target="deletePeriode">
+                            <i class="ri-delete-bin-6-line me-1"></i>
+                            Ya, Hapus
+                        </span>
+
+                        <span wire:loading wire:target="deletePeriode">
+                            <span class="spinner-border spinner-border-sm me-1"></span>
+                            Menghapus...
+                        </span>
                     </button>
                 </div>
             </div>

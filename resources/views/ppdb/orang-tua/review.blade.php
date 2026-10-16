@@ -56,13 +56,12 @@
                     </div>
 
                     <div class="card-body">
-
                         {{-- NOMOR PENDAFTARAN --}}
                         <div class="border rounded-4 p-3 mb-4">
                             <div class="d-flex flex-column flex-sm-row justify-content-between gap-2">
                                 <div>
                                     <small class="text-muted d-block mb-1">Nomor Pendaftaran</small>
-                                    <h6 class="fw-bold text-primary mb-1">
+                                    <h6 class="fw-semibold text-primary mb-1">
                                         {{ $pendaftaran->nomor_pendaftaran ?? '—' }}
                                     </h6>
                                     <small class="text-muted">
@@ -112,21 +111,6 @@
                             </div>
                         </div>
 
-                        {{-- INFORMASI --}}
-                        <div class="alert alert-light border rounded-3 mb-4">
-                            <div class="d-flex gap-3">
-                                <i class="ri-information-line text-primary fs-20"></i>
-                                <div>
-                                    <h6 class="fw-semibold mb-1">Sebelum Mengirim Pendaftaran</h6>
-                                    <p class="text-muted small mb-0">
-                                        Periksa kembali seluruh data dan dokumen. Jika ada kesalahan,
-                                        gunakan tombol Ubah Data pada bagian terkait. Setelah dikirim,
-                                        pendaftaran akan masuk ke proses verifikasi panitia PPDB.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
                         {{-- DATA CALON SISWA --}}
                         <div class="border rounded-4 mb-3 overflow-hidden">
                             <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 p-3 border-bottom">
@@ -138,7 +122,7 @@
                                     </div>
 
                                     <div>
-                                        <h6 class="fw-bold mb-1">Data Calon Siswa</h6>
+                                        <h6 class="fw-semibold mb-1">Data Calon Siswa</h6>
                                         <small class="text-muted">Identitas calon siswa</small>
                                     </div>
                                 </div>
@@ -146,7 +130,14 @@
                                 @if ($pendaftaran->status === 'draft')
                                     <a href="{{ route('ppdb.pendaftaran.data-siswa') }}"
                                         class="btn btn-outline-primary rounded-pill px-3">
-                                        <i class="ri-edit-line me-1"></i> Ubah Data
+                                        <i class="ri-edit-line me-1"></i>
+                                        Ubah Data
+                                    </a>
+                                @elseif ($pendaftaran->status === 'perbaikan')
+                                    <a href="{{ route('ppdb.pendaftaran.data-siswa') }}"
+                                        class="btn btn-primary rounded-pill px-3">
+                                        <i class="ri-edit-line me-1"></i>
+                                        Perbaiki Data
                                     </a>
                                 @endif
                             </div>
@@ -190,9 +181,8 @@
                                             <i class="ri-parent-line"></i>
                                         </div>
                                     </div>
-
                                     <div>
-                                        <h6 class="fw-bold mb-1">Data Orang Tua/Wali</h6>
+                                        <h6 class="fw-semibold mb-1">Data Orang Tua/Wali</h6>
                                         <small class="text-muted">Informasi orang tua atau wali</small>
                                     </div>
                                 </div>
@@ -200,34 +190,90 @@
                                 @if ($pendaftaran->status === 'draft')
                                     <a href="{{ route('ppdb.pendaftaran.orang-tua') }}"
                                         class="btn btn-outline-primary rounded-pill px-3">
-                                        <i class="ri-edit-line me-1"></i> Ubah Data
+                                        <i class="ri-edit-line me-1"></i>
+                                        Ubah Data
+                                    </a>
+                                @elseif ($pendaftaran->status === 'perbaikan')
+                                    <a href="{{ route('ppdb.pendaftaran.orang-tua') }}"
+                                        class="btn btn-primary rounded-pill px-3">
+                                        <i class="ri-edit-line me-1"></i>
+                                        Perbaiki Data
                                     </a>
                                 @endif
                             </div>
 
+                            {{-- INFORMASI --}}
                             <div class="p-3">
                                 <div class="row g-3">
-                                    <div class="col-md-4">
+                                    {{-- NAMA AYAH --}}
+                                    <div class="col-12 col-md-6">
                                         <small class="text-muted d-block mb-1">Nama Ayah</small>
                                         <span class="fw-semibold">
-                                            {{ $orangTua->nama_ayah ?? '—' }}
+                                            {{ $orangTua->nama_ayah ?: '—' }}
                                         </span>
                                     </div>
 
-                                    <div class="col-md-4">
+                                    {{-- NAMA IBU --}}
+                                    <div class="col-12 col-md-6">
                                         <small class="text-muted d-block mb-1">Nama Ibu</small>
                                         <span class="fw-semibold">
-                                            {{ $orangTua->nama_ibu ?? '—' }}
+                                            {{ $orangTua->nama_ibu ?: '—' }}
                                         </span>
                                     </div>
 
-                                    <div class="col-md-4">
-                                        <small class="text-muted d-block mb-1">Nomor WhatsApp</small>
+                                    {{-- NOMOR TELEPON UTAMA --}}
+                                    <div class="col-12">
+                                        <small class="text-muted d-block mb-1">
+                                            Nomor Telepon
+                                        </small>
                                         <span class="fw-semibold">
-                                            {{ $orangTua->no_whatsapp ?? $orangTua->nomor_whatsapp ?? '—' }}
+                                            @if (filled($orangTua->telepon_ayah))
+                                                {{ $orangTua->telepon_ayah }}
+                                                <small class="text-muted fw-normal">(Ayah)</small>
+                                            @elseif (filled($orangTua->telepon_ibu))
+                                                {{ $orangTua->telepon_ibu }}
+                                                <small class="text-muted fw-normal">(Ibu)</small>
+                                            @elseif (filled($orangTua->telepon_wali))
+                                                {{ $orangTua->telepon_wali }}
+                                                <small class="text-muted fw-normal">(Wali)</small>
+                                            @else
+                                                —
+                                            @endif
                                         </span>
                                     </div>
                                 </div>
+
+                                {{-- INFORMASI WALI --}}
+                                @if (filled($orangTua->nama_wali))
+                                    <div class="border-top mt-3 pt-3">
+                                        <div class="d-flex align-items-center gap-2 mb-3">
+                                            <i class="ri-user-star-line text-primary fs-18"></i>
+                                            <h6 class="fw-semibold mb-0">Informasi Wali</h6>
+                                        </div>
+
+                                        <div class="row g-3">
+                                            <div class="col-12 col-md-6">
+                                                <small class="text-muted d-block mb-1">
+                                                    Nama Wali
+                                                </small>
+                                                <span class="fw-semibold">
+                                                    {{ $orangTua->nama_wali }}
+                                                </span>
+                                            </div>
+
+                                            @if (filled($orangTua->hubungan_wali))
+                                                <div class="col-12 col-md-6">
+                                                    <small class="text-muted d-block mb-1">
+                                                        Hubungan dengan Calon Siswa
+                                                    </small>
+                                                    <span class="fw-semibold">
+                                                        {{ $orangTua->hubungan_wali }}
+                                                    </span>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
                         </div>
 
@@ -242,7 +288,7 @@
                                     </div>
 
                                     <div>
-                                        <h6 class="fw-bold mb-1">Data Alamat</h6>
+                                        <h6 class="fw-semibold mb-1">Data Alamat</h6>
                                         <small class="text-muted">Alamat tempat tinggal calon siswa</small>
                                     </div>
                                 </div>
@@ -251,6 +297,12 @@
                                     <a href="{{ route('ppdb.pendaftaran.alamat') }}"
                                         class="btn btn-outline-primary rounded-pill px-3">
                                         <i class="ri-edit-line me-1"></i> Ubah Data
+                                    </a>
+                                @elseif ($pendaftaran->status === 'perbaikan')
+                                    <a href="{{ route('ppdb.pendaftaran.alamat') }}"
+                                        class="btn btn-primary rounded-pill px-3">
+                                        <i class="ri-edit-line me-1"></i>
+                                        Perbaiki Data
                                     </a>
                                 @endif
                             </div>
@@ -292,7 +344,7 @@
                                     </div>
 
                                     <div>
-                                        <h6 class="fw-bold mb-1">Pendidikan & Jalur Pendaftaran</h6>
+                                        <h6 class="fw-semibold mb-1">Pendidikan & Jalur Pendaftaran</h6>
                                         <small class="text-muted">Asal pendidikan dan jalur yang dipilih</small>
                                     </div>
                                 </div>
@@ -301,6 +353,12 @@
                                     <a href="{{ route('ppdb.pendaftaran.pendidikan') }}"
                                         class="btn btn-outline-primary rounded-pill px-3">
                                         <i class="ri-edit-line me-1"></i> Ubah Data
+                                    </a>
+                                @elseif ($pendaftaran->status === 'pendidikan')
+                                    <a href="{{ route('ppdb.pendaftaran.pendidikan') }}"
+                                        class="btn btn-primary rounded-pill px-3">
+                                        <i class="ri-edit-line me-1"></i>
+                                        Perbaiki Data
                                     </a>
                                 @endif
                             </div>
@@ -332,7 +390,7 @@
                         </div>
 
                         {{-- BERKAS PERSYARATAN --}}
-                        <div class="border rounded-4 overflow-hidden">
+                        <div class="border rounded-4 mb-3 overflow-hidden">
                             <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 p-3 border-bottom">
                                 <div class="d-flex align-items-center gap-3">
                                     <div class="avatar-sm">
@@ -342,7 +400,7 @@
                                     </div>
 
                                     <div>
-                                        <h6 class="fw-bold mb-1">Berkas Persyaratan</h6>
+                                        <h6 class="fw-semibold mb-1">Berkas Persyaratan</h6>
                                         <small class="text-muted">Status dokumen yang dipersyaratkan</small>
                                     </div>
                                 </div>
@@ -351,6 +409,12 @@
                                     <a href="{{ route('ppdb.pendaftaran.berkas') }}"
                                         class="btn btn-outline-primary rounded-pill px-3">
                                         <i class="ri-edit-line me-1"></i> Kelola Berkas
+                                    </a>
+                                @elseif ($pendaftaran->status === 'perbaikan')
+                                    <a href="{{ route('ppdb.pendaftaran.berkas') }}"
+                                        class="btn btn-primary rounded-pill px-3">
+                                        <i class="ri-edit-line me-1"></i>
+                                        Perbaiki Berkas
                                     </a>
                                 @endif
                             </div>
@@ -384,68 +448,84 @@
                             </div>
                         </div>
 
-                        {{-- PERNYATAAN DAN PENGIRIMAN --}}
-                        @if ($pendaftaran->status === 'draft')
-                            <form
-                                {{-- action="{{ route('ppdb.pendaftaran.kirim') }}" --}}
-                                method="POST"
-                                id="submitPendaftaranForm">
-                                @csrf
-
-                                <div class="border rounded-4 p-3 mt-4">
-                                    <div class="form-check">
-                                        <input
-                                            class="form-check-input"
-                                            type="checkbox"
-                                            name="pernyataan"
-                                            value="1"
-                                            id="agree-review"
-                                            required
-                                        >
-
-                                        <label class="form-check-label" for="agree-review">
-                                            Saya menyatakan bahwa data yang saya isi adalah benar
-                                            dan dapat dipertanggungjawabkan.
-                                        </label>
+                        {{-- INFORMASI TAMBAHAN --}}
+                        @if ($jawabanTambahan->isNotEmpty())
+                            <div class="border rounded-4 mb-3 overflow-hidden">
+                                <div class="d-flex align-items-center gap-3 p-3 border-bottom">
+                                    <div class="avatar-sm">
+                                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                                            <i class="ri-question-answer-line"></i>
+                                        </div>
                                     </div>
 
-                                    @error('pernyataan')
-                                        <div class="text-danger small mt-2">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                <div class="d-flex flex-column flex-sm-row justify-content-between gap-2 mt-4">
-                                    <a href="{{ route('ppdb.pendaftaran.berkas') }}"
-                                        class="btn btn-outline-secondary rounded-pill px-4">
-                                        <i class="ri-arrow-left-line me-1"></i>
-                                        Kembali
-                                    </a>
-
-                                    <button
-                                        type="submit"
-                                        class="btn btn-primary rounded-pill px-4"
-                                        onclick="return confirm('Apakah Anda yakin ingin mengirim pendaftaran ini?')"
-                                    >
-                                        <i class="ri-send-plane-line me-1"></i>
-                                        Kirim Pendaftaran
-                                    </button>
-                                </div>
-                            </form>
-                        @else
-                            <div class="alert alert-light border rounded-3 mt-4 mb-0">
-                                <div class="d-flex gap-3">
-                                    <i class="ri-information-line text-primary fs-20"></i>
                                     <div>
-                                        <h6 class="fw-semibold mb-1">Pendaftaran sudah dikirim</h6>
-                                        <p class="text-muted small mb-0">
-                                            Anda dapat melihat informasi pendaftaran ini.
-                                            Perubahan data mengikuti ketentuan dan proses verifikasi panitia PPDB.
-                                        </p>
+                                        <h6 class="fw-semibold mb-1">Informasi Tambahan</h6>
+                                        <small class="text-muted">
+                                            Jawaban atas pertanyaan tambahan pendaftaran
+                                        </small>
                                     </div>
+                                </div>
+
+                                <div class="p-3">
+                                    @foreach ($jawabanTambahan as $item)
+                                        <div class="{{ !$loop->last ? 'mb-3' : '' }}">
+                                            <small class="text-muted d-block mb-1">
+                                                {{ $item->ppdb_pertanyaan->pertanyaan }}
+                                            </small>
+
+                                            <div class="fw-semibold text-break">
+                                                {{ filled($item->jawaban) ? $item->jawaban : '—' }}
+                                            </div>
+                                        </div>
+                                    @endforeach
                                 </div>
                             </div>
                         @endif
 
+                        {{-- PERNYATAAN DAN PENGIRIMAN --}}
+                        @if ($pendaftaran->status === 'draft')
+                            @livewire(
+                                'p-p-d-b.pendaftaran.pertanyaan-tambahan',
+                                [
+                                    'pendaftaranId' => $pendaftaran->ppdb_pendaftaran_id,
+                                ],
+                                key('pertanyaan-tambahan-' . $pendaftaran->ppdb_pendaftaran_id)
+                            )
+                        @else
+                            <div class="alert alert-light border rounded-3 mt-4 mb-0">
+                                <div class="d-flex gap-3">
+                                    <i class="ri-information-line text-primary fs-20"></i>
+
+                                    <div>
+                                        <h6 class="fw-semibold mb-1">
+                                            Pendaftaran sudah dikirim
+                                        </h6>
+
+                                        <p class="text-muted small mb-0">
+                                            Anda dapat melihat informasi pendaftaran ini.
+                                            Perubahan data mengikuti ketentuan dan proses
+                                            verifikasi panitia PPDB.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex flex-column flex-sm-row justify-content-between gap-2 mt-4">
+                                {{-- KEMBALI KE DASHBOARD --}}
+                                <a href="{{ route('ppdb.dashboard') }}"
+                                    class="btn btn-outline-secondary rounded-pill px-4">
+                                    <i class="ri-dashboard-line me-1"></i>
+                                    Dashboard
+                                </a>
+
+                                {{-- STATUS PENDAFTARAN --}}
+                                <a href="{{ route('ppdb.pendaftaran.status') }}"
+                                    class="btn btn-primary rounded-pill px-4">
+                                    Status Pendaftaran
+                                    <i class="ri-arrow-right-line ms-1"></i>
+                                </a>
+                            </div>
+                        @endif
                     </div>
                 </div>
 
@@ -453,90 +533,5 @@
         </div>
     </div>
 </div>
-
-{{-- Modal Konfirmasi --}}
-<div
-    class="modal fade"
-    id="confirmSubmitModal"
-    tabindex="-1"
-    aria-labelledby="confirmSubmitLabel"
-    aria-hidden="true">
-
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 rounded-4 shadow">
-
-            <div class="modal-header border-0 pb-0">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="avatar-sm">
-                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
-                            <i class="ri-send-plane-line"></i>
-                        </div>
-                    </div>
-
-                    <h5 class="modal-title fw-bold" id="confirmSubmitLabel">
-                        Kirim Pendaftaran?
-                    </h5>
-                </div>
-
-                <button
-                    type="button"
-                    class="btn-close"
-                    data-bs-dismiss="modal"
-                    aria-label="Tutup">
-                </button>
-            </div>
-
-            <div class="modal-body">
-                <p class="text-muted mb-0">
-                    Setelah dikirim, pendaftaran akan masuk ke proses verifikasi
-                    panitia PPDB. Pastikan data dan dokumen Anda sudah benar.
-                </p>
-            </div>
-
-            <div class="modal-footer border-0 pt-0">
-                <button
-                    type="button"
-                    class="btn btn-light rounded-pill px-4"
-                    data-bs-dismiss="modal">
-                    Periksa Kembali
-                </button>
-
-                <button
-                    type="button"
-                    class="btn btn-primary rounded-pill px-4"
-                    id="confirmSubmitButton">
-                    Ya, Kirim Pendaftaran
-                </button>
-            </div>
-
-        </div>
-    </div>
-</div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const form = document.getElementById('submitPendaftaranForm');
-        const confirmButton = document.getElementById('confirmSubmitButton');
-
-        confirmButton.addEventListener('click', function () {
-            if (!form.reportValidity()) {
-                const modalElement = document.getElementById('confirmSubmitModal');
-                const modal = bootstrap.Modal.getInstance(modalElement);
-
-                if (modal) {
-                    modal.hide();
-                }
-
-                return;
-            }
-
-            confirmButton.disabled = true;
-            confirmButton.innerHTML =
-                '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Mengirim...';
-
-            form.submit();
-        });
-    });
-</script>
 
 @endsection

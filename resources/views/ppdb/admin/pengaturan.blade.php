@@ -189,6 +189,16 @@
                             Jalur
                         </a>
                     </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link"
+                            data-bs-toggle="tab"
+                            href="#tab-pertanyaan"
+                            role="tab">
+                            <i class="ri-questionnaire-line me-1"></i>
+                            Pertanyaan
+                        </a>
+                    </li>
                 </ul>
 
                 <div class="tab-content p-3 p-lg-4">
@@ -218,6 +228,15 @@
                         @livewire('p-p-d-b.jalur.detail')
                         @livewire('p-p-d-b.jalur.edit')
                         @livewire('p-p-d-b.jalur.delete')
+                    </div>
+
+                    {{-- TAB PERTANYAAN --}}
+                    <div class="tab-pane fade" id="tab-pertanyaan" role="tabpanel">
+                        @livewire('p-p-d-b.pertanyaan.index')
+                        @livewire('p-p-d-b.pertanyaan.create')
+                        @livewire('p-p-d-b.pertanyaan.detail')
+                        @livewire('p-p-d-b.pertanyaan.edit')
+                        @livewire('p-p-d-b.pertanyaan.delete')
                     </div>
                 </div>
             </div>

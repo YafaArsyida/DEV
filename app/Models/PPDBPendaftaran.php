@@ -19,7 +19,7 @@ class PPDBPendaftaran extends Model
     protected $primaryKey = 'ppdb_pendaftaran_id';
 
     protected $fillable = [
-        'ms_penguna_id',
+        'ms_pengguna_id',
         'ppdb_periode_id',
         'ppdb_gelombang_id',
         'ppdb_jalur_id',
@@ -28,6 +28,8 @@ class PPDBPendaftaran extends Model
         'current_step',
         'status',
         'submitted_at',
+
+        'catatan_perbaikan'
     ];
 
     protected $casts = [
@@ -42,9 +44,9 @@ class PPDBPendaftaran extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function ms_penguna(): BelongsTo
+    public function ms_pengguna(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'ms_penguna_id', 'ms_penguna_id');
+        return $this->belongsTo(User::class, 'ms_pengguna_id', 'ms_pengguna_id');
     }
 
     public function ppdb_periode(): BelongsTo

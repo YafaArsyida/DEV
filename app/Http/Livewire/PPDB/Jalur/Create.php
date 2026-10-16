@@ -11,7 +11,7 @@ use Livewire\Component;
 
 class Create extends Component
 {
-     public $ppdb_periode_id;
+    public $ppdb_periode_id;
 
     public $kode_jalur = '';
     public $nama_jalur = '';

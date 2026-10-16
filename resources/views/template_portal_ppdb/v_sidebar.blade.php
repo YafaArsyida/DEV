@@ -84,13 +84,8 @@
 
                 <li class="menu-title"><span>Informasi</span></li>
                 <li class="nav-item">
-                    <a href="{{ route('ppdb.status') }}" class="nav-link menu-link {{ request()->routeIs('ppdb.status') ? 'active' : '' }}">
-                        <i class="ri-badge-check-line"></i><span>Status Pendaftaran</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('ppdb.bukti-pendaftaran') }}" class="nav-link menu-link {{ request()->routeIs('ppdb.bukti-pendaftaran') ? 'active' : '' }}">
-                        <i class="ri-file-list-3-line"></i><span>Bukti Pendaftaran</span>
+                    <a href="{{ route('ppdb.pendaftaran.status') }}" class="nav-link menu-link {{ request()->routeIs('ppdb.pendaftaran.status') ? 'active' : '' }}">
+                        <i class="ri-check-double-line"></i><span>Status Pendaftaran</span>
                     </a>
                 </li>
             </ul>

@@ -16,14 +16,16 @@ class Authenticate extends Middleware
             return null;
         }
 
-        if ($request->is('ppdb') || $request->is('ppdb/*')) {
+        // Login admin PPDB menggunakan login utama
+        if ($request->is('ppdb/admin') || $request->is('ppdb/admin/*')) {
+            return route('login.index');
+        }
+
+        // Login orang tua PPDB
+        if ($request->is('ppdb') ||$request->is('ppdb/*')){
             return route('ppdb.login');
         }
 
-        // return route('login.index');
-        if (! $request->expectsJson()) {
-            // return route('login');
-            return route('login.index');
-        }
+        return route('login.index');
     }
 }

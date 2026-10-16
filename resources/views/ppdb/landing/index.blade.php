@@ -385,7 +385,7 @@
 
                         <div class="ppdb-hero-cta d-grid d-sm-flex gap-3 mt-4">
                             <a href="{{ route('ppdb.daftar') }}" class="btn btn-primary rounded-pill">Daftar Sekarang</a>
-                            <a href="{{ route('ppdb.status') }}" class="btn ppdb-secondary-cta rounded-pill">Cek Status Pendaftaran</a>
+                            <a class="btn ppdb-secondary-cta rounded-pill">Cek Status Pendaftaran</a>
                         </div>
 
                         <div class="ppdb-status d-flex flex-column flex-sm-row flex-wrap gap-3 align-items-sm-center mt-4 text-white">
@@ -1113,7 +1113,7 @@
                         <a href="{{ route('ppdb.daftar') }}" class="link-light me-3">
                             Daftar PPDB
                         </a>
-                        <a href="{{ route('ppdb.status') }}" class="link-light">
+                        <a href="" class="link-light">
                             Cek Status
                         </a>
                     </div>

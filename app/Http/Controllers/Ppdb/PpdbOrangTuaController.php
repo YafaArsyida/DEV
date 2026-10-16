@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\PPDBAlamat;
 use App\Models\PPDBBerkas;
 use App\Models\PPDBCalonSiswa;
+use App\Models\PPDBJawaban;
 use App\Models\PPDBOrangTua;
 use App\Models\PPDBPendaftaran;
 use App\Models\PPDBPendidikan;
@@ -18,7 +19,53 @@ class PpdbOrangTuaController extends Controller
 {
     public function dashboard()
     {
-        return view('ppdb.orang-tua.dashboard');
+        // Periode PPDB aktif
+        $periode = PPDBPeriode::query()
+            ->where('status', 'aktif')
+            ->first();
+
+        // Pendaftaran milik orang tua yang sedang login
+        $pendaftaran = null;
+
+        if ($periode) {
+            $pendaftaran = PPDBPendaftaran::query()
+                ->with([
+                    'ppdb_periode',
+                    'ppdb_gelombang',
+                    'ppdb_jalur',
+                    'ppdb_calon_siswa',
+                ])
+                ->where('ms_penguna_id', Auth::id())
+                ->where('ppdb_periode_id', $periode->ppdb_periode_id)
+                ->first();
+        }
+
+        // Progres pendaftaran
+        $totalStep = 8;
+
+        $currentStep = $pendaftaran
+            ? min(max((int) $pendaftaran->current_step, 1), $totalStep)
+            : 0;
+
+        $progressPersen = $currentStep > 0
+            ? round(($currentStep / $totalStep) * 100)
+            : 0;
+
+        // Status pendaftaran
+        $status = $pendaftaran?->status;
+
+        // Apakah orang tua perlu melakukan tindakan?
+        $perluPerbaikan = $status === 'perbaikan';
+
+        return view('ppdb.orang-tua.dashboard',[
+            'periode' => $periode,
+            'pendaftaran' => $pendaftaran,
+            'currentStep' => $currentStep,
+            'totalStep' => $totalStep,
+            'progressPersen' => $progressPersen,
+            'status' => $status,
+            'perluPerbaikan' => $perluPerbaikan,
+        ]);
     }
 
     public function show(Request $request, $berkasId)
@@ -328,18 +375,70 @@ class PpdbOrangTuaController extends Controller
             ->where('ms_penguna_id', Auth::id())
             ->latest('ppdb_pendaftaran_id')
             ->firstOrFail();
+
+        $jawabanTambahan = PPDBJawaban::query()
+            ->with('ppdb_pertanyaan')
+            ->where('ppdb_pendaftaran_id', $pendaftaran->ppdb_pendaftaran_id)
+            ->where('ppdb_periode_id', $pendaftaran->ppdb_periode_id)
+            ->whereHas('ppdb_pertanyaan', function ($query) {
+                $query->where('status', 'aktif');
+            })
+            ->get()
+            ->sortBy(function ($item) {
+                return $item->ppdb_pertanyaan->urutan ?? 0;
+            })
+            ->values();
         
             $stepAktif = 7;
 
         return view('ppdb.orang-tua.review', compact(
             'pendaftaran',
-            'stepAktif'
+            'stepAktif',
+            'jawabanTambahan'
         ));
     }
 
     public function status()
     {
-        return view('ppdb.orang-tua.status');
+        $pendaftaran = PPDBPendaftaran::query()
+            ->with([
+                'ppdb_periode',
+                'ppdb_gelombang',
+                'ppdb_jalur',
+                'ppdb_calon_siswa',
+            ])
+            ->where('ms_penguna_id', auth()->id())
+            ->latest('created_at')
+            ->first();
+
+        $stepAktif = 8;
+        
+        if (!$pendaftaran) {
+            return redirect()->route('ppdb.pendaftaran.jalur')
+                ->with('error', 'Anda belum memiliki data pendaftaran.');
+        }
+        return view('ppdb.orang-tua.status', compact(
+            'pendaftaran',
+            'stepAktif',
+        ));
+    }
+
+    public function kirimUlang($ppdb_pendaftaran_id)
+    {
+        $pendaftaran = PPDBPendaftaran::query()
+            ->where('ppdb_pendaftaran_id', $ppdb_pendaftaran_id)
+            ->where('ms_penguna_id', Auth::id())
+            ->where('status', 'perbaikan')
+            ->firstOrFail();
+
+        $pendaftaran->update([
+            'status' => 'pengecekan',
+            'catatan_perbaikan' => null,
+        ]);
+
+        return redirect()
+            ->route('ppdb.pendaftaran.status')
+            ->with('success', 'Perbaikan data berhasil dikirim. Pendaftaran Anda akan diperiksa kembali oleh panitia.');
     }
 
     public function buktiPendaftaran()

@@ -106,12 +106,6 @@ Route::get('/ekstrakurikuler', [LandingEkstrakurikuler::class, 'index'])
 Route::get('/ppdb', [PpdbLandingController::class, 'index'])
     ->name('ppdb.landing');
 
-// STATUS DAN BUKTI PENDAFTARAN
-Route::get('/ppdb/status', [PpdbLandingController::class, 'status'])
-    ->name('ppdb.status');
-
-Route::get('/ppdb/bukti-pendaftaran', [PpdbLandingController::class, 'buktiPendaftaran'])
-    ->name('ppdb.bukti-pendaftaran');
 /*
 |--------------------------------------------------------------------------
 | Guest Auth PPDB
@@ -147,6 +141,13 @@ Route::prefix('ppdb')
 
         Route::get('/berkas/preview/{berkasId}', [PpdbOrangTuaController::class, 'show',])
             ->name('berkas.preview');
+
+        // STATUS PENDAFTARAN
+        Route::get('/pendaftaran/status', [PpdbOrangTuaController::class, 'status'])
+            ->name('pendaftaran.status');
+
+        Route::post('/pendaftaran/kirim-ulang/{ppdb_pendaftaran_id}', [PpdbOrangTuaController::class, 'kirimUlang'])
+            ->name('pendaftaran.kirim-ulang');
             
         Route::get('/pendaftaran/jalur', [PpdbOrangTuaController::class, 'jalur'])
             ->name('pendaftaran.jalur');
