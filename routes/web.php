@@ -11,8 +11,8 @@ use App\Http\Controllers\Akademik\PenempatanEkstrakurikulerSiswa;
 use App\Http\Controllers\Akademik\PenempatanSiswaController;
 use App\Http\Controllers\Akademik\SiswaController;
 use App\Http\Controllers\Akademik\TahunAjaranController;
-use App\Http\Controllers\Ppdb\PpdbAdminController;
-use App\Http\Controllers\Ppdb\PpdbLandingController;
+use App\Http\Controllers\PPDB\PpdbAdminController;
+use App\Http\Controllers\PPDB\PpdbLandingController;
 use App\Http\Controllers\Portal\PortalController;
 
 use App\Http\Controllers\Keuangan\AkuntansiJurnalDetail;
