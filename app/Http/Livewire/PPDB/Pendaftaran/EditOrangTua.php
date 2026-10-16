@@ -2,7 +2,7 @@
 
 namespace App\Http\Livewire\PPDB\Pendaftaran;
 
-use App\Models\PPDBOrangtua;
+use App\Models\PPDBOrangTua;
 use App\Models\PPDBPendaftaran;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -55,7 +55,7 @@ class EditOrangTua extends Component
 
         $this->pastikanBolehMengubah($pendaftaran->status);
 
-        $orangTua = PPDBOrangtua::query()
+        $orangTua = PPDBOrangTua::query()
             ->where(
                 'ppdb_pendaftaran_id',
                 $pendaftaran->ppdb_pendaftaran_id
@@ -101,7 +101,7 @@ class EditOrangTua extends Component
     /**
      * Mengisi properti form dari data orang tua yang tersimpan.
      */
-    protected function isiForm(PPDBOrangtua $orangTua)
+    protected function isiForm(PPDBOrangTua $orangTua)
     {
         // Data ayah
         $this->ayah_nama = $orangTua->nama_ayah ?? '';
@@ -402,7 +402,7 @@ class EditOrangTua extends Component
                 ]);
             }
 
-            $orangTua = PPDBOrangtua::query()
+            $orangTua = PPDBOrangTua::query()
                 ->where(
                     'ppdb_pendaftaran_id',
                     $pendaftaran->ppdb_pendaftaran_id

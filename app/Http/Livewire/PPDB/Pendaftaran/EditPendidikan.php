@@ -3,7 +3,7 @@
 namespace App\Http\Livewire\PPDB\Pendaftaran;
 
 use App\Models\PPDBPendaftaran;
-use App\Models\PpdbPendidikan;
+use App\Models\PPDBPendidikan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -74,7 +74,7 @@ class EditPendidikan extends Component
     {
         $pendaftaran = $this->ambilPendaftaran();
 
-        $pendidikan = PpdbPendidikan::query()
+        $pendidikan = PPDBPendidikan::query()
             ->where(
                 'ppdb_pendaftaran_id',
                 $pendaftaran->ppdb_pendaftaran_id
@@ -179,7 +179,7 @@ class EditPendidikan extends Component
             // Periksa kembali status di dalam transaksi.
             $this->pastikanBolehUbah($pendaftaran);
 
-            $pendidikan = PpdbPendidikan::query()
+            $pendidikan = PPDBPendidikan::query()
                 ->where(
                     'ppdb_pendaftaran_id',
                     $pendaftaran->ppdb_pendaftaran_id
