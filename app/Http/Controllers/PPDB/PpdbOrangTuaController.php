@@ -35,7 +35,7 @@ class PpdbOrangTuaController extends Controller
                     'ppdb_jalur',
                     'ppdb_calon_siswa',
                 ])
-                ->where('ms_penguna_id', Auth::id())
+                ->where('ms_pengguna_id', Auth::id())
                 ->where('ppdb_periode_id', $periode->ppdb_periode_id)
                 ->first();
         }
@@ -79,7 +79,7 @@ class PpdbOrangTuaController extends Controller
 
         // Pastikan berkas milik orang tua yang sedang login.
         abort_unless(
-            (string) $pendaftaran->ms_penguna_id ===
+            (string) $pendaftaran->ms_pengguna_id ===
             (string) $request->user()->getAuthIdentifier(),
             403
         );
@@ -126,7 +126,7 @@ class PpdbOrangTuaController extends Controller
 
         if ($periode) {
             $pendaftaran = PPDBPendaftaran::query()
-                ->where('ms_penguna_id', Auth::id())
+                ->where('ms_pengguna_id', Auth::id())
                 ->where('ppdb_periode_id', $periode->ppdb_periode_id)
                 ->first();
         }
@@ -149,7 +149,7 @@ class PpdbOrangTuaController extends Controller
 
         if ($periode) {
             $pendaftaran = PPDBPendaftaran::query()
-                ->where('ms_penguna_id', Auth::id())
+                ->where('ms_pengguna_id', Auth::id())
                 ->where(
                     'ppdb_periode_id',
                     $periode->ppdb_periode_id
@@ -183,7 +183,7 @@ class PpdbOrangTuaController extends Controller
 
         if ($periode) {
             $pendaftaran = PPDBPendaftaran::query()
-                ->where('ms_penguna_id', Auth::id())
+                ->where('ms_pengguna_id', Auth::id())
                 ->where(
                     'ppdb_periode_id',
                     $periode->ppdb_periode_id
@@ -231,7 +231,7 @@ class PpdbOrangTuaController extends Controller
 
         if ($periode) {
             $pendaftaran = PPDBPendaftaran::query()
-                ->where('ms_penguna_id', Auth::id())
+                ->where('ms_pengguna_id', Auth::id())
                 ->where(
                     'ppdb_periode_id',
                     $periode->ppdb_periode_id
@@ -279,7 +279,7 @@ class PpdbOrangTuaController extends Controller
 
         if ($periode) {
             $pendaftaran = PPDBPendaftaran::query()
-                ->where('ms_penguna_id', Auth::id())
+                ->where('ms_pengguna_id', Auth::id())
                 ->where(
                     'ppdb_periode_id',
                     $periode->ppdb_periode_id
@@ -326,7 +326,7 @@ class PpdbOrangTuaController extends Controller
 
         if ($periode) {
             $pendaftaran = PPDBPendaftaran::query()
-                ->where('ms_penguna_id', Auth::id())
+                ->where('ms_pengguna_id', Auth::id())
                 ->where(
                     'ppdb_periode_id', $periode->ppdb_periode_id
                 )
@@ -372,7 +372,7 @@ class PpdbOrangTuaController extends Controller
                 'ppdb_pendidikan',
                 'ppdb_berkas',
             ])
-            ->where('ms_penguna_id', Auth::id())
+            ->where('ms_pengguna_id', Auth::id())
             ->latest('ppdb_pendaftaran_id')
             ->firstOrFail();
 
@@ -407,7 +407,7 @@ class PpdbOrangTuaController extends Controller
                 'ppdb_jalur',
                 'ppdb_calon_siswa',
             ])
-            ->where('ms_penguna_id', auth()->id())
+            ->where('ms_pengguna_id', auth()->id())
             ->latest('created_at')
             ->first();
 
@@ -427,7 +427,7 @@ class PpdbOrangTuaController extends Controller
     {
         $pendaftaran = PPDBPendaftaran::query()
             ->where('ppdb_pendaftaran_id', $ppdb_pendaftaran_id)
-            ->where('ms_penguna_id', Auth::id())
+            ->where('ms_pengguna_id', Auth::id())
             ->where('status', 'perbaikan')
             ->firstOrFail();
 
