@@ -364,7 +364,7 @@ class FormOrangTua extends Component
             $orangTua->save();
 
             $pendaftaran->update([
-                'current_step' => 4,
+                'current_step' => 3,
             ]);
         });
 

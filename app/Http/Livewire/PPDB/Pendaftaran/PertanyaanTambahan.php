@@ -305,6 +305,7 @@ class PertanyaanTambahan extends Component
 
             $pendaftaran->status = 'pengecekan';
             $pendaftaran->submitted_at = now();
+            $pendaftaran->current_step = 7;
             $pendaftaran->save();
 
             DB::commit();

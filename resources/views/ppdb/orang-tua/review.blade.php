@@ -21,6 +21,20 @@
                     $alamat = $pendaftaran->ppdb_alamat;
                     $pendidikan = $pendaftaran->ppdb_pendidikan;
 
+                    $statusLabel = [
+                        'draft' => 'Draft',
+                        'pengecekan' => 'Pengecekan',
+                        'diterima' => 'Diterima',
+                        'perbaikan' => 'Perlu Perbaikan',
+                    ];
+
+                    $statusClass = [
+                        'draft' => 'bg-secondary-subtle text-secondary',
+                        'pengecekan' => 'bg-warning-subtle text-warning',
+                        'diterima' => 'bg-success-subtle text-success',
+                        'perbaikan' => 'bg-danger-subtle text-danger',
+                    ];
+
                     $daftarBerkas = [
                         'KARTU_KELUARGA' => 'Kartu Keluarga',
                         'AKTA_KELAHIRAN' => 'Akta Kelahiran',
@@ -58,72 +72,53 @@
                     <div class="card-body">
                         {{-- NOMOR PENDAFTARAN --}}
                         <div class="border rounded-4 p-3 mb-4">
-                            <div class="d-flex flex-column flex-sm-row justify-content-between gap-2">
+                            <div class="d-flex flex-column flex-md-row justify-content-between gap-3">
                                 <div>
-                                    <small class="text-muted d-block mb-1">Nomor Pendaftaran</small>
-                                    <h6 class="fw-semibold text-primary mb-1">
-                                        {{ $pendaftaran->nomor_pendaftaran ?? '—' }}
-                                    </h6>
-                                    <small class="text-muted">
-                                        Periksa kembali seluruh informasi sebelum mengirim pendaftaran.
-                                    </small>
+                                    <div class="text-muted small mb-1">
+                                        Nomor Pendaftaran
+                                    </div>
+
+                                    <h5 class="mb-2">
+                                        {{ $pendaftaran->nomor_pendaftaran ?? '-' }}
+                                    </h5>
+
+                                    <div class="text-muted small">
+                                        <i class="ri-calendar-line me-1"></i>
+                                        {{ $pendaftaran->created_at?->translatedFormat('d F Y, H:i') ?? '-' }}
+                                    </div>
                                 </div>
 
-                                <div class="text-sm-end">
-                                    <small class="text-muted d-block mb-1">Status Pendaftaran</small>
-                                    @switch($pendaftaran->status)
-                                        @case('draft')
-                                            <span class="badge bg-warning-subtle text-warning">
-                                                Belum Dikirim
-                                            </span>
-                                            @break
+                                <div class="text-md-end">
+                                    <span class="badge rounded-pill {{ $statusClass[$pendaftaran->status] ?? 'bg-secondary-subtle text-secondary' }}">
+                                        {{ $statusLabel[$pendaftaran->status] ?? ucfirst($pendaftaran->status ?? '-') }}
+                                    </span>
 
-                                        @case('submitted')
-                                            <span class="badge bg-info-subtle text-info">
-                                                Menunggu Verifikasi
-                                            </span>
-                                            @break
+                                    <div class="mt-2 fw-medium">
+                                        {{ $pendaftaran->ppdb_jalur->nama_jalur ?? '-' }}
+                                    </div>
 
-                                        @case('verified')
-                                            <span class="badge bg-success-subtle text-success">
-                                                Terverifikasi
-                                            </span>
-                                            @break
-
-                                        @case('accepted')
-                                            <span class="badge bg-success-subtle text-success">
-                                                Diterima
-                                            </span>
-                                            @break
-
-                                        @case('rejected')
-                                            <span class="badge bg-danger-subtle text-danger">
-                                                Ditolak
-                                            </span>
-                                            @break
-
-                                        @default
-                                            <span class="badge bg-light text-muted">
-                                                {{ $pendaftaran->status ?? 'Belum diketahui' }}
-                                            </span>
-                                    @endswitch
+                                    <div class="text-muted small">
+                                        {{ $pendaftaran->ppdb_periode->nama_periode ?? '-' }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
                         {{-- DATA CALON SISWA --}}
-                        <div class="border rounded-4 mb-3 overflow-hidden">
+                        <div class="border rounded-4 mb-4 overflow-hidden">
                             <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 p-3 border-bottom">
                                 <div class="d-flex align-items-center gap-3">
                                     <div class="avatar-sm">
-                                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
-                                            <i class="ri-user-line"></i>
+                                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
+                                            <i class="ri-user-3-line fs-18"></i>
                                         </div>
                                     </div>
 
                                     <div>
-                                        <h6 class="fw-semibold mb-1">Data Calon Siswa</h6>
-                                        <small class="text-muted">Identitas calon siswa</small>
+                                        <h6 class="mb-1">Data Calon Siswa</h6>
+                                        <p class="text-muted small mb-0">
+                                            Identitas calon peserta didik
+                                        </p>
                                     </div>
                                 </div>
 
@@ -143,47 +138,62 @@
                             </div>
 
                             <div class="p-3">
-                                <div class="row g-3">
-                                    <div class="col-md-4">
-                                        <small class="text-muted d-block mb-1">Nama Lengkap</small>
-                                        <span class="fw-semibold">
-                                            {{ $calonSiswa->nama_siswa ?? '—' }}
-                                        </span>
-                                    </div>
+                                @if ($calonSiswa)
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <div class="text-muted small mb-1">Nama Lengkap</div>
+                                            <div class="fw-medium">
+                                                {{ $calonSiswa->nama_siswa ?? '-' }}
+                                            </div>
+                                        </div>
 
-                                    <div class="col-md-4">
-                                        <small class="text-muted d-block mb-1">NIK</small>
-                                        <span class="fw-semibold">
-                                            {{ $calonSiswa->nik ?? '—' }}
-                                        </span>
-                                    </div>
+                                        <div class="col-md-6">
+                                            <div class="text-muted small mb-1">NIK</div>
+                                            <div>
+                                                {{ $calonSiswa->nik ?? '-' }}
+                                            </div>
+                                        </div>
 
-                                    <div class="col-md-4">
-                                        <small class="text-muted d-block mb-1">Tanggal Lahir</small>
-                                        <span class="fw-semibold">
-                                            @if ($calonSiswa?->tanggal_lahir)
-                                                {{ \Carbon\Carbon::parse($calonSiswa->tanggal_lahir)->translatedFormat('d F Y') }}
-                                            @else
-                                                —
-                                            @endif
-                                        </span>
+                                        <div class="col-md-6">
+                                            <div class="text-muted small mb-1">Tempat, Tanggal Lahir</div>
+                                            <div>
+                                                {{ $calonSiswa->tempat_lahir ?? '-' }},
+                                                {{ $calonSiswa->tanggal_lahir
+                                                    ? \Carbon\Carbon::parse($calonSiswa->tanggal_lahir)->translatedFormat('d F Y')
+                                                    : '-' }}
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="text-muted small mb-1">Jenis Kelamin</div>
+                                            <div>
+                                                {{ $calonSiswa->jenis_kelamin ?? '-' }}
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
+                                @else
+                                    <p class="text-muted mb-0">
+                                        Data calon siswa belum diisi.
+                                    </p>
+                                @endif
                             </div>
                         </div>
 
                         {{-- DATA ORANG TUA --}}
-                        <div class="border rounded-4 mb-3 overflow-hidden">
+                        <div class="border rounded-4 mb-4 overflow-hidden">
                             <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 p-3 border-bottom">
                                 <div class="d-flex align-items-center gap-3">
                                     <div class="avatar-sm">
-                                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
-                                            <i class="ri-parent-line"></i>
+                                        <div class="avatar-title bg-success-subtle text-success rounded-circle">
+                                            <i class="ri-parent-line fs-18"></i>
                                         </div>
                                     </div>
+
                                     <div>
-                                        <h6 class="fw-semibold mb-1">Data Orang Tua/Wali</h6>
-                                        <small class="text-muted">Informasi orang tua atau wali</small>
+                                        <h6 class="mb-1">Data Orang Tua / Wali</h6>
+                                        <p class="text-muted small mb-0">
+                                            Informasi keluarga dan kontak
+                                        </p>
                                     </div>
                                 </div>
 
@@ -202,101 +212,92 @@
                                 @endif
                             </div>
 
-                            {{-- INFORMASI --}}
                             <div class="p-3">
-                                <div class="row g-3">
-                                    {{-- NAMA AYAH --}}
-                                    <div class="col-12 col-md-6">
-                                        <small class="text-muted d-block mb-1">Nama Ayah</small>
-                                        <span class="fw-semibold">
-                                            {{ $orangTua->nama_ayah ?: '—' }}
-                                        </span>
-                                    </div>
-
-                                    {{-- NAMA IBU --}}
-                                    <div class="col-12 col-md-6">
-                                        <small class="text-muted d-block mb-1">Nama Ibu</small>
-                                        <span class="fw-semibold">
-                                            {{ $orangTua->nama_ibu ?: '—' }}
-                                        </span>
-                                    </div>
-
-                                    {{-- NOMOR TELEPON UTAMA --}}
-                                    <div class="col-12">
-                                        <small class="text-muted d-block mb-1">
-                                            Nomor Telepon
-                                        </small>
-                                        <span class="fw-semibold">
-                                            @if (filled($orangTua->telepon_ayah))
-                                                {{ $orangTua->telepon_ayah }}
-                                                <small class="text-muted fw-normal">(Ayah)</small>
-                                            @elseif (filled($orangTua->telepon_ibu))
-                                                {{ $orangTua->telepon_ibu }}
-                                                <small class="text-muted fw-normal">(Ibu)</small>
-                                            @elseif (filled($orangTua->telepon_wali))
-                                                {{ $orangTua->telepon_wali }}
-                                                <small class="text-muted fw-normal">(Wali)</small>
-                                            @else
-                                                —
-                                            @endif
-                                        </span>
-                                    </div>
-                                </div>
-
-                                {{-- INFORMASI WALI --}}
-                                @if (filled($orangTua->nama_wali))
-                                    <div class="border-top mt-3 pt-3">
-                                        <div class="d-flex align-items-center gap-2 mb-3">
-                                            <i class="ri-user-star-line text-primary fs-18"></i>
-                                            <h6 class="fw-semibold mb-0">Informasi Wali</h6>
+                                @if ($orangTua)
+                                    <div class="row g-3">
+                                        {{-- AYAH --}}
+                                        <div class="col-md-6">
+                                            <div class="text-muted small mb-1">Nama Ayah</div>
+                                            <div class="fw-medium">
+                                                {{ $orangTua->nama_ayah ?? '-' }}
+                                            </div>
                                         </div>
 
-                                        <div class="row g-3">
-                                            <div class="col-12 col-md-6">
-                                                <small class="text-muted d-block mb-1">
-                                                    Nama Wali
-                                                </small>
-                                                <span class="fw-semibold">
-                                                    {{ $orangTua->nama_wali }}
-                                                </span>
+                                        <div class="col-md-6">
+                                            <div class="text-muted small mb-1">Telepon Ayah</div>
+                                            <div>
+                                                {{ $orangTua->telepon_ayah ?? '-' }}
+                                            </div>
+                                        </div>
+
+                                        {{-- IBU --}}
+                                        <div class="col-md-6">
+                                            <div class="text-muted small mb-1">Nama Ibu</div>
+                                            <div class="fw-medium">
+                                                {{ $orangTua->nama_ibu ?? '-' }}
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="text-muted small mb-1">Telepon Ibu</div>
+                                            <div>
+                                                {{ $orangTua->telepon_ibu ?? '-' }}
+                                            </div>
+                                        </div>
+
+                                        {{-- WALI --}}
+                                        @if (filled($orangTua->nama_wali))
+                                            <div class="col-12">
+                                                <hr class="my-0">
                                             </div>
 
-                                            @if (filled($orangTua->hubungan_wali))
-                                                <div class="col-12 col-md-6">
-                                                    <small class="text-muted d-block mb-1">
-                                                        Hubungan dengan Calon Siswa
-                                                    </small>
-                                                    <span class="fw-semibold">
-                                                        {{ $orangTua->hubungan_wali }}
-                                                    </span>
+                                            <div class="col-md-6">
+                                                <div class="text-muted small mb-1">Nama Wali</div>
+                                                <div class="fw-medium">
+                                                    {{ $orangTua->nama_wali }}
                                                 </div>
-                                            @endif
-                                        </div>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <div class="text-muted small mb-1">Telepon Wali</div>
+                                                <div>
+                                                    {{ $orangTua->telepon_wali ?? '-' }}
+                                                </div>
+                                            </div>
+                                        @endif
                                     </div>
+                                @else
+                                    <p class="text-muted mb-0">
+                                        Data orang tua belum diisi.
+                                    </p>
                                 @endif
                             </div>
                         </div>
 
+                        
                         {{-- DATA ALAMAT --}}
-                        <div class="border rounded-4 mb-3 overflow-hidden">
+                        <div class="border rounded-4 mb-4 overflow-hidden">
                             <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 p-3 border-bottom">
                                 <div class="d-flex align-items-center gap-3">
                                     <div class="avatar-sm">
-                                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
-                                            <i class="ri-map-pin-user-line"></i>
+                                        <div class="avatar-title bg-info-subtle text-info rounded-circle">
+                                            <i class="ri-map-pin-line fs-18"></i>
                                         </div>
                                     </div>
 
                                     <div>
-                                        <h6 class="fw-semibold mb-1">Data Alamat</h6>
-                                        <small class="text-muted">Alamat tempat tinggal calon siswa</small>
+                                        <h6 class="mb-1">Data Alamat</h6>
+                                        <p class="text-muted small mb-0">
+                                            Domisili calon siswa
+                                        </p>
                                     </div>
                                 </div>
 
                                 @if ($pendaftaran->status === 'draft')
                                     <a href="{{ route('ppdb.pendaftaran.alamat') }}"
                                         class="btn btn-outline-primary rounded-pill px-3">
-                                        <i class="ri-edit-line me-1"></i> Ubah Data
+                                        <i class="ri-edit-line me-1"></i>
+                                        Ubah Data
                                     </a>
                                 @elseif ($pendaftaran->status === 'perbaikan')
                                     <a href="{{ route('ppdb.pendaftaran.alamat') }}"
@@ -308,53 +309,77 @@
                             </div>
 
                             <div class="p-3">
-                                <div class="row g-3">
-                                    <div class="col-lg-6">
-                                        <small class="text-muted d-block mb-1">Alamat Lengkap</small>
-                                        <span class="fw-semibold">
-                                            {{ $alamat->alamat_lengkap ?? '—' }}
-                                        </span>
-                                    </div>
+                                @if ($alamat)
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <div class="text-muted small mb-1">Alamat Lengkap</div>
+                                            <div class="fw-medium">
+                                                {{ $alamat->alamat_lengkap ?? '-' }}
+                                            </div>
+                                        </div>
 
-                                    <div class="col-md-6 col-lg-3">
-                                        <small class="text-muted d-block mb-1">Kecamatan</small>
-                                        <span class="fw-semibold">
-                                            {{ $alamat->kecamatan ?? '—' }}
-                                        </span>
-                                    </div>
+                                        <div class="col-md-6">
+                                            <div class="text-muted small mb-1">Kelurahan / Desa</div>
+                                            <div>
+                                                {{ $alamat->kelurahan_desa ?? '-' }}
+                                            </div>
+                                        </div>
 
-                                    <div class="col-md-6 col-lg-3">
-                                        <small class="text-muted d-block mb-1">Kode Pos</small>
-                                        <span class="fw-semibold">
-                                            {{ $alamat->kode_pos ?? '—' }}
-                                        </span>
+                                        <div class="col-md-6">
+                                            <div class="text-muted small mb-1">Kecamatan</div>
+                                            <div>
+                                                {{ $alamat->kecamatan ?? '-' }}
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="text-muted small mb-1">Jarak ke Sekolah</div>
+                                            <div>
+                                                {{ $alamat->jarak_ke_sekolah ?? '-' }} Km
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="text-muted small mb-1">Waktu Tempuh</div>
+                                            <div>
+                                                {{ $alamat->waktu_tempuh_ke_sekolah ?? '-' }} Menit
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
+                                @else
+                                    <p class="text-muted mb-0">
+                                        Data alamat belum diisi.
+                                    </p>
+                                @endif
                             </div>
                         </div>
 
-                        {{-- PENDIDIKAN DAN JALUR --}}
-                        <div class="border rounded-4 mb-3 overflow-hidden">
+                    
+                        {{-- RIWAYAT PENDIDIKAN --}}
+                        <div class="border rounded-4 mb-4 overflow-hidden">
                             <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 p-3 border-bottom">
                                 <div class="d-flex align-items-center gap-3">
                                     <div class="avatar-sm">
-                                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
-                                            <i class="ri-school-line"></i>
+                                        <div class="avatar-title bg-warning-subtle text-warning rounded-circle">
+                                            <i class="ri-graduation-cap-line fs-18"></i>
                                         </div>
                                     </div>
 
                                     <div>
-                                        <h6 class="fw-semibold mb-1">Pendidikan & Jalur Pendaftaran</h6>
-                                        <small class="text-muted">Asal pendidikan dan jalur yang dipilih</small>
+                                        <h6 class="mb-1">Riwayat Pendidikan</h6>
+                                        <p class="text-muted small mb-0">
+                                            Informasi sekolah asal
+                                        </p>
                                     </div>
                                 </div>
 
                                 @if ($pendaftaran->status === 'draft')
                                     <a href="{{ route('ppdb.pendaftaran.pendidikan') }}"
                                         class="btn btn-outline-primary rounded-pill px-3">
-                                        <i class="ri-edit-line me-1"></i> Ubah Data
+                                        <i class="ri-edit-line me-1"></i>
+                                        Ubah Data
                                     </a>
-                                @elseif ($pendaftaran->status === 'pendidikan')
+                                @elseif ($pendaftaran->status === 'perbaikan')
                                     <a href="{{ route('ppdb.pendaftaran.pendidikan') }}"
                                         class="btn btn-primary rounded-pill px-3">
                                         <i class="ri-edit-line me-1"></i>
@@ -364,44 +389,65 @@
                             </div>
 
                             <div class="p-3">
-                                <div class="row g-3">
-                                    <div class="col-md-4">
-                                        <small class="text-muted d-block mb-1">Asal TK/RA</small>
-                                        <span class="fw-semibold">
-                                            {{ $pendidikan->nama_sekolah_asal ?? $pendidikan->asal_sekolah ?? '—' }}
-                                        </span>
-                                    </div>
+                                @if ($pendidikan)
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <div class="text-muted small mb-1">Jenjang Asal</div>
+                                            <div class="fw-medium">
+                                                {{ $pendidikan->jenjang_asal ?? '-' }}
+                                            </div>
+                                        </div>
 
-                                    <div class="col-md-4">
-                                        <small class="text-muted d-block mb-1">Tahun Lulus</small>
-                                        <span class="fw-semibold">
-                                            {{ $pendidikan->tahun_lulus ?? '—' }}
-                                        </span>
-                                    </div>
+                                        <div class="col-md-6">
+                                            <div class="text-muted small mb-1">Nama Sekolah Asal</div>
+                                            <div class="fw-medium">
+                                                {{ $pendidikan->asal_sekolah ?? '-' }}
+                                            </div>
+                                        </div>
 
-                                    <div class="col-md-4">
-                                        <small class="text-muted d-block mb-1">Jalur Pendaftaran</small>
-                                        <span class="fw-semibold">
-                                            {{ $pendaftaran->ppdb_jalur->nama_jalur ?? '—' }}
-                                        </span>
+                                        <div class="col-md-6">
+                                            <div class="text-muted small mb-1">Tahun Lulus</div>
+                                            <div>
+                                                {{ $pendidikan->tahun_lulus ?? '-' }}
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="text-muted small mb-1">NPSN Sekolah</div>
+                                            <div>
+                                                {{ $pendidikan->npsn_asal_sekolah ?? '-' }}
+                                            </div>
+                                        </div>
+
+                                        @if (filled($pendidikan->alamat_asal_sekolah))
+                                            <div class="col-12">
+                                                <div class="text-muted small mb-1">Alamat Sekolah Asal</div>
+                                                <div>
+                                                    {{ $pendidikan->alamat_asal_sekolah }}
+                                                </div>
+                                            </div>
+                                        @endif
                                     </div>
-                                </div>
+                                @else
+                                    <p class="text-muted mb-0">
+                                        Data riwayat pendidikan belum diisi.
+                                    </p>
+                                @endif
                             </div>
                         </div>
 
                         {{-- BERKAS PERSYARATAN --}}
-                        <div class="border rounded-4 mb-3 overflow-hidden">
+                        <div class="border rounded-4 mb-4 overflow-hidden">
                             <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 p-3 border-bottom">
                                 <div class="d-flex align-items-center gap-3">
                                     <div class="avatar-sm">
-                                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
-                                            <i class="ri-file-upload-line"></i>
+                                        <div class="avatar-title bg-danger-subtle text-danger rounded-circle">
+                                            <i class="ri-file-upload-line fs-18"></i>
                                         </div>
                                     </div>
-
                                     <div>
-                                        <h6 class="fw-semibold mb-1">Berkas Persyaratan</h6>
-                                        <small class="text-muted">Status dokumen yang dipersyaratkan</small>
+                                        <h6 class="mb-1">Berkas Persyaratan</h6>
+                                        <p class="text-muted small mb-0">Dokumen pendukung pendaftaran</p>
                                     </div>
                                 </div>
 
@@ -413,8 +459,7 @@
                                 @elseif ($pendaftaran->status === 'perbaikan')
                                     <a href="{{ route('ppdb.pendaftaran.berkas') }}"
                                         class="btn btn-primary rounded-pill px-3">
-                                        <i class="ri-edit-line me-1"></i>
-                                        Perbaiki Berkas
+                                        <i class="ri-edit-line me-1"></i> Perbaiki Berkas
                                     </a>
                                 @endif
                             </div>
@@ -427,26 +472,39 @@
                                         @endphp
 
                                         <div class="d-flex justify-content-between align-items-start gap-3">
-                                            <div>
-                                                <small class="text-muted d-block mb-1">{{ $nama }}</small>
+                                            <div class="flex-grow-1">
+                                                <div class="text-muted small mb-1">{{ $nama }}</div>
+
                                                 @if ($berkas)
-                                                    <span class="fw-semibold">
+                                                    <div class="fw-medium text-break">
                                                         {{ $berkas->nama_file }}
-                                                    </span>
+                                                    </div>
+                                                @else
+                                                    <div class="text-muted small">Belum ada dokumen</div>
                                                 @endif
                                             </div>
 
-                                            @if (!$berkas)
+                                            @if ($berkas)
+                                                <span class="text-success small text-nowrap">
+                                                    <i class="ri-checkbox-circle-line me-1"></i>
+                                                    Terunggah
+                                                </span>
+                                            @else
                                                 <span class="text-warning small text-nowrap">
                                                     <i class="ri-error-warning-line me-1"></i>
                                                     Belum diunggah
                                                 </span>
                                             @endif
                                         </div>
+
+                                        @if (!$loop->last)
+                                            <hr class="my-0">
+                                        @endif
                                     @endforeach
                                 </div>
                             </div>
                         </div>
+
 
                         {{-- INFORMASI TAMBAHAN --}}
                         @if ($jawabanTambahan->isNotEmpty())

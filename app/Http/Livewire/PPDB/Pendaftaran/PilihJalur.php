@@ -121,7 +121,7 @@ class PilihJalur extends Component
                 'ppdb_gelombang_id' => $gelombang->ppdb_gelombang_id,
                 'ppdb_jalur_id' => $jalur->ppdb_jalur_id,
                 'nomor_pendaftaran' => $nomor,
-                'current_step' => 2,
+                'current_step' => 1,
                 'status' => 'draft',
                 'submitted_at' => null,
             ]);

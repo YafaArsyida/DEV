@@ -175,6 +175,9 @@ class FormPendidikan extends Component
                     ? null
                     : (trim($this->nomor_ijazah) ?: null),
             ]);
+            $pendaftaran->update([
+                'current_step' => 5,
+            ]);
         });
 
         $this->dispatchBrowserEvent('alertify-success', [

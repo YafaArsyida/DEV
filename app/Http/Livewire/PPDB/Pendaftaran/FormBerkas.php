@@ -297,6 +297,10 @@ class FormBerkas extends Component
                         ]));
                     }
                 }
+                
+                $pendaftaranTerkunci->update([
+                    'current_step' => 6,
+                ]);
             });
 
             // Hapus file lama hanya setelah seluruh perubahan database berhasil.

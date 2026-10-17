@@ -337,7 +337,7 @@ class FormSiswa extends Component
             ]);
 
             $pendaftaran->update([
-                'current_step' => 3,
+                'current_step' => 2,
             ]);
         });
 

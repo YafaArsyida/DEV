@@ -8,7 +8,7 @@
         aria-labelledby="ModalDetailPendaftarLabel"
         aria-hidden="true">
 
-        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content rounded-4 border-0">
 
                 <div class="modal-header">
@@ -67,33 +67,42 @@
                             ];
                         @endphp
 
-                        {{-- Informasi pendaftaran --}}
+                        
+                        {{-- Informasi Pendaftaran --}}
                         <div class="card border rounded-4 shadow-none mb-4">
-                            <div class="card-body">
+                            <div class="card-body p-3 p-md-4">
                                 <div class="d-flex flex-column flex-md-row justify-content-between gap-3">
                                     <div>
                                         <div class="text-muted small mb-1">
                                             Nomor Pendaftaran
                                         </div>
-                                        <h5 class="mb-2">
+
+                                        <h5 class="text-primary fw-bold mb-3">
                                             {{ $pendaftaran->nomor_pendaftaran ?? '-' }}
                                         </h5>
 
-                                        <div class="text-muted small">
-                                            <i class="ri-calendar-line me-1"></i>
-                                            {{ $pendaftaran->created_at?->translatedFormat('d F Y, H:i') ?? '-' }}
+                                        <div class="d-flex align-items-center gap-2 text-muted small">
+                                            <i class="ri-calendar-line fs-16"></i>
+                                            <span>
+                                                {{ $pendaftaran->created_at?->translatedFormat('d F Y, H:i') ?? '-' }}
+                                            </span>
                                         </div>
                                     </div>
 
-                                    <div class="text-md-end">
-                                        <span class="badge rounded-pill {{ $statusClass[$pendaftaran->status] ?? 'bg-secondary-subtle text-secondary' }}">
-                                            {{ $statusLabel[$pendaftaran->status] ?? ucfirst($pendaftaran->status ?? '-') }}
-                                        </span>
+                                    <div class="border-top d-md-none"></div>
 
-                                        <div class="mt-2 fw-medium">
+                                    <div class="flex-shrink-0">
+                                        <div class="mb-2">
+                                            <span class="badge rounded-pill px-3 py-2 {{ $statusClass[$pendaftaran->status] ?? 'bg-secondary-subtle text-secondary' }}">
+                                                {{ $statusLabel[$pendaftaran->status] ?? ucfirst($pendaftaran->status ?? '-') }}
+                                            </span>
+                                        </div>
+
+                                        <div class="fw-semibold">
                                             {{ $pendaftaran->ppdb_jalur->nama_jalur ?? '-' }}
                                         </div>
-                                        <div class="text-muted small">
+
+                                        <div class="text-muted small mt-1">
                                             {{ $pendaftaran->ppdb_periode->nama_periode ?? '-' }}
                                         </div>
                                     </div>
@@ -101,14 +110,15 @@
                             </div>
                         </div>
 
-                        {{-- Data calon siswa --}}
+                        {{-- Data Calon Siswa --}}
                         <div class="border rounded-4 mb-4 overflow-hidden">
                             <div class="d-flex align-items-center gap-3 p-3 border-bottom">
-                                <div class="avatar-sm">
+                                <div class="avatar-sm flex-shrink-0">
                                     <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
                                         <i class="ri-user-3-line fs-18"></i>
                                     </div>
                                 </div>
+
                                 <div>
                                     <h6 class="mb-1">Data Calon Siswa</h6>
                                     <p class="text-muted small mb-0">
@@ -122,7 +132,9 @@
                                     <div class="row g-3">
                                         <div class="col-md-6">
                                             <div class="text-muted small mb-1">Nama Lengkap</div>
-                                            <div class="fw-medium">{{ $siswa->nama_lengkap ?? '-' }}</div>
+                                            <div class="fw-medium">
+                                                {{ $siswa->nama_siswa ?? '-' }}
+                                            </div>
                                         </div>
 
                                         <div class="col-md-6">
@@ -153,14 +165,15 @@
                             </div>
                         </div>
 
-                        {{-- Data orang tua dan wali --}}
+                        {{-- Data Orang Tua / Wali --}}
                         <div class="border rounded-4 mb-4 overflow-hidden">
                             <div class="d-flex align-items-center gap-3 p-3 border-bottom">
-                                <div class="avatar-sm">
+                                <div class="avatar-sm flex-shrink-0">
                                     <div class="avatar-title bg-success-subtle text-success rounded-circle">
                                         <i class="ri-parent-line fs-18"></i>
                                     </div>
                                 </div>
+
                                 <div>
                                     <h6 class="mb-1">Data Orang Tua / Wali</h6>
                                     <p class="text-muted small mb-0">
@@ -220,11 +233,12 @@
                         @if ($alamat)
                             <div class="border rounded-4 mb-4 overflow-hidden">
                                 <div class="d-flex align-items-center gap-3 p-3 border-bottom">
-                                    <div class="avatar-sm">
+                                    <div class="avatar-sm flex-shrink-0">
                                         <div class="avatar-title bg-info-subtle text-info rounded-circle">
                                             <i class="ri-map-pin-line fs-18"></i>
                                         </div>
                                     </div>
+
                                     <div>
                                         <h6 class="mb-1">Alamat</h6>
                                         <p class="text-muted small mb-0">
@@ -234,23 +248,46 @@
                                 </div>
 
                                 <div class="p-3">
-                                    <div class="text-muted small mb-1">Alamat Lengkap</div>
-                                    <div>
-                                        {{ $alamat->alamat_lengkap ?? '-' }}
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <div class="text-muted small mb-1">Alamat Lengkap</div>
+                                            <div>{{ $alamat->alamat_lengkap ?? '-' }}</div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="text-muted small mb-1">Kelurahan / Desa</div>
+                                            <div>{{ $alamat->kelurahan_desa ?? '-' }}</div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="text-muted small mb-1">Kecamatan</div>
+                                            <div>{{ $alamat->kecamatan ?? '-' }}</div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="text-muted small mb-1">Jarak ke Sekolah</div>
+                                            <div>{{ $alamat->jarak_ke_sekolah ?? '-' }}</div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="text-muted small mb-1">Waktu Tempuh</div>
+                                            <div>{{ $alamat->waktu_tempuh_ke_sekolah ?? '-' }}</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         @endif
 
-                        {{-- Pendidikan --}}
+                        {{-- Riwayat Pendidikan --}}
                         @if ($pendidikan)
                             <div class="border rounded-4 mb-4 overflow-hidden">
                                 <div class="d-flex align-items-center gap-3 p-3 border-bottom">
-                                    <div class="avatar-sm">
+                                    <div class="avatar-sm flex-shrink-0">
                                         <div class="avatar-title bg-warning-subtle text-warning rounded-circle">
                                             <i class="ri-graduation-cap-line fs-18"></i>
                                         </div>
                                     </div>
+
                                     <div>
                                         <h6 class="mb-1">Riwayat Pendidikan</h6>
                                         <p class="text-muted small mb-0">
@@ -262,62 +299,100 @@
                                 <div class="p-3">
                                     <div class="row g-3">
                                         <div class="col-md-6">
-                                            <div class="text-muted small mb-1">Nama Sekolah</div>
-                                            <div>{{ $pendidikan->nama_sekolah ?? '-' }}</div>
+                                            <div class="text-muted small mb-1">Jenjang Asal</div>
+                                            <div>{{ $pendidikan->jenjang_asal ?? '-' }}</div>
                                         </div>
 
                                         <div class="col-md-6">
-                                            <div class="text-muted small mb-1">NISN</div>
-                                            <div>{{ $pendidikan->nisn ?? '-' }}</div>
+                                            <div class="text-muted small mb-1">Nama Sekolah</div>
+                                            <div>{{ $pendidikan->asal_sekolah ?? '-' }}</div>
                                         </div>
+
+                                        <div class="col-md-6">
+                                            <div class="text-muted small mb-1">NPSN Sekolah Asal</div>
+                                            <div>{{ $pendidikan->npsn_asal_sekolah ?? '-' }}</div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="text-muted small mb-1">Tahun Lulus</div>
+                                            <div>{{ $pendidikan->tahun_lulus ?? '-' }}</div>
+                                        </div>
+
+                                        @if (filled($pendidikan->alamat_asal_sekolah))
+                                            <div class="col-12">
+                                                <div class="text-muted small mb-1">Alamat Sekolah Asal</div>
+                                                <div>{{ $pendidikan->alamat_asal_sekolah }}</div>
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
                         @endif
 
-                        {{-- Berkas --}}
+                        
+                        {{-- Berkas Persyaratan --}}
                         @if ($pendaftaran->ppdb_berkas->isNotEmpty())
                             <div class="border rounded-4 mb-4 overflow-hidden">
                                 <div class="d-flex align-items-center gap-3 p-3 border-bottom">
                                     <div class="avatar-sm">
                                         <div class="avatar-title bg-danger-subtle text-danger rounded-circle">
-                                            <i class="ri-file-list-3-line fs-18"></i>
+                                            <i class="ri-file-upload-line fs-18"></i>
                                         </div>
                                     </div>
+
                                     <div>
-                                        <h6 class="mb-1">Berkas Pendaftaran</h6>
+                                        <h6 class="mb-1">Berkas Persyaratan</h6>
                                         <p class="text-muted small mb-0">
-                                            Berkas yang telah diunggah
+                                            Dokumen pendukung pendaftaran
                                         </p>
                                     </div>
                                 </div>
 
-                                <div class="list-group list-group-flush">
-                                    @foreach ($pendaftaran->ppdb_berkas as $berkas)
-                                        <div class="list-group-item px-3 py-3">
-                                            <div class="d-flex align-items-center gap-3">
-                                                <i class="ri-file-text-line fs-20 text-muted"></i>
+                                <div class="p-3">
+                                    <div class="d-flex flex-column gap-3">
+                                        @foreach ($pendaftaran->ppdb_berkas as $berkas)
+                                            <div class="d-flex justify-content-between align-items-start gap-3">
                                                 <div class="flex-grow-1">
-                                                    <div class="fw-medium">
-                                                        {{ $berkas->nama_berkas ?? $berkas->jenis_berkas ?? 'Berkas' }}
+                                                    <div class="text-muted small mb-1">
+                                                        {{ $berkas->jenis_berkas ?? 'Berkas' }}
+                                                    </div>
+
+                                                    <div class="fw-medium text-break">
+                                                        {{ $berkas->nama_file ?? '-' }}
                                                     </div>
                                                 </div>
+
+                                                <span class="text-success small text-nowrap">
+                                                    <i class="ri-checkbox-circle-line me-1"></i>
+                                                    Terunggah
+                                                </span>
                                             </div>
-                                        </div>
-                                    @endforeach
+
+                                            @if (!$loop->last)
+                                                <hr class="my-0">
+                                            @endif
+                                        @endforeach
+                                    </div>
                                 </div>
                             </div>
                         @endif
 
-                        {{-- Jawaban tambahan --}}
-                        @if (count($jawabanTambahan))
-                            <div class="border rounded-4 mb-2 overflow-hidden">
+
+                        {{-- Informasi Tambahan --}}
+                        @php
+                            $jawabanTerisi = collect($jawabanTambahan)
+                                ->filter(fn ($jawaban) => filled($jawaban->jawaban));
+                        @endphp
+
+                        @if ($jawabanTerisi->isNotEmpty())
+                            <div class="border rounded-4 mb-4 overflow-hidden">
                                 <div class="d-flex align-items-center gap-3 p-3 border-bottom">
-                                    <div class="avatar-sm">
+                                    <div class="avatar-sm flex-shrink-0">
                                         <div class="avatar-title bg-info-subtle text-info rounded-circle">
                                             <i class="ri-question-answer-line fs-18"></i>
                                         </div>
                                     </div>
+
                                     <div>
                                         <h6 class="mb-1">Informasi Tambahan</h6>
                                         <p class="text-muted small mb-0">
@@ -327,21 +402,23 @@
                                 </div>
 
                                 <div class="p-3">
-                                    @foreach ($jawabanTambahan as $jawaban)
-                                        @if (filled($jawaban->jawaban))
-                                            <div class="{{ !$loop->last ? 'mb-3' : '' }}">
-                                                <div class="text-muted small mb-1">
-                                                    {{ $jawaban->ppdb_pertanyaan->pertanyaan ?? $jawaban->ppdb_pertanyaan->nama_pertanyaan ?? 'Pertanyaan' }}
-                                                </div>
-                                                <div>{{ $jawaban->jawaban }}</div>
+                                    @foreach ($jawabanTerisi as $jawaban)
+                                        <div class="{{ !$loop->last ? 'mb-3' : '' }}">
+                                            <div class="text-muted small mb-1">
+                                                {{ $jawaban->ppdb_pertanyaan->pertanyaan ?? $jawaban->ppdb_pertanyaan->nama_pertanyaan ?? 'Pertanyaan' }}
                                             </div>
-                                        @endif
+
+                                            <div class="fw-medium">
+                                                {{ $jawaban->jawaban }}
+                                            </div>
+                                        </div>
                                     @endforeach
                                 </div>
                             </div>
                         @endif
+
                     @endif
-                </div>
+                </>
 
                 <div class="modal-footer">
                     <button

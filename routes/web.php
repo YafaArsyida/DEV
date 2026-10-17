@@ -314,6 +314,7 @@ Route::middleware(['auth', 'peran:SUPERADMIN, ADMIN, KEUANGAN'])->group(function
     */
     Route::prefix('ppdb/admin')
         ->name('ppdb.admin.')
+        ->middleware(['auth', 'peran:SUPERADMIN,ADMIN,PANITIA_PPDB'])
         ->group(function () {
 
             /*
@@ -347,6 +348,9 @@ Route::middleware(['auth', 'peran:SUPERADMIN, ADMIN, KEUANGAN'])->group(function
 
             Route::get('/pengaturan', [PpdbAdminController::class, 'pengaturan'])
                 ->name('pengaturan');
+
+            Route::get('/berkas/preview/{berkasId}', [PpdbAdminController::class, 'showBerkas',])
+                ->name('berkas.preview');
         });
         
     /*

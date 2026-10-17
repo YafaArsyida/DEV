@@ -29,108 +29,135 @@
 
                     <div class="card-body pt-3">
                         @if ($pendaftaran)
-                            <div class="row align-items-center g-3">
-                                <div class="col-lg-7">
-                                    <small class="text-muted d-block mb-1">
-                                        Nomor Pendaftaran
-                                    </small>
+                            @php
+                                $statusInfo = [
+                                    'draft' => [
+                                        'label' => 'Belum Dikirim',
+                                        'class' => 'bg-secondary-subtle text-secondary',
+                                        'icon' => 'ri-draft-line',
+                                        'deskripsi' => 'Lengkapi data dan kirim pendaftaran setelah semuanya sesuai.',
+                                    ],
+                                    'pengecekan' => [
+                                        'label' => 'Sedang Diperiksa',
+                                        'class' => 'bg-warning-subtle text-warning',
+                                        'icon' => 'ri-time-line',
+                                        'deskripsi' => 'Pendaftaran sudah dikirim dan sedang diperiksa oleh panitia.',
+                                    ],
+                                    'perbaikan' => [
+                                        'label' => 'Perlu Perbaikan',
+                                        'class' => 'bg-danger-subtle text-danger',
+                                        'icon' => 'ri-edit-line',
+                                        'deskripsi' => 'Ada data yang perlu diperbaiki sesuai catatan panitia.',
+                                    ],
+                                    'diterima' => [
+                                        'label' => 'Diterima',
+                                        'class' => 'bg-success-subtle text-success',
+                                        'icon' => 'ri-checkbox-circle-line',
+                                        'deskripsi' => 'Selamat, calon siswa dinyatakan diterima.',
+                                    ],
+                                    'ditolak' => [
+                                        'label' => 'Tidak Diterima',
+                                        'class' => 'bg-danger-subtle text-danger',
+                                        'icon' => 'ri-close-circle-line',
+                                        'deskripsi' => 'Silakan lihat status pendaftaran untuk informasi selengkapnya.',
+                                    ],
+                                ];
 
-                                    <h4 class="fw-bold text-primary mb-2">
-                                        {{ $pendaftaran->nomor_pendaftaran }}
-                                    </h4>
+                                $info = $statusInfo[$pendaftaran->status] ?? [
+                                    'label' => 'Dalam Proses',
+                                    'class' => 'bg-secondary-subtle text-secondary',
+                                    'icon' => 'ri-information-line',
+                                    'deskripsi' => 'Silakan periksa status pendaftaran secara berkala.',
+                                ];
 
-                                    <div class="d-flex flex-wrap align-items-center gap-2">
-                                        @if ($pendaftaran->ppdb_calon_siswa)
-                                            <span class="text-muted">
-                                                <i class="ri-user-line me-1"></i>
-                                                {{ $pendaftaran->ppdb_calon_siswa->nama_siswa ?? '-' }}
-                                            </span>
-                                        @endif
+                                $bolehEdit = in_array($pendaftaran->status, [
+                                    'draft',
+                                    'perbaikan',
+                                ]);
+                            @endphp
+
+                            <div class="border rounded-4 p-3 p-md-4">
+                                <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
+                                    <div class="flex-grow-1">
+                                        <div class="text-muted small mb-1">
+                                            Nomor Pendaftaran
+                                        </div>
+
+                                        <h4 class="text-primary fw-bold mb-3">
+                                            {{ $pendaftaran->nomor_pendaftaran ?? '-' }}
+                                        </h4>
+
+                                        <div class="d-flex align-items-center gap-2 mb-3">
+                                            <div class="avatar-xs flex-shrink-0">
+                                                <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
+                                                    <i class="ri-user-3-line"></i>
+                                                </div>
+                                            </div>
+
+                                            <div class="fw-semibold">
+                                                {{ $pendaftaran->ppdb_calon_siswa->nama_siswa ?? 'Data siswa belum diisi' }}
+                                            </div>
+                                        </div>
 
                                         @if ($pendaftaran->ppdb_jalur)
-                                            <span class="badge bg-light text-body border rounded-pill px-3 py-2">
-                                                {{ $pendaftaran->ppdb_jalur->nama_jalur }}
-                                            </span>
+                                            <div class="d-flex align-items-center gap-2 mb-3">
+                                                <div class="avatar-xs flex-shrink-0">
+                                                    <div class="avatar-title bg-secondary-subtle text-secondary rounded-circle">
+                                                        <i class="ri-route-line"></i>
+                                                    </div>
+                                                </div>
+
+                                                <div class="fw-semibold">
+                                                    {{ $pendaftaran->ppdb_jalur->nama_jalur }}
+                                                </div>
+                                            </div>
                                         @endif
                                     </div>
-                                </div>
 
-                                <div class="col-lg-5 text-lg-end">
-                                    @php
-                                        $statusInfo = [
-                                            'draft' => [
-                                                'label' => 'Belum Dikirim',
-                                                'class' => 'bg-secondary-subtle text-secondary',
-                                                'icon' => 'ri-draft-line',
-                                            ],
-                                            'submitted' => [
-                                                'label' => 'Menunggu Verifikasi',
-                                                'class' => 'bg-info-subtle text-info',
-                                                'icon' => 'ri-time-line',
-                                            ],
-                                            'menunggu_verifikasi' => [
-                                                'label' => 'Menunggu Verifikasi',
-                                                'class' => 'bg-info-subtle text-info',
-                                                'icon' => 'ri-time-line',
-                                            ],
-                                            'perbaikan' => [
-                                                'label' => 'Perlu Perbaikan',
-                                                'class' => 'bg-warning-subtle text-warning',
-                                                'icon' => 'ri-edit-line',
-                                            ],
-                                            'diterima' => [
-                                                'label' => 'Diterima',
-                                                'class' => 'bg-success-subtle text-success',
-                                                'icon' => 'ri-checkbox-circle-line',
-                                            ],
-                                            'ditolak' => [
-                                                'label' => 'Tidak Diterima',
-                                                'class' => 'bg-danger-subtle text-danger',
-                                                'icon' => 'ri-close-circle-line',
-                                            ],
-                                        ];
+                                    <div class="border-top d-lg-none"></div>
 
-                                        $info = $statusInfo[$status] ?? [
-                                            'label' => 'Dalam Proses',
-                                            'class' => 'bg-secondary-subtle text-secondary',
-                                            'icon' => 'ri-information-line',
-                                        ];
-                                    @endphp
+                                    <div class="flex-shrink-0" style="min-width: 240px;">
+                                        <div class="mb-2">
+                                            <span class="badge {{ $info['class'] }} rounded-pill px-3 py-2">
+                                                <i class="{{ $info['icon'] }} me-1"></i>
+                                                {{ $info['label'] }}
+                                            </span>
+                                        </div>
 
-                                    <span class="badge {{ $info['class'] }} rounded-pill px-3 py-2 fs-13">
-                                        <i class="{{ $info['icon'] }} me-1"></i>
-                                        {{ $info['label'] }}
-                                    </span>
+                                        <p class="text-muted small mb-3">
+                                            {{ $info['deskripsi'] }}
+                                        </p>
 
-                                    <div class="mt-3">
-                                        <a href="{{ route('ppdb.pendaftaran.status') }}"
-                                            class="btn btn-outline-primary rounded-pill px-4">
-                                            <i class="ri-file-list-3-line me-1"></i>
-                                            Lihat Status
-                                        </a>
+                                        <div class="d-flex flex-column gap-2">
+                                            <a href="{{ route('ppdb.pendaftaran.status') }}"
+                                                class="btn btn-outline-primary rounded-pill">
+                                                <i class="ri-file-list-3-line me-1"></i>
+                                                Lihat Status
+                                            </a>
 
-                                        <a href="{{ route('ppdb.pendaftaran.review') }}"
-                                            class="btn btn-primary rounded-pill px-4">
-                                            <i class="ri-eye-line me-1"></i>
-                                            Preview Data
-                                        </a>
+                                            <a href="{{ route('ppdb.pendaftaran.review') }}"
+                                                class="btn btn-light rounded-pill">
+                                                <i class="ri-eye-line me-1"></i>
+                                                Preview Data
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         @else
-                            <div class="text-center py-4">
+                            <div class="text-center py-4 py-md-5">
                                 <div class="avatar-lg mx-auto mb-3">
-                                    <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-1">
-                                        <i class="ri-file-add-line"></i>
+                                    <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
+                                        <i class="ri-file-add-line fs-1"></i>
                                     </div>
                                 </div>
 
-                                <h5 class="fw-bold mb-2">
+                                <h5 class="fw-semibold mb-2">
                                     Belum Ada Pendaftaran
                                 </h5>
 
-                                <p class="text-muted mb-3">
-                                    Silakan pilih jalur pendaftaran untuk memulai proses PPDB.
+                                <p class="text-muted mb-4 mx-auto" style="max-width: 380px;">
+                                    Mulai proses PPDB dengan memilih jalur pendaftaran yang tersedia.
                                 </p>
 
                                 @if ($periode)
@@ -140,13 +167,15 @@
                                         Mulai Pendaftaran
                                     </a>
                                 @else
-                                    <span class="text-muted small">
-                                        Belum ada periode PPDB yang dibuka saat ini.
-                                    </span>
+                                    <div class="d-inline-flex align-items-center gap-2 text-muted small">
+                                        <i class="ri-information-line"></i>
+                                        <span>Belum ada periode PPDB yang dibuka saat ini.</span>
+                                    </div>
                                 @endif
                             </div>
                         @endif
                     </div>
+
                 </div>
 
                 @if ($pendaftaran)
@@ -221,15 +250,48 @@
                         <div class="card-body">
                             @php
                                 $steps = [
-                                    1 => 'Jalur Pendaftaran',
-                                    2 => 'Data Calon Siswa',
-                                    3 => 'Orang Tua/Wali',
-                                    4 => 'Alamat',
-                                    5 => 'Pendidikan',
-                                    6 => 'Berkas',
-                                    7 => 'Review Data',
-                                    8 => 'Menunggu Hasil',
+                                    1 => [
+                                        'label' => 'Jalur Pendaftaran',
+                                        'route' => 'ppdb.pendaftaran.jalur',
+                                        'icon' => 'ri-route-line',
+                                    ],
+                                    2 => [
+                                        'label' => 'Data Calon Siswa',
+                                        'route' => 'ppdb.pendaftaran.data-siswa',
+                                        'icon' => 'ri-user-3-line',
+                                    ],
+                                    3 => [
+                                        'label' => 'Orang Tua/Wali',
+                                        'route' => 'ppdb.pendaftaran.orang-tua',
+                                        'icon' => 'ri-parent-line',
+                                    ],
+                                    4 => [
+                                        'label' => 'Alamat',
+                                        'route' => 'ppdb.pendaftaran.alamat',
+                                        'icon' => 'ri-map-pin-line',
+                                    ],
+                                    5 => [
+                                        'label' => 'Pendidikan',
+                                        'route' => 'ppdb.pendaftaran.pendidikan',
+                                        'icon' => 'ri-school-line',
+                                    ],
+                                    6 => [
+                                        'label' => 'Berkas',
+                                        'route' => 'ppdb.pendaftaran.berkas',
+                                        'icon' => 'ri-file-paper-2-line',
+                                    ],
+                                    7 => [
+                                        'label' => 'Review Data',
+                                        'route' => 'ppdb.pendaftaran.review',
+                                        'icon' => 'ri-checkbox-circle-line',
+                                    ],
+                                    8 => [
+                                        'label' => 'Menunggu Hasil',
+                                        'route' => 'ppdb.pendaftaran.status',
+                                        'icon' => 'ri-time-line',
+                                    ],
                                 ];
+
                             @endphp
 
                             <div class="d-flex justify-content-between align-items-center mb-2">
@@ -253,10 +315,21 @@
                             </div>
 
                             <div class="row g-3">
-                                @foreach ($steps as $step => $label)
+                                @foreach ($steps as $step => $item)
                                     @php
-                                        $selesai = $step < $currentStep;
-                                        $aktif = $step === $currentStep;
+                                        $label = $item['label'];
+
+                                        $sudahDikirim = in_array($status, [
+                                            'pengecekan',
+                                            'diterima',
+                                        ]);
+
+                                        $stepSelesaiSampai = $sudahDikirim
+                                            ? max($currentStep, 7)
+                                            : $currentStep - 1;
+
+                                        $selesai = $step <= $stepSelesaiSampai;
+                                        $aktif = ! $selesai && $step === $currentStep;
 
                                         $iconClass = $selesai
                                             ? 'bg-success-subtle text-success'
@@ -269,10 +342,32 @@
                                             : ($aktif
                                                 ? 'ri-time-line'
                                                 : 'ri-checkbox-blank-circle-line');
+
+                                        // Tahap yang boleh dibuka.
+                                        $bolehDibuka = $step <= $currentStep;
+
+                                        // Setelah dikirim, form tidak boleh dibuka kembali.
+                                        if ($sudahDikirim && $step <= 7) {
+                                            $bolehDibuka = false;
+                                        }
+
+                                        // Status perbaikan boleh mengakses form untuk memperbaiki data.
+                                        if ($status === 'perbaikan' && $step >= 2 && $step <= 6) {
+                                            $bolehDibuka = true;
+                                        }
+
+                                        $url = $bolehDibuka && \Illuminate\Support\Facades\Route::has($item['route'])
+                                            ? route($item['route'])
+                                            : null;
                                     @endphp
 
                                     <div class="col-12 col-sm-6 col-lg-3">
-                                        <div class="border rounded-4 p-3 h-100">
+                                        @if ($url)
+                                            <a href="{{ $url }}"
+                                                class="text-reset text-decoration-none d-block h-100">
+                                        @endif
+
+                                        <div class="border rounded-4 p-3 h-100 {{ $url ? 'cursor-pointer' : '' }}">
                                             <div class="d-flex align-items-center gap-2 mb-2">
                                                 <div class="avatar-xs">
                                                     <div class="avatar-title {{ $iconClass }} rounded-circle">
@@ -285,17 +380,28 @@
                                                 </small>
                                             </div>
 
-                                            <div class="fw-semibold">
+                                            <div class="fw-semibold mb-1">
                                                 {{ $label }}
                                             </div>
 
                                             <small class="{{ $selesai ? 'text-success' : ($aktif ? 'text-primary' : 'text-muted') }}">
                                                 {{ $selesai ? 'Selesai' : ($aktif ? 'Tahap saat ini' : 'Belum dicapai') }}
                                             </small>
+
+                                            {{-- @if ($url)
+                                                <div class="text-primary small mt-2">
+                                                    Buka tahap <i class="ri-arrow-right-line align-middle"></i>
+                                                </div>
+                                            @endif --}}
                                         </div>
+
+                                        @if ($url)
+                                            </a>
+                                        @endif
                                     </div>
                                 @endforeach
                             </div>
+
 
                             @if ($status === 'draft' || $status === 'perbaikan')
                                 <div class="mt-4">
@@ -308,7 +414,6 @@
                             @endif
                         </div>
                     </div>
-
                 @endif
 
                 {{-- INFORMASI JADWAL PPDB --}}

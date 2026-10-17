@@ -78,17 +78,18 @@
 
         {{-- Tabel --}}
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
+            <table class="table table-hover table-nowrap align-middle">
                 <thead class="table-light">
                     <tr class="text-uppercase">
                         <th class="text-center" style="width: 60px;">No.</th>
                         <th>Calon Siswa</th>
                         <th>Nomor Pendaftaran</th>
                         <th>Jalur</th>
-                        <th>Sumber Pendaftaran</th>
+                        <th>Sumber</th>
+                        <th>Akun</th>
                         <th>Tanggal Daftar</th>
                         <th>Status</th>
-                        <th class="text-center" style="width: 110px;">Aksi</th>
+                        <th class="text-center">Aksi</th>
                     </tr>
                 </thead>
 
@@ -114,10 +115,18 @@
                                     @if ($item->ms_pengguna->peran === 'ORANG_TUA')
                                         Orang Tua {{ $item->ms_pengguna->nama ?? '-' }}
                                     @elseif ($item->ms_pengguna->peran != 'ORANG_TUA')
-                                        Dibantu Panitia {{ $item->ms_pengguna->nama ?? '-' }}
+                                        Panitia {{ $item->ms_pengguna->nama ?? '-' }}
                                     @else
                                         {{ $item->ms_pengguna->peran ?? 'Tidak diketahui' }}
                                     @endif
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
+                            </td>
+
+                            <td>
+                                @if ($item->ms_pengguna)
+                                    {{ $item->ms_pengguna->email ?? '-' }}
                                 @else
                                     <span class="text-muted">-</span>
                                 @endif
@@ -151,19 +160,105 @@
                                     'perbaikan' => 'Perlu Perbaikan',
                                 ][$item->status] ?? '-' }}
                             </td>
+                            
+                            <td>
+                                <div class="d-flex justify-content-center align-items-center gap-2 flex-nowrap">
 
-
-                            <td class="text-center">
-                                <div class="d-flex justify-content-center gap-2">
                                     {{-- Detail --}}
-                                    <a href="#ModalDetailPendaftar" data-bs-toggle="modal" class="btn btn-soft-primary btn-sm rounded-pill px-3"
-                                        title="Detail Pendaftar" wire:click.prevent="$emit('loadDetailPendaftar', {{ $item->ppdb_pendaftaran_id }} )">
-                                        <i class="ri-eye-line me-1"></i> Detail
+                                    <a
+                                        href="#ModalDetailPendaftar"
+                                        data-bs-toggle="modal"
+                                        class="btn btn-soft-primary btn-sm rounded-pill px-3 text-nowrap"
+                                        title="Detail Pendaftar"
+                                        wire:click.prevent="$emit('loadDetailPendaftar', {{ $item->ppdb_pendaftaran_id }})">
+                                        <i class="ri-eye-line me-1"></i>
+                                        Detail
                                     </a>
-                                    {{-- WA --}}
-                                    
+
+                                    {{-- Kontak WhatsApp --}}
+                                    @php
+                                        $orangTua = $item->ppdb_orangtua;
+
+                                        $kontakWhatsApp = [
+                                            'Ayah' => $orangTua->telepon_ayah ?? null,
+                                            'Ibu' => $orangTua->telepon_ibu ?? null,
+                                            'Wali' => $orangTua->telepon_wali ?? null,
+                                        ];
+
+                                        $kontakTersedia = collect($kontakWhatsApp)
+                                            ->filter(fn ($nomor) => filled($nomor));
+                                    @endphp
+
+                                    <div class="dropdown">
+                                        <button
+                                            type="button"
+                                            class="btn btn-soft-success btn-sm rounded-pill px-3 text-nowrap"
+                                            data-bs-toggle="dropdown"
+                                            aria-expanded="false"
+                                            title="Hubungi orang tua">
+                                            <i class="ri-whatsapp-line me-1"></i>
+                                            Hubungi
+                                            <i class="ri-arrow-down-s-line ms-1"></i>
+                                        </button>
+
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                            <li>
+                                                <h6 class="dropdown-header">Hubungi Orang Tua</h6>
+                                            </li>
+
+                                            @forelse ($kontakTersedia as $label => $nomor)
+                                                @php
+                                                    $nomorBersih = preg_replace('/\D/', '', $nomor);
+
+                                                    if (str_starts_with($nomorBersih, '0')) {
+                                                        $nomorBersih = '62' . substr($nomorBersih, 1);
+                                                    } elseif (str_starts_with($nomorBersih, '8')) {
+                                                        $nomorBersih = '62' . $nomorBersih;
+                                                    }
+                                                @endphp
+
+                                                @if ($nomorBersih)
+                                                    <li>
+                                                        <a
+                                                            href="https://wa.me/{{ $nomorBersih }}"
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            class="dropdown-item py-2">
+                                                            <i class="ri-whatsapp-line text-success me-2"></i>
+                                                            WhatsApp {{ $label }}
+                                                        </a>
+                                                    </li>
+                                                @endif
+                                            @empty
+                                                <li>
+                                                    <span class="dropdown-item-text text-muted small">
+                                                        Nomor kontak belum tersedia.
+                                                    </span>
+                                                </li>
+                                            @endforelse
+                                        </ul>
+                                    </div>
+
+                                    {{-- RESET PASSWORD --}}
+                                    @if ($item->ms_pengguna && $item->ms_pengguna->peran === 'ORANG_TUA')
+                                        <a
+                                            href="#ModalKonfirmasiReset"
+                                            data-bs-toggle="modal"
+                                            class="btn btn-soft-danger btn-sm rounded-pill px-3 text-nowrap"
+                                            title="Reset Password"
+                                            wire:click.prevent="$emit(
+                                                'resetPassword',
+                                                {{ $item->ms_pengguna->ms_pengguna_id }}
+                                            )">
+
+                                            <i class="ri-lock-unlock-line me-1"></i>
+                                            Reset
+                                        </a>
+                                    @endif
+
                                 </div>
                             </td>
+
                         </tr>
                     @empty
                         <tr>
@@ -193,20 +288,29 @@
                     @endforelse
                 </tbody>
             </table>
-        </div>
-
-        {{-- Pagination dinamis --}}
-        @if ($pendaftar->total() > 0)
-            <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3 mt-4">
-                <div class="text-muted small">
-                    Menampilkan {{ $pendaftar->firstItem() }}–{{ $pendaftar->lastItem() }}
-                    dari {{ $pendaftar->total() }} pendaftar
-                </div>
-
-                <div>
-                    {{ $pendaftar->links() }}
+            {{-- PAGINATION --}}
+            <div class="mt-3">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div class="text-muted fs-13">
+                        Menampilkan
+                        <span class="fw-semibold">
+                            {{ $pendaftar->firstItem() ?? 0 }}
+                        </span>
+                        -
+                        <span class="fw-semibold">
+                            {{ $pendaftar->lastItem() ?? 0 }}
+                        </span>
+                        dari
+                        <span class="fw-semibold">
+                            {{ $pendaftar->total() }}
+                        </span>
+                        data pendaftar
+                    </div>
+                    <div>
+                        {{ $pendaftar->links() }}
+                    </div>
                 </div>
             </div>
-        @endif
+        </div>
     </div>
 </div>

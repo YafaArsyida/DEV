@@ -32,7 +32,7 @@ class PreviewBerkas extends Component
 
         $isAdmin = in_array(
             strtoupper($user->peran ?? ''),
-            ['SUPERADMIN', 'ADMIN', 'KEUANGAN'],
+            ['SUPERADMIN', 'ADMIN', 'KEUANGAN', 'PANITIA_PPDB'],
             true
         );
 
@@ -53,10 +53,15 @@ class PreviewBerkas extends Component
             'jenis'     => $berkas->jenis_berkas,
             'nama_file' => $berkas->nama_file,
             'mime_type' => $berkas->mime_type,
-            'url'       => route(
-                'ppdb.berkas.preview',
-                $berkas->ppdb_berkas_id
-            ),
+            'url' => $isAdmin
+                ? route(
+                    'ppdb.admin.berkas.preview',
+                    $berkas->ppdb_berkas_id
+                )
+                : route(
+                    'ppdb.berkas.preview',
+                    $berkas->ppdb_berkas_id
+                ),
         ];
     }
 

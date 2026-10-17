@@ -99,6 +99,24 @@
         @livewireScripts 
     
         <script>
+            // reset tab
+            document.addEventListener('DOMContentLoaded', function () {
+                const offcanvasElement = document.getElementById(
+                    'offcanvasPemeriksaanPendaftaran'
+                );
+
+                if (!offcanvasElement) return;
+
+                offcanvasElement.addEventListener('show.bs.offcanvas', function () {
+                    const tabTrigger = offcanvasElement.querySelector(
+                        '[data-bs-target="#konten-siswa"]'
+                    );
+
+                    if (tabTrigger) {
+                        bootstrap.Tab.getOrCreateInstance(tabTrigger).show();
+                    }
+                });
+            });
             // notif
             window.addEventListener('alertify-success', event => {
                 alertify.set('notifier', 'position', 'bottom-right');

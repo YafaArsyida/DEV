@@ -1,7 +1,6 @@
 
 <div>
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-
         {{-- HEADER --}}
         <div class="card-header">
             <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">

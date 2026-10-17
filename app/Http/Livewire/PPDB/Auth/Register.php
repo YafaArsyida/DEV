@@ -42,7 +42,7 @@ class Register extends Component
             'password' => [
                 'required',
                 'string',
-                'min:8',
+                'min:6',
                 'confirmed',
             ],
 
@@ -65,7 +65,7 @@ class Register extends Component
         'telepon.max' => 'Nomor WhatsApp maksimal 20 karakter.',
 
         'password.required' => 'Password wajib diisi.',
-        'password.min' => 'Password minimal 8 karakter.',
+        'password.min' => 'Password minimal 6 karakter.',
         'password.confirmed' => 'Konfirmasi password tidak cocok.',
 
         'agreement.accepted' => 'Kamu harus menyetujui syarat dan ketentuan PPDB.',

@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\PPDB;
 
 use App\Http\Controllers\Controller;
+use App\Models\PPDBBerkas;
 use App\Models\PPDBGelombang;
 use App\Models\PPDBJalur;
 use App\Models\PPDBPendaftaran;
 use App\Models\PPDBPeriode;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
 
 class PpdbAdminController extends Controller
 {
@@ -218,9 +221,85 @@ class PpdbAdminController extends Controller
         ));
     }
 
+    public function showBerkas(Request $request, $berkasId)
+    {
+        $berkas = PPDBBerkas::with('ppdb_pendaftaran')
+            ->findOrFail($berkasId);
+
+        abort_unless($berkas->ppdb_pendaftaran, 404);
+
+        // Otorisasi petugas PPDB.
+        $peran = strtoupper($request->user()->peran ?? '');
+
+        abort_unless(
+            in_array(
+                $peran,
+                ['SUPERADMIN', 'ADMIN', 'KEUANGAN', 'PANITIA_PPDB'],
+                true
+            ),
+            403
+        );
+
+        // Batasi format yang dapat ditampilkan.
+        abort_unless(
+            in_array($berkas->mime_type, [
+                'image/webp',
+                'image/jpeg',
+                'image/png',
+                'application/pdf',
+            ], true),
+            415
+        );
+
+        $disk = Storage::disk('local');
+        $path = $berkas->path_file;
+
+        abort_unless(
+            $path && $disk->exists($path),
+            404
+        );
+
+        return response()->file(
+            $disk->path($path),
+            [
+                'Content-Type' => $berkas->mime_type,
+                'Content-Disposition' =>
+                    'inline; filename="' .
+                    basename($berkas->nama_file) . '"',
+                'X-Content-Type-Options' => 'nosniff',
+            ]
+        );
+    }
+
     public function pendaftar()
     {
-        return view('ppdb.admin.pendaftar');
+        $query = PPDBPendaftaran::whereHas('ppdb_periode', function ($query) {
+            $query->where('status', 'aktif');
+        });
+
+        $totalPendaftar = (clone $query)->count();
+
+        $menungguVerifikasi = PPDBPendaftaran::where(
+            'status',
+            'pengecekan'
+        )->count();
+
+        $terverifikasi = PPDBPendaftaran::where(
+            'status',
+            'diterima'
+        )->count();
+
+        $perluPerbaikan = PPDBPendaftaran::where(
+            'status',
+            'perbaikan'
+        )->count();
+
+        return view('ppdb.admin.pendaftar', compact(
+            'totalPendaftar',
+            'menungguVerifikasi',
+            'terverifikasi',
+            'perluPerbaikan'
+        ));
     }
 
     public function bantuPendaftaran()

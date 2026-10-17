@@ -178,6 +178,10 @@ class FormAlamat extends Component
                 'moda_transportasi' => $this->moda_transportasi,
             ]);
 
+            $pendaftaran->update([
+                'current_step' => 4,
+            ]);
+
         });
 
 
