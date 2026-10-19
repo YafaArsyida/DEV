@@ -84,7 +84,12 @@
                                         <div class="d-flex align-items-center gap-2 text-muted small">
                                             <i class="ri-calendar-line fs-16"></i>
                                             <span>
-                                                {{ $pendaftaran->created_at?->translatedFormat('d F Y, H:i') ?? '-' }}
+                                                {{ $pendaftaran->created_at
+                                                    ? \App\Http\Controllers\HelperController::formatTanggalIndonesia(
+                                                        $pendaftaran->created_at,
+                                                        'd F Y, H:i'
+                                                    )
+                                                    : '-' }}
                                             </span>
                                         </div>
                                     </div>

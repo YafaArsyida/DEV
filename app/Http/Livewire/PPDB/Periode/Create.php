@@ -21,7 +21,7 @@ class Create extends Component
 
     public $status = 'aktif';
 
-    public $keterangan = '';
+    public $deskripsi = '';
 
     protected $listeners = [
         'showCreatePeriode',
@@ -51,7 +51,7 @@ class Create extends Component
             'tanggal_mulai' => 'required|date',
             'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
             'status' => 'required|in:aktif,nonaktif',
-            'keterangan' => 'nullable|string|max:1000',
+            'deskripsi' => 'nullable|string|max:1000',
         ];
     }
 
@@ -72,7 +72,7 @@ class Create extends Component
         'tanggal_selesai.after_or_equal' => 'Tanggal selesai harus sama dengan atau setelah tanggal mulai.',
         'status.required' => 'Status periode wajib dipilih.',
         'status.in' => 'Status periode tidak valid.',
-        'keterangan.max' => 'Keterangan maksimal 1000 karakter.',
+        'deskripsi.max' => 'Deskripsi maksimal 1000 karakter.',
     ];
 
     /**
@@ -100,7 +100,7 @@ class Create extends Component
                 'tanggal_mulai' => $this->tanggal_mulai,
                 'tanggal_selesai' => $this->tanggal_selesai,
                 'status' => $this->status,
-                'keterangan' => $this->keterangan,
+                'deskripsi' => $this->deskripsi,
             ]);
 
             DB::commit();
@@ -146,7 +146,7 @@ class Create extends Component
         $this->tanggal_mulai = '';
         $this->tanggal_selesai = '';
         $this->status = 'aktif';
-        $this->keterangan = '';
+        $this->deskripsi = '';
     }
     public function render()
     {

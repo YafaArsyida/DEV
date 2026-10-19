@@ -159,21 +159,21 @@
 
                         <div class="mb-3">
                             <label
-                                for="create_keterangan_periode"
+                                for="create_deskripsi_periode"
                                 class="form-label"
                             >
-                                Keterangan
+                                Deskripsi
                             </label>
 
                             <textarea
-                                id="create_keterangan_periode"
-                                wire:model.defer="keterangan"
-                                class="form-control @error('keterangan') is-invalid @enderror"
+                                id="create_deskripsi_periode"
+                                wire:model.defer="deskripsi"
+                                class="form-control @error('deskripsi') is-invalid @enderror"
                                 rows="2"
-                                placeholder="Keterangan tambahan tentang periode"
+                                placeholder="deskripsi tambahan tentang periode"
                             ></textarea>
 
-                            @error('keterangan')
+                            @error('deskripsi')
                                 <div class="invalid-feedback">
                                     {{ $message }}
                                 </div>

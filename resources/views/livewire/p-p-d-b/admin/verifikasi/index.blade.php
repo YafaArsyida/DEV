@@ -18,11 +18,6 @@
                         </small>
                     </div>
                 </div>
-
-                <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">
-                    <i class="ri-time-line me-1"></i>
-                    {{ number_format($jumlahMenunggu) }} Menunggu
-                </span>
             </div>
         </div>
 
@@ -166,19 +161,11 @@
                                             {{ $jumlahBerkas }} berkas
                                         </span>
                                     </div>
-
-                                    <small class="text-muted">
-                                        Dokumen terunggah
-                                    </small>
                                 </td>
 
                                 {{-- Tanggal dikirim --}}
                                 <td>
-                                    <span>
-                                        {{ $item->updated_at
-                                            ? $item->updated_at->format('d M Y')
-                                            : '-' }}
-                                    </span>
+                                    {{\App\Http\Controllers\HelperController::formatTanggalIndonesia($item->updated_at, 'd F Y') }}
                                 </td>
 
                                 {{-- Status --}}
@@ -221,12 +208,13 @@
                                 </td>
 
                                 {{-- Aksi --}}
-                                
                                 <td class="text-center">
-                                    <div class="d-flex justify-content-center gap-2">
+                                    <div class="d-flex justify-content-center align-items-center gap-2 flex-nowrap">
+
+                                        {{-- PERIKSA --}}
                                         <button
                                             type="button"
-                                            class="btn btn-soft-primary btn-sm rounded-pill px-3"
+                                            class="btn btn-soft-primary btn-sm rounded-pill px-3 text-nowrap"
                                             data-bs-toggle="offcanvas"
                                             data-bs-target="#offcanvasPemeriksaanPendaftaran"
                                             title="Periksa Dokumen Pendaftaran"
@@ -236,8 +224,77 @@
                                             Periksa
                                         </button>
 
+                                        {{-- KONTAK WHATSAPP --}}
+                                        @php
+                                            $orangTua = $item->ppdb_orangtua;
+
+                                            $kontakWhatsApp = [
+                                                'Ayah' => $orangTua->telepon_ayah ?? null,
+                                                'Ibu' => $orangTua->telepon_ibu ?? null,
+                                                'Wali' => $orangTua->telepon_wali ?? null,
+                                            ];
+
+                                            $kontakTersedia = collect($kontakWhatsApp)
+                                                ->filter(fn ($nomor) => filled($nomor));
+                                        @endphp
+
+                                        <div class="dropdown">
+                                            <button
+                                                type="button"
+                                                class="btn btn-soft-success btn-sm rounded-pill px-3 text-nowrap"
+                                                data-bs-toggle="dropdown"
+                                                aria-expanded="false"
+                                                title="Hubungi orang tua">
+
+                                                <i class="ri-whatsapp-line me-1"></i>
+                                                Hubungi
+                                                <i class="ri-arrow-down-s-line ms-1"></i>
+                                            </button>
+
+                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                                <li>
+                                                    <h6 class="dropdown-header">
+                                                        Hubungi Orang Tua
+                                                    </h6>
+                                                </li>
+
+                                                @forelse ($kontakTersedia as $label => $nomor)
+                                                    @php
+                                                        $nomorBersih = preg_replace('/\D/', '', $nomor);
+
+                                                        if (str_starts_with($nomorBersih, '0')) {
+                                                            $nomorBersih = '62' . substr($nomorBersih, 1);
+                                                        } elseif (str_starts_with($nomorBersih, '8')) {
+                                                            $nomorBersih = '62' . $nomorBersih;
+                                                        }
+                                                    @endphp
+
+                                                    @if ($nomorBersih)
+                                                        <li>
+                                                            <a
+                                                                href="https://wa.me/{{ $nomorBersih }}"
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                class="dropdown-item py-2">
+
+                                                                <i class="ri-whatsapp-line text-success me-2"></i>
+                                                                WhatsApp {{ $label }}
+                                                            </a>
+                                                        </li>
+                                                    @endif
+                                                @empty
+                                                    <li>
+                                                        <span class="dropdown-item-text text-muted small">
+                                                            Nomor kontak belum tersedia.
+                                                        </span>
+                                                    </li>
+                                                @endforelse
+                                            </ul>
+                                        </div>
+
                                     </div>
                                 </td>
+
 
                             </tr>
                         @empty

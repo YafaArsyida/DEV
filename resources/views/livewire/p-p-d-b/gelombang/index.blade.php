@@ -249,7 +249,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="8" class="text-center py-5">
+                                    <td colspan="9" class="text-center py-5">
                                         <div class="avatar-md mx-auto mb-3">
                                             <div class="avatar-title bg-light text-muted rounded-circle fs-24">
                                                 <i class="ri-calendar-check-line"></i>

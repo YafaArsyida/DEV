@@ -3,55 +3,20 @@
 @section('content')
 <div class="page-content">
     <div class="container-fluid" style="max-width: 100%">
-
-        {{-- PAGE TITLE --}}
         <div class="row">
             <div class="col-12">
-                <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                    <h4 class="mb-sm-0">Pengaturan PPDB</h4>
-
-                    <div class="page-title-right">
-                        <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">Akademik</a></li>
-                            <li class="breadcrumb-item active">Pengaturan PPDB</li>
-                        </ol>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-
-        {{-- PARAMETER AKADEMIK --}}
-        <div class="row">
-            <div class="col-12">
-                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
                     <div class="card-body p-3 p-lg-4">
-                        <div class="d-flex flex-column flex-md-row
-                            align-items-md-center justify-content-between gap-3">
+                        <div class="d-flex flex-column flex-xl-row align-items-xl-center justify-content-between gap-4">
 
-                            <div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="avatar-sm">
-                                        <div class="avatar-title
-                                            bg-primary-subtle text-primary rounded-3">
-                                            <i class="ri-equalizer-line fs-5"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <h6 class="mb-1 fw-semibold">
-                                            Parameter Akademik
-                                        </h6>
-                                        <p class="text-muted mb-0">
-                                            Pilih jenjang dan tahun ajaran
-                                            untuk mengelola konfigurasi PPDB.
-                                        </p>
-                                    </div>
-                                </div>
+                            {{-- INFORMASI PERIODE --}}
+                            @livewire('p-p-d-b.admin.dashboard.informasi-periode')
+
+                            {{-- PARAMETER JENJANG & TAHUN AJAR --}}
+                            <div class="flex-shrink-0">
+                                @livewire('p-p-d-b.parameter.jenjang-tahun-ajar')
                             </div>
 
-                            <div>
-                                @livewire('keuangan.parameter.jenjang-tahun-ajar')
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -59,100 +24,34 @@
         </div>
 
         {{-- SUMMARY --}}
-        <div class="row g-3 mb-4">
-            <div class="col-sm-6 col-xl-4">
-                <div class="card border-0 shadow-sm rounded-4 h-100 mb-0">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="avatar-md">
-                                <div class="avatar-title bg-primary-subtle
-                                    text-primary rounded-3 fs-4">
-                                    <i class="ri-calendar-event-line"></i>
-                                </div>
-                            </div>
-                            <div>
-                                <p class="text-muted mb-1">
-                                    Periode Pendaftaran
-                                </p>
-                                <h4 class="mb-0 fw-bold">
-                                    {{ number_format($totalPeriode, 0, ',', '.') }}
-                                </h4>
-                                <small class="text-muted">
-                                    Periode terkonfigurasi
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-sm-6 col-xl-4">
-                <div class="card border-0 shadow-sm rounded-4 h-100 mb-0">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="avatar-md">
-                                <div class="avatar-title bg-info-subtle
-                                    text-info rounded-3 fs-4">
-                                    <i class="ri-stack-line"></i>
-                                </div>
-                            </div>
-                            <div>
-                                <p class="text-muted mb-1">
-                                    Gelombang
-                                </p>
-                                <h4 class="mb-0 fw-bold">
-                                    {{ number_format($totalGelombang, 0, ',', '.') }}
-                                </h4>
-                                <small class="text-muted">
-                                    Gelombang terkonfigurasi
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-sm-6 col-xl-4">
-                <div class="card border-0 shadow-sm rounded-4 h-100 mb-0">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="avatar-md">
-                                <div class="avatar-title bg-success-subtle
-                                    text-success rounded-3 fs-4">
-                                    <i class="ri-git-branch-line"></i>
-                                </div>
-                            </div>
-                            <div>
-                                <p class="text-muted mb-1">
-                                    Jalur Penerimaan
-                                </p>
-                                <h4 class="mb-0 fw-bold">
-                                    {{ number_format($totalJalur, 0, ',', '.') }}
-                                </h4>
-                                <small class="text-muted">
-                                    Jalur terkonfigurasi
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <div class="row">
+            <div class="col-xxl-12 mb-3">
+                @livewire('p-p-d-b.admin.pengaturan.statistik-pengaturan')   
             </div>
         </div>
 
         {{-- MAIN CONFIGURATION --}}
         <div class="card border-0 shadow-sm rounded-4 mb-4">
+            {{-- Header --}}
+            <div class="card-header bg-transparent border-bottom p-3 p-lg-4">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-sm flex-shrink-0">
+                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                            <i class="ri-settings-3-line"></i>
+                        </div>
+                    </div>
 
-            <div class="card-header bg-transparent border-bottom
-                p-3 p-lg-4">
-                <h5 class="card-title mb-1 fw-semibold">
-                    Konfigurasi Penerimaan
-                </h5>
-                <p class="text-muted mb-0">
-                    Atur jadwal penerimaan dan persyaratan
-                    yang akan ditampilkan pada portal PPDB.
-                </p>
+                    <div>
+                        <h5 class="fw-bold mb-1">Pengaturan PPDB</h5>
+                        <small class="text-muted">
+                            Atur jadwal penerimaan dan persyaratan
+                            yang akan ditampilkan pada portal PPDB.
+                        </small>
+                    </div>
+                </div>
             </div>
 
+            {{-- Body --}}
             <div class="card-body p-0">
 
                 {{-- TABS --}}

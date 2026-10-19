@@ -89,7 +89,7 @@
                                 <div class="d-flex align-items-center gap-2 text-muted small">
                                     <i class="ri-calendar-line fs-16"></i>
                                     <span>
-                                        {{ $pendaftaran->created_at?->translatedFormat('d F Y, H:i') ?? '-' }}
+                                        {{\App\Http\Controllers\HelperController::formatTanggalIndonesia($pendaftaran->created_at, 'd F Y') }}
                                     </span>
                                 </div>
                             </div>
@@ -310,9 +310,7 @@
 
             {{-- FOOTER KEPUTUSAN --}}
             <div class="bg-white border-top p-3 p-md-4 mt-auto">
-                <div class="d-flex flex-column flex-sm-row
-                            justify-content-between align-items-sm-center gap-3">
-
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
                     {{-- INFORMASI --}}
                     <div class="d-flex align-items-start gap-2">
                         <i class="ri-information-line text-muted fs-18 mt-1"></i>
@@ -329,25 +327,38 @@
 
                     {{-- TOMBOL KEPUTUSAN --}}
                     <div class="d-flex flex-column flex-sm-row gap-2 flex-shrink-0">
-
-                        {{-- PERBAIKAN --}}
-                        <button type="button"
+                        {{-- MINTA PERBAIKAN --}}
+                        <button
+                            type="button"
                             class="btn btn-soft-danger rounded-pill px-4"
                             data-bs-toggle="modal"
-                            data-bs-target="#ModalKonfirmasiPerbaikan">
+                            data-bs-target="#ModalKonfirmasiPerbaikan"
+                            wire:click="$emit('bukaPerbaikan', {{ $pendaftaranId }})"
+                            @if (!$pendaftaran || $pendaftaran->status !== 'pengecekan')
+                                disabled
+                            @endif
+                        >
                             <i class="ri-edit-line me-1"></i>
                             Minta Perbaikan
                         </button>
 
-                        {{-- DITERIMA --}}
-                        <button type="button"
+                        {{-- TERIMA PENDAFTARAN --}}
+                        <button
+                            type="button"
                             class="btn btn-success rounded-pill px-4"
                             data-bs-toggle="modal"
-                            data-bs-target="#ModalKonfirmasiDiterima">
+                            data-bs-target="#ModalKonfirmasiDiterima"
+                            wire:click="$emit('bukaDiterima', {{ $pendaftaranId }})"
+                            @if (
+                                !$pendaftaran ||
+                                !in_array($pendaftaran->status, ['pengecekan', 'perbaikan'])
+                            )
+                                disabled
+                            @endif
+                        >
                             <i class="ri-checkbox-circle-line me-1"></i>
                             Terima Pendaftaran
                         </button>
-
                     </div>
                 </div>
             </div>

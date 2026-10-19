@@ -113,9 +113,9 @@
                             <td>
                                 @if ($item->ms_pengguna)
                                     @if ($item->ms_pengguna->peran === 'ORANG_TUA')
-                                        Orang Tua {{ $item->ms_pengguna->nama ?? '-' }}
+                                        Orang Tua
                                     @elseif ($item->ms_pengguna->peran != 'ORANG_TUA')
-                                        Panitia {{ $item->ms_pengguna->nama ?? '-' }}
+                                        Panitia
                                     @else
                                         {{ $item->ms_pengguna->peran ?? 'Tidak diketahui' }}
                                     @endif
@@ -262,7 +262,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="text-center py-5">
+                            <td colspan="9" class="text-center py-5">
                                 <div class="avatar-md mx-auto mb-3">
                                     <div class="avatar-title bg-light text-muted rounded-circle fs-24">
                                         <i class="ri-user-search-line"></i>

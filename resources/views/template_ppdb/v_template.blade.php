@@ -130,36 +130,6 @@
             // end notif
 
             // modal
-            window.addEventListener('hide-create-modal', (event) => {
-                let modalId = event.detail.modalId;
-                let modal = document.getElementById(modalId);
-                if (modal) {
-                    let bootstrapModal = bootstrap.Modal.getInstance(modal);
-                    if (bootstrapModal) {
-                        bootstrapModal.hide();
-                    }
-                }
-            });
-            window.addEventListener('hide-edit-modal', (event) => {
-                let modalId = event.detail.modalId;
-                let modal = document.getElementById(modalId);
-                if (modal) {
-                    let bootstrapModal = bootstrap.Modal.getInstance(modal);
-                    if (bootstrapModal) {
-                        bootstrapModal.hide();
-                    }
-                }
-            });
-            window.addEventListener('hide-delete-modal', (event) => {
-                let modalId = event.detail.modalId;
-                let modal = document.getElementById(modalId);
-                if (modal) {
-                    let bootstrapModal = bootstrap.Modal.getInstance(modal);
-                    if (bootstrapModal) {
-                        bootstrapModal.hide();
-                    }
-                }
-            });
             window.addEventListener('hide-modal', (event) => {
                 let modalId = event.detail.modalId;
                 let modal = document.getElementById(modalId);

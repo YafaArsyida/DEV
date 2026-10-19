@@ -12,6 +12,7 @@ class Detail extends Component
 
     protected $listeners = [
         'bukaPemeriksaan' => 'loadPemeriksaan',
+        'pendaftaranDiperbarui' => '$refresh',
     ];
 
     public function loadPemeriksaan($id)

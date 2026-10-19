@@ -2,10 +2,11 @@
 
 namespace App\Http\Livewire\PPDB\Admin\Pendaftar;
 
-use App\Models\PPDBJalur;
-use App\Models\PPDBPendaftaran;
 use Livewire\Component;
 use Livewire\WithPagination;
+use App\Models\PPDBPeriode;
+use App\Models\PPDBJalur;
+use App\Models\PPDBPendaftaran;
 
 class Index extends Component
 {
@@ -13,10 +14,17 @@ class Index extends Component
 
     protected $paginationTheme = 'bootstrap';
 
+    public $selectedJenjang = null;
+    public $selectedTahunAjar = null;
+
     public $search = '';
     public $filterStatus = '';
     public $filterJalur = '';
     public $filterSumber = '';
+
+    protected $listeners = [
+        'parameterUpdated' => 'updateParameters',
+    ];
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -24,6 +32,20 @@ class Index extends Component
         'filterJalur' => ['except' => ''],
         'filterSumber' => ['except' => ''],
     ];
+
+    /**
+     * Menerima perubahan jenjang dan tahun ajar.
+     */
+    public function updateParameters($jenjangId = null, $tahunAjarId = null)
+    {
+        $this->selectedJenjang = $jenjangId;
+        $this->selectedTahunAjar = $tahunAjarId;
+
+        // Jalur dapat berbeda pada setiap periode.
+        $this->filterJalur = '';
+
+        $this->resetPage();
+    }
 
     public function updatingSearch()
     {
@@ -45,6 +67,9 @@ class Index extends Component
         $this->resetPage();
     }
 
+    /**
+     * Menghapus seluruh filter tabel.
+     */
     public function resetFilter()
     {
         $this->reset([
@@ -59,15 +84,62 @@ class Index extends Component
 
     public function render()
     {
-        $pendaftar = PPDBPendaftaran::query()
+        $periode = null;
+
+        // Cari periode aktif berdasarkan parameter pilihan.
+        if (
+            $this->selectedJenjang &&
+            $this->selectedTahunAjar
+        ) {
+            $periode = PPDBPeriode::query()
+                ->where(
+                    'ms_jenjang_id',
+                    $this->selectedJenjang
+                )
+                ->where(
+                    'ms_tahun_ajar_id',
+                    $this->selectedTahunAjar
+                )
+                ->where('status', 'aktif')
+                ->first();
+        }
+
+        // Jalur hanya ditampilkan dari periode terpilih.
+        $daftarJalur = $periode
+            ? PPDBJalur::query()
+                ->where(
+                    'ppdb_periode_id',
+                    $periode->ppdb_periode_id
+                )
+                ->where('status', 'aktif')
+                ->orderBy('nama_jalur')
+                ->get()
+            : collect();
+
+        // Satu query utama untuk seluruh data pendaftar.
+        $query = PPDBPendaftaran::query()
             ->with([
                 'ms_pengguna',
                 'ppdb_calon_siswa',
                 'ppdb_orangtua',
                 'ppdb_gelombang',
                 'ppdb_jalur',
-            ])
-            ->when($this->search, function ($query) {
+            ]);
+
+        // Jangan tampilkan data jika periode belum valid.
+        if ($periode) {
+            $query->where(
+                'ppdb_periode_id',
+                $periode->ppdb_periode_id
+            );
+        } else {
+            $query->whereRaw('1 = 0');
+        }
+
+        // Pencarian nomor pendaftaran atau nama calon siswa.
+        $query->when(
+            trim($this->search) !== '',
+            function ($query) {
                 $search = trim($this->search);
 
                 $query->where(function ($query) use ($search) {
@@ -88,37 +160,66 @@ class Index extends Component
                         }
                     );
                 });
-            })
-            ->when($this->filterStatus, function ($query) {
-                $query->where('status', $this->filterStatus);
-            })
-            ->when($this->filterJalur, function ($query) {
+            }
+        );
+
+        // Filter status pendaftaran.
+        $query->when(
+            $this->filterStatus !== '',
+            function ($query) {
                 $query->where(
-                    'ppdb_jalur_id', $this->filterJalur
+                    'status',
+                    $this->filterStatus
                 );
-            })
-            ->when($this->filterSumber, function ($query) {
-                $query->whereHas('ms_pengguna', function ($query) {
-                    if ($this->filterSumber === 'online') {
-                        $query->where('peran', 'ORANG_TUA');
-                    } elseif ($this->filterSumber === 'dibantu_panitia') {
-                        $query->whereIn('peran', [
-                            'ADMIN',
-                            'SUPERADMIN',
-                        ]);
+            }
+        );
+
+        // Filter jalur pendaftaran.
+        $query->when(
+            $this->filterJalur !== '',
+            function ($query) {
+                $query->where(
+                    'ppdb_jalur_id',
+                    $this->filterJalur
+                );
+            }
+        );
+
+        // Filter sumber pendaftaran.
+        $query->when(
+            $this->filterSumber !== '',
+            function ($query) {
+                $query->whereHas(
+                    'ms_pengguna',
+                    function ($query) {
+                        if ($this->filterSumber === 'online') {
+                            $query->where(
+                                'peran',
+                                'ORANG_TUA'
+                            );
+                        } elseif (
+                            $this->filterSumber === 'dibantu_panitia'
+                        ) {
+                            $query->whereIn('peran', [
+                                'ADMIN',
+                                'SUPERADMIN',
+                            ]);
+                        }
                     }
-                });
-            })
+                );
+            }
+        );
+
+        // Urutkan dari pendaftaran terbaru.
+        $pendaftar = $query
             ->latest('created_at')
             ->paginate(50);
 
-        return view('livewire.p-p-d-b.admin.pendaftar.index',[
-            'pendaftar' => $pendaftar,
-
-            'daftarJalur' => PPDBJalur::query()
-                ->where('status', 'aktif')
-                ->orderBy('nama_jalur')
-                ->get(),
-        ]);
+        return view('livewire.p-p-d-b.admin.pendaftar.index',
+            [
+                'pendaftar' => $pendaftar,
+                'daftarJalur' => $daftarJalur,
+            ]
+        );
     }
 }
