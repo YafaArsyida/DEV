@@ -4,6 +4,7 @@ namespace App\Http\Controllers\PPDB\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Jenjang;
+use App\Models\PPDBPendaftaran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -23,9 +24,19 @@ class LoginController extends Controller
     {
         $user = Auth::user();
 
+        $jenjang = null;
+
         if ($user) {
+            $pendaftaran = PPDBPendaftaran::query()
+                ->with('ppdb_periode.ms_jenjang')
+                ->where('ms_pengguna_id', $user->ms_pengguna_id)
+                ->latest('created_at')
+                ->first();
+
+            $jenjang = $pendaftaran?->ppdb_periode?->ms_jenjang?->slug;
+
             $user->current_session = null;
-            // $user->save();
+            $user->save();
         }
 
         Auth::logout();
@@ -33,6 +44,10 @@ class LoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('ppdb.landing');
+        if ($jenjang) {
+            return redirect("/ppdb/{$jenjang}");
+        }
+
+        return redirect('/ppdb');
     }
 }

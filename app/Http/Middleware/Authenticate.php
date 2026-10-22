@@ -17,25 +17,26 @@ class Authenticate extends Middleware
         }
 
         // Login admin PPDB menggunakan login utama
-        if ($request->is('ppdb/admin') || $request->is('ppdb/admin/*')) {
+        if (
+            $request->is('ppdb/admin') ||
+            $request->is('ppdb/admin/*')
+        ) {
             return route('login.index');
         }
 
-        // Login orang tua PPDB berdasarkan jenjang
+        // URL PPDB dengan jenjang
         if ($request->is('ppdb/*')) {
             $segments = $request->segments();
-
-            // Contoh: /ppdb/sd/dashboard -> jenjang = sd
             $jenjang = $segments[1] ?? null;
 
-            if (in_array($jenjang, ['sd', 'tk', 'kb'])) {
+            if (in_array($jenjang, ['sd', 'tk'])) {
                 return route('ppdb.login', [
                     'jenjang' => $jenjang,
                 ]);
             }
 
-            // URL PPDB tanpa jenjang
-            return route('ppdb.landing');
+            // URL PPDB tanpa jenjang atau jenjang tidak dikenal
+            return url('/ppdb');
         }
 
         return route('login.index');
