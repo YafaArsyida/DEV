@@ -11,8 +11,8 @@ use App\Http\Controllers\Akademik\PenempatanEkstrakurikulerSiswa;
 use App\Http\Controllers\Akademik\PenempatanSiswaController;
 use App\Http\Controllers\Akademik\SiswaController;
 use App\Http\Controllers\Akademik\TahunAjaranController;
-use App\Http\Controllers\PPDB\PpdbAdminController;
-use App\Http\Controllers\PPDB\PpdbLandingController;
+use App\Http\Controllers\PPDB\PPDBAdminController;
+use App\Http\Controllers\PPDB\PPDBLandingController;
 use App\Http\Controllers\Portal\PortalController;
 
 use App\Http\Controllers\Keuangan\AkuntansiJurnalDetail;
@@ -71,7 +71,7 @@ use App\Http\Controllers\SmartPassPresensiPegawai;
 use App\Http\Controllers\Keuangan\PenempatanSiswaController as KeuanganPenempatanSiswaController;
 use App\Http\Controllers\PPDB\Auth\LoginController as AuthLoginController;
 use App\Http\Controllers\PPDB\Auth\RegisterController as PPDBRegisterController;
-use App\Http\Controllers\PPDB\PpdbOrangTuaController;
+use App\Http\Controllers\PPDB\PPDBOrangTuaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -103,21 +103,39 @@ Route::get('/', [PortalController::class, 'index'])
 Route::get('/ekstrakurikuler', [LandingEkstrakurikuler::class, 'index'])
     ->name('landing.ekstrakurikuler');
 
-Route::get('/ppdb', [PpdbLandingController::class, 'index'])
+// Landing page PPDB
+Route::get('/ppdb', [PPDBLandingController::class, 'index'])
     ->name('ppdb.landing');
+
+Route::prefix('ppdb')->name('ppdb.')->group(function () {
+    Route::get('/sd', [PPDBLandingController::class, 'sd'])
+        ->name('sd');
+
+    Route::get('/tk', [PPDBLandingController::class, 'tk'])
+        ->name('tk');
+
+    Route::get('/kb', [PPDBLandingController::class, 'kb'])
+        ->name('kb');
+});
+
+
 
 /*
 |--------------------------------------------------------------------------
-| Guest Auth PPDB
+| PPDB - PUBLIC / GUEST
 |--------------------------------------------------------------------------
 */
-Route::prefix('ppdb')
+
+Route::prefix('ppdb/{jenjang}')
     ->name('ppdb.')
     ->middleware('guest')
     ->group(function () {
+
+        // REGISTRASI
         Route::get('/daftar', [PPDBRegisterController::class, 'index'])
             ->name('daftar');
 
+        // LOGIN
         Route::get('/login', [AuthLoginController::class, 'index'])
             ->name('login');
 
@@ -125,54 +143,62 @@ Route::prefix('ppdb')
             ->name('authenticate');
     });
 
+
 /*
 |--------------------------------------------------------------------------
-| Portal Orang Tua PPDB
+| PPDB - ORANG TUA / AUTHENTICATED
 |--------------------------------------------------------------------------
 */
 
-
-Route::prefix('ppdb')
+Route::prefix('ppdb/{jenjang}')
     ->name('ppdb.')
     ->middleware(['auth', 'peran:ORANG_TUA'])
     ->group(function () {
-        Route::get('/dashboard', [PpdbOrangTuaController::class, 'dashboard'])
+
+        // DASHBOARD
+        Route::get('/dashboard', [PPDBOrangTuaController::class, 'dashboard'])
             ->name('dashboard');
 
-        Route::get('/berkas/preview/{berkasId}', [PpdbOrangTuaController::class, 'show',])
+        // PREVIEW BERKAS
+        Route::get('/berkas/preview/{berkasId}', [PPDBOrangTuaController::class, 'show'])
             ->name('berkas.preview');
 
         // STATUS PENDAFTARAN
-        Route::get('/pendaftaran/status', [PpdbOrangTuaController::class, 'status'])
+        Route::get('/pendaftaran/status', [PPDBOrangTuaController::class, 'status'])
             ->name('pendaftaran.status');
 
-        Route::post('/pendaftaran/kirim-ulang/{ppdb_pendaftaran_id}', [PpdbOrangTuaController::class, 'kirimUlang'])
-            ->name('pendaftaran.kirim-ulang');
-            
-        Route::get('/pendaftaran/jalur', [PpdbOrangTuaController::class, 'jalur'])
+        Route::post(
+            '/pendaftaran/kirim-ulang/{ppdb_pendaftaran_id}',
+            [PPDBOrangTuaController::class, 'kirimUlang']
+        )->name('pendaftaran.kirim-ulang');
+
+        // FORMULIR PENDAFTARAN
+        Route::get('/pendaftaran/jalur', [PPDBOrangTuaController::class, 'jalur'])
             ->name('pendaftaran.jalur');
 
-        Route::get('/pendaftaran/data-siswa', [PpdbOrangTuaController::class, 'dataSiswa'])
+        Route::get('/pendaftaran/data-siswa', [PPDBOrangTuaController::class, 'dataSiswa'])
             ->name('pendaftaran.data-siswa');
 
-        Route::get('/pendaftaran/orang-tua', [PpdbOrangTuaController::class, 'orangTua'])
+        Route::get('/pendaftaran/orang-tua', [PPDBOrangTuaController::class, 'orangTua'])
             ->name('pendaftaran.orang-tua');
 
-        Route::get('/pendaftaran/alamat', [PpdbOrangTuaController::class, 'alamat'])
+        Route::get('/pendaftaran/alamat', [PPDBOrangTuaController::class, 'alamat'])
             ->name('pendaftaran.alamat');
 
-        Route::get('/pendaftaran/pendidikan', [PpdbOrangTuaController::class, 'pendidikan'])
+        Route::get('/pendaftaran/pendidikan', [PPDBOrangTuaController::class, 'pendidikan'])
             ->name('pendaftaran.pendidikan');
 
-        Route::get('/pendaftaran/berkas', [PpdbOrangTuaController::class, 'berkas'])
+        Route::get('/pendaftaran/berkas', [PPDBOrangTuaController::class, 'berkas'])
             ->name('pendaftaran.berkas');
 
-        Route::get('/pendaftaran/review', [PpdbOrangTuaController::class, 'review'])
+        Route::get('/pendaftaran/review', [PPDBOrangTuaController::class, 'review'])
             ->name('pendaftaran.review');
 
+        // LOGOUT
         Route::post('/logout', [AuthLoginController::class, 'logOut'])
             ->name('logout');
     });
+
 
 /*
 |--------------------------------------------------------------------------
@@ -322,34 +348,34 @@ Route::middleware(['auth', 'peran:SUPERADMIN, ADMIN, KEUANGAN'])->group(function
             | Dashboard
             |--------------------------------------------------------------------------
             */
-            Route::get('/', [PpdbAdminController::class, 'index'])
+            Route::get('/', [PPDBAdminController::class, 'index'])
                 ->name('dashboard');
 
-            Route::get('/pendaftar', [PpdbAdminController::class, 'pendaftar'])
+            Route::get('/pendaftar', [PPDBAdminController::class, 'pendaftar'])
                 ->name('pendaftar');
 
-            Route::get('/bantu-pendaftaran', [PpdbAdminController::class, 'bantuPendaftaran'])
+            Route::get('/bantu-pendaftaran', [PPDBAdminController::class, 'bantuPendaftaran'])
                 ->name('bantu-pendaftaran');
 
-            Route::get('/verifikasi', [PpdbAdminController::class, 'verifikasi'])
+            Route::get('/verifikasi', [PPDBAdminController::class, 'verifikasi'])
                 ->name('verifikasi');
 
-            Route::get('/seleksi', [PpdbAdminController::class, 'seleksi'])
+            Route::get('/seleksi', [PPDBAdminController::class, 'seleksi'])
                 ->name('seleksi');
 
-            Route::get('/pengumuman', [PpdbAdminController::class, 'pengumuman'])
+            Route::get('/pengumuman', [PPDBAdminController::class, 'pengumuman'])
                 ->name('pengumuman');
 
-            Route::get('/daftar-ulang', [PpdbAdminController::class, 'daftarUlang'])
+            Route::get('/daftar-ulang', [PPDBAdminController::class, 'daftarUlang'])
                 ->name('daftar-ulang');
 
-            Route::get('/laporan', [PpdbAdminController::class, 'laporan'])
+            Route::get('/laporan', [PPDBAdminController::class, 'laporan'])
                 ->name('laporan');
 
-            Route::get('/pengaturan', [PpdbAdminController::class, 'pengaturan'])
+            Route::get('/pengaturan', [PPDBAdminController::class, 'pengaturan'])
                 ->name('pengaturan');
 
-            Route::get('/berkas/preview/{berkasId}', [PpdbAdminController::class, 'showBerkas',])
+            Route::get('/berkas/preview/{berkasId}', [PPDBAdminController::class, 'showBerkas',])
                 ->name('berkas.preview');
         });
         

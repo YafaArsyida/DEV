@@ -21,6 +21,7 @@ class Jenjang extends Model
         'urutan',
         'status',
         'deskripsi',
+        'slug'
     ];
 
     public function ms_pengguna(): BelongsToMany

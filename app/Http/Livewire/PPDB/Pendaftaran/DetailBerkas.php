@@ -12,9 +12,15 @@ class DetailBerkas extends Component
 {
     public $pendaftaranId;
 
-    protected function ambilPendaftaran()
+    public function mount($pendaftaranId)
+    {
+        $this->pendaftaranId = $pendaftaranId;
+    }
+
+    protected function ambilPendaftaranMilikPengguna()
     {
         return PPDBPendaftaran::query()
+            ->with('ppdb_periode.ms_jenjang')
             ->whereKey($this->pendaftaranId)
             ->where('ms_pengguna_id', Auth::id())
             ->firstOrFail();
@@ -29,44 +35,9 @@ class DetailBerkas extends Component
         );
     }
 
-    public function mount($pendaftaranId)
-    {
-        $this->pendaftaranId = $pendaftaranId;
-
-        $pendaftaran = PPDBPendaftaran::query()
-            ->where('ppdb_pendaftaran_id', $this->pendaftaranId)
-            ->where('ms_pengguna_id', Auth::id())
-            ->first();
-
-        if (! $pendaftaran) {
-            return redirect()->route('ppdb.pendaftaran.jalur');
-        }
-
-        // Data orang tua wajib tersedia sebelum membuka alamat.
-        $alamat = PPDBAlamat::query()
-            ->where(
-                'ppdb_pendaftaran_id', $pendaftaran->ppdb_pendaftaran_id
-            )
-            ->exists();
-
-        if (! $alamat) {
-            return redirect()->route('ppdb.pendaftaran.alamat');
-        }
-
-         $berkas = PPDBBerkas::query()
-            ->where(
-                'ppdb_pendaftaran_id', $pendaftaran->ppdb_pendaftaran_id
-            )
-            ->first();
-
-        if (! $berkas) {
-            return redirect()->route('ppdb.pendaftaran.berkas');
-        }
-    }
-
     public function render()
     {
-        $pendaftaran = $this->ambilPendaftaran();
+        $pendaftaran = $this->ambilPendaftaranMilikPengguna();
 
         $berkas = PPDBBerkas::query()
             ->where(

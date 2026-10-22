@@ -343,10 +343,8 @@
             {{-- ACTIONS --}}
             <div class="d-flex flex-column flex-sm-row justify-content-between gap-2 mt-4 pt-3 border-top">
 
-                <a
-                    href="{{ request()->url() }}"
-                    class="btn btn-light border rounded-pill px-4"
-                >
+                <a href="{{ request()->url() }}"
+                    class="btn btn-light border rounded-pill px-4">
                     <i class="ri-arrow-left-line me-1"></i>
                     Batal
                 </a>
@@ -355,8 +353,8 @@
                     type="submit"
                     class="btn btn-primary rounded-pill px-4"
                     wire:loading.attr="disabled"
-                    wire:target="update"
-                >
+                    wire:target="update">
+                    
                     <span wire:loading.remove wire:target="update">
                         <i class="ri-save-line me-1"></i>
                         Simpan Perubahan

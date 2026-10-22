@@ -4,15 +4,10 @@ namespace App\Http\Controllers\PPDB;
 
 use App\Http\Controllers\Controller;
 use App\Models\PPDBBerkas;
-use App\Models\PPDBGelombang;
-use App\Models\PPDBJalur;
-use App\Models\PPDBPendaftaran;
-use App\Models\PPDBPeriode;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 
-class PpdbAdminController extends Controller
+class PPDBAdminController extends Controller
 {
     public function index()
     {

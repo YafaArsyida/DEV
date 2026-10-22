@@ -584,10 +584,9 @@
         {{-- ACTION --}}
         <div class="d-flex flex-column flex-sm-row justify-content-between gap-2 pt-3 border-top">
 
-            <a
-                href="{{ route('ppdb.pendaftaran.orang-tua') }}"
+            <a href="{{ request()->url() }}"
                 class="btn btn-light border rounded-pill px-4">
-                <i class="ri-close-line me-1"></i>
+                <i class="ri-arrow-left-line me-1"></i>
                 Batal
             </a>
 

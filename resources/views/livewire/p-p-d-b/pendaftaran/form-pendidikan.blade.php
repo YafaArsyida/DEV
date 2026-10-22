@@ -213,8 +213,9 @@
             
             {{-- ACTION --}}
             <div class="d-flex flex-column flex-sm-row justify-content-between gap-2 mt-4">
-                <a
-                    href="{{ route('ppdb.pendaftaran.alamat') }}"
+                <a href="{{ route('ppdb.pendaftaran.alamat', [
+                        'jenjang' => $pendaftaran->ppdb_periode->ms_jenjang->slug,
+                    ]) }}"
                     class="btn btn-outline-secondary rounded-pill px-4">
                     <i class="ri-arrow-left-line me-1"></i>
                     Kembali

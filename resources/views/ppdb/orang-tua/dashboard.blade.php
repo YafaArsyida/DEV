@@ -129,13 +129,17 @@
                                         </p>
 
                                         <div class="d-flex flex-column gap-2">
-                                            <a href="{{ route('ppdb.pendaftaran.status') }}"
+                                            <a href="{{ route('ppdb.pendaftaran.status', [
+                                                'jenjang' => $jenjang->slug,
+                                            ]) }}"
                                                 class="btn btn-outline-primary rounded-pill">
                                                 <i class="ri-file-list-3-line me-1"></i>
                                                 Lihat Status
                                             </a>
 
-                                            <a href="{{ route('ppdb.pendaftaran.review') }}"
+                                            <a href="{{ route('ppdb.pendaftaran.review', [
+                                                'jenjang' => $jenjang->slug,
+                                            ]) }}"
                                                 class="btn btn-light rounded-pill">
                                                 <i class="ri-eye-line me-1"></i>
                                                 Preview Data
@@ -161,7 +165,9 @@
                                 </p>
 
                                 @if ($periode)
-                                    <a href="{{ route('ppdb.pendaftaran.jalur') }}"
+                                    <a href="{{ route('ppdb.pendaftaran.jalur', [
+                                        'jenjang' => $jenjang->slug,
+                                    ]) }}"
                                         class="btn btn-primary rounded-pill px-4">
                                         <i class="ri-arrow-right-line me-1"></i>
                                         Mulai Pendaftaran
@@ -356,9 +362,15 @@
                                             $bolehDibuka = true;
                                         }
 
-                                        $url = $bolehDibuka && \Illuminate\Support\Facades\Route::has($item['route'])
-                                            ? route($item['route'])
-                                            : null;
+                                        $slugJenjang = $pendaftaran->ppdb_periode->ms_jenjang->slug ?? null;
+
+                                        $url = $bolehDibuka
+                                            && $slugJenjang
+                                            && \Illuminate\Support\Facades\Route::has($item['route'])
+                                                ? route($item['route'], [
+                                                    'jenjang' => $slugJenjang,
+                                                ])
+                                                : null;
                                     @endphp
 
                                     <div class="col-12 col-sm-6 col-lg-3">
@@ -405,7 +417,9 @@
 
                             @if ($status === 'draft' || $status === 'perbaikan')
                                 <div class="mt-4">
-                                    <a href="{{ route('ppdb.pendaftaran.data-siswa') }}"
+                                    <a href="{{ route('ppdb.pendaftaran.data-siswa', [
+                                            'jenjang' => $jenjang->slug,
+                                        ]) }}"
                                         class="btn btn-primary rounded-pill px-4">
                                         <i class="ri-edit-line me-1"></i>
                                         {{ $status === 'perbaikan' ? 'Perbaiki Data' : 'Lanjutkan Pendaftaran' }}

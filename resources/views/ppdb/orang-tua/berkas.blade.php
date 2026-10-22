@@ -48,7 +48,9 @@
                                 agar proses pendaftaran dapat dilanjutkan.
                             </p>
 
-                            <a href="{{ route('ppdb.pendaftaran.pendidikan') }}"
+                            <a href="{{ route('ppdb.pendaftaran.pendidikan', [
+                                    'jenjang' => $pendaftaran->ppdb_periode->ms_jenjang->slug,
+                                ]) }}"
                                 class="btn btn-primary rounded-pill px-4">
                                 <i class="ri-graduation-cap-line me-1"></i>
                                 Lengkapi Data Pendidikan

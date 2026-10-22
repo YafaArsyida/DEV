@@ -121,12 +121,18 @@
 
                 {{-- NAVIGASI MODE DETAIL --}}
                 <div class="d-flex flex-column flex-sm-row justify-content-between gap-2 mt-4 pt-3 border-top">
-                    <a href="{{ route('ppdb.dashboard') }}" class="btn btn-light border rounded-pill px-4">
+                    <a href="{{ route('ppdb.dashboard', [
+                        'jenjang' => $pendaftaran->ppdb_periode->ms_jenjang->slug,
+                    ]) }}"
+                        class="btn btn-light border rounded-pill px-4">
                         <i class="ri-arrow-left-line me-1"></i>
                         Dashboard
                     </a>
 
-                    <a href="{{ route('ppdb.pendaftaran.data-siswa') }}" class="btn btn-primary rounded-pill px-4">
+                    <a href="{{ route('ppdb.pendaftaran.data-siswa', [
+                        'jenjang' => $pendaftaran->ppdb_periode->ms_jenjang->slug,
+                    ]) }}"
+                        class="btn btn-primary rounded-pill px-4">
                         Data Calon Siswa
                         <i class="ri-arrow-right-line ms-1"></i>
                     </a>

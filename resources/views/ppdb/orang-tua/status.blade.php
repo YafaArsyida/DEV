@@ -144,14 +144,18 @@
                                 <div class="d-flex flex-column flex-sm-row flex-wrap gap-2">
                                     {{-- PERBAIKAN DATA --}}
                                     @if (in_array($status, ['draft', 'perbaikan']))
-                                        <a href="{{ route('ppdb.pendaftaran.review') }}"
+                                        <a href="{{ route('ppdb.pendaftaran.review', [
+                                            'jenjang' => $pendaftaran->ppdb_periode->ms_jenjang->slug,
+                                        ]) }}"
                                             class="btn btn-primary rounded-pill px-4">
                                             <i class="ri-edit-line me-1"></i>
                                             {{ $status === 'perbaikan' ? 'Perbaiki Data' : 'Lanjutkan Pendaftaran' }}
                                         </a>
                                     @else
                                         {{-- PREVIEW PENDAFTARAN --}}
-                                        <a href="{{ route('ppdb.pendaftaran.review') }}"
+                                        <a href="{{ route('ppdb.pendaftaran.review', [
+                                            'jenjang' => $pendaftaran->ppdb_periode->ms_jenjang->slug,
+                                        ]) }}"
                                             class="btn btn-outline-primary rounded-pill px-4">
                                             <i class="ri-eye-line me-1"></i>
                                             Preview Pendaftaran
@@ -337,124 +341,125 @@
         </div>
     </div>
     @if ($status === 'perbaikan')
-        <div
-            wire:ignore.self
-            class="modal fade"
-            id="modalKirimUlang"
-            tabindex="-1"
-            aria-labelledby="modalKirimUlangLabel"
-            aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+    <div
+        wire:ignore.self
+        class="modal fade"
+        id="modalKirimUlang"
+        tabindex="-1"
+        aria-labelledby="modalKirimUlangLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
 
-                    {{-- HEADER --}}
-                    <div class="modal-header border-0 pb-0">
-                        <button
-                            type="button"
-                            class="btn btn-light btn-icon rounded-circle ms-auto"
-                            data-bs-dismiss="modal"
-                            aria-label="Tutup"
-                        >
-                            <i class="ri-close-line fs-18"></i>
-                        </button>
-                    </div>
+                {{-- HEADER --}}
+                <div class="modal-header border-0 pb-0">
+                    <button
+                        type="button"
+                        class="btn btn-light btn-icon rounded-circle ms-auto"
+                        data-bs-dismiss="modal"
+                        aria-label="Tutup"
+                    >
+                        <i class="ri-close-line fs-18"></i>
+                    </button>
+                </div>
 
-                    {{-- BODY --}}
-                    <div class="modal-body px-4 pb-4 pt-2 text-center">
+                {{-- BODY --}}
+                <div class="modal-body px-4 pb-4 pt-2 text-center">
 
-                        {{-- ICON --}}
-                        <div class="mb-4">
-                            <div class="avatar-xl mx-auto">
-                                <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
-                                    <lord-icon
-                                        src="https://cdn.lordicon.com/sbnjyzil.json"
-                                        trigger="loop"
-                                        colors="primary:#0d6efd,secondary:#0d6efd"
-                                        style="width:70px;height:70px"
-                                    >
-                                    </lord-icon>
-                                </div>
+                    {{-- ICON --}}
+                    <div class="mb-4">
+                        <div class="avatar-xl mx-auto">
+                            <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
+                                <lord-icon
+                                    src="https://cdn.lordicon.com/sbnjyzil.json"
+                                    trigger="loop"
+                                    colors="primary:#0d6efd,secondary:#0d6efd"
+                                    style="width:70px;height:70px"
+                                >
+                                </lord-icon>
                             </div>
                         </div>
-
-                        {{-- TITLE --}}
-                        <div class="mb-2">
-                            <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill mb-3">
-                                Konfirmasi Perbaikan
-                            </span>
-
-                            <h3
-                                class="fw-bold mb-2"
-                                id="modalKirimUlangLabel"
-                            >
-                                Kirim Ulang Pendaftaran?
-                            </h3>
-
-                            <p class="text-muted mb-0 lh-lg px-lg-2">
-                                Pastikan seluruh data yang diminta panitia telah
-                                diperbaiki. Setelah dikirim, pendaftaran Anda akan
-                                diperiksa kembali oleh panitia PPDB.
-                            </p>
-                        </div>
-
-                        {{-- INFORMASI --}}
-                        <div class="alert alert-light border rounded-4 text-start mt-4 mb-0">
-                            <div class="d-flex align-items-start gap-3">
-                                <div class="flex-shrink-0">
-                                    <i class="ri-information-line text-primary fs-20"></i>
-                                </div>
-
-                                <div>
-                                    <h6 class="fw-semibold mb-1">
-                                        Sebelum Mengirim
-                                    </h6>
-
-                                    <p class="text-muted mb-0 fs-13">
-                                        Pastikan perbaikan sudah selesai dan data
-                                        yang diperbarui sudah benar. Setelah dikirim,
-                                        status pendaftaran akan berubah menjadi pengecekan. Anda dapat memantau
-                                        hasil pemeriksaan melalui halaman status PPDB.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
                     </div>
 
-                    {{-- FOOTER --}}
-                    <div class="modal-footer border-0 pt-0 px-4 pb-4 justify-content-center">
+                    {{-- TITLE --}}
+                    <div class="mb-2">
+                        <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill mb-3">
+                            Konfirmasi Perbaikan
+                        </span>
 
-                        <button
-                            type="button"
-                            class="btn btn-light rounded-pill px-4"
-                            data-bs-dismiss="modal"
+                        <h3
+                            class="fw-bold mb-2"
+                            id="modalKirimUlangLabel"
                         >
-                            <i class="ri-arrow-go-back-line me-1"></i>
-                            Periksa Kembali
-                        </button>
+                            Kirim Ulang Pendaftaran?
+                        </h3>
 
-                        <form
-                            action="{{ route('ppdb.pendaftaran.kirim-ulang', [
-                                'ppdb_pendaftaran_id' => $pendaftaran->ppdb_pendaftaran_id
-                            ]) }}"
-                            method="POST"
-                        >
-                            @csrf
+                        <p class="text-muted mb-0 lh-lg px-lg-2">
+                            Pastikan seluruh data yang diminta panitia telah
+                            diperbaiki. Setelah dikirim, pendaftaran Anda akan
+                            diperiksa kembali oleh panitia PPDB.
+                        </p>
+                    </div>
 
-                            <button
-                                type="submit"
-                                class="btn btn-primary rounded-pill px-4"
-                            >
-                                <i class="ri-send-plane-line me-1"></i>
-                                Ya, Kirim Ulang
-                            </button>
-                        </form>
+                    {{-- INFORMASI --}}
+                    <div class="alert alert-light border rounded-4 text-start mt-4 mb-0">
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="flex-shrink-0">
+                                <i class="ri-information-line text-primary fs-20"></i>
+                            </div>
 
+                            <div>
+                                <h6 class="fw-semibold mb-1">
+                                    Sebelum Mengirim
+                                </h6>
+
+                                <p class="text-muted mb-0 fs-13">
+                                    Pastikan perbaikan sudah selesai dan data
+                                    yang diperbarui sudah benar. Setelah dikirim,
+                                    status pendaftaran akan berubah menjadi pengecekan. Anda dapat memantau
+                                    hasil pemeriksaan melalui halaman status PPDB.
+                                </p>
+                            </div>
+                        </div>
                     </div>
 
                 </div>
+
+                {{-- FOOTER --}}
+                <div class="modal-footer border-0 pt-0 px-4 pb-4 justify-content-center">
+
+                    <button
+                        type="button"
+                        class="btn btn-light rounded-pill px-4"
+                        data-bs-dismiss="modal"
+                    >
+                        <i class="ri-arrow-go-back-line me-1"></i>
+                        Periksa Kembali
+                    </button>
+
+                    <form
+                        action="{{ route('ppdb.pendaftaran.kirim-ulang', [
+                            'jenjang' => $pendaftaran->ppdb_periode->ms_jenjang->slug,
+                            'ppdb_pendaftaran_id' => $pendaftaran->ppdb_pendaftaran_id,
+                        ]) }}"
+                        method="POST"
+                    >
+                        @csrf
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary rounded-pill px-4"
+                        >
+                            <i class="ri-send-plane-line me-1"></i>
+                            Ya, Kirim Ulang
+                        </button>
+                    </form>
+
+                </div>
+
             </div>
-</div>
+        </div>
+    </div>
     @endif
     @if (session('success'))
         <script>

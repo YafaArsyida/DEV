@@ -15,11 +15,21 @@ use Livewire\Component;
 class PilihJalur extends Component
 {
     public $periodeId;
+    
     public $jalurTerpilih;
 
     public function mount($periodeId)
     {
         $this->periodeId = $periodeId;
+    }
+
+
+    protected function ambilPeriode()
+    {
+        return PPDBPeriode::query()
+            ->with('ms_jenjang')
+            ->whereKey($this->periodeId)
+            ->firstOrFail();
     }
 
     /**
@@ -73,8 +83,7 @@ class PilihJalur extends Component
 
             if (!$gelombang) {
                 throw ValidationException::withMessages([
-                    'jalurTerpilih' =>
-                        'Belum ada gelombang pendaftaran yang aktif.',
+                    'jalurTerpilih' => 'Belum ada gelombang pendaftaran yang aktif.',
                 ]);
             }
 
@@ -133,7 +142,11 @@ class PilihJalur extends Component
             'message' => 'Jalur berhasil dipilih. Silakan lanjutkan pengisian data calon siswa.',
         ]);
 
-        return redirect()->route('ppdb.pendaftaran.data-siswa');
+        $periode = $this->ambilPeriode();
+
+        return redirect()->route('ppdb.pendaftaran.data-siswa', [
+            'jenjang' => $periode->ms_jenjang->slug,
+        ]);
     }
 
     /**
@@ -155,6 +168,8 @@ class PilihJalur extends Component
 
     public function render()
     {
+        $periode = $this->ambilPeriode();
+
         $jalurTersedia = collect();
 
         if ($this->periodeId) {
@@ -175,6 +190,7 @@ class PilihJalur extends Component
                 ->get();
         }
         return view('livewire.p-p-d-b.pendaftaran.pilih-jalur',[
+            'periode' => $periode,
             'jalurTersedia' => $jalurTersedia
         ]);
     }

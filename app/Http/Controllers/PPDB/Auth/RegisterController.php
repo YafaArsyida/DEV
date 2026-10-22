@@ -3,12 +3,17 @@
 namespace App\Http\Controllers\PPDB\Auth;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Models\Jenjang;
 
 class RegisterController extends Controller
 {
-    public function index()
+    public function index(string $jenjang)
     {
-        return view('ppdb.auth.register');
+        $jenjang = Jenjang::where('slug', $jenjang)
+            ->where('status', 'aktif')
+            ->firstOrFail();
+
+        return view('ppdb.auth.register', compact('jenjang'));
     }
+
 }

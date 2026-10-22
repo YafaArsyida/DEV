@@ -5,8 +5,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Masuk PPDB | {{ config('app.name') }}</title>
+    <title>Masuk PPDB {{ $jenjang->nama_jenjang }}</title>
 
+    <link rel="shortcut icon" href="{{asset('assets')}}/logo/yayasan.webp">
     <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assets/css/icons.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assets/css/app.min.css') }}" rel="stylesheet" type="text/css" />
@@ -23,7 +24,9 @@
                 <div class="row justify-content-center">
                     <div class="col-md-10 col-lg-8 col-xl-7 col-xxl-6">
                         {{-- Login Card --}}
-                        @livewire('p-p-d-b.auth.login')    
+                        @livewire('p-p-d-b.auth.login',[
+                            'jenjangSlug' => $jenjang->slug,
+                        ])    
                         
                         {{-- Footer --}}
                         <div class="text-center mt-4 mb-4">

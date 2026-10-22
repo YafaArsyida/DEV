@@ -28,6 +28,7 @@ class PPDBPendaftaran extends Model
         'current_step',
         'status',
         'submitted_at',
+        'submitted_by',
 
         'catatan_perbaikan'
     ];

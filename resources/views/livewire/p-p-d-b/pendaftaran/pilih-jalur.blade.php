@@ -195,7 +195,10 @@
             </div>
 
             <div class="d-flex flex-column flex-sm-row justify-content-between gap-2 mt-4 pt-3 border-top">
-                <a href="{{ route('ppdb.dashboard') }}" class="btn btn-light border rounded-pill px-4">
+                <a href="{{ route('ppdb.dashboard', [
+                    'jenjang' => $periode->ms_jenjang->slug,
+                ]) }}"
+                    class="btn btn-light border rounded-pill px-4">
                     <i class="ri-arrow-left-line me-1"></i>
                     Kembali
                 </a>

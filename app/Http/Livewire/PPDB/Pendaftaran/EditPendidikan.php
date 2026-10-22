@@ -24,19 +24,27 @@ class EditPendidikan extends Component
     {
         $this->pendaftaranId = $pendaftaranId;
 
-        $pendaftaran = $this->ambilPendaftaran();
+        $pendaftaran = $this->ambilPendaftaranMilikPengguna();
 
         $this->pastikanBolehUbah($pendaftaran);
 
-        $this->isiForm();
+        $pendidikan = PPDBPendidikan::query()
+            ->where(
+                'ppdb_pendaftaran_id',
+                $pendaftaran->ppdb_pendaftaran_id
+            )
+            ->firstOrFail();
+
+        $this->isiForm($pendidikan);
     }
 
     /**
      * Mengambil pendaftaran milik pengguna yang sedang login.
      */
-    protected function ambilPendaftaran()
+    protected function ambilPendaftaranMilikPengguna()
     {
         return PPDBPendaftaran::query()
+            ->with('ppdb_periode.ms_jenjang')
             ->whereKey($this->pendaftaranId)
             ->where('ms_pengguna_id', Auth::id())
             ->firstOrFail();
@@ -54,33 +62,18 @@ class EditPendidikan extends Component
         );
     }
 
-    /**
-     * Memastikan status pendaftaran mengizinkan pengeditan.
-     */
-    protected function pastikanBolehUbah($pendaftaran)
+    protected function pastikanBolehUbah(PPDBPendaftaran $pendaftaran): void
     {
         if (! $this->bolehUbahData($pendaftaran->status)) {
             abort(
                 403,
-                'Data pendidikan tidak dapat diubah pada tahap pendaftaran ini.'
+                'Pendaftaran tidak dapat diubah pada status saat ini.'
             );
         }
     }
 
-    /**
-     * Mengisi form dari data pendidikan yang tersimpan.
-     */
-    protected function isiForm()
+    protected function isiForm(PPDBPendidikan $pendidikan)
     {
-        $pendaftaran = $this->ambilPendaftaran();
-
-        $pendidikan = PPDBPendidikan::query()
-            ->where(
-                'ppdb_pendaftaran_id',
-                $pendaftaran->ppdb_pendaftaran_id
-            )
-            ->firstOrFail();
-
         $this->asal_sekolah = $pendidikan->asal_sekolah ?? '';
         $this->alamat_asal_sekolah = $pendidikan->alamat_asal_sekolah ?? '';
         $this->npsn_asal_sekolah =
@@ -157,7 +150,7 @@ class EditPendidikan extends Component
     public function update()
     {
         // Periksa status sebelum validasi dan penyimpanan.
-        $pendaftaran = $this->ambilPendaftaran();
+        $pendaftaran = $this->ambilPendaftaranMilikPengguna();
 
         $this->pastikanBolehUbah($pendaftaran);
 
@@ -185,13 +178,7 @@ class EditPendidikan extends Component
                     $pendaftaran->ppdb_pendaftaran_id
                 )
                 ->lockForUpdate()
-                ->first();
-
-            if (! $pendidikan) {
-                throw ValidationException::withMessages([
-                    'asal_sekolah' => 'Data pendidikan tidak ditemukan. Silakan muat ulang halaman.',
-                ]);
-            }
+                ->firstOrFail();
 
             $tidakAdaSekolah =
                 $data['jenjang_asal'] === 'TIDAK_ADA';
@@ -227,17 +214,25 @@ class EditPendidikan extends Component
             ]);
         });
 
+        $pendaftaran = $this->ambilPendaftaranMilikPengguna();
+
+        $slugJenjang = $pendaftaran->ppdb_periode->ms_jenjang->slug;
+
         $this->dispatchBrowserEvent('alertify-success', [
             'message' => 'Data pendidikan berhasil diperbarui.',
         ]);
 
-        return redirect()->route(
-            'ppdb.pendaftaran.pendidikan'
-        );
+        return redirect()->route('ppdb.pendaftaran.pendidikan', [
+            'jenjang' => $slugJenjang,
+        ]);
     }
     
     public function render()
     {
-        return view('livewire.p-p-d-b.pendaftaran.edit-pendidikan');
+        $pendaftaran = $this->ambilPendaftaranMilikPengguna();
+
+        return view('livewire.p-p-d-b.pendaftaran.edit-pendidikan', [
+            'pendaftaran' => $pendaftaran,
+        ]);
     }
 }

@@ -14,9 +14,15 @@ class DetailOrangTua extends Component
     public $pendaftaranId;
     public $gunakan_wali = false;
 
+    public function mount($pendaftaranId)
+    {
+        $this->pendaftaranId = $pendaftaranId;
+    }
+    
     protected function ambilPendaftaranMilikPengguna()
     {
         return PPDBPendaftaran::query()
+            ->with('ppdb_periode.ms_jenjang')
             ->whereKey($this->pendaftaranId)
             ->where('ms_pengguna_id', Auth::id())
             ->firstOrFail();
@@ -29,41 +35,6 @@ class DetailOrangTua extends Component
             ['diterima', 'pengecekan'],
             true
         );
-    }
-
-    public function mount($pendaftaranId)
-    {
-        $this->pendaftaranId = $pendaftaranId;
-
-        $pendaftaran = PPDBPendaftaran::query()
-            ->where('ppdb_pendaftaran_id', $this->pendaftaranId)
-            ->where('ms_pengguna_id', Auth::id())
-            ->first();
-
-        if (! $pendaftaran) {
-            return redirect()->route('ppdb.pendaftaran.jalur');
-        }
-
-        $adaDataSiswa =PPDBCalonSiswa::query()
-            ->where(
-                'ppdb_pendaftaran_id', $pendaftaran->ppdb_pendaftaran_id
-            )
-            ->exists();
-
-        if (! $adaDataSiswa) {
-            return redirect()->route('ppdb.pendaftaran.data-siswa');
-        }
-
-        $orangTua = PPDBOrangtua::query()
-            ->where(
-                'ppdb_pendaftaran_id',
-                $pendaftaran->ppdb_pendaftaran_id
-            )
-            ->first();
-
-        if (! $orangTua) {
-            return redirect()->route('ppdb.pendaftaran.orang-tua');
-        }
     }
     
     public function render()

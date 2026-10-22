@@ -19,20 +19,15 @@ class DetailSiswa extends Component
         $this->pendaftaranId = $pendaftaranId;
     }
 
-    /**
-     * Mengambil pendaftaran milik pengguna yang sedang login.
-     */
-    protected function ambilPendaftaran()
+    protected function ambilPendaftaranMilikPengguna()
     {
         return PPDBPendaftaran::query()
+            ->with('ppdb_periode.ms_jenjang')
             ->whereKey($this->pendaftaranId)
             ->where('ms_pengguna_id', Auth::id())
             ->firstOrFail();
     }
 
-    /**
-     * Menentukan apakah data masih boleh diubah.
-     */
     protected function bolehUbahData($status)
     {
         return ! in_array(
@@ -44,7 +39,7 @@ class DetailSiswa extends Component
 
     public function render()
     {
-        $pendaftaran = $this->ambilPendaftaran();
+        $pendaftaran = $this->ambilPendaftaranMilikPengguna();
 
         $calonSiswa = PPDBCalonSiswa::query()
             ->where(

@@ -1,13 +1,12 @@
 
 <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
     <div class="card-body p-4 p-sm-5">
-
+    
         {{-- Brand --}}
         <div class="text-center mb-4">
-            <a href="{{ route('ppdb.landing') }}"
-                class="d-inline-flex align-items-center gap-3 text-decoration-none">
+            <a class="d-inline-flex align-items-center gap-3 text-decoration-none">
 
-                <img src="{{ asset('assets/logo/logo.jpg') }}"
+                <img src="{{ asset('assets/logo/yayasan.webp') }}"
                     alt="Logo sekolah"
                     class="rounded-3"
                     width="48"
@@ -15,10 +14,10 @@
 
                 <div class="text-start">
                     <h5 class="mb-1 fw-bold text-body">
-                        {{ config('app.name') }}
+                        {{ $namaJenjang }}
                     </h5>
                     <p class="text-muted mb-0">
-                        Portal Pendaftaran PPDB
+                        Modul PPDB Orang Tua
                     </p>
                 </div>
             </a>
@@ -52,37 +51,6 @@
                 </div>
             </div>
         </div>
-
-        @once
-            <script>
-                window.addEventListener('registration-success', function () {
-                    const alertBox = document.getElementById(
-                        'registration-success'
-                    );
-
-                    const submitButton = document.getElementById(
-                        'registrationSubmit'
-                    );
-
-                    if (alertBox) {
-                        alertBox.classList.remove('d-none');
-
-                        alertBox.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'center'
-                        });
-                    }
-
-                    if (submitButton) {
-                        submitButton.disabled = true;
-                    }
-
-                    setTimeout(function () {
-                        window.location.href = @json(route('ppdb.dashboard'));
-                    }, 3000);
-                });
-            </script>
-        @endonce
 
         <form id="registrationForm" wire:submit.prevent="register">
 
@@ -270,7 +238,7 @@
                 <p class="text-muted mb-0">
                     Sudah memiliki akun?
 
-                    <a href="{{ route('ppdb.login') }}"
+                    <a href="{{ route('ppdb.login', ['jenjang' => $jenjangSlug]) }}"
                         class="fw-semibold text-primary text-decoration-underline">
                         Masuk di sini
                     </a>
@@ -279,4 +247,38 @@
 
         </form>
     </div>
+    @once
+        <script>
+            window.addEventListener('registration-success', function () {
+                const alertBox = document.getElementById(
+                    'registration-success'
+                );
+
+                const submitButton = document.getElementById(
+                    'registrationSubmit'
+                );
+
+                if (alertBox) {
+                    alertBox.classList.remove('d-none');
+
+                    alertBox.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                }
+
+                if (submitButton) {
+                    submitButton.disabled = true;
+                }
+
+                setTimeout(function () {
+                    window.location.href = @json(
+                        route('ppdb.dashboard', [
+                            'jenjang' => $jenjangSlug,
+                        ])
+                    );
+                }, 3000);
+            });
+        </script>
+    @endonce
 </div>

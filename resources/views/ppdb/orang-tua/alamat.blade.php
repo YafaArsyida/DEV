@@ -46,8 +46,10 @@
                                 tersimpan. Silakan lengkapi data orang tua terlebih dahulu.
                             </p>
 
-                            <a href="{{ route('ppdb.pendaftaran.orang-tua') }}"
-                            class="btn btn-primary rounded-pill px-4">
+                            <a href="{{ route('ppdb.pendaftaran.data-siswa', [
+                                    'jenjang' => $pendaftaran->ppdb_periode->ms_jenjang->slug,
+                                ]) }}"
+                                class="btn btn-primary rounded-pill px-4">
                                 <i class="ri-parent-line me-1"></i>
                                 Lengkapi Data Orang Tua
                             </a>

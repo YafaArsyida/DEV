@@ -21,7 +21,6 @@ class EditAlamat extends Component
     public $kode_pos = '';
     public $jenis_tempat_tinggal = '';
 
-
     public $jarak_ke_sekolah = 0;
     public $waktu_tempuh_ke_sekolah = '';
     public $moda_transportasi = '';
@@ -31,19 +30,27 @@ class EditAlamat extends Component
     {
         $this->pendaftaranId = $pendaftaranId;
 
-        $pendaftaran = $this->ambilPendaftaran();
+        $pendaftaran = $this->ambilPendaftaranMilikPengguna();
 
         $this->pastikanBolehUbah($pendaftaran);
 
-        $this->isiForm();
+        $alamat = PPDBAlamat::query()
+            ->where(
+                'ppdb_pendaftaran_id',
+                $pendaftaran->ppdb_pendaftaran_id
+            )
+            ->firstOrFail();
+
+        $this->isiForm($alamat);
     }
 
     /**
      * Mengambil pendaftaran milik pengguna yang sedang login.
      */
-    protected function ambilPendaftaran()
+    protected function ambilPendaftaranMilikPengguna()
     {
         return PPDBPendaftaran::query()
+            ->with('ppdb_periode.ms_jenjang')
             ->whereKey($this->pendaftaranId)
             ->where('ms_pengguna_id', Auth::id())
             ->firstOrFail();
@@ -61,15 +68,12 @@ class EditAlamat extends Component
         );
     }
 
-    /**
-     * Memastikan status pendaftaran mengizinkan pengeditan.
-     */
-    protected function pastikanBolehUbah($pendaftaran)
+    protected function pastikanBolehUbah(PPDBPendaftaran $pendaftaran): void
     {
         if (! $this->bolehUbahData($pendaftaran->status)) {
             abort(
                 403,
-                'Data alamat tidak dapat diubah pada tahap pendaftaran ini.'
+                'Pendaftaran tidak dapat diubah pada status saat ini.'
             );
         }
     }
@@ -77,17 +81,8 @@ class EditAlamat extends Component
     /**
      * Mengisi form dari data alamat yang sudah tersimpan.
      */
-    protected function isiForm()
+    protected function isiForm(PPDBAlamat $alamat)
     {
-        $pendaftaran = $this->ambilPendaftaran();
-
-        $alamat = PPDBAlamat::query()
-            ->where(
-                'ppdb_pendaftaran_id',
-                $pendaftaran->ppdb_pendaftaran_id
-            )
-            ->firstOrFail();
-
         $this->alamat_lengkap = $alamat->alamat_lengkap ?? '';
         $this->provinsi = $alamat->provinsi ?? '';
         $this->kabupaten = $alamat->kabupaten ?? '';
@@ -192,7 +187,7 @@ class EditAlamat extends Component
     public function update()
     {
         // Periksa status sebelum validasi dan penyimpanan.
-        $pendaftaran = $this->ambilPendaftaran();
+        $pendaftaran = $this->ambilPendaftaranMilikPengguna();
 
         $this->pastikanBolehUbah($pendaftaran);
 
@@ -220,13 +215,7 @@ class EditAlamat extends Component
                     $pendaftaran->ppdb_pendaftaran_id
                 )
                 ->lockForUpdate()
-                ->first();
-
-            if (! $alamat) {
-                throw ValidationException::withMessages([
-                    'alamat_lengkap' => 'Data alamat tidak ditemukan. Silakan muat ulang halaman.',
-                ]);
-            }
+                ->firstOrFail();
 
             $alamat->update([
                 'alamat_lengkap' => trim($data['alamat_lengkap']),
@@ -245,14 +234,24 @@ class EditAlamat extends Component
             ]);
         });
 
+        $pendaftaran = $this->ambilPendaftaranMilikPengguna();
+
+        $slugJenjang = $pendaftaran->ppdb_periode->ms_jenjang->slug;
+
         $this->dispatchBrowserEvent('alertify-success', [
             'message' => 'Data alamat berhasil diperbarui.',
         ]);
 
-        return redirect()->route('ppdb.pendaftaran.alamat');
+        return redirect()->route('ppdb.pendaftaran.alamat', [
+            'jenjang' => $slugJenjang,
+        ]);
     }
     public function render()
     {
-        return view('livewire.p-p-d-b.pendaftaran.edit-alamat');
+        $pendaftaran = $this->ambilPendaftaranMilikPengguna();
+
+        return view('livewire.p-p-d-b.pendaftaran.edit-alamat', [
+            'pendaftaran' => $pendaftaran,
+        ]);
     }
 }

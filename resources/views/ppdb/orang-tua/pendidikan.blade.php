@@ -49,7 +49,9 @@
                                 pendaftaran dapat dilanjutkan.
                             </p>
 
-                            <a href="{{ route('ppdb.pendaftaran.alamat') }}"
+                            <a href="{{ route('ppdb.pendaftaran.data-siswa', [
+                                    'jenjang' => $pendaftaran->ppdb_periode->ms_jenjang->slug,
+                                ]) }}"
                                 class="btn btn-primary rounded-pill px-4">
                                 <i class="ri-map-pin-line me-1"></i>
                                 Lengkapi Data Alamat

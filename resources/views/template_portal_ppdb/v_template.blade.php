@@ -11,13 +11,30 @@
                     <div class="navbar-header">
                         <div class="d-flex align-items-center">
                             <div class="navbar-brand-box horizontal-logo">
-                                <a href="{{ route('ppdb.dashboard') }}" class="logo logo-dark">
-                                    <span class="logo-sm"><img src="{{ asset('assets/logo/logo.jpg') }}" alt="{{ config('app.name') }}" height="30"></span>
-                                    <span class="logo-lg"><img src="{{ asset('assets/logo/logo.jpg') }}" alt="{{ config('app.name') }}" height="40"></span>
+                                <a href="{{ route('ppdb.dashboard', [
+                                    'jenjang' => request()->route('jenjang'),
+                                ]) }}" class="logo logo-dark">
+                                    <span class="logo-sm">
+                                        <img src="{{ asset('assets/logo/logo.jpg') }}"
+                                            alt="{{ config('app.name') }}" height="30">
+                                    </span>
+                                    <span class="logo-lg">
+                                        <img src="{{ asset('assets/logo/logo.jpg') }}"
+                                            alt="{{ config('app.name') }}" height="40">
+                                    </span>
                                 </a>
-                                <a href="{{ route('ppdb.dashboard') }}" class="logo logo-light">
-                                    <span class="logo-sm"><img src="{{ asset('assets/logo/logo.jpg') }}" alt="{{ config('app.name') }}" height="30"></span>
-                                    <span class="logo-lg"><img src="{{ asset('assets/logo/logo.jpg') }}" alt="{{ config('app.name') }}" height="40"></span>
+
+                                <a href="{{ route('ppdb.dashboard', [
+                                    'jenjang' => request()->route('jenjang'),
+                                ]) }}" class="logo logo-light">
+                                    <span class="logo-sm">
+                                        <img src="{{ asset('assets/logo/logo.jpg') }}"
+                                            alt="{{ config('app.name') }}" height="30">
+                                    </span>
+                                    <span class="logo-lg">
+                                        <img src="{{ asset('assets/logo/logo.jpg') }}"
+                                            alt="{{ config('app.name') }}" height="40">
+                                    </span>
                                 </a>
                             </div>
 
@@ -27,7 +44,7 @@
 
                             <div class="app-search d-none d-md-flex header-item">
                                 <div class="position-relative">
-                                    <h3 class="mb-0">PPDB {{ config('app.name') }}</h3>
+                                    <h3 class="mb-0">PPDB {{ $jenjang->nama_jenjang ?? config('app.name') }}</h3>
                                 </div>
                             </div>
                         </div>
@@ -79,13 +96,20 @@
 
                                     {{-- Logout --}}
                                     <a class="dropdown-item"
-                                        href="{{ route('ppdb.logout') }}"
+                                        href="{{ route('ppdb.logout', [
+                                            'jenjang' => request()->route('jenjang'),
+                                        ]) }}"
                                         onclick="event.preventDefault(); document.getElementById('logout-form-ppdb').submit();">
                                         <i class="ri-logout-box-line text-muted fs-16 align-middle me-1"></i>
                                         <span class="align-middle">Keluar</span>
                                     </a>
 
-                                    <form id="logout-form-ppdb" action="{{ route('ppdb.logout') }}" method="POST" class="d-none">
+                                    <form id="logout-form-ppdb"
+                                        action="{{ route('ppdb.logout', [
+                                            'jenjang' => request()->route('jenjang'),
+                                        ]) }}"
+                                        method="POST"
+                                        class="d-none">
                                         @csrf
                                     </form>
                                 </div>

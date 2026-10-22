@@ -7,6 +7,7 @@ use App\Models\PPDBOrangTua;
 use App\Models\PPDBAlamat;
 use App\Models\PPDBPendidikan;
 use App\Models\PPDBBerkas;
+use App\Models\PPDBPeriode;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -39,12 +40,59 @@ class FormBerkas extends Component
         '*.max' => 'Ukuran file maksimal 2 MB.',
     ];
 
-    protected function ambilPendaftaran()
+    public function mount($periodeId = null, $pendaftaranId = null)
     {
-        return PPDBPendaftaran::query()
-            ->where('ppdb_pendaftaran_id', $this->pendaftaranId)
+        $this->periodeId = $periodeId;
+        $this->pendaftaranId = $pendaftaranId;
+
+        $pendaftaran = $this->ambilPendaftaranMilikPengguna();
+
+        // Form awal hanya digunakan jika data belum tersedia.
+        $berkas = PPDBBerkas::query()
+            ->where(
+                'ppdb_pendaftaran_id',
+                $pendaftaran->ppdb_pendaftaran_id
+            )
+            ->first();
+
+        if ($berkas) {
+            $slugJenjang = PPDBPeriode::query()
+                ->with('ms_jenjang')
+                ->whereKey($pendaftaran->ppdb_periode_id)
+                ->firstOrFail()
+                ->ms_jenjang
+                ->slug;
+
+            return redirect()->route('ppdb.pendaftaran.berkas',  [
+                'jenjang' => $slugJenjang,
+            ]);
+        }
+    }
+
+    protected function ambilPendaftaranMilikPengguna()
+    {
+        $periode = PPDBPeriode::query()
+            ->with('ms_jenjang')
+            ->whereKey($this->periodeId)
+            ->where('status', 'aktif')
+            ->first();
+
+        if (! $periode) {
+            abort(403, 'Periode PPDB tidak aktif.');
+        }
+
+        $pendaftaran = PPDBPendaftaran::query()
+            ->with('ppdb_periode.ms_jenjang')
+            ->whereKey($this->pendaftaranId)
             ->where('ms_pengguna_id', Auth::id())
-            ->firstOrFail();
+            ->where('ppdb_periode_id', $periode->ppdb_periode_id)
+            ->first();
+
+        if (! $pendaftaran) {
+            abort(403, 'Pendaftaran tidak ditemukan atau bukan milik Anda.');
+        }
+
+        return $pendaftaran;
     }
 
     protected function pastikanBolehUnggah($pendaftaran)
@@ -56,23 +104,6 @@ class FormBerkas extends Component
         )) {
             abort(403, 'Berkas tidak dapat diubah pada tahap pendaftaran ini.');
         }
-    }
-
-    public function mount($periodeId, $pendaftaranId)
-    {
-        $this->periodeId = $periodeId;
-        $this->pendaftaranId = $pendaftaranId;
-
-        $pendaftaran = $this->ambilPendaftaran();
-
-        if (! PPDBPendidikan::where(
-            'ppdb_pendaftaran_id',
-            $pendaftaran->ppdb_pendaftaran_id
-        )->exists()) {
-            return redirect()->route('ppdb.pendaftaran.pendidikan');
-        }
-
-        $this->pastikanBolehUnggah($pendaftaran);
     }
 
     protected function jenisBerkas()
@@ -153,7 +184,8 @@ class FormBerkas extends Component
 
     public function simpan()
     {
-        $pendaftaran = $this->ambilPendaftaran();
+        $pendaftaran = $this->ambilPendaftaranMilikPengguna();
+        
         $this->pastikanBolehUnggah($pendaftaran);
 
         $this->validate($this->aturanBerkas());
@@ -316,11 +348,15 @@ class FormBerkas extends Component
 
             $this->resetValidation();
 
+            $slugJenjang = $pendaftaran->ppdb_periode->ms_jenjang->slug;
+
             $this->dispatchBrowserEvent('alertify-success', [
                 'message' => 'Berkas berhasil disimpan.',
             ]);
 
-            return redirect()->route('ppdb.pendaftaran.review');
+            return redirect()->route('ppdb.pendaftaran.review', [
+                'jenjang' => $slugJenjang,
+            ]);
 
         } catch (\Throwable $e) {
             // Bersihkan file baru jika proses gagal.
@@ -392,7 +428,7 @@ class FormBerkas extends Component
 
     public function render()
     {
-        $pendaftaran = $this->ambilPendaftaran();
+        $pendaftaran = $this->ambilPendaftaranMilikPengguna();
 
         $berkas = PPDBBerkas::query()
             ->where('ppdb_pendaftaran_id', $pendaftaran->ppdb_pendaftaran_id)

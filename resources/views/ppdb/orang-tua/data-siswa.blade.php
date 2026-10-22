@@ -49,7 +49,9 @@
                                 mengisi data calon siswa.
                             </p>
 
-                            <a href="{{ route('ppdb.pendaftaran.jalur') }}"
+                            <a href="{{ route('ppdb.pendaftaran.jalur', [
+                                    'jenjang' => $pendaftaran->ppdb_periode->ms_jenjang->slug,
+                                ]) }}"
                                 class="btn btn-primary rounded-pill px-4">
                                 <i class="ri-route-line me-1"></i>
                                 Pilih Jalur Pendaftaran

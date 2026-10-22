@@ -3,15 +3,20 @@
 namespace App\Http\Controllers\PPDB\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Jenjang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
 
-    public function index()
+    public function index(string $jenjang)
     {
-        return view('ppdb.auth.login');
+        $jenjang = Jenjang::where('slug', $jenjang)
+            ->where('status', 'aktif')
+            ->firstOrFail();
+
+        return view('ppdb.auth.login', compact('jenjang'));
     }
     
     public function logOut(Request $request)

@@ -51,19 +51,27 @@ class EditSiswa extends Component
     {
         $this->pendaftaranId = $pendaftaranId;
 
-        $pendaftaran = $this->ambilPendaftaran();
+        $pendaftaran = $this->ambilPendaftaranMilikPengguna();
 
         $this->pastikanBolehUbah($pendaftaran);
 
-        $this->isiForm();
+        $siswa = PPDBCalonSiswa::query()
+            ->where(
+                'ppdb_pendaftaran_id',
+                $pendaftaran->ppdb_pendaftaran_id
+            )
+            ->firstOrFail();
+
+        $this->isiForm($siswa);
     }
 
     /**
      * Mengambil pendaftaran milik pengguna yang sedang login.
      */
-    protected function ambilPendaftaran()
+    protected function ambilPendaftaranMilikPengguna()
     {
         return PPDBPendaftaran::query()
+            ->with('ppdb_periode.ms_jenjang')
             ->whereKey($this->pendaftaranId)
             ->where('ms_pengguna_id', Auth::id())
             ->firstOrFail();
@@ -84,12 +92,12 @@ class EditSiswa extends Component
     /**
      * Memastikan status pendaftaran mengizinkan pengeditan.
      */
-    protected function pastikanBolehUbah($pendaftaran)
+    protected function pastikanBolehUbah(PPDBPendaftaran $pendaftaran): void
     {
         if (! $this->bolehUbahData($pendaftaran->status)) {
             abort(
                 403,
-                'Data calon siswa tidak dapat diubah pada tahap pendaftaran ini.'
+                'Pendaftaran tidak dapat diubah pada status saat ini.'
             );
         }
     }
@@ -97,17 +105,8 @@ class EditSiswa extends Component
     /**
      * Mengisi form dari data yang sudah tersimpan.
      */
-    protected function isiForm()
+    protected function isiForm(PPDBCalonSiswa $siswa)
     {
-        $pendaftaran = $this->ambilPendaftaran();
-
-        $siswa = PPDBCalonSiswa::query()
-            ->where(
-                'ppdb_pendaftaran_id',
-                $pendaftaran->ppdb_pendaftaran_id
-            )
-            ->firstOrFail();
-
         // Identitas siswa
         $this->nama_siswa = $siswa->nama_siswa ?? '';
         $this->nama_panggilan = $siswa->nama_panggilan ?? '';
@@ -389,7 +388,7 @@ class EditSiswa extends Component
     public function update()
     {
         // Periksa status sebelum validasi dan penyimpanan.
-        $pendaftaran = $this->ambilPendaftaran();
+        $pendaftaran = $this->ambilPendaftaranMilikPengguna();
 
         $this->pastikanBolehUbah($pendaftaran);
 
@@ -409,23 +408,13 @@ class EditSiswa extends Component
                 ]);
             }
 
-            // Periksa ulang status di dalam transaksi.
-            $this->pastikanBolehUbah($pendaftaran);
-
             $siswa = PPDBCalonSiswa::query()
                 ->where(
                     'ppdb_pendaftaran_id',
                     $pendaftaran->ppdb_pendaftaran_id
                 )
                 ->lockForUpdate()
-                ->first();
-
-            if (! $siswa) {
-                throw ValidationException::withMessages([
-                    'nama_siswa' =>
-                        'Data calon siswa tidak ditemukan. Silakan muat ulang halaman.',
-                ]);
-            }
+                ->firstOrFail();
 
             $bantuanSosial = $data['penerima_bantuan_sosial'] ?? [];
 
@@ -472,17 +461,25 @@ class EditSiswa extends Component
             ]);
         });
 
+        $pendaftaran = $this->ambilPendaftaranMilikPengguna();
+
+        $slugJenjang = $pendaftaran->ppdb_periode->ms_jenjang->slug;
+
         $this->dispatchBrowserEvent('alertify-success', [
             'message' => 'Data calon siswa berhasil diperbarui.',
         ]);
 
-        return redirect()->to(
-            route('ppdb.pendaftaran.data-siswa')
-        );
+        return redirect()->route('ppdb.pendaftaran.data-siswa', [
+            'jenjang' => $slugJenjang,
+        ]);
     }
 
     public function render()
     {
-        return view('livewire.p-p-d-b.pendaftaran.edit-siswa');
+        $pendaftaran = $this->ambilPendaftaranMilikPengguna();
+
+        return view('livewire.p-p-d-b.pendaftaran.edit-siswa',[
+            'pendaftaran' => $pendaftaran,
+        ]);
     }
 }

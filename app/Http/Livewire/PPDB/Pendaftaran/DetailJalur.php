@@ -30,7 +30,12 @@ class DetailJalur extends Component
     protected function ambilPendaftaran()
     {
         return PPDBPendaftaran::query()
-            ->with(['ppdb_jalur', 'ppdb_gelombang'])
+            ->with([
+                'ppdb_jalur',
+                'ppdb_gelombang',
+                'ppdb_periode',
+                'ppdb_periode.ms_jenjang',
+            ])
             ->where('ppdb_pendaftaran_id', $this->pendaftaranId)
             ->where('ms_pengguna_id', Auth::id())
             ->firstOrFail();
@@ -163,14 +168,20 @@ class DetailJalur extends Component
             ]);
         });
 
-        // Ambil kembali pilihan yang benar-benar tersimpan.
-        $this->jalurTerpilih = $this->ambilPendaftaran()->ppdb_jalur_id;
+        // Ambil kembali data pendaftaran beserta jenjangnya.
+        $pendaftaran = $this->ambilPendaftaran();
+
+        $this->jalurTerpilih = $pendaftaran->ppdb_jalur_id;
+
+        $slugJenjang = $pendaftaran->ppdb_periode->ms_jenjang->slug;
 
         $this->dispatchBrowserEvent('alertify-success', [
             'message' => 'Jalur pendaftaran berhasil diperbarui.',
         ]);
-        
-        return redirect()->route('ppdb.pendaftaran.data-siswa');
+
+        return redirect()->route('ppdb.pendaftaran.data-siswa', [
+            'jenjang' => $slugJenjang,
+        ]);
     }
 
     public function render()

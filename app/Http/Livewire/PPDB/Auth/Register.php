@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\PPDB\Auth;
 
+use App\Models\Jenjang;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -10,12 +11,25 @@ use Livewire\Component;
 
 class Register extends Component
 {
+    public $jenjangSlug;
+    public $namaJenjang;
+
     public $nama = '';
     public $email = '';
     public $telepon = '';
     public $password = '';
     public $password_confirmation = '';
     public $agreement = false;
+
+    public function mount(string $jenjangSlug)
+    {
+        $jenjang = Jenjang::where('slug', $jenjangSlug)
+            ->where('status', 'aktif')
+            ->firstOrFail();
+
+        $this->jenjangSlug = $jenjang->slug;
+        $this->namaJenjang = $jenjang->nama_jenjang;
+    }
 
     protected function rules()
     {

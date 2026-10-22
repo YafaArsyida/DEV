@@ -53,7 +53,7 @@ class EditOrangTua extends Component
 
         $pendaftaran = $this->ambilPendaftaranMilikPengguna();
 
-        $this->pastikanBolehMengubah($pendaftaran->status);
+        $this->pastikanBolehUbah($pendaftaran);
 
         $orangTua = PPDBOrangTua::query()
             ->where(
@@ -71,6 +71,7 @@ class EditOrangTua extends Component
     protected function ambilPendaftaranMilikPengguna()
     {
         return PPDBPendaftaran::query()
+            ->with('ppdb_periode.ms_jenjang')
             ->whereKey($this->pendaftaranId)
             ->where('ms_pengguna_id', Auth::id())
             ->firstOrFail();
@@ -88,12 +89,12 @@ class EditOrangTua extends Component
         );
     }
 
-    protected function pastikanBolehMengubah($status)
+    protected function pastikanBolehUbah(PPDBPendaftaran $pendaftaran): void
     {
-        if (! $this->bolehUbahData($status)) {
+        if (! $this->bolehUbahData($pendaftaran->status)) {
             abort(
                 403,
-                'Data orang tua tidak dapat diubah pada status pendaftaran ini.'
+                'Pendaftaran tidak dapat diubah pada status saat ini.'
             );
         }
     }
@@ -383,7 +384,7 @@ class EditOrangTua extends Component
         // Pastikan pendaftaran masih milik pengguna dan boleh diedit.
         $pendaftaran = $this->ambilPendaftaranMilikPengguna();
 
-        $this->pastikanBolehMengubah($pendaftaran->status);
+        $this->pastikanBolehUbah($pendaftaran);
 
         $data = $this->validate();
 
@@ -475,15 +476,25 @@ class EditOrangTua extends Component
             $orangTua->save();
         });
 
+        $pendaftaran = $this->ambilPendaftaranMilikPengguna();
+
+        $slugJenjang = $pendaftaran->ppdb_periode->ms_jenjang->slug;
+
         $this->dispatchBrowserEvent('alertify-success', [
             'message' => 'Data orang tua berhasil diperbarui.',
         ]);
 
-        return redirect()->route('ppdb.pendaftaran.orang-tua');
+        return redirect()->route('ppdb.pendaftaran.orang-tua', [
+            'jenjang' => $slugJenjang,
+        ]);
     }
     
     public function render()
     {
-        return view('livewire.p-p-d-b.pendaftaran.edit-orang-tua');
+        $pendaftaran = $this->ambilPendaftaranMilikPengguna();
+
+        return view('livewire.p-p-d-b.pendaftaran.edit-orang-tua', [
+            'pendaftaran' => $pendaftaran,
+        ]);
     }
 }

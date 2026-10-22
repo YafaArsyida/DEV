@@ -6,6 +6,7 @@ use App\Models\PPDBAlamat;
 use App\Models\PPDBPendaftaran;
 use App\Models\PPDBOrangTua;
 use App\Models\PPDBPendidikan;
+use App\Models\PPDBPeriode;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -69,18 +70,7 @@ class FormPendidikan extends Component
         $this->periodeId = $periodeId;
         $this->pendaftaranId = $pendaftaranId;
 
-        $pendaftaran = PPDBPendaftaran::query()
-            ->where(
-                'ppdb_pendaftaran_id',
-                $this->pendaftaranId
-            )
-            ->where('ms_pengguna_id', Auth::id())
-            ->where('ppdb_periode_id', $this->periodeId)
-            ->first();
-
-        if (! $pendaftaran) {
-            return redirect()->route('ppdb.pendaftaran.jalur');
-        }
+        $pendaftaran = $this->ambilPendaftaranMilikPengguna();
 
         // Form awal hanya digunakan jika data belum tersedia.
         $pendidikan = PPDBPendidikan::query()
@@ -91,8 +81,43 @@ class FormPendidikan extends Component
             ->first();
 
         if ($pendidikan) {
-            return redirect()->route('ppdb.pendaftaran.pendidikan');
+            $slugJenjang = PPDBPeriode::query()
+                ->with('ms_jenjang')
+                ->whereKey($pendaftaran->ppdb_periode_id)
+                ->firstOrFail()
+                ->ms_jenjang
+                ->slug;
+
+            return redirect()->route('ppdb.pendaftaran.pendidikan',  [
+                'jenjang' => $slugJenjang,
+            ]);
         }
+    }
+
+    protected function ambilPendaftaranMilikPengguna()
+    {
+        $periode = PPDBPeriode::query()
+            ->with('ms_jenjang')
+            ->whereKey($this->periodeId)
+            ->where('status', 'aktif')
+            ->first();
+
+        if (! $periode) {
+            abort(403, 'Periode PPDB tidak aktif.');
+        }
+
+        $pendaftaran = PPDBPendaftaran::query()
+            ->with('ppdb_periode.ms_jenjang')
+            ->whereKey($this->pendaftaranId)
+            ->where('ms_pengguna_id', Auth::id())
+            ->where('ppdb_periode_id', $periode->ppdb_periode_id)
+            ->first();
+
+        if (! $pendaftaran) {
+            abort(403, 'Pendaftaran tidak ditemukan atau bukan milik Anda.');
+        }
+
+        return $pendaftaran;
     }
 
     public function simpan()
@@ -115,20 +140,6 @@ class FormPendidikan extends Component
                 throw ValidationException::withMessages([
                     'asal_sekolah' =>
                         'Pendaftaran tidak ditemukan. Silakan periksa kembali.',
-                ]);
-            }
-
-            // Pastikan data orang tua sudah tersedia.
-            $alamat = PPDBAlamat::query()
-                ->where(
-                    'ppdb_pendaftaran_id',
-                    $pendaftaran->ppdb_pendaftaran_id
-                )
-                ->exists();
-
-            if (! $alamat) {
-                throw ValidationException::withMessages([
-                    'asal_sekolah' => 'Lengkapi data alamat terlebih dahulu.',
                 ]);
             }
 
@@ -180,14 +191,24 @@ class FormPendidikan extends Component
             ]);
         });
 
+        $pendaftaran = $this->ambilPendaftaranMilikPengguna();
+
+        $slugJenjang = $pendaftaran->ppdb_periode->ms_jenjang->slug;
+
         $this->dispatchBrowserEvent('alertify-success', [
             'message' => 'Data pendidikan berhasil disimpan.',
         ]);
 
-        return redirect()->route('ppdb.pendaftaran.berkas');
+        return redirect()->route('ppdb.pendaftaran.berkas', [
+            'jenjang' => $slugJenjang,
+        ]);
     }
     public function render()
     {
-        return view('livewire.p-p-d-b.pendaftaran.form-pendidikan');
+        $pendaftaran = $this->ambilPendaftaranMilikPengguna();
+        
+        return view('livewire.p-p-d-b.pendaftaran.form-pendidikan', [
+            'pendaftaran' => $pendaftaran
+        ]);
     }
 }

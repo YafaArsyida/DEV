@@ -123,13 +123,17 @@
                                 </div>
 
                                 @if ($pendaftaran->status === 'draft')
-                                    <a href="{{ route('ppdb.pendaftaran.data-siswa') }}"
+                                    <a href="{{ route('ppdb.pendaftaran.data-siswa', [
+                                            'jenjang' => $pendaftaran->ppdb_periode->ms_jenjang->slug,
+                                        ]) }}"
                                         class="btn btn-outline-primary rounded-pill px-3">
                                         <i class="ri-edit-line me-1"></i>
                                         Ubah Data
                                     </a>
                                 @elseif ($pendaftaran->status === 'perbaikan')
-                                    <a href="{{ route('ppdb.pendaftaran.data-siswa') }}"
+                                    <a href="{{ route('ppdb.pendaftaran.data-siswa', [
+                                            'jenjang' => $pendaftaran->ppdb_periode->ms_jenjang->slug,
+                                        ]) }}"
                                         class="btn btn-primary rounded-pill px-3">
                                         <i class="ri-edit-line me-1"></i>
                                         Perbaiki Data
@@ -198,13 +202,17 @@
                                 </div>
 
                                 @if ($pendaftaran->status === 'draft')
-                                    <a href="{{ route('ppdb.pendaftaran.orang-tua') }}"
+                                    <a href="{{ route('ppdb.pendaftaran.orang-tua', [
+                                            'jenjang' => $pendaftaran->ppdb_periode->ms_jenjang->slug,
+                                        ]) }}"
                                         class="btn btn-outline-primary rounded-pill px-3">
                                         <i class="ri-edit-line me-1"></i>
                                         Ubah Data
                                     </a>
                                 @elseif ($pendaftaran->status === 'perbaikan')
-                                    <a href="{{ route('ppdb.pendaftaran.orang-tua') }}"
+                                    <a href="{{ route('ppdb.pendaftaran.orang-tua', [
+                                            'jenjang' => $pendaftaran->ppdb_periode->ms_jenjang->slug,
+                                        ]) }}"
                                         class="btn btn-primary rounded-pill px-3">
                                         <i class="ri-edit-line me-1"></i>
                                         Perbaiki Data
@@ -294,13 +302,17 @@
                                 </div>
 
                                 @if ($pendaftaran->status === 'draft')
-                                    <a href="{{ route('ppdb.pendaftaran.alamat') }}"
+                                    <a href="{{ route('ppdb.pendaftaran.alamat', [
+                                            'jenjang' => $pendaftaran->ppdb_periode->ms_jenjang->slug,
+                                        ]) }}"
                                         class="btn btn-outline-primary rounded-pill px-3">
                                         <i class="ri-edit-line me-1"></i>
                                         Ubah Data
                                     </a>
                                 @elseif ($pendaftaran->status === 'perbaikan')
-                                    <a href="{{ route('ppdb.pendaftaran.alamat') }}"
+                                    <a href="{{ route('ppdb.pendaftaran.alamat', [
+                                            'jenjang' => $pendaftaran->ppdb_periode->ms_jenjang->slug,
+                                        ]) }}"
                                         class="btn btn-primary rounded-pill px-3">
                                         <i class="ri-edit-line me-1"></i>
                                         Perbaiki Data
@@ -374,13 +386,17 @@
                                 </div>
 
                                 @if ($pendaftaran->status === 'draft')
-                                    <a href="{{ route('ppdb.pendaftaran.pendidikan') }}"
+                                    <a href="{{ route('ppdb.pendaftaran.pendidikan', [
+                                            'jenjang' => $pendaftaran->ppdb_periode->ms_jenjang->slug,
+                                        ]) }}"
                                         class="btn btn-outline-primary rounded-pill px-3">
                                         <i class="ri-edit-line me-1"></i>
                                         Ubah Data
                                     </a>
                                 @elseif ($pendaftaran->status === 'perbaikan')
-                                    <a href="{{ route('ppdb.pendaftaran.pendidikan') }}"
+                                    <a href="{{ route('ppdb.pendaftaran.pendidikan', [
+                                            'jenjang' => $pendaftaran->ppdb_periode->ms_jenjang->slug,
+                                        ]) }}"
                                         class="btn btn-primary rounded-pill px-3">
                                         <i class="ri-edit-line me-1"></i>
                                         Perbaiki Data
@@ -452,12 +468,16 @@
                                 </div>
 
                                 @if ($pendaftaran->status === 'draft')
-                                    <a href="{{ route('ppdb.pendaftaran.berkas') }}"
+                                    <a href="{{ route('ppdb.pendaftaran.berkas', [
+                                            'jenjang' => $pendaftaran->ppdb_periode->ms_jenjang->slug,
+                                        ]) }}"
                                         class="btn btn-outline-primary rounded-pill px-3">
                                         <i class="ri-edit-line me-1"></i> Kelola Berkas
                                     </a>
                                 @elseif ($pendaftaran->status === 'perbaikan')
-                                    <a href="{{ route('ppdb.pendaftaran.berkas') }}"
+                                    <a href="{{ route('ppdb.pendaftaran.berkas', [
+                                            'jenjang' => $pendaftaran->ppdb_periode->ms_jenjang->slug,
+                                        ]) }}"
                                         class="btn btn-primary rounded-pill px-3">
                                         <i class="ri-edit-line me-1"></i> Perbaiki Berkas
                                     </a>
@@ -570,14 +590,18 @@
 
                             <div class="d-flex flex-column flex-sm-row justify-content-between gap-2 mt-4">
                                 {{-- KEMBALI KE DASHBOARD --}}
-                                <a href="{{ route('ppdb.dashboard') }}"
+                                <a href="{{ route('ppdb.dashboard', [
+                                        'jenjang' => $pendaftaran->ppdb_periode->ms_jenjang->slug,
+                                    ]) }}"
                                     class="btn btn-outline-secondary rounded-pill px-4">
                                     <i class="ri-dashboard-line me-1"></i>
                                     Dashboard
                                 </a>
 
                                 {{-- STATUS PENDAFTARAN --}}
-                                <a href="{{ route('ppdb.pendaftaran.status') }}"
+                                <a href="{{ route('ppdb.pendaftaran.status', [
+                                        'jenjang' => $pendaftaran->ppdb_periode->ms_jenjang->slug,
+                                    ]) }}"
                                     class="btn btn-primary rounded-pill px-4">
                                     Status Pendaftaran
                                     <i class="ri-arrow-right-line ms-1"></i>

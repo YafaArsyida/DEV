@@ -27,6 +27,17 @@ class EditBerkas extends Component
     public $filePasFoto;
     public $fileDokumenPendukung;
 
+    public function mount($pendaftaranId)
+    {
+        $this->pendaftaranId = $pendaftaranId;
+
+        $this->pendaftaran = $this->ambilPendaftaranMilikPengguna();
+
+        $this->pastikanBolehUbah($this->pendaftaran);
+
+        $this->muatBerkas();
+    }
+
     protected $messages = [
         'fileKartuKeluarga.max' => 'Ukuran Kartu Keluarga maksimal 2 MB.',
         'fileAktaKelahiran.max' => 'Ukuran Akta Kelahiran maksimal 2 MB.',
@@ -35,7 +46,7 @@ class EditBerkas extends Component
         '*.mimes' => 'Format file harus JPG, JPEG, PNG, WebP, atau PDF.',
     ];
 
-    protected function ambilPendaftaran()
+    protected function ambilPendaftaranMilikPengguna()
     {
         return PPDBPendaftaran::query()
             ->where('ppdb_pendaftaran_id', $this->pendaftaranId)
@@ -54,16 +65,6 @@ class EditBerkas extends Component
         }
     }
 
-    public function mount($pendaftaranId)
-    {
-        $this->pendaftaranId = $pendaftaranId;
-
-        $this->pendaftaran = $this->ambilPendaftaran();
-
-        $this->pastikanBolehUbah($this->pendaftaran);
-
-        $this->muatBerkas();
-    }
 
     protected function muatBerkas()
     {
@@ -123,7 +124,8 @@ class EditBerkas extends Component
 
     public function simpan()
     {
-        $pendaftaran = $this->ambilPendaftaran();
+        $pendaftaran = $this->ambilPendaftaranMilikPengguna();
+
         $this->pastikanBolehUbah($pendaftaran);
 
         $this->validate($this->aturanValidasi());
@@ -285,12 +287,15 @@ class EditBerkas extends Component
 
             $this->resetValidation();
 
-            session()->flash(
-                'success',
-                'Perubahan berkas berhasil disimpan.'
-            );
+            $slugJenjang = $pendaftaran->ppdb_periode->ms_jenjang->slug;
 
-            return redirect()->route('ppdb.pendaftaran.berkas');
+            $this->dispatchBrowserEvent('alertify-success', [
+                'message' => 'Perubahan berhasil disimpan.',
+            ]);
+
+            return redirect()->route('ppdb.pendaftaran.berkas',  [
+                'jenjang' => $slugJenjang,
+            ]);
 
         } catch (Throwable $e) {
             // Bersihkan file baru jika penyimpanan gagal.
@@ -372,7 +377,7 @@ class EditBerkas extends Component
    
     public function render()
     {
-        $pendaftaran = $this->ambilPendaftaran();
+        $pendaftaran = $this->ambilPendaftaranMilikPengguna();
 
         $berkas = PPDBBerkas::query()
             ->where(

@@ -426,21 +426,24 @@
             </div>
         </div>
 
-    {{-- PUBLIC WEBSITES --}}
-    <div class="mb-4">
-        <div class="d-flex align-items-center justify-content-between mb-3">
-            <div>
-                <h5 class="fw-bold mb-1">Situs Publik</h5>
-                <p class="text-muted mb-0">
-                    Halaman informasi yang dapat diakses calon siswa dan masyarakat.
-                </p>
+        {{-- PUBLIC WEBSITES --}}
+        <div class="mb-4">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <div>
+                    <h5 class="fw-bold mb-1">Situs Publik</h5>
+                    <p class="text-muted mb-0">
+                        Halaman informasi yang dapat diakses calon siswa dan masyarakat.
+                    </p>
+                </div>
             </div>
-        </div>
 
-        <div class="row g-4">
-            <div class="col-xl-6 col-md-6">
-                <a href="{{ route('ppdb.landing') }}" class="text-decoration-none">
-                    <div class="card border-0 shadow-sm rounded-4 h-100 application-card">
+            <div class="row g-4">
+                <div class="col-xl-6 col-md-6">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 application-card"
+                        role="button"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalPilihJenjangPPDB">
+
                         <div class="card-body p-4">
                             <div class="d-flex justify-content-between align-items-start mb-4">
                                 <div class="avatar-md">
@@ -448,47 +451,159 @@
                                         <i class="ri-user-add-line"></i>
                                     </div>
                                 </div>
-                                <span class="badge bg-info-subtle text-info rounded-pill">Publik</span>
+
+                                <span class="badge bg-info-subtle text-info rounded-pill">
+                                    Publik
+                                </span>
                             </div>
+
                             <h5 class="fw-bold text-dark mb-2">Landing PPDB</h5>
+
                             <p class="text-muted mb-0">
                                 Tampilkan informasi penerimaan siswa baru, persyaratan,
-                                jadwal, dan akses pendaftaran online.
+                                jadwal, dan akses pendaftaran online sesuai jenjang pendidikan.
                             </p>
-                            <div class="text-primary fw-medium mt-3">
-                                Buka halaman PPDB <i class="ri-arrow-right-line align-middle ms-1"></i>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-            </div>
 
-            <div class="col-xl-6 col-md-6">
-                <a href="{{ route('landing.ekstrakurikuler') }}" class="text-decoration-none">
-                    <div class="card border-0 shadow-sm rounded-4 h-100 application-card">
-                        <div class="card-body p-4">
-                            <div class="d-flex justify-content-between align-items-start mb-4">
-                                <div class="avatar-md">
-                                    <div class="avatar-title bg-warning-subtle text-warning rounded-3 fs-4">
-                                        <i class="ri-football-line"></i>
-                                    </div>
-                                </div>
-                                <span class="badge bg-warning-subtle text-warning rounded-pill">Publik</span>
-                            </div>
-                            <h5 class="fw-bold text-dark mb-2">Landing Ekstrakurikuler</h5>
-                            <p class="text-muted mb-0">
-                                Perkenalkan pilihan kegiatan ekstrakurikuler dan informasi
-                                pendaftaran kepada siswa dan orang tua.
-                            </p>
                             <div class="text-primary fw-medium mt-3">
-                                Buka halaman ekstrakurikuler <i class="ri-arrow-right-line align-middle ms-1"></i>
+                                Pilih jenjang PPDB
+                                <i class="ri-arrow-right-line align-middle ms-1"></i>
                             </div>
                         </div>
                     </div>
-                </a>
+                </div>
+
+                <div class="col-xl-6 col-md-6">
+                    <a href="{{ route('landing.ekstrakurikuler') }}" class="text-decoration-none">
+                        <div class="card border-0 shadow-sm rounded-4 h-100 application-card">
+                            <div class="card-body p-4">
+                                <div class="d-flex justify-content-between align-items-start mb-4">
+                                    <div class="avatar-md">
+                                        <div class="avatar-title bg-warning-subtle text-warning rounded-3 fs-4">
+                                            <i class="ri-football-line"></i>
+                                        </div>
+                                    </div>
+                                    <span class="badge bg-warning-subtle text-warning rounded-pill">Publik</span>
+                                </div>
+                                <h5 class="fw-bold text-dark mb-2">Landing Ekstrakurikuler</h5>
+                                <p class="text-muted mb-0">
+                                    Perkenalkan pilihan kegiatan ekstrakurikuler dan informasi
+                                    pendaftaran kepada siswa dan orang tua.
+                                </p>
+                                <div class="text-primary fw-medium mt-3">
+                                    Buka halaman ekstrakurikuler <i class="ri-arrow-right-line align-middle ms-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
+
+         {{-- Modal Pilih Jenjang PPDB --}}
+        <div class="modal fade" id="modalPilihJenjangPPDB" tabindex="-1"
+            aria-labelledby="modalPilihJenjangPPDBLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 rounded-4">
+
+                    <div class="modal-header border-bottom-0 pb-0">
+                        <div>
+                            <h5 class="modal-title fw-bold" id="modalPilihJenjangPPDBLabel">
+                                Pilih Jenjang PPDB
+                            </h5>
+                            <p class="text-muted mb-0 mt-1">
+                                Pilih jenjang pendidikan untuk membuka halaman PPDB.
+                            </p>
+                        </div>
+
+                        <button type="button" class="btn-close"
+                            data-bs-dismiss="modal" aria-label="Tutup"></button>
+                    </div>
+
+                    <div class="modal-body p-4">
+                        <div class="row g-3">
+
+                            {{-- PPDB SD --}}
+                            <div class="col-12">
+                                <a href="{{ route('ppdb.sd') }}"
+                                    class="card border rounded-3 shadow-none mb-0 text-decoration-none">
+                                    <div class="card-body d-flex align-items-center gap-3">
+                                        <div class="avatar-md flex-shrink-0">
+                                            <div class="avatar-title bg-primary-subtle text-primary rounded-3 fs-4">
+                                                <i class="ri-school-line"></i>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex-grow-1">
+                                            <h6 class="fw-semibold text-dark mb-1">PPDB SD</h6>
+                                            <p class="text-muted mb-0 fs-13">
+                                                Penerimaan Peserta Didik Baru Sekolah Dasar
+                                            </p>
+                                        </div>
+
+                                        <i class="ri-arrow-right-s-line fs-22 text-muted"></i>
+                                    </div>
+                                </a>
+                            </div>
+
+                            {{-- PPDB TK --}}
+                            <div class="col-12">
+                                <a href="{{ route('ppdb.tk') }}"
+                                    class="card border rounded-3 shadow-none mb-0 text-decoration-none">
+                                    <div class="card-body d-flex align-items-center gap-3">
+                                        <div class="avatar-md flex-shrink-0">
+                                            <div class="avatar-title bg-success-subtle text-success rounded-3 fs-4">
+                                                <i class="ri-parent-line"></i>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex-grow-1">
+                                            <h6 class="fw-semibold text-dark mb-1">PPDB TK</h6>
+                                            <p class="text-muted mb-0 fs-13">
+                                                Penerimaan Peserta Didik Baru Taman Kanak-kanak
+                                            </p>
+                                        </div>
+
+                                        <i class="ri-arrow-right-s-line fs-22 text-muted"></i>
+                                    </div>
+                                </a>
+                            </div>
+
+                            {{-- PPDB KB --}}
+                            <div class="col-12">
+                                <a href="{{ route('ppdb.kb') }}"
+                                    class="card border rounded-3 shadow-none mb-0 text-decoration-none">
+                                    <div class="card-body d-flex align-items-center gap-3">
+                                        <div class="avatar-md flex-shrink-0">
+                                            <div class="avatar-title bg-warning-subtle text-warning rounded-3 fs-4">
+                                                <i class="ri-emotion-happy-line"></i>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex-grow-1">
+                                            <h6 class="fw-semibold text-dark mb-1">PPDB KB</h6>
+                                            <p class="text-muted mb-0 fs-13">
+                                                Penerimaan Peserta Didik Baru Kelompok Bermain
+                                            </p>
+                                        </div>
+
+                                        <i class="ri-arrow-right-s-line fs-22 text-muted"></i>
+                                    </div>
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="modal-footer border-top-0 pt-0">
+                        <button type="button" class="btn btn-light"
+                            data-bs-dismiss="modal">
+                            Batal
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
 
     </div>
     

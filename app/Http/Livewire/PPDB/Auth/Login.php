@@ -2,17 +2,30 @@
 
 namespace App\Http\Livewire\PPDB\Auth;
 
+use App\Models\Jenjang;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 
 class Login extends Component
 {
+    public $jenjangSlug;
+    public $namaJenjang;
+
     public $email = '';
     public $password = '';
     public $remember = false;
-
     
+    public function mount(string $jenjangSlug)
+    {
+        $jenjang = Jenjang::where('slug', $jenjangSlug)
+            ->where('status', 'aktif')
+            ->firstOrFail();
+
+        $this->jenjangSlug = $jenjang->slug;
+        $this->namaJenjang = $jenjang->nama_jenjang;
+    }
+
     protected function rules()
     {
         return [

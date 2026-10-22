@@ -13,9 +13,15 @@ class DetailPendidikan extends Component
 {
     public $pendaftaranId;
 
+    public function mount($pendaftaranId)
+    {
+        $this->pendaftaranId = $pendaftaranId;
+    }
+
     protected function ambilPendaftaranMilikPengguna()
     {
         return PPDBPendaftaran::query()
+            ->with('ppdb_periode.ms_jenjang')
             ->whereKey($this->pendaftaranId)
             ->where('ms_pengguna_id', Auth::id())
             ->firstOrFail();
@@ -30,53 +36,6 @@ class DetailPendidikan extends Component
         );
     }
 
-    public function mount($pendaftaranId)
-    {
-        $this->pendaftaranId = $pendaftaranId;
-
-        $pendaftaran = PPDBPendaftaran::query()
-            ->where(
-                'ppdb_pendaftaran_id',
-                $this->pendaftaranId
-            )
-            ->where('ms_pengguna_id', Auth::id())
-            ->first();
-
-        if (! $pendaftaran) {
-            return redirect()->route(
-                'ppdb.pendaftaran.jalur'
-            );
-        }
-
-        // Data alamat wajib tersedia sebelum pendidikan.
-        $alamat = PPDBAlamat::query()
-            ->where(
-                'ppdb_pendaftaran_id',
-                $pendaftaran->ppdb_pendaftaran_id
-            )
-            ->exists();
-
-        if (! $alamat) {
-            return redirect()->route(
-                'ppdb.pendaftaran.alamat'
-            );
-        }
-
-        // Data pendidikan harus sudah tersedia.
-        $pendidikan = PpdbPendidikan::query()
-            ->where(
-                'ppdb_pendaftaran_id',
-                $pendaftaran->ppdb_pendaftaran_id
-            )
-            ->exists();
-
-        if (! $pendidikan) {
-            return redirect()->route(
-                'ppdb.pendaftaran.pendidikan'
-            );
-        }
-    }
-
     public function render()
     {
         $pendaftaran = $this->ambilPendaftaranMilikPengguna();
@@ -86,13 +45,7 @@ class DetailPendidikan extends Component
                 'ppdb_pendaftaran_id',
                 $pendaftaran->ppdb_pendaftaran_id
             )
-            ->first();
-
-        if (! $pendidikan) {
-            return redirect()->route(
-                'ppdb.pendaftaran.pendidikan'
-            );
-        }
+            ->firstOrFail();
 
         return view('livewire.p-p-d-b.pendaftaran.detail-pendidikan',[
             'pendaftaran' => $pendaftaran,

@@ -320,9 +320,10 @@ class PertanyaanTambahan extends Component
 
             $this->muatData();
 
-            // Muat ulang halaman agar status dan ringkasan
-            // mengikuti data terbaru.
-            return redirect()->route('ppdb.pendaftaran.status');
+            return redirect()->route('ppdb.pendaftaran.status', [
+                'jenjang' => $pendaftaran->ppdb_periode->ms_jenjang->slug,
+            ]);
+
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
 

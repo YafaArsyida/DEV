@@ -181,27 +181,7 @@ class FormOrangTua extends Component
         $this->periodeId = $periodeId;
         $this->pendaftaranId = $pendaftaranId;
 
-        $pendaftaran = PPDBPendaftaran::query()
-            ->where('ppdb_pendaftaran_id', $this->pendaftaranId)
-            ->where('ms_pengguna_id', Auth::id())
-            ->where('ppdb_periode_id', $this->periodeId)
-            ->first();
-
-        if (! $pendaftaran) {
-            return redirect()->route('ppdb.pendaftaran.jalur');
-        }
-
-        // Data siswa wajib tersedia sebelum mengisi data orang tua.
-        $adaDataSiswa = DB::table('ppdb_calon_siswa')
-            ->where(
-                'ppdb_pendaftaran_id',
-                $pendaftaran->ppdb_pendaftaran_id
-            )
-            ->exists();
-
-        if (! $adaDataSiswa) {
-            return redirect()->route('ppdb.pendaftaran.jalur');
-        }
+        $pendaftaran = $this->ambilPendaftaranMilikPengguna();
 
         // Hindari form kosong jika data orang tua sudah tersimpan.
         $orangTua = PPDBOrangTua::query()
@@ -212,13 +192,23 @@ class FormOrangTua extends Component
             ->first();
 
         if ($orangTua) {
-            return redirect()->route('ppdb.pendaftaran.orang-tua');
+            $slugJenjang = PPDBPeriode::query()
+                ->with('ms_jenjang')
+                ->whereKey($pendaftaran->ppdb_periode_id)
+                ->firstOrFail()
+                ->ms_jenjang
+                ->slug;
+
+            return redirect()->route('ppdb.pendaftaran.orang-tua', [
+                'jenjang' => $slugJenjang,
+            ]);
         }
     }
 
     protected function ambilPendaftaranMilikPengguna()
     {
         $periode = PPDBPeriode::query()
+            ->with('ms_jenjang')
             ->whereKey($this->periodeId)
             ->where('status', 'aktif')
             ->first();
@@ -228,6 +218,7 @@ class FormOrangTua extends Component
         }
 
         $pendaftaran = PPDBPendaftaran::query()
+            ->with('ppdb_periode.ms_jenjang')
             ->whereKey($this->pendaftaranId)
             ->where('ms_pengguna_id', Auth::id())
             ->where('ppdb_periode_id', $periode->ppdb_periode_id)
@@ -255,30 +246,6 @@ class FormOrangTua extends Component
             if (! $pendaftaran) {
                 throw ValidationException::withMessages([
                     'ayah_nama' => 'Pendaftaran tidak ditemukan. Silakan periksa kembali.',
-                ]);
-            }
-
-            $periodeAktif = PPDBPeriode::query()
-                ->whereKey($this->periodeId)
-                ->where('status', 'aktif')
-                ->exists();
-
-            if (! $periodeAktif) {
-                throw ValidationException::withMessages([
-                    'ayah_nama' => 'Periode PPDB sudah tidak aktif.',
-                ]);
-            }
-
-            $adaDataSiswa = PPDBCalonSiswa::query()
-                ->where(
-                    'ppdb_pendaftaran_id',
-                    $pendaftaran->ppdb_pendaftaran_id
-                )
-                ->exists();
-
-            if (! $adaDataSiswa) {
-                throw ValidationException::withMessages([
-                    'ayah_nama' => 'Lengkapi data calon siswa terlebih dahulu.',
                 ]);
             }
 
@@ -368,15 +335,24 @@ class FormOrangTua extends Component
             ]);
         });
 
+        $pendaftaran = $this->ambilPendaftaranMilikPengguna();
+
+        $slugJenjang = $pendaftaran->ppdb_periode->ms_jenjang->slug;
+
         $this->dispatchBrowserEvent('alertify-success', [
             'message' => 'Data orang tua berhasil disimpan.',
         ]);
 
-        return redirect()->route('ppdb.pendaftaran.alamat');
+        return redirect()->route('ppdb.pendaftaran.alamat', [
+            'jenjang' => $slugJenjang,
+        ]);
     }
     
     public function render()
     {
-        return view('livewire.p-p-d-b.pendaftaran.form-orang-tua');
+        $pendaftaran = $this->ambilPendaftaranMilikPengguna();
+        return view('livewire.p-p-d-b.pendaftaran.form-orang-tua',[
+            'pendaftaran' => $pendaftaran
+        ]);
     }
 }

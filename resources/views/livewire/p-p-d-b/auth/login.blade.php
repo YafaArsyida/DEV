@@ -4,10 +4,9 @@
 
         {{-- Brand --}}
         <div class="text-center mb-4">
-            <a href="{{ route('ppdb.landing') }}"
-                class="d-inline-flex align-items-center gap-3 text-decoration-none">
+            <a class="d-inline-flex align-items-center gap-3 text-decoration-none">
 
-                <img src="{{ asset('assets/logo/logo.jpg') }}"
+                <img src="{{ asset('assets/logo/yayasan.webp') }}"
                     alt="Logo sekolah"
                     class="rounded-3"
                     width="48"
@@ -15,11 +14,11 @@
 
                 <div class="text-start">
                     <h5 class="mb-1 fw-bold text-body">
-                        {{ config('app.name') }}
+                        {{ $namaJenjang }}
                     </h5>
 
                     <p class="text-muted mb-0">
-                        Portal Pendaftaran PPDB
+                        Modul PPDB Orang Tua
                     </p>
                 </div>
             </a>
@@ -147,10 +146,7 @@
                     </span>
 
                     <span wire:loading wire:target="login">
-                        <span class="spinner-border spinner-border-sm me-1"
-                            role="status"
-                            aria-hidden="true"></span>
-
+                        <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
                         Memeriksa akun...
                     </span>
                 </button>
@@ -160,8 +156,7 @@
             <div class="text-center mt-4">
                 <p class="text-muted mb-0">
                     Belum memiliki akun?
-
-                    <a href="{{ route('ppdb.daftar') }}"
+                    <a href="{{ route('ppdb.daftar', ['jenjang' => $jenjangSlug]) }}"
                         class="fw-semibold text-primary text-decoration-underline">
                         Daftar sekarang
                     </a>
@@ -232,7 +227,11 @@
 
                 // Redirect setelah 3 detik.
                 setTimeout(function () {
-                    window.location.href = @json(route('ppdb.dashboard'));
+                    window.location.href = @json(
+                        route('ppdb.dashboard', [
+                            'jenjang' => $jenjangSlug,
+                        ])
+                    );
                 }, 3000);
             });
         </script>

@@ -12,15 +12,21 @@ class DetailAlamat extends Component
 {
     public $pendaftaranId;
 
+    public function mount($pendaftaranId)
+    {
+        $this->pendaftaranId = $pendaftaranId;
+    }
+
     protected function ambilPendaftaranMilikPengguna()
     {
         return PPDBPendaftaran::query()
+            ->with('ppdb_periode.ms_jenjang')
             ->whereKey($this->pendaftaranId)
             ->where('ms_pengguna_id', Auth::id())
             ->firstOrFail();
     }
 
-     protected function bolehUbahData($status)
+    protected function bolehUbahData($status)
     {
         return ! in_array(
             strtolower(trim((string) $status)),
@@ -29,53 +35,17 @@ class DetailAlamat extends Component
         );
     }
 
-    public function mount($pendaftaranId)
-    {
-        $this->pendaftaranId = $pendaftaranId;
-
-        $pendaftaran = PPDBPendaftaran::query()
-            ->where('ppdb_pendaftaran_id', $this->pendaftaranId)
-            ->where('ms_pengguna_id', Auth::id())
-            ->first();
-
-        if (! $pendaftaran) {
-            return redirect()->route('ppdb.pendaftaran.jalur');
-        }
-
-        // Data orang tua wajib tersedia sebelum membuka alamat.
-        $orangTua = PPDBOrangTua::query()
-            ->where(
-                'ppdb_pendaftaran_id', $pendaftaran->ppdb_pendaftaran_id
-            )
-            ->exists();
-
-        if (! $orangTua) {
-            return redirect()->route('ppdb.pendaftaran.orang-tua');
-        }
-
-        $alamat = PPDBAlamat::query()
-            ->where(
-                'ppdb_pendaftaran_id', $pendaftaran->ppdb_pendaftaran_id
-            )
-            ->first();
-
-        if (! $alamat) {
-            return redirect()->route('ppdb.pendaftaran.alamat');
-        }
-    }
-
     public function render()
     {
         $pendaftaran = $this->ambilPendaftaranMilikPengguna();
 
-        $alamat = PPDBAlamat::where(
-            'ppdb_pendaftaran_id', $pendaftaran->ppdb_pendaftaran_id
-        )->first();
-
-        if (! $alamat) {
-            return redirect()->route('ppdb.pendaftaran.alamat');
-        }
-
+        $alamat = PPDBAlamat::query()
+            ->where(
+                'ppdb_pendaftaran_id',
+                $pendaftaran->ppdb_pendaftaran_id
+            )
+            ->firstOrFail();
+            
         return view('livewire.p-p-d-b.pendaftaran.detail-alamat',[
             'pendaftaran' => $pendaftaran,
             'alamat' => $alamat,
