@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Informasi Penerimaan Peserta Didik Baru Tahun Ajaran 2027/2028 di {{ $jenjang->nama_jenjang }}.">
     {{-- <link rel="shortcut icon" href="{{ asset('assets') }}/images/favicon.ico"> --}}
-    <link rel="shortcut icon" href="{{asset('assets')}}/logo/hero.png">
+    <link rel="shortcut icon" href="{{asset('assets')}}/logo/logo.png">
     <script src="{{ asset('assets') }}/js/layout.js"></script>
     <link href="{{ asset('assets') }}/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assets') }}/css/icons.min.css" rel="stylesheet" type="text/css" />
@@ -403,7 +403,7 @@
 
                     <div class="col-lg-5">
                         <div class="ppdb-hero-card rounded-4 shadow-sm">
-                            <img src="{{ asset('assets/images/about.jpg') }}" alt="Kegiatan sekolah">
+                            <img src="{{ asset('assets/logo/hero.jpeg') }}" alt="Kegiatan sekolah">
                         </div>
                     </div>
                 </div>
@@ -1018,7 +1018,7 @@
                     <div>
                         {{-- Logo --}}
                         <div class="mb-4">
-                            <img src="{{ asset('assets/logo/hero.png') }}"
+                            <img src="{{ asset('assets/logo/logo.png') }}"
                                 alt="Logo {{ $jenjang->nama_jenjang }}"
                                 height="50"
                                 class="rounded-2">
