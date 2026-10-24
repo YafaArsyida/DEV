@@ -19,10 +19,28 @@ class MiddlewarePeran
      */
     public function handle(Request $request, Closure $next, ...$roles)
     {
-        if (auth()->check() && in_array(auth()->user()->peran, $roles)) {
-            return $next($request);
+        if (! $request->user()) {
+            abort(401);
         }
 
-        abort(403, 'Unauthorized action.');
+        $peran = strtoupper(trim($request->user()->peran ?? ''));
+
+        $roles = array_map(
+            fn ($role) => strtoupper(trim($role)),
+            $roles
+        );
+
+        // dd([
+        //     'user_id' => auth()->id(),
+        //     'peran_user' => auth()->user()?->peran,
+        //     'roles_diizinkan' => $roles,
+        //     'path' => request()->path(),
+        //     'route_name' => request()->route()?->getName(),
+        //     'route_action' => request()->route()?->getActionName(),
+        // ]);
+
+        abort_unless(in_array($peran, $roles, true), 403);
+
+        return $next($request);
     }
 }

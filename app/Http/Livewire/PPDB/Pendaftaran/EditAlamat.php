@@ -4,6 +4,7 @@ namespace App\Http\Livewire\PPDB\Pendaftaran;
 
 use App\Models\PPDBAlamat;
 use App\Models\PPDBPendaftaran;
+use App\Services\PPDB\PPDBAlamatService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -11,6 +12,7 @@ use Livewire\Component;
 
 class EditAlamat extends Component
 {
+    public $periodeId;
     public $pendaftaranId;
 
     public $alamat_lengkap = '';
@@ -31,6 +33,8 @@ class EditAlamat extends Component
         $this->pendaftaranId = $pendaftaranId;
 
         $pendaftaran = $this->ambilPendaftaranMilikPengguna();
+
+        $this->periodeId = $pendaftaran->ppdb_periode_id;
 
         $this->pastikanBolehUbah($pendaftaran);
 
@@ -181,6 +185,7 @@ class EditAlamat extends Component
 
     ];
 
+    
     /**
      * Memperbarui data alamat.
      */
@@ -197,12 +202,14 @@ class EditAlamat extends Component
             $pendaftaran = PPDBPendaftaran::query()
                 ->whereKey($this->pendaftaranId)
                 ->where('ms_pengguna_id', Auth::id())
+                ->where('ppdb_periode_id', $this->periodeId)
                 ->lockForUpdate()
                 ->first();
 
-            if (! $pendaftaran) {
+            if (!$pendaftaran) {
                 throw ValidationException::withMessages([
-                    'alamat_lengkap' => 'Pendaftaran tidak ditemukan atau bukan milik Anda.',
+                    'alamat_lengkap' =>
+                        'Pendaftaran tidak ditemukan atau bukan milik Anda.',
                 ]);
             }
 
@@ -215,23 +222,15 @@ class EditAlamat extends Component
                     $pendaftaran->ppdb_pendaftaran_id
                 )
                 ->lockForUpdate()
-                ->firstOrFail();
+                ->first();
 
-            $alamat->update([
-                'alamat_lengkap' => trim($data['alamat_lengkap']),
-                'provinsi' => trim($data['provinsi']),
-                'kabupaten' => trim($data['kabupaten']),
-                'kecamatan' => trim($data['kecamatan']),
-                'kelurahan_desa' => trim($data['kelurahan_desa']),
-                'kode_pos' => filled($data['kode_pos'])
-                    ? trim($data['kode_pos'])
-                    : null,
-                'jenis_tempat_tinggal' => $data['jenis_tempat_tinggal'],
+            if (!$alamat) {
+                throw ValidationException::withMessages([
+                    'alamat_lengkap' => 'Data alamat belum tersedia. Silakan simpan data terlebih dahulu.',
+                ]);
+            }
 
-                'jarak_ke_sekolah' => $data['jarak_ke_sekolah'],
-                'waktu_tempuh_ke_sekolah' => $data['waktu_tempuh_ke_sekolah'],
-                'moda_transportasi' => $data['moda_transportasi'],
-            ]);
+            PPDBAlamatService::update($alamat, $data);
         });
 
         $pendaftaran = $this->ambilPendaftaranMilikPengguna();
@@ -246,6 +245,7 @@ class EditAlamat extends Component
             'jenjang' => $slugJenjang,
         ]);
     }
+
     public function render()
     {
         $pendaftaran = $this->ambilPendaftaranMilikPengguna();

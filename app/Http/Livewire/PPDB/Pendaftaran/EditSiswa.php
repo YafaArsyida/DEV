@@ -4,6 +4,7 @@ namespace App\Http\Livewire\PPDB\Pendaftaran;
 
 use App\Models\PPDBCalonSiswa;
 use App\Models\PPDBPendaftaran;
+use App\Services\PPDB\PPDBDataSiswaService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -382,9 +383,7 @@ class EditSiswa extends Component
             'Nomor bantuan sosial maksimal 100 karakter.',
     ];
 
-    /**
-     * Memperbarui data calon siswa.
-     */
+
     public function update()
     {
         // Periksa status sebelum validasi dan penyimpanan.
@@ -401,64 +400,31 @@ class EditSiswa extends Component
                 ->lockForUpdate()
                 ->first();
 
-            if (! $pendaftaran) {
+            if (!$pendaftaran) {
                 throw ValidationException::withMessages([
                     'nama_siswa' =>
                         'Pendaftaran tidak ditemukan atau bukan milik Anda.',
                 ]);
             }
 
+            // Ambil data siswa yang terkait dengan pendaftaran.
             $siswa = PPDBCalonSiswa::query()
                 ->where(
                     'ppdb_pendaftaran_id',
                     $pendaftaran->ppdb_pendaftaran_id
                 )
                 ->lockForUpdate()
-                ->firstOrFail();
+                ->first();
 
-            $bantuanSosial = $data['penerima_bantuan_sosial'] ?? [];
+            if (!$siswa) {
+                throw ValidationException::withMessages([
+                    'nama_siswa' =>
+                        'Data calon siswa belum tersedia. Silakan simpan data terlebih dahulu.',
+                ]);
+            }
 
-            $siswa->update([
-                // Identitas siswa
-                'nama_siswa' => $data['nama_siswa'],
-                'nama_panggilan' => $data['nama_panggilan'] ?: null,
-                'nik' => $data['nik'],
-                'nisn' => $data['nisn'] ?: null,
-                'tempat_lahir' => $data['tempat_lahir'],
-                'tanggal_lahir' => $data['tanggal_lahir'],
-                'jenis_kelamin' => $data['jenis_kelamin'],
-                'agama' => $data['agama'],
-                'kewarganegaraan' => $data['kewarganegaraan'],
-                'anak_ke' => $data['anak_ke'],
-
-                // Data keluarga
-                'jumlah_saudara_kandung' =>
-                    $data['jumlah_saudara_kandung'],
-                'jumlah_saudara_tiri' =>
-                    $data['jumlah_saudara_tiri'],
-                'status_yatim_piatu' =>
-                    $data['status_yatim_piatu'],
-
-                // Data pribadi dan kesehatan
-                'cita_cita' => $data['cita_cita'] ?: null,
-                'hobi' => $data['hobi'] ?: null,
-                'berkebutuhan_khusus' =>
-                    $data['berkebutuhan_khusus'],
-                'penyakit' => $data['penyakit'] ?: null,
-                'alergi' => $data['alergi'] ?: null,
-
-                // Kondisi fisik
-                'tinggi_badan' => $data['tinggi_badan'] ?: null,
-                'berat_badan' => $data['berat_badan'] ?: null,
-
-                // Bantuan sosial
-                'penerima_bantuan_sosial' => ! empty($bantuanSosial)
-                    ? implode(', ', $bantuanSosial)
-                    : null,
-
-                'nomor_bantuan_sosial' =>
-                    $data['nomor_bantuan_sosial'] ?: null,
-            ]);
+            // Perbarui data melalui service.
+            PPDBDataSiswaService::update($siswa, $data);
         });
 
         $pendaftaran = $this->ambilPendaftaranMilikPengguna();

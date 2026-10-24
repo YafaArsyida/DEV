@@ -4,6 +4,7 @@ namespace App\Http\Livewire\PPDB\Pendaftaran;
 
 use App\Models\PPDBPendaftaran;
 use App\Models\PPDBPendidikan;
+use App\Services\PPDB\PPDBPendidikanService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -11,6 +12,7 @@ use Livewire\Component;
 
 class EditPendidikan extends Component
 {
+    public $periodeId;
     public $pendaftaranId;
 
     public $asal_sekolah = '';
@@ -25,6 +27,8 @@ class EditPendidikan extends Component
         $this->pendaftaranId = $pendaftaranId;
 
         $pendaftaran = $this->ambilPendaftaranMilikPengguna();
+
+        $this->periodeId = $pendaftaran->ppdb_periode_id;
 
         $this->pastikanBolehUbah($pendaftaran);
 
@@ -116,37 +120,27 @@ class EditPendidikan extends Component
     }
 
     protected $messages = [
-        'asal_sekolah.max' =>
-            'Nama sekolah maksimal 255 karakter.',
-
-        'npsn_asal_sekolah.regex' =>
-            'NPSN harus terdiri dari 8 digit angka.',
+        'asal_sekolah.max' => 'Nama sekolah maksimal 255 karakter.',
 
         'alamat_asal_sekolah.string' => 'Alamat TK harus berupa teks.',
         'alamat_asal_sekolah.max' => 'Alamat TK maksimal 1000 karakter.',
 
-        'jenjang_asal.required' =>
-            'Jenjang pendidikan asal wajib dipilih.',
+        'npsn_asal_sekolah.regex' => 'NPSN harus terdiri dari 8 digit angka.',
 
-        'jenjang_asal.in' =>
-            'Pilihan jenjang pendidikan tidak valid.',
+        'jenjang_asal.required' => 'Jenjang pendidikan asal wajib dipilih.',
 
-        'tahun_lulus.integer' =>
-            'Tahun lulus harus berupa angka.',
+        'jenjang_asal.in' => 'Jenjang pendidikan asal tidak valid.',
 
-        'tahun_lulus.min' =>
-            'Tahun lulus terlalu lama. Silakan periksa kembali.',
+        'tahun_lulus.integer' => 'Tahun lulus harus berupa angka.',
 
-        'tahun_lulus.max' =>
-            'Tahun lulus tidak boleh melebihi tahun berjalan.',
+        'tahun_lulus.min' => 'Tahun lulus terlalu lama. Silakan periksa kembali.',
 
-        'nomor_ijazah.max' =>
-            'Nomor peserta atau bukti kelulusan maksimal 100 karakter.',
+        'tahun_lulus.max' => 'Tahun lulus tidak boleh melebihi tahun berjalan.',
+
+        'nomor_ijazah.max' => 'Nomor ijazah maksimal 100 karakter.',
     ];
 
-    /**
-     * Memperbarui data pendidikan.
-     */
+    
     public function update()
     {
         // Periksa status sebelum validasi dan penyimpanan.
@@ -160,12 +154,14 @@ class EditPendidikan extends Component
             $pendaftaran = PPDBPendaftaran::query()
                 ->whereKey($this->pendaftaranId)
                 ->where('ms_pengguna_id', Auth::id())
+                ->where('ppdb_periode_id', $this->periodeId)
                 ->lockForUpdate()
                 ->first();
 
-            if (! $pendaftaran) {
+            if (!$pendaftaran) {
                 throw ValidationException::withMessages([
-                    'asal_sekolah' => 'Pendaftaran tidak ditemukan atau bukan milik Anda.',
+                    'asal_sekolah' =>
+                        'Pendaftaran tidak ditemukan atau bukan milik Anda.',
                 ]);
             }
 
@@ -178,40 +174,16 @@ class EditPendidikan extends Component
                     $pendaftaran->ppdb_pendaftaran_id
                 )
                 ->lockForUpdate()
-                ->firstOrFail();
+                ->first();
 
-            $tidakAdaSekolah =
-                $data['jenjang_asal'] === 'TIDAK_ADA';
+            if (!$pendidikan) {
+                throw ValidationException::withMessages([
+                    'asal_sekolah' =>
+                        'Data pendidikan belum tersedia. Silakan simpan data terlebih dahulu.',
+                ]);
+            }
 
-            $pendidikan->update([
-                'jenjang_asal' => $data['jenjang_asal'],
-
-                'asal_sekolah' => $tidakAdaSekolah
-                    ? null
-                    : (filled($data['asal_sekolah'])
-                        ? trim($data['asal_sekolah'])
-                        : null),
-                
-                'alamat_asal_sekolah' => $tidakAdaSekolah
-                    ? null
-                    : (trim($this->alamat_asal_sekolah) ?: null),
-
-                'npsn_asal_sekolah' => $tidakAdaSekolah
-                    ? null
-                    : (filled($data['npsn_asal_sekolah'])
-                        ? trim($data['npsn_asal_sekolah'])
-                        : null),
-
-                'tahun_lulus' => $tidakAdaSekolah
-                    ? null
-                    : ($data['tahun_lulus'] ?: null),
-
-                'nomor_ijazah' => $tidakAdaSekolah
-                    ? null
-                    : (filled($data['nomor_ijazah'])
-                        ? trim($data['nomor_ijazah'])
-                        : null),
-            ]);
+            PPDBPendidikanService::update($pendidikan, $data);
         });
 
         $pendaftaran = $this->ambilPendaftaranMilikPengguna();
@@ -226,6 +198,7 @@ class EditPendidikan extends Component
             'jenjang' => $slugJenjang,
         ]);
     }
+
     
     public function render()
     {

@@ -119,15 +119,16 @@
             </div>
 
             {{-- NAVIGASI TAB --}}
-            <div class="bg-white border-bottom px-2 px-md-4">
+            <div class="bg-white border-bottom px-2 px-md-4 py-3">
                 <ul
-                    class="nav nav-tabs flex-nowrap overflow-x-auto overflow-y-hidden border-bottom-0 gap-1"
+                    class="nav nav-pills nav-justified gap-1 flex-wrap mb-0"
                     id="tabPemeriksaanPendaftaran"
                     role="tablist">
 
-                    <li class="nav-item flex-shrink-0" role="presentation">
+                    {{-- SISWA --}}
+                    <li class="nav-item" role="presentation">
                         <button
-                            class="nav-link active d-flex align-items-center gap-2 px-3 py-3"
+                            class="nav-link active rounded-pill"
                             id="tab-siswa"
                             data-bs-toggle="tab"
                             data-bs-target="#konten-siswa"
@@ -135,14 +136,15 @@
                             role="tab"
                             aria-controls="konten-siswa"
                             aria-selected="true">
-                            <i class="ri-user-line fs-16"></i>
-                            <span>Siswa</span>
+                            <i class="ri-user-line me-1"></i>
+                            Siswa
                         </button>
                     </li>
 
-                    <li class="nav-item flex-shrink-0" role="presentation">
+                    {{-- ORANG TUA / WALI --}}
+                    <li class="nav-item" role="presentation">
                         <button
-                            class="nav-link d-flex align-items-center gap-2 px-3 py-3"
+                            class="nav-link rounded-pill"
                             id="tab-orang-tua"
                             data-bs-toggle="tab"
                             data-bs-target="#konten-orang-tua"
@@ -150,14 +152,15 @@
                             role="tab"
                             aria-controls="konten-orang-tua"
                             aria-selected="false">
-                            <i class="ri-team-line fs-16"></i>
-                            <span>Orang Tua / Wali</span>
+                            <i class="ri-team-line me-1"></i>
+                            Orang Tua / Wali
                         </button>
                     </li>
 
-                    <li class="nav-item flex-shrink-0" role="presentation">
+                    {{-- ALAMAT --}}
+                    <li class="nav-item" role="presentation">
                         <button
-                            class="nav-link d-flex align-items-center gap-2 px-3 py-3"
+                            class="nav-link rounded-pill"
                             id="tab-alamat"
                             data-bs-toggle="tab"
                             data-bs-target="#konten-alamat"
@@ -165,14 +168,15 @@
                             role="tab"
                             aria-controls="konten-alamat"
                             aria-selected="false">
-                            <i class="ri-map-pin-line fs-16"></i>
-                            <span>Alamat</span>
+                            <i class="ri-map-pin-line me-1"></i>
+                            Alamat
                         </button>
                     </li>
 
-                    <li class="nav-item flex-shrink-0" role="presentation">
+                    {{-- PENDIDIKAN --}}
+                    <li class="nav-item" role="presentation">
                         <button
-                            class="nav-link d-flex align-items-center gap-2 px-3 py-3"
+                            class="nav-link rounded-pill"
                             id="tab-pendidikan"
                             data-bs-toggle="tab"
                             data-bs-target="#konten-pendidikan"
@@ -180,14 +184,15 @@
                             role="tab"
                             aria-controls="konten-pendidikan"
                             aria-selected="false">
-                            <i class="ri-graduation-cap-line fs-16"></i>
-                            <span>Pendidikan</span>
+                            <i class="ri-graduation-cap-line me-1"></i>
+                            Pendidikan
                         </button>
                     </li>
 
-                    <li class="nav-item flex-shrink-0" role="presentation">
+                    {{-- BERKAS --}}
+                    <li class="nav-item" role="presentation">
                         <button
-                            class="nav-link d-flex align-items-center gap-2 px-3 py-3"
+                            class="nav-link rounded-pill"
                             id="tab-berkas"
                             data-bs-toggle="tab"
                             data-bs-target="#konten-berkas"
@@ -195,14 +200,15 @@
                             role="tab"
                             aria-controls="konten-berkas"
                             aria-selected="false">
-                            <i class="ri-folder-line fs-16"></i>
-                            <span>Berkas</span>
+                            <i class="ri-folder-line me-1"></i>
+                            Berkas
                         </button>
                     </li>
 
-                    <li class="nav-item flex-shrink-0" role="presentation">
+                    {{-- TAMBAHAN --}}
+                    <li class="nav-item" role="presentation">
                         <button
-                            class="nav-link d-flex align-items-center gap-2 px-3 py-3"
+                            class="nav-link rounded-pill"
                             id="tab-tambahan"
                             data-bs-toggle="tab"
                             data-bs-target="#konten-tambahan"
@@ -210,16 +216,16 @@
                             role="tab"
                             aria-controls="konten-tambahan"
                             aria-selected="false">
-                            <i class="ri-questionnaire-line fs-16"></i>
-                            <span>Tambahan</span>
+                            <i class="ri-questionnaire-line me-1"></i>
+                            Tambahan
                         </button>
                     </li>
+
                 </ul>
             </div>
 
             {{-- KONTEN TAB --}}
             <div class="tab-content p-3 p-md-4" id="kontenTabPemeriksaan">
-
                 <div
                     class="tab-pane fade show active"
                     id="konten-siswa"
@@ -263,8 +269,7 @@
                     )
                 </div>
 
-                <div
-                    class="tab-pane fade"
+                <div class="tab-pane fade"
                     id="konten-pendidikan"
                     role="tabpanel"
                     aria-labelledby="tab-pendidikan"

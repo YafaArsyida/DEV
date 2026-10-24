@@ -33,7 +33,8 @@
         {{-- Tabel pendaftar --}}
         <div class="row">
             <div class="col-xxl-12">
-                @livewire('p-p-d-b.admin.pendaftar.index')   
+                @livewire('p-p-d-b.admin.pendaftar.index') 
+                @livewire('p-p-d-b.admin.pendaftar.create')   
                 @livewire('p-p-d-b.admin.pendaftar.detail')  
                 
                 

@@ -2,22 +2,49 @@
 <div>
     <div class="card border-0 shadow-sm rounded-4">
         {{-- Header --}}
-        <div class="card-header bg-transparent border-bottom">
-            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="avatar-sm">
-                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
-                            <i class="ri-file-search-line"></i>
+        <div class="card-header">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4">
+
+                {{-- TITLE --}}
+                <div>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="avatar-sm">
+                            <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                                <i class="ri-file-search-line"></i>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h5 class="fw-bold mb-1">
+                                Antrean Verifikasi
+                            </h5>
+
+                            <small class="text-muted">
+                                Periksa data dan dokumen calon siswa sebelum memberikan keputusan.
+                            </small>
                         </div>
                     </div>
-
-                    <div>
-                        <h5 class="fw-bold mb-1">Antrean Verifikasi</h5>
-                        <small class="text-muted">
-                            Periksa data dan dokumen calon siswa sebelum memberikan keputusan.
-                        </small>
-                    </div>
                 </div>
+
+                {{-- ACTION --}}
+                @if ($selectedJenjang && $selectedTahunAjar && $periode)
+                    <div class="d-flex gap-2 flex-wrap">
+
+                        {{-- BANTU PENDAFTARAN --}}
+                        <button
+                            type="button"
+                            class="btn btn-primary rounded-pill px-4"
+                            data-bs-toggle="offcanvas"
+                            data-bs-target="#offcanvasBantuPendaftaran"
+                            aria-controls="offcanvasBantuPendaftaran"
+                            wire:click="$emit('bukaBantuPendaftaran', {{ $periode->ppdb_periode_id }})">
+
+                            <i class="ri-user-add-line me-1"></i>
+                            Bantu Pendaftaran
+                        </button>
+
+                    </div>
+                @endif
             </div>
         </div>
 

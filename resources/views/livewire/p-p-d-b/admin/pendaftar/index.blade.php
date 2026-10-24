@@ -1,20 +1,50 @@
 <div class="card border-0 shadow-sm rounded-4">
-    <div class="card-header bg-transparent border-bottom">
-        <div class="d-flex align-items-center gap-3">
-            <div class="avatar-sm">
-                <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
-                    <i class="ri-user-search-line"></i>
+    <div class="card-header">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4">
+
+            {{-- TITLE --}}
+            <div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-sm">
+                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                            <i class="ri-user-add-line"></i>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h5 class="fw-bold mb-1">
+                            Data Pendaftar PPDB
+                        </h5>
+
+                        <small class="text-muted">
+                            Kelola data pendaftar, verifikasi berkas, dan bantu calon siswa melakukan pendaftaran.
+                        </small>
+                    </div>
                 </div>
             </div>
 
-            <div>
-                <h5 class="fw-bold mb-1">Semua Pendaftar</h5>
-                <small class="text-muted">
-                    Kelola dan periksa data calon siswa baru.
-                </small>
-            </div>
+            {{-- ACTION --}}
+            @if ($selectedJenjang && $selectedTahunAjar && $periode)
+                <div class="d-flex gap-2 flex-wrap">
+
+                    {{-- BANTU PENDAFTARAN --}}
+                    <button
+                        type="button"
+                        class="btn btn-primary rounded-pill px-4"
+                        data-bs-toggle="offcanvas"
+                        data-bs-target="#offcanvasBantuPendaftaran"
+                        aria-controls="offcanvasBantuPendaftaran"
+                        wire:click="$emit('bukaBantuPendaftaran', {{ $periode->ppdb_periode_id }})">
+
+                        <i class="ri-user-add-line me-1"></i>
+                        Bantu Pendaftaran
+                    </button>
+
+                </div>
+            @endif
         </div>
     </div>
+
 
     <div class="card-body">
         {{-- Filter --}}
@@ -111,14 +141,10 @@
                             </td>
 
                             <td>
-                                @if ($item->ms_pengguna)
-                                    @if ($item->ms_pengguna->peran === 'ORANG_TUA')
-                                        Orang Tua
-                                    @elseif ($item->ms_pengguna->peran != 'ORANG_TUA')
-                                        Panitia
-                                    @else
-                                        {{ $item->ms_pengguna->peran ?? 'Tidak diketahui' }}
-                                    @endif
+                                @if ($item->ms_pengguna?->peran === 'ORANG_TUA')
+                                    Orang Tua
+                                @elseif ($item->pembuat)
+                                    Panitia
                                 @else
                                     <span class="text-muted">-</span>
                                 @endif
@@ -127,6 +153,8 @@
                             <td>
                                 @if ($item->ms_pengguna)
                                     {{ $item->ms_pengguna->email ?? '-' }}
+                                @elseif ($item->pembuat)
+                                    {{ $item->pembuat->email ?? '-' }}
                                 @else
                                     <span class="text-muted">-</span>
                                 @endif
@@ -241,19 +269,20 @@
 
                                     {{-- RESET PASSWORD --}}
                                     @if ($item->ms_pengguna && $item->ms_pengguna->peran === 'ORANG_TUA')
-                                        <a
-                                            href="#ModalKonfirmasiReset"
-                                            data-bs-toggle="modal"
+                                        <button
+                                            type="button"
                                             class="btn btn-soft-danger btn-sm rounded-pill px-3 text-nowrap"
                                             title="Reset Password"
-                                            wire:click.prevent="$emit(
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#ModalKonfirmasiReset"
+                                            wire:click="$emit(
                                                 'resetPassword',
                                                 {{ $item->ms_pengguna->ms_pengguna_id }}
                                             )">
 
                                             <i class="ri-lock-unlock-line me-1"></i>
                                             Reset
-                                        </a>
+                                        </button>
                                     @endif
 
                                 </div>

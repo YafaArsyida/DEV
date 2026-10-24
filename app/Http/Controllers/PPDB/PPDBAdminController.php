@@ -68,10 +68,6 @@ class PPDBAdminController extends Controller
     {
         return view('ppdb.admin.pendaftar');
     }
-    public function bantuPendaftaran()
-    {
-        return view('ppdb.admin.bantu-pendaftaran');
-    }
 
     public function verifikasi()
     {

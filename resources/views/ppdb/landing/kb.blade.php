@@ -5,8 +5,7 @@
     <title>PPDB {{ $jenjang->nama_jenjang }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Informasi Penerimaan Peserta Didik Baru Tahun Ajaran 2027/2028 di {{ $jenjang->nama_jenjang }}.">
-    {{-- <link rel="shortcut icon" href="{{ asset('assets') }}/images/favicon.ico"> --}}
-    <link rel="shortcut icon" href="{{asset('assets')}}/logo/hero.png">
+    <link rel="shortcut icon" href="{{asset('assets')}}/logo/yayasan.webp">
     <script src="{{ asset('assets') }}/js/layout.js"></script>
     <link href="{{ asset('assets') }}/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assets') }}/css/icons.min.css" rel="stylesheet" type="text/css" />
@@ -428,12 +427,22 @@
 
                         {{-- CTA --}}
                         <div class="ppdb-hero-cta d-grid d-sm-flex gap-3 mt-4">
-                            <a href="{{ route('ppdb.daftar', [
-                                'jenjang' => $jenjang->slug,
-                            ]) }}"
-                                class="btn btn-primary rounded-pill">
-                                Daftar Sekarang
-                            </a>
+                            @auth
+                                <a href="{{ route('ppdb.dashboard', [
+                                    'jenjang' => $jenjang->slug,
+                                ]) }}"
+                                    class="btn btn-primary rounded-pill">
+                                    <i class="ri-home-line me-1"></i>
+                                    Dashboard
+                                </a>
+                            @else
+                                <a href="{{ route('ppdb.daftar', [
+                                    'jenjang' => $jenjang->slug,
+                                ]) }}"
+                                    class="btn btn-primary rounded-pill">
+                                    Daftar Sekarang
+                                </a>
+                            @endauth
 
                             <a href="#informasi"
                                 class="btn ppdb-secondary-cta rounded-pill">
@@ -461,7 +470,7 @@
                     <div class="col-lg-5">
                         <div class="ppdb-hero-card rounded-4 shadow-sm">
                             <img
-                                src="{{ asset('assets/images/about.jpg') }}"
+                                src="{{ asset('assets/logo/hero.jpeg') }}"
                                 alt="Kegiatan bermain dan stimulasi tumbuh kembang anak {{ $jenjang->nama_jenjang }}">
                         </div>
                     </div>
@@ -1103,13 +1112,23 @@
                                         </span>
                                     </div>
 
-                                    <a href="{{ route('ppdb.login', [
-                                        'jenjang' => $jenjang->slug,
-                                    ]) }}"
-                                        class="btn btn-outline-primary rounded-pill flex-shrink-0">
-                                        Login
-                                        <i class="ri-login-box-line ms-1"></i>
-                                    </a>
+                                    @auth
+                                        <a href="{{ route('ppdb.dashboard', [
+                                            'jenjang' => $jenjang->slug,
+                                        ]) }}"
+                                            class="btn btn-outline-primary rounded-pill flex-shrink-0">
+                                            Dashboard
+                                            <i class="ri-home-line ms-1"></i>
+                                        </a>
+                                    @else
+                                        <a href="{{ route('ppdb.login', [
+                                            'jenjang' => $jenjang->slug,
+                                        ]) }}"
+                                            class="btn btn-outline-primary rounded-pill flex-shrink-0">
+                                            Login
+                                            <i class="ri-login-box-line ms-1"></i>
+                                        </a>
+                                    @endauth
                                 </div>
                             </div>
                         </div>
@@ -1322,13 +1341,22 @@
                         </p>
 
                         <div class="d-flex flex-wrap gap-2">
-                            <a href="{{ route('ppdb.daftar', [
+                            @auth
+                                <a href="{{ route('ppdb.dashboard', [
                                     'jenjang' => $jenjang->slug,
                                 ]) }}"
-                                class="btn btn-primary rounded-pill">
-                                Daftarkan Si Kecil
-                                <i class="ri-arrow-right-line ms-1"></i>
-                            </a>
+                                    class="btn btn-primary rounded-pill">
+                                    <i class="ri-home-line me-1"></i>
+                                    Dashboard
+                                </a>
+                            @else
+                                <a href="{{ route('ppdb.daftar', [
+                                    'jenjang' => $jenjang->slug,
+                                ]) }}"
+                                    class="btn btn-primary rounded-pill">
+                                    Daftarkan Si Kecil
+                                </a>
+                            @endauth
 
                             <a href="#persyaratan"
                                 class="btn ppdb-secondary-cta rounded-pill">
@@ -1425,13 +1453,24 @@
                         </p>
 
                         <div class="d-flex flex-wrap gap-2">
-                            <a href="{{ route('ppdb.daftar', [
+                            @auth
+                                <a href="{{ route('ppdb.dashboard', [
                                     'jenjang' => $jenjang->slug,
                                 ]) }}"
-                                class="btn btn-primary rounded-pill px-4">
-                                <i class="ri-pencil-line align-middle me-1"></i>
-                                Daftarkan Si Kecil
-                            </a>
+                                    class="btn btn-primary rounded-pill px-4">
+                                    <i class="ri-home-line align-middle me-1"></i>
+                                    Dashboard Orang Tua
+                                </a>
+                            @else
+                                <a href="{{ route('ppdb.daftar', [
+                                    'jenjang' => $jenjang->slug,
+                                ]) }}"
+                                    class="btn btn-primary rounded-pill px-4">
+                                    <i class="ri-pencil-line align-middle me-1"></i>
+                                    Daftarkan Si Kecil
+                                    <i class="ri-arrow-right-line align-middle ms-1"></i>
+                                </a>
+                            @endauth
 
                             <a href="#persyaratan"
                                 class="btn btn-outline-light rounded-pill px-4">
@@ -1459,12 +1498,24 @@
 
                 <div class="col-sm-6">
                     <div class="text-sm-end">
-                        <a href="{{ route('ppdb.daftar', [
+                        @auth
+                            <a href="{{ route('ppdb.dashboard', [
                                 'jenjang' => $jenjang->slug,
                             ]) }}"
-                            class="link-light">
-                            Daftar PPDB
-                        </a>
+                                class="btn btn-primary rounded-pill px-4">
+                                <i class="ri-home-line align-middle me-1"></i>
+                                Dashboard Orang Tua
+                            </a>
+                        @else
+                            <a href="{{ route('ppdb.daftar', [
+                                'jenjang' => $jenjang->slug,
+                            ]) }}"
+                                class="btn btn-primary rounded-pill px-4">
+                                <i class="ri-pencil-line align-middle me-1"></i>
+                                Mulai Pendaftaran
+                                <i class="ri-arrow-right-line align-middle ms-1"></i>
+                            </a>
+                        @endauth
                     </div>
                 </div>
 

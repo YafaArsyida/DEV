@@ -30,6 +30,8 @@ class PPDBPendaftaran extends Model
         'submitted_at',
         'submitted_by',
 
+        'created_by',
+
         'catatan_perbaikan'
     ];
 
@@ -50,6 +52,23 @@ class PPDBPendaftaran extends Model
         return $this->belongsTo(User::class, 'ms_pengguna_id', 'ms_pengguna_id');
     }
 
+    public function pembuat()
+    {
+        return $this->belongsTo(
+            User::class,
+            'created_by',
+            'ms_pengguna_id'
+        );
+    }
+
+    public function pengirim()
+    {
+        return $this->belongsTo(
+            User::class,
+            'submitted_by',
+            'ms_pengguna_id'
+        );
+    }
     public function ppdb_periode(): BelongsTo
     {
         return $this->belongsTo(

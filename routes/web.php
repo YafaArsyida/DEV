@@ -72,6 +72,7 @@ use App\Http\Controllers\Keuangan\PenempatanSiswaController as KeuanganPenempata
 use App\Http\Controllers\PPDB\Auth\LoginController as AuthLoginController;
 use App\Http\Controllers\PPDB\Auth\RegisterController as PPDBRegisterController;
 use App\Http\Controllers\PPDB\PPDBOrangTuaController;
+use App\Http\Controllers\PPDB\PPDBBerkasController;
 
 /*
 |--------------------------------------------------------------------------
@@ -205,6 +206,13 @@ Route::prefix('ppdb/{jenjang}')
 | Guest Auth Admin
 |--------------------------------------------------------------------------
 */
+Route::middleware(['auth'])->group(function () {
+    Route::get('/ppdb/berkas/preview/{berkasId}', [
+        PPDBBerkasController::class, 'preview',
+    ])->name('ppdb.berkas.preview');
+});
+
+
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'index'])
         ->name('login.index');
@@ -272,8 +280,48 @@ Route::post('/logout', [
 //     Route::middleware(['auth'])->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
 //     Route::get('/administrasi/manajemen-kepegawaian',  [ManajemenKepegawaian::class, 'index'])->name('administrasi.manajemen-kepegawaian');
+Route::middleware(['auth', 'peran:SUPERADMIN,ADMIN,KEUANGAN,PANITIA_PPDB'])->group(function () {
+    /*
+    |--------------------------------------------------------------------------
+    | PPDB
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('ppdb/admin')
+        ->name('ppdb.admin.')
+        ->group(function () {
 
-Route::middleware(['auth', 'peran:SUPERADMIN, ADMIN, KEUANGAN'])->group(function () {
+            /*
+            |--------------------------------------------------------------------------
+            | Dashboard
+            |--------------------------------------------------------------------------
+            */
+            Route::get('/', [PPDBAdminController::class, 'index'])
+                ->name('dashboard');
+
+            Route::get('/pendaftar', [PPDBAdminController::class, 'pendaftar'])
+                ->name('pendaftar');
+
+            Route::get('/verifikasi', [PPDBAdminController::class, 'verifikasi'])
+                ->name('verifikasi');
+
+            Route::get('/seleksi', [PPDBAdminController::class, 'seleksi'])
+                ->name('seleksi');
+
+            Route::get('/pengumuman', [PPDBAdminController::class, 'pengumuman'])
+                ->name('pengumuman');
+
+            Route::get('/daftar-ulang', [PPDBAdminController::class, 'daftarUlang'])
+                ->name('daftar-ulang');
+
+            Route::get('/laporan', [PPDBAdminController::class, 'laporan'])
+                ->name('laporan');
+
+            Route::get('/pengaturan', [PPDBAdminController::class, 'pengaturan'])
+                ->name('pengaturan');
+
+            Route::get('/berkas/preview/{berkasId}', [PPDBAdminController::class, 'showBerkas',])
+                ->name('berkas.preview');
+        });
 
     /*
     |--------------------------------------------------------------------------
@@ -332,52 +380,6 @@ Route::middleware(['auth', 'peran:SUPERADMIN, ADMIN, KEUANGAN'])->group(function
                 ->name('laporan');
         });
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | PPDB
-    |--------------------------------------------------------------------------
-    */
-    Route::prefix('ppdb/admin')
-        ->name('ppdb.admin.')
-        ->middleware(['auth', 'peran:SUPERADMIN,ADMIN,PANITIA_PPDB'])
-        ->group(function () {
-
-            /*
-            |--------------------------------------------------------------------------
-            | Dashboard
-            |--------------------------------------------------------------------------
-            */
-            Route::get('/', [PPDBAdminController::class, 'index'])
-                ->name('dashboard');
-
-            Route::get('/pendaftar', [PPDBAdminController::class, 'pendaftar'])
-                ->name('pendaftar');
-
-            Route::get('/bantu-pendaftaran', [PPDBAdminController::class, 'bantuPendaftaran'])
-                ->name('bantu-pendaftaran');
-
-            Route::get('/verifikasi', [PPDBAdminController::class, 'verifikasi'])
-                ->name('verifikasi');
-
-            Route::get('/seleksi', [PPDBAdminController::class, 'seleksi'])
-                ->name('seleksi');
-
-            Route::get('/pengumuman', [PPDBAdminController::class, 'pengumuman'])
-                ->name('pengumuman');
-
-            Route::get('/daftar-ulang', [PPDBAdminController::class, 'daftarUlang'])
-                ->name('daftar-ulang');
-
-            Route::get('/laporan', [PPDBAdminController::class, 'laporan'])
-                ->name('laporan');
-
-            Route::get('/pengaturan', [PPDBAdminController::class, 'pengaturan'])
-                ->name('pengaturan');
-
-            Route::get('/berkas/preview/{berkasId}', [PPDBAdminController::class, 'showBerkas',])
-                ->name('berkas.preview');
-        });
         
     /*
     |--------------------------------------------------------------------------

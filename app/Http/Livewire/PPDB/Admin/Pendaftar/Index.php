@@ -24,6 +24,7 @@ class Index extends Component
 
     protected $listeners = [
         'parameterUpdated' => 'updateParameters',
+        'pendaftaranTersimpan' => '$refresh',
     ];
 
     protected $queryString = [
@@ -124,6 +125,7 @@ class Index extends Component
                 'ppdb_orangtua',
                 'ppdb_gelombang',
                 'ppdb_jalur',
+                'pembuat',
             ]);
 
         // Jangan tampilkan data jika periode belum valid.
@@ -217,6 +219,7 @@ class Index extends Component
 
         return view('livewire.p-p-d-b.admin.pendaftar.index',
             [
+                'periode' => $periode,
                 'pendaftar' => $pendaftar,
                 'daftarJalur' => $daftarJalur,
             ]

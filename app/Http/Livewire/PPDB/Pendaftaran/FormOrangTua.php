@@ -6,6 +6,7 @@ use App\Models\PPDBCalonSiswa;
 use App\Models\PPDBOrangTua;
 use App\Models\PPDBPendaftaran;
 use App\Models\PPDBPeriode;
+use App\Services\PPDB\PPDBOrangTuaService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -231,6 +232,7 @@ class FormOrangTua extends Component
         return $pendaftaran;
     }
 
+    
     public function simpan()
     {
         $data = $this->validate();
@@ -243,13 +245,14 @@ class FormOrangTua extends Component
                 ->lockForUpdate()
                 ->first();
 
-            if (! $pendaftaran) {
+            if (!$pendaftaran) {
                 throw ValidationException::withMessages([
-                    'ayah_nama' => 'Pendaftaran tidak ditemukan. Silakan periksa kembali.',
+                    'ayah_nama' =>
+                        'Pendaftaran tidak ditemukan. Silakan periksa kembali.',
                 ]);
             }
 
-            $sudahAda = PPDBOrangtua::query()
+            $sudahAda = PPDBOrangTua::query()
                 ->where(
                     'ppdb_pendaftaran_id',
                     $pendaftaran->ppdb_pendaftaran_id
@@ -262,73 +265,10 @@ class FormOrangTua extends Component
                 ]);
             }
 
-            $orangTua = new PPDBOrangtua();
-
-            $orangTua->ppdb_pendaftaran_id =
-                $pendaftaran->ppdb_pendaftaran_id;
-
-            // Data ayah
-            $orangTua->nama_ayah = $data['ayah_nama'];
-            $orangTua->nik_ayah = $data['ayah_nik'] ?: null;
-            $orangTua->tempat_lahir_ayah =
-                $data['ayah_tempat_lahir'] ?: null;
-            $orangTua->tanggal_lahir_ayah =
-                $data['ayah_tanggal_lahir'] ?: null;
-            $orangTua->berkebutuhan_khusus_ayah =
-                $data['ayah_berkebutuhan_khusus'];
-            $orangTua->pendidikan_ayah =
-                $data['ayah_pendidikan'] ?: null;
-            $orangTua->pekerjaan_ayah =
-                $data['ayah_pekerjaan'] ?: null;
-            $orangTua->penghasilan_ayah =
-                $data['ayah_penghasilan'] ?: null;
-            $orangTua->telepon_ayah =
-                $data['ayah_whatsapp'] ?: null;
-
-            // Data ibu
-            $orangTua->nama_ibu = $data['ibu_nama'];
-            $orangTua->nik_ibu = $data['ibu_nik'] ?: null;
-            $orangTua->tempat_lahir_ibu =
-                $data['ibu_tempat_lahir'] ?: null;
-            $orangTua->tanggal_lahir_ibu =
-                $data['ibu_tanggal_lahir'] ?: null;
-            $orangTua->berkebutuhan_khusus_ibu =
-                $data['ibu_berkebutuhan_khusus'];
-            $orangTua->pendidikan_ibu =
-                $data['ibu_pendidikan'] ?: null;
-            $orangTua->pekerjaan_ibu =
-                $data['ibu_pekerjaan'] ?: null;
-            $orangTua->penghasilan_ibu =
-                $data['ibu_penghasilan'] ?: null;
-            $orangTua->telepon_ibu =
-                $data['ibu_whatsapp'] ?: null;
-
-            // Data wali hanya disimpan jika diaktifkan.
-            if ($this->gunakan_wali) {
-                $orangTua->nama_wali = $data['wali_nama'];
-                $orangTua->nik_wali = $data['wali_nik'];
-                $orangTua->tempat_lahir_wali =
-                    $data['wali_tempat_lahir'] ?: null;
-                $orangTua->tanggal_lahir_wali =
-                    $data['wali_tanggal_lahir'] ?: null;
-                $orangTua->berkebutuhan_khusus_wali =
-                    $data['wali_berkebutuhan_khusus'];
-                $orangTua->hubungan_wali = $data['wali_hubungan'];
-                $orangTua->pekerjaan_wali =
-                    $data['wali_pekerjaan'] ?: null;
-                $orangTua->telepon_wali = $data['wali_whatsapp'];
-            } else {
-                $orangTua->nama_wali = null;
-                $orangTua->nik_wali = null;
-                $orangTua->tempat_lahir_wali = null;
-                $orangTua->tanggal_lahir_wali = null;
-                $orangTua->berkebutuhan_khusus_wali = null;
-                $orangTua->hubungan_wali = null;
-                $orangTua->pekerjaan_wali = null;
-                $orangTua->telepon_wali = null;
-            }
-
-            $orangTua->save();
+            PPDBOrangTuaService::create(
+                $pendaftaran->ppdb_pendaftaran_id,
+                $data
+            );
 
             $pendaftaran->update([
                 'current_step' => 3,
@@ -347,6 +287,7 @@ class FormOrangTua extends Component
             'jenjang' => $slugJenjang,
         ]);
     }
+
     
     public function render()
     {

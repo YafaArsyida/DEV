@@ -7,6 +7,7 @@ use App\Models\PPDBPendaftaran;
 use App\Models\PPDBOrangTua;
 use App\Models\PPDBPendidikan;
 use App\Models\PPDBPeriode;
+use App\Services\PPDB\PPDBPendidikanService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -120,23 +121,21 @@ class FormPendidikan extends Component
         return $pendaftaran;
     }
 
+    
     public function simpan()
     {
-        $this->validate();
+        $data = $this->validate();
 
-        DB::transaction(function () {
+        DB::transaction(function () use ($data) {
             // Pastikan pendaftaran milik pengguna yang login.
             $pendaftaran = PPDBPendaftaran::query()
-                ->where(
-                    'ppdb_pendaftaran_id',
-                    $this->pendaftaranId
-                )
+                ->whereKey($this->pendaftaranId)
                 ->where('ms_pengguna_id', Auth::id())
                 ->where('ppdb_periode_id', $this->periodeId)
                 ->lockForUpdate()
                 ->first();
 
-            if (! $pendaftaran) {
+            if (!$pendaftaran) {
                 throw ValidationException::withMessages([
                     'asal_sekolah' =>
                         'Pendaftaran tidak ditemukan. Silakan periksa kembali.',
@@ -149,7 +148,6 @@ class FormPendidikan extends Component
                     'ppdb_pendaftaran_id',
                     $pendaftaran->ppdb_pendaftaran_id
                 )
-                ->lockForUpdate()
                 ->exists();
 
             if ($sudahAda) {
@@ -158,34 +156,11 @@ class FormPendidikan extends Component
                 ]);
             }
 
-            $tidakAdaSekolah = $this->jenjang_asal === 'TIDAK_ADA';
+            PPDBPendidikanService::create(
+                $pendaftaran->ppdb_pendaftaran_id,
+                $data
+            );
 
-            PPDBPendidikan::create([
-                'ppdb_pendaftaran_id' =>
-                    $pendaftaran->ppdb_pendaftaran_id,
-
-                'asal_sekolah' => $tidakAdaSekolah
-                    ? null
-                    : (trim($this->asal_sekolah) ?: null),
-
-                'alamat_asal_sekolah' => $tidakAdaSekolah
-                    ? null
-                    : (trim($this->alamat_asal_sekolah) ?: null),
-                    
-                'npsn_asal_sekolah' => $tidakAdaSekolah
-                    ? null
-                    : (trim($this->npsn_asal_sekolah) ?: null),
-
-                'jenjang_asal' => $this->jenjang_asal,
-
-                'tahun_lulus' => $tidakAdaSekolah
-                    ? null
-                    : ($this->tahun_lulus ?: null),
-
-                'nomor_ijazah' => $tidakAdaSekolah
-                    ? null
-                    : (trim($this->nomor_ijazah) ?: null),
-            ]);
             $pendaftaran->update([
                 'current_step' => 5,
             ]);
@@ -203,6 +178,8 @@ class FormPendidikan extends Component
             'jenjang' => $slugJenjang,
         ]);
     }
+
+
     public function render()
     {
         $pendaftaran = $this->ambilPendaftaranMilikPengguna();

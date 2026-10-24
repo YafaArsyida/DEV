@@ -649,18 +649,18 @@
             </a>
 
             <button type="button"
-                    wire:click="simpan"
+                    wire:click="update"
                     wire:loading.attr="disabled"
-                    wire:target="simpan,fileKartuKeluarga,fileAktaKelahiran,filePasFoto,fileDokumenPendukung"
+                    wire:target="update,fileKartuKeluarga,fileAktaKelahiran,filePasFoto,fileDokumenPendukung"
                     class="btn btn-primary rounded-pill px-4">
                 <span wire:loading.remove
-                        wire:target="simpan">
+                        wire:target="update">
                     <i class="ri-save-line me-1"></i>
                     Simpan Perubahan
                 </span>
 
                 <span wire:loading
-                        wire:target="simpan">
+                        wire:target="update">
                     <span class="spinner-border spinner-border-sm me-1"></span>
                     Menyimpan...
                 </span>

@@ -2,29 +2,25 @@
     {{-- A good traveler has no fixed plans and is not intent upon arriving. --}}
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
         {{-- HEADER --}}
-        <div class="card-header">
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="avatar-sm">
-                        <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
-                            <i class="ri-parent-line"></i>
-                        </div>
-                    </div>
-
-                    <div>
-                        <h5 class="fw-bold mb-1">Data Orang Tua/Wali</h5>
-                        <small class="text-muted">
-                            Lengkapi informasi orang tua atau wali calon siswa.
-                        </small>
+        <div class="card-header bg-transparent">
+            <div class="d-flex align-items-center gap-3">
+                <div class="avatar-sm">
+                    <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                        <i class="ri-parent-line"></i>
                     </div>
                 </div>
 
-                <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 align-self-start">
-                    Langkah 3 dari 8
-                </span>
+                <div>
+                    <h5 class="fw-bold mb-1">
+                        Data Orang Tua/Wali
+                    </h5>
+                    <small class="text-muted">
+                        Lengkapi informasi orang tua atau wali calon siswa.
+                        Informasi domisili calon siswa saat ini.
+                    </small>
+                </div>
             </div>
         </div>
-
         
         <div class="card-body">
             {{-- DATA AYAH --}}
@@ -47,7 +43,9 @@
                     <div class="row g-3">
                         {{-- Nama --}}
                         <div class="col-md-6">
-                            <label class="form-label" for="ayah-nama">Nama Lengkap <span class="text-danger">*</span></label>
+                            <label class="form-label" for="ayah-nama">
+                                Nama Lengkap <span class="text-danger">*</span>
+                            </label>
                             <input type="text" id="ayah-nama"
                                 class="form-control @error('ayah_nama') is-invalid @enderror"
                                 wire:model.defer="ayah_nama"
@@ -59,7 +57,9 @@
 
                         {{-- NIK --}}
                         <div class="col-md-6">
-                            <label class="form-label" for="ayah-nik">NIK</label>
+                            <label class="form-label" for="ayah-nik">
+                                NIK <span class="text-danger">*</span>
+                            </label>
                             <input type="text" id="ayah-nik"
                                 class="form-control @error('ayah_nik') is-invalid @enderror"
                                 wire:model.defer="ayah_nik"
@@ -165,7 +165,9 @@
 
                         {{-- WhatsApp --}}
                         <div class="col-md-6">
-                            <label class="form-label" for="ayah-whatsapp">Nomor WhatsApp</label>
+                            <label class="form-label" for="ayah-whatsapp">
+                                Nomor WhatsApp <span class="text-danger">*</span>
+                            </label>
                             <input type="tel" id="ayah-whatsapp"
                                 class="form-control @error('ayah_whatsapp') is-invalid @enderror"
                                 wire:model.defer="ayah_whatsapp"
@@ -199,7 +201,9 @@
                     <div class="row g-3">
                         {{-- Nama --}}
                         <div class="col-md-6">
-                            <label class="form-label" for="ibu-nama">Nama Lengkap <span class="text-danger">*</span></label>
+                            <label class="form-label" for="ibu-nama">
+                                Nama Lengkap <span class="text-danger">*</span>
+                            </label>
                             <input type="text" id="ibu-nama"
                                 class="form-control @error('ibu_nama') is-invalid @enderror"
                                 wire:model.defer="ibu_nama"
@@ -211,7 +215,9 @@
 
                         {{-- NIK --}}
                         <div class="col-md-6">
-                            <label class="form-label" for="ibu-nik">NIK</label>
+                            <label class="form-label" for="ibu-nik">
+                                NIK <span class="text-danger">*</span>
+                            </label>
                             <input type="text" id="ibu-nik"
                                 class="form-control @error('ibu_nik') is-invalid @enderror"
                                 wire:model.defer="ibu_nik"
@@ -317,7 +323,9 @@
 
                         {{-- WhatsApp --}}
                         <div class="col-md-6">
-                            <label class="form-label" for="ibu-whatsapp">Nomor WhatsApp</label>
+                            <label class="form-label" for="ibu-whatsapp">
+                                Nomor WhatsApp <span class="text-danger">*</span>
+                            </label>
                             <input type="tel" id="ibu-whatsapp"
                                 class="form-control @error('ibu_whatsapp') is-invalid @enderror"
                                 wire:model.defer="ibu_whatsapp"

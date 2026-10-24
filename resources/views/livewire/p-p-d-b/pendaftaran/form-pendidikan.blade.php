@@ -9,9 +9,9 @@
             </div>
 
             <div>
-                <h5 class="fw-bold mb-1">Asal Pendidikan</h5>
+                <h5 class="fw-bold mb-1">Pendidikan Sebelumnya</h5>
                 <small class="text-muted">
-                    Informasi sekolah atau lembaga pendidikan sebelumnya.
+                    Lengkapi informasi riwayat pendidikan calon siswa.
                 </small>
             </div>
         </div>
@@ -24,8 +24,7 @@
                 {{-- JENJANG ASAL --}}
                 <div class="col-12">
                     <label for="jenjang-asal" class="form-label">
-                        Jenjang Pendidikan Asal
-                        <span class="text-danger">*</span>
+                        Jenjang Pendidikan Asal <span class="text-danger">*</span>
                     </label>
 
                     <select

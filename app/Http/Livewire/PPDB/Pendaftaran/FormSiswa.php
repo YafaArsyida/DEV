@@ -5,6 +5,7 @@ namespace App\Http\Livewire\PPDB\Pendaftaran;
 use App\Models\PPDBCalonSiswa;
 use App\Models\PPDBPendaftaran;
 use App\Models\PPDBPeriode;
+use App\Services\PPDB\PPDBDataSiswaService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -17,16 +18,16 @@ class FormSiswa extends Component
     public $pendaftaranId;
 
     public $nama_siswa = '';
+    public $nama_panggilan = '';
     public $nik = '';
     public $nisn = '';
     public $tempat_lahir = '';
     public $tanggal_lahir = '';
-    public $jenis_kelamin = '';
-    public $agama = '';
+    public $jenis_kelamin = 'Laki-Laki';
+    public $agama = 'Islam';
     public $anak_ke = 1;
 
     // Identitas tambahan
-    public $nama_panggilan = '';
     public $cita_cita = '';
     public $hobi = '';
     public $kewarganegaraan = 'Indonesia';
@@ -259,9 +260,6 @@ class FormSiswa extends Component
         return $pendaftaran;
     }
 
-    /**
-     * Simpan data calon siswa dan lanjut ke data orang tua.
-     */
     public function simpan()
     {
         $data = $this->validate();
@@ -276,14 +274,16 @@ class FormSiswa extends Component
 
             if (!$pendaftaran) {
                 throw ValidationException::withMessages([
-                    'nama_siswa' => 'Pendaftaran tidak ditemukan. Silakan periksa kembali.',
+                    'nama_siswa' =>
+                        'Pendaftaran tidak ditemukan. Silakan periksa kembali.',
                 ]);
             }
 
             // Hindari membuat data calon siswa ganda.
             $sudahAda = PPDBCalonSiswa::query()
                 ->where(
-                    'ppdb_pendaftaran_id', $pendaftaran->ppdb_pendaftaran_id
+                    'ppdb_pendaftaran_id',
+                    $pendaftaran->ppdb_pendaftaran_id
                 )
                 ->exists();
 
@@ -293,46 +293,12 @@ class FormSiswa extends Component
                 ]);
             }
 
-            PPDBCalonSiswa::create([
+            // Simpan data calon siswa melalui service.
+            PPDBDataSiswaService::create(array_merge($data, [
                 'ppdb_pendaftaran_id' => $pendaftaran->ppdb_pendaftaran_id,
+            ]));
 
-                // Identitas siswa
-                'nama_siswa' => $data['nama_siswa'],
-                'nama_panggilan' => $data['nama_panggilan'] ?: null,
-                'cita_cita' => $data['cita_cita'] ?: null,
-                'hobi' => $data['hobi'] ?: null,
-                'kewarganegaraan' => $data['kewarganegaraan'],
-
-                'nisn' => $data['nisn'] ?: null,
-                'nik' => $data['nik'],
-                'tempat_lahir' => $data['tempat_lahir'],
-                'tanggal_lahir' => $data['tanggal_lahir'],
-                'jenis_kelamin' => $data['jenis_kelamin'],
-                'agama' => $data['agama'],
-                'anak_ke' => $data['anak_ke'],
-
-                // Data keluarga
-                'jumlah_saudara_kandung' => $data['jumlah_saudara_kandung'],
-                'jumlah_saudara_tiri' => $data['jumlah_saudara_tiri'],
-                'status_yatim_piatu' => $data['status_yatim_piatu'],
-
-                // Kondisi khusus dan kesehatan
-                'berkebutuhan_khusus' => $data['berkebutuhan_khusus'],
-                'penyakit' => $data['penyakit'] ?: null,
-                'alergi' => $data['alergi'] ?: null,
-
-                // Kondisi fisik
-                'tinggi_badan' => $data['tinggi_badan'] ?: null,
-                'berat_badan' => $data['berat_badan'] ?: null,
-
-                // Bantuan sosial disimpan sebagai teks
-                'penerima_bantuan_sosial' => !empty($data['penerima_bantuan_sosial'])
-                    ? implode(', ', $data['penerima_bantuan_sosial'])
-                    : null,
-
-                'nomor_bantuan_sosial' => $data['nomor_bantuan_sosial'] ?: null,
-            ]);
-
+            // Tandai bahwa tahap data siswa sudah selesai.
             $pendaftaran->update([
                 'current_step' => 2,
             ]);
@@ -343,7 +309,8 @@ class FormSiswa extends Component
         $slugJenjang = $pendaftaran->ppdb_periode->ms_jenjang->slug;
 
         $this->dispatchBrowserEvent('alertify-success', [
-            'message' => 'Data calon siswa berhasil disimpan. Silakan lanjutkan data orang tua.',
+            'message' =>
+                'Data calon siswa berhasil disimpan. Silakan lanjutkan data orang tua.',
         ]);
 
         return redirect()->route('ppdb.pendaftaran.orang-tua', [

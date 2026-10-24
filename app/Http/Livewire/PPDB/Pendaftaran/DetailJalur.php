@@ -4,6 +4,7 @@ namespace App\Http\Livewire\PPDB\Pendaftaran;
 
 use App\Models\PPDBJalur;
 use App\Models\PPDBPendaftaran;
+use App\Services\PPDB\PPDBPendaftaranService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -85,34 +86,39 @@ class DetailJalur extends Component
         $this->modeEdit = false;
     }
 
-
     /**
-     * Memperbarui jalur pada pendaftaran yang sudah ada.
+     * Memperbarui jalur pendaftaran.
      */
     public function perbaruiJalur()
     {
         $this->validate([
             'jalurTerpilih' => ['required', 'integer'],
         ], [
-            'jalurTerpilih.required' => 'Silakan pilih jalur pendaftaran.',
-            'jalurTerpilih.integer' => 'Pilihan jalur tidak valid.',
+            'jalurTerpilih.required' =>
+                'Silakan pilih jalur pendaftaran.',
+            'jalurTerpilih.integer' =>
+                'Pilihan jalur tidak valid.',
         ]);
 
         DB::transaction(function () {
             $pendaftaran = PPDBPendaftaran::query()
                 ->where(
-                    'ppdb_pendaftaran_id', $this->pendaftaranId
+                    'ppdb_pendaftaran_id',
+                    $this->pendaftaranId
                 )
                 ->where('ms_pengguna_id', Auth::id())
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            if (!$pendaftaran) {
+            // Pastikan pendaftaran masih boleh diubah.
+            if (!in_array($pendaftaran->status, ['draft', 'perbaikan'])) {
                 throw ValidationException::withMessages([
-                    'nama_siswa' => 'Pendaftaran tidak ditemukan atau bukan milik Anda.',
+                    'jalurTerpilih' =>
+                        'Pendaftaran tidak dapat diubah pada status saat ini.',
                 ]);
             }
 
+            // Pastikan jalur aktif pada periode pendaftaran.
             $jalur = PPDBJalur::query()
                 ->where(
                     'ppdb_jalur_id',
@@ -126,19 +132,23 @@ class DetailJalur extends Component
                 ->lockForUpdate()
                 ->first();
 
-            if (! $jalur) {
+            if (!$jalur) {
                 throw ValidationException::withMessages([
                     'jalurTerpilih' =>
                         'Jalur tidak tersedia pada periode pendaftaran ini.',
                 ]);
             }
 
+            // Hitung pendaftar lain pada jalur tujuan.
+            // Pendaftaran yang sedang diedit tidak ikut dihitung.
             $jumlahPendaftar = PPDBPendaftaran::query()
                 ->where(
-                    'ppdb_jalur_id', $jalur->ppdb_jalur_id
+                    'ppdb_jalur_id',
+                    $jalur->ppdb_jalur_id
                 )
                 ->where(
-                    'ppdb_periode_id', $pendaftaran->ppdb_periode_id
+                    'ppdb_periode_id',
+                    $pendaftaran->ppdb_periode_id
                 )
                 ->where(
                     'ppdb_pendaftaran_id',
@@ -162,10 +172,10 @@ class DetailJalur extends Component
                 ]);
             }
 
-            // UPDATE record lama, tidak membuat pendaftaran baru.
-            $pendaftaran->update([
-                'ppdb_jalur_id' => $jalur->ppdb_jalur_id,
-            ]);
+            // Perbarui record melalui service.
+            PPDBPendaftaranService::updateJalur(
+                $pendaftaran, (int) $jalur->ppdb_jalur_id
+            );
         });
 
         // Ambil kembali data pendaftaran beserta jenjangnya.

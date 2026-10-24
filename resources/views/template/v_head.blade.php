@@ -4,7 +4,8 @@
 <meta content="Sistem Administrasi Terintegrasi untuk Sekolah" name="description" />
 <meta content="ManekaromaTeknologi" name="author" />
 <!-- App favicon -->
-<link rel="shortcut icon" href="{{asset('assets')}}/logo/hero.png">
+<link rel="shortcut icon" href="{{asset('assets')}}/logo/yayasan.webp">
+
 
 <!-- aos css -->
 <link rel="stylesheet" href="{{asset('assets')}}/libs/aos/aos.css" />

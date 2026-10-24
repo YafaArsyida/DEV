@@ -68,13 +68,6 @@
                 </li>
 
                 <li class="nav-item">
-                    <a href="{{ route('ppdb.admin.bantu-pendaftaran') }}" class="nav-link menu-link {{ request()->routeIs('ppdb.admin.bantu-pendaftaran') ? 'active' : '' }}">
-                        <i class="mdi mdi-account-plus-outline"></i>
-                        <span>Bantu Pendaftaran</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
                     <a href="{{ route('ppdb.admin.verifikasi') }}" class="nav-link menu-link {{ request()->routeIs('ppdb.admin.verifikasi') ? 'active' : '' }}">
                         <i class="mdi mdi-file-search-outline"></i>
                         <span>

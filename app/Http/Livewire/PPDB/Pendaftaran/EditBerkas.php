@@ -4,6 +4,7 @@ namespace App\Http\Livewire\PPDB\Pendaftaran;
 
 use App\Models\PPDBBerkas;
 use App\Models\PPDBPendaftaran;
+use App\Services\PPDB\PPDBBerkasService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -122,7 +123,8 @@ class EditBerkas extends Component
         ];
     }
 
-    public function simpan()
+    
+    public function update()
     {
         $pendaftaran = $this->ambilPendaftaranMilikPengguna();
 
@@ -130,20 +132,17 @@ class EditBerkas extends Component
 
         $this->validate($this->aturanValidasi());
 
-        $disk = Storage::disk('local');
-        $direktori = 'ppdb/berkas/' . $pendaftaran->ppdb_pendaftaran_id;
-
-        $fileBaru = [];
-        $pathLama = [];
+        $daftarInput = $this->daftarInputBerkas();
 
         $berkasTersimpan = PPDBBerkas::query()
-            ->where('ppdb_pendaftaran_id', $pendaftaran->ppdb_pendaftaran_id)
+            ->where(
+                'ppdb_pendaftaran_id',
+                $pendaftaran->ppdb_pendaftaran_id
+            )
             ->get()
             ->keyBy('jenis_berkas');
 
-        $daftarInput = $this->daftarInputBerkas();
-
-        // Berkas wajib harus sudah tersedia atau diganti dengan file baru.
+        // Berkas wajib harus tersedia dari unggahan lama atau baru.
         foreach ([
             'KARTU_KELUARGA',
             'AKTA_KELAHIRAN',
@@ -161,69 +160,32 @@ class EditBerkas extends Component
             }
         }
 
+        $fileBaru = [];
+        $pathLama = [];
+        $transaksiBerhasil = false;
+
         try {
+            // Simpan file pengganti. File lama belum dihapus.
             foreach ($daftarInput as $jenis => $property) {
                 $file = $this->{$property};
 
-                // Berkas yang tidak diganti tetap dipertahankan.
+                // Tidak ada penggantian, pertahankan berkas lama.
                 if (! $file) {
                     continue;
                 }
 
-                $mime = $file->getMimeType();
-
-                if (! in_array($mime, [
-                    'image/jpeg',
-                    'image/png',
-                    'image/webp',
-                    'application/pdf',
-                ], true)) {
-                    throw ValidationException::withMessages([
-                        $property => 'Isi file tidak sesuai dengan format yang diperbolehkan.',
-                    ]);
-                }
-
-                if (
-                    $jenis === 'PAS_FOTO'
-                    && $mime === 'application/pdf'
-                ) {
-                    throw ValidationException::withMessages([
-                        $property => 'Pas foto harus berupa gambar.',
-                    ]);
-                }
-
-                $isPdf = $mime === 'application/pdf';
-                $namaSimpan = Str::uuid()->toString()
-                    . ($isPdf ? '.pdf' : '.webp');
-
-                $path = $direktori . '/' . $namaSimpan;
-
-                $disk->makeDirectory($direktori);
-
-                if ($isPdf) {
-                    $disk->putFileAs($direktori, $file, $namaSimpan);
-                } else {
-                    $this->simpanSebagaiWebP(
-                        $file->getRealPath(),
-                        $disk->path($path),
-                        $property
-                    );
-                }
-
-                $fileBaru[$jenis] = [
-                    'property' => $property,
-                    'nama_file' => $file->getClientOriginalName(),
-                    'path_file' => $path,
-                    'mime_type' => $isPdf
-                        ? 'application/pdf'
-                        : 'image/webp',
-                    'ukuran_file' => $disk->size($path),
-                ];
+                $fileBaru[$jenis] = PPDBBerkasService::simpanFile(
+                    $file,
+                    (int) $pendaftaran->ppdb_pendaftaran_id,
+                    $jenis,
+                    $property
+                );
             }
 
             DB::transaction(function () use (
                 $pendaftaran,
                 $fileBaru,
+                $daftarInput,
                 &$pathLama
             ) {
                 $pendaftaranTerkunci = PPDBPendaftaran::query()
@@ -236,6 +198,34 @@ class EditBerkas extends Component
                     ->firstOrFail();
 
                 $this->pastikanBolehUbah($pendaftaranTerkunci);
+
+                // Ambil kondisi berkas terbaru di dalam transaksi.
+                $berkasTerkini = PPDBBerkas::query()
+                    ->where(
+                        'ppdb_pendaftaran_id',
+                        $pendaftaranTerkunci->ppdb_pendaftaran_id
+                    )
+                    ->lockForUpdate()
+                    ->get()
+                    ->keyBy('jenis_berkas');
+
+                // Pastikan berkas wajib tetap tersedia.
+                foreach ([
+                    'KARTU_KELUARGA',
+                    'AKTA_KELAHIRAN',
+                    'PAS_FOTO',
+                ] as $jenis) {
+                    $property = $daftarInput[$jenis];
+
+                    if (
+                        ! isset($fileBaru[$jenis])
+                        && ! $berkasTerkini->has($jenis)
+                    ) {
+                        throw ValidationException::withMessages([
+                            $property => 'Berkas ini wajib diunggah.',
+                        ]);
+                    }
+                }
 
                 foreach ($fileBaru as $jenis => $data) {
                     $berkas = PPDBBerkas::query()
@@ -251,57 +241,52 @@ class EditBerkas extends Component
                         $pathLama[] = $berkas->path_file;
                     }
 
-                    $atribut = [
-                        'nama_file' => $data['nama_file'],
-                        'path_file' => $data['path_file'],
-                        'mime_type' => $data['mime_type'],
-                        'ukuran_file' => $data['ukuran_file'],
-                        'status_verifikasi' => 'menunggu',
-                        'catatan_verifikasi' => null,
-                        'verified_by' => null,
-                        'verified_at' => null,
-                    ];
-
                     if ($berkas) {
-                        $berkas->update($atribut);
+                        PPDBBerkasService::update($berkas, $data);
                     } else {
-                        PPDBBerkas::create(array_merge($atribut, [
-                            'ppdb_pendaftaran_id' =>
-                                $pendaftaranTerkunci->ppdb_pendaftaran_id,
-                            'jenis_berkas' => $jenis,
-                        ]));
+                        PPDBBerkasService::create(
+                            (int) $pendaftaranTerkunci->ppdb_pendaftaran_id,
+                            $jenis,
+                            $data
+                        );
                     }
                 }
             });
 
-            // File lama dihapus setelah transaksi berhasil.
-            foreach (array_unique($pathLama) as $path) {
-                if ($disk->exists($path)) {
-                    $disk->delete($path);
-                }
-            }
+            // Database sudah berhasil diperbarui.
+            $transaksiBerhasil = true;
 
+            // Hapus file lama hanya setelah transaksi berhasil.
+            PPDBBerkasService::hapusFileLama($pathLama);
+
+            // Reset input file pengganti.
             foreach ($fileBaru as $data) {
                 $this->{$data['property']} = null;
             }
 
             $this->resetValidation();
 
-            $slugJenjang = $pendaftaran->ppdb_periode->ms_jenjang->slug;
+            $slugJenjang = $pendaftaran
+                ->ppdb_periode
+                ->ms_jenjang
+                ->slug;
 
             $this->dispatchBrowserEvent('alertify-success', [
                 'message' => 'Perubahan berhasil disimpan.',
             ]);
 
-            return redirect()->route('ppdb.pendaftaran.berkas',  [
+            return redirect()->route('ppdb.pendaftaran.berkas', [
                 'jenjang' => $slugJenjang,
             ]);
-
-        } catch (Throwable $e) {
-            // Bersihkan file baru jika penyimpanan gagal.
-            foreach ($fileBaru as $data) {
-                if ($disk->exists($data['path_file'])) {
-                    $disk->delete($data['path_file']);
+        } catch (\Throwable $e) {
+            // Jika transaksi gagal, bersihkan file yang baru dibuat.
+            // Jika transaksi berhasil, jangan hapus file yang direferensikan
+            // oleh database meskipun penghapusan file lama mengalami error.
+            if (! $transaksiBerhasil) {
+                foreach ($fileBaru as $data) {
+                    PPDBBerkasService::hapusFile(
+                        $data['path_file']
+                    );
                 }
             }
 
@@ -309,71 +294,6 @@ class EditBerkas extends Component
         }
     }
 
-    protected function simpanSebagaiWebP(
-        $source,
-        $destination,
-        $property
-    ) {
-        if (
-            ! function_exists('imagewebp')
-            || ! function_exists('imagecreatefromstring')
-        ) {
-            throw ValidationException::withMessages([
-                $property => 'Server belum mendukung WebP.',
-            ]);
-        }
-
-        $isi = file_get_contents($source);
-        $gambar = $isi !== false
-            ? @imagecreatefromstring($isi)
-            : false;
-
-        if (! $gambar) {
-            throw ValidationException::withMessages([
-                $property => 'Gambar tidak valid atau tidak dapat dibaca.',
-            ]);
-        }
-
-        $lebar = imagesx($gambar);
-        $tinggi = imagesy($gambar);
-        $skala = min(1, 2000 / max($lebar, $tinggi));
-
-        $lebarBaru = max(1, (int) round($lebar * $skala));
-        $tinggiBaru = max(1, (int) round($tinggi * $skala));
-
-        $hasil = imagecreatetruecolor($lebarBaru, $tinggiBaru);
-
-        $putih = imagecolorallocate($hasil, 255, 255, 255);
-        imagefilledrectangle(
-            $hasil,
-            0,
-            0,
-            $lebarBaru,
-            $tinggiBaru,
-            $putih
-        );
-
-        imagecopyresampled(
-            $hasil,
-            $gambar,
-            0, 0, 0, 0,
-            $lebarBaru,
-            $tinggiBaru,
-            $lebar,
-            $tinggi
-        );
-
-        $berhasil = imagewebp($hasil, $destination, 82);
-
-        imagedestroy($gambar);
-        imagedestroy($hasil);
-
-        if (! $berhasil) {
-            throw ValidationException::withMessages([
-                $property => 'Gambar gagal dikonversi menjadi WebP.',
-            ]);
-        }
-    }
    
     public function render()
     {

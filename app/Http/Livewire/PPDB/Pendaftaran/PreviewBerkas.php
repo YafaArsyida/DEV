@@ -47,25 +47,15 @@ class PreviewBerkas extends Component
             ], true),
             415
         );
-
-        $slugJenjang = $pendaftaran
-            ->ppdb_periode
-            ->ms_jenjang
-            ->slug;
             
         $this->berkas = [
             'id'        => $berkas->ppdb_berkas_id,
             'jenis'     => $berkas->jenis_berkas,
             'nama_file' => $berkas->nama_file,
             'mime_type' => $berkas->mime_type,
-            'url' => $isAdmin
-                ? route('ppdb.admin.berkas.preview', [
-                    'berkasId' => $berkas->ppdb_berkas_id,
-                ])
-                : route('ppdb.berkas.preview', [
-                    'jenjang'  => $slugJenjang,
-                    'berkasId' => $berkas->ppdb_berkas_id,
-                ]),
+            'url' => route('ppdb.berkas.preview', [
+                'berkasId' => $berkas->ppdb_berkas_id,
+            ]),
         ];
     }
 
