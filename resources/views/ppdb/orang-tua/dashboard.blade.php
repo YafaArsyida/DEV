@@ -220,7 +220,9 @@
                                             </div>
                                         @endif
 
-                                        <a href="{{ route('ppdb.pendaftaran.status') }}"
+                                        <a href="{{ route('ppdb.pendaftaran.data-siswa', [
+                                            'jenjang' => $jenjang->slug,
+                                        ]) }}"
                                             class="btn btn-warning rounded-pill px-4">
                                             <i class="ri-edit-line me-1"></i>
                                             Lihat Instruksi Perbaikan

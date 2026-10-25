@@ -23,6 +23,7 @@ class Index extends Component
     protected $listeners = [
         'parameterUpdated' => 'updateParameters',
         'pendaftaranTersimpan' => '$refresh',
+        'pendaftaranDiperbarui' => '$refresh',
     ];
 
     protected $queryString = [

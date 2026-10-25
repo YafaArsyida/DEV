@@ -21,7 +21,7 @@ class PPDBPendaftaranService
                 'ppdb_jalur_id' => $data['ppdb_jalur_id'],
                 'nomor_pendaftaran' => self::buatNomorPendaftaran(),
                 'current_step' => 1,
-                'status' => 'draft',
+                'status' => $data['status'],
                 'submitted_at' => null,
                 'submitted_by' => null,
                 'created_by' => $data['created_by'] ?? null,

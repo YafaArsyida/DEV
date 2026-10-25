@@ -420,6 +420,10 @@ class PPDBOrangTuaController extends Controller
     
     public function review($jenjang)
     {
+         $jenjang = Jenjang::query()
+            ->where('slug', $jenjang)
+            ->firstOrFail();
+
         $pendaftaran = PPDBPendaftaran::query()
             ->with([
                 'ppdb_periode.ms_jenjang',
@@ -433,7 +437,7 @@ class PPDBOrangTuaController extends Controller
             ])
             ->where('ms_pengguna_id', Auth::id())
             ->whereHas('ppdb_periode.ms_jenjang', function ($query) use ($jenjang) {
-                $query->where('slug', $jenjang);
+                $query->where('slug', $jenjang->slug);
             })
             ->latest('ppdb_pendaftaran_id')
             ->firstOrFail();
@@ -458,6 +462,7 @@ class PPDBOrangTuaController extends Controller
         $stepAktif = 7;
 
         return view('ppdb.orang-tua.review', compact(
+            'jenjang',
             'pendaftaran',
             'stepAktif',
             'jawabanTambahan'
@@ -466,6 +471,10 @@ class PPDBOrangTuaController extends Controller
 
     public function status($jenjang)
     {
+        $jenjang = Jenjang::query()
+            ->where('slug', $jenjang)
+            ->firstOrFail();
+
         $pendaftaran = PPDBPendaftaran::query()
             ->with([
                 'ppdb_periode.ms_jenjang',
@@ -475,7 +484,7 @@ class PPDBOrangTuaController extends Controller
             ])
             ->where('ms_pengguna_id', auth()->id())
             ->whereHas('ppdb_periode.ms_jenjang', function ($query) use ($jenjang) {
-                $query->where('slug', $jenjang);
+                $query->where('slug', $jenjang->slug);
             })
             ->latest('created_at')
             ->first();
@@ -491,6 +500,7 @@ class PPDBOrangTuaController extends Controller
         $stepAktif = 8;
 
         return view('ppdb.orang-tua.status', compact(
+            'jenjang',
             'pendaftaran',
             'stepAktif',
         ));

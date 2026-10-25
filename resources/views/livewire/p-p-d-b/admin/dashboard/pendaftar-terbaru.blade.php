@@ -18,7 +18,7 @@
                 </div>
             </div>
 
-            <a href="javascript:void(0)"
+            <a href="{{ route('ppdb.admin.pendaftar') }}"
                 class="btn btn-outline-primary rounded-pill">
                 Lihat Semua Pendaftar
                 <i class="mdi mdi-arrow-right ms-1"></i>
@@ -124,14 +124,16 @@
                                 </td>
 
                                 <td class="text-center">
-                                    <button
-                                        type="button"
-                                        class="btn btn-sm btn-light rounded-circle"
-                                        title="Lihat detail"
-                                        aria-label="Lihat detail"
-                                        wire:click="$emit('loadDetailPendaftar', {{ $pendaftar['id'] }})">
-                                        <i class="mdi mdi-eye-outline fs-16"></i>
-                                    </button>
+                                    {{-- Detail --}}
+                                    <a
+                                        href="#ModalDetailPendaftar"
+                                        data-bs-toggle="modal"
+                                        class="btn btn-soft-primary btn-sm rounded-pill px-3 text-nowrap"
+                                        title="Detail Pendaftar"
+                                        wire:click.prevent="$emit('loadDetailPendaftar', {{ $pendaftar['ppdb_pendaftaran_id'] }})">
+                                        <i class="ri-eye-line me-1"></i>
+                                        Detail
+                                    </a>
                                 </td>
                             </tr>
                         @endforeach

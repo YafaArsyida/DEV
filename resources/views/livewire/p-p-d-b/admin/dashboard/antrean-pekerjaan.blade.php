@@ -74,7 +74,7 @@
                         Menunggu pemeriksaan data dan dokumen.
                     </p>
 
-                    <a href="javascript:void(0)"
+                    <a href="{{ route('ppdb.admin.verifikasi') }}"
                        class="link-primary fw-medium small">
                         Buka antrean
                         <i class="mdi mdi-arrow-right ms-1"></i>
@@ -100,7 +100,7 @@
                         Memerlukan perbaikan data atau kelengkapan berkas.
                     </p>
 
-                    <a href="javascript:void(0)"
+                    <a href="{{ route('ppdb.admin.pendaftar') }}"
                        class="link-primary fw-medium small">
                         Lihat pendaftar
                         <i class="mdi mdi-arrow-right ms-1"></i>
@@ -123,7 +123,7 @@
                         Layani orang tua yang membutuhkan bantuan mendaftar.
                     </p>
 
-                    <a href="javascript:void(0)"
+                    <a href="{{ route('ppdb.admin.pendaftar') }}"
                        class="link-primary fw-medium small">
                         Mulai pendaftaran
                         <i class="mdi mdi-arrow-right ms-1"></i>

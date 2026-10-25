@@ -84,7 +84,7 @@ class PendaftarTerbaru extends Component
 
                             'badge' => $statusBadge[$status] ?? 'secondary',
 
-                            'id' => $pendaftar->ppdb_pendaftaran_id,
+                            'ppdb_pendaftaran_id' => $pendaftar->ppdb_pendaftaran_id,
                         ];
                     });
             }

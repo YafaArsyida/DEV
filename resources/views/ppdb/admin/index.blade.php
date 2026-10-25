@@ -48,6 +48,9 @@
         <div class="row">
             <div class="col-12">
                 @livewire('p-p-d-b.admin.dashboard.pendaftar-terbaru')
+
+                @livewire('p-p-d-b.admin.pendaftar.detail')  
+
             </div>
         </div>
 

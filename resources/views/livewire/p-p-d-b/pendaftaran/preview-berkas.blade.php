@@ -40,7 +40,27 @@
 
             {{-- BODY --}}
             <div class="modal-body px-4 pt-2 pb-4">
+                {{-- LOADING SAAT LIVEWIRE MEMUAT DATA BERKAS --}}
+                <div wire:loading.flex
+                    wire:target="showPreviewBerkas"
+                    class="align-items-center justify-content-center text-center py-5"
+                    style="min-height: 300px;">
+                    <div>
+                        <div
+                            class="spinner-border text-primary mb-3"
+                            role="status"
+                        >
+                            <span class="visually-hidden">Memuat...</span>
+                        </div>
 
+                        <p class="text-muted mb-0">
+                            Menyiapkan pratinjau berkas...
+                        </p>
+                    </div>
+                </div>
+
+                {{-- KONTEN PREVIEW --}}
+                <div wire:loading.remove wire:target="showPreviewBerkas">
                 @if ($berkas)
                     <div class="bg-white border rounded-3 p-2 text-center">
 
@@ -95,7 +115,7 @@
                         </p>
                     </div>
                 @endif
-
+                </div>
             </div>
 
             {{-- FOOTER --}}
