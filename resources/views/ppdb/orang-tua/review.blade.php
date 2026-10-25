@@ -78,9 +78,20 @@
                                         Nomor Pendaftaran
                                     </div>
 
-                                    <h5 class="mb-2">
-                                        {{ $pendaftaran->nomor_pendaftaran ?? '-' }}
-                                    </h5>
+                                    <div class="d-flex align-items-center gap-2 flex-wrap mb-2">
+                                        <h5 class="mb-0">
+                                            {{ $pendaftaran->nomor_pendaftaran ?? '-' }}
+                                        </h5>
+
+                                        @if (!empty($pendaftaran->nomor_pendaftaran))
+                                            <button type="button"
+                                                class="btn btn-sm btn-light btn-icon rounded-circle"
+                                                title="Salin nomor pendaftaran"
+                                                onclick="copyToClipboard(@js($pendaftaran->nomor_pendaftaran))">
+                                                <i class="ri-file-copy-line"></i>
+                                            </button>
+                                        @endif
+                                    </div>
 
                                     <div class="text-muted small">
                                         <i class="ri-calendar-line me-1"></i>

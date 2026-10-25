@@ -46,6 +46,7 @@ class PPDBCalonSiswa extends Model
         // Kondisi fisik
         'tinggi_badan',
         'berat_badan',
+        'ukuran_baju',
 
         // Bantuan sosial
         'penerima_bantuan_sosial',

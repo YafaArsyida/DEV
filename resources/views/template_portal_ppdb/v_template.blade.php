@@ -81,15 +81,10 @@
                                     </h6>
 
                                     {{-- Akun --}}
-                                    <a class="dropdown-item" href="#">
+                                    <a class="dropdown-item"
+                                    href="{{ route('ppdb.profil', ['jenjang' => $jenjang->slug]) }}">
                                         <i class="ri-user-settings-line text-muted fs-16 align-middle me-1"></i>
                                         <span class="align-middle">Akun</span>
-                                    </a>
-
-                                    {{-- Bantuan --}}
-                                    <a class="dropdown-item" href="#">
-                                        <i class="ri-question-line text-muted fs-16 align-middle me-1"></i>
-                                        <span class="align-middle">Bantuan</span>
                                     </a>
 
                                     <div class="dropdown-divider"></div>
@@ -143,15 +138,49 @@
         @include('template.v_script')
         @livewireScripts 
     
+
         <script>
-            // notif
+            // Konfigurasi Alertify
+            if (window.alertify) {
+                alertify.set('notifier', 'position', 'top-right');
+            }
+
+            // Copy clipboard
+            window.copyToClipboard = function(text) {
+                if (!text) {
+                    if (window.alertify) {
+                        alertify.error('Nomor pendaftaran tidak tersedia.');
+                    } else {
+                        alert('Nomor pendaftaran tidak tersedia.');
+                    }
+                    return;
+                }
+
+                navigator.clipboard.writeText(text)
+                    .then(() => {
+                        if (window.alertify) {
+                            alertify.success('Nomor pendaftaran berhasil disalin!');
+                        } else {
+                            alert('Nomor pendaftaran berhasil disalin!');
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Gagal menyalin:', err);
+
+                        if (window.alertify) {
+                            alertify.error('Gagal menyalin nomor pendaftaran.');
+                        } else {
+                            alert('Gagal menyalin nomor pendaftaran.');
+                        }
+                    });
+            };
+
+            // Notifikasi dari Livewire
             window.addEventListener('alertify-success', event => {
-                alertify.set('notifier', 'position', 'bottom-right');
                 alertify.success(event.detail.message);
             });
 
             window.addEventListener('alertify-error', event => {
-                alertify.set('notifier', 'position', 'bottom-right');
                 alertify.error(event.detail.message);
             });
             // end notif

@@ -372,7 +372,7 @@
                     <div class="row g-3">
 
                         {{-- Tinggi Badan --}}
-                        <div class="col-12 col-md-6">
+                        <div class="col-12 col-md-4">
                             <label for="edit-tinggi-badan" class="form-label">
                                 Tinggi Badan (cm)
                             </label>
@@ -387,7 +387,7 @@
                         </div>
 
                         {{-- Berat Badan --}}
-                        <div class="col-12 col-md-6">
+                        <div class="col-12 col-md-4">
                             <label for="edit-berat-badan" class="form-label">
                                 Berat Badan (kg)
                             </label>
@@ -401,7 +401,28 @@
                             @enderror
                         </div>
 
+                        {{-- Ukuran Baju --}}
+                        <div class="col-12 col-md-4">
+                            <label for="edit-ukuran-baju" class="form-label">
+                                Ukuran Baju <span class="text-danger">*</span>
+                            </label>
+                            <select id="edit-ukuran-baju"
+                                class="form-select @error('ukuran_baju') is-invalid @enderror"
+                                wire:model.defer="ukuran_baju">
+                                <option value="">Pilih ukuran baju</option>
+                                @foreach (['XS', 'S', 'M', 'L', 'XL', 'XXL'] as $ukuran)
+                                    <option value="{{ $ukuran }}">
+                                        {{ $ukuran }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('ukuran_baju')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
                     </div>
+
                 </div>
             </div>
 

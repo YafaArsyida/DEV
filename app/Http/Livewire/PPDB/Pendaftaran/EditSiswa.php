@@ -43,6 +43,7 @@ class EditSiswa extends Component
     // Kondisi fisik
     public $tinggi_badan = '';
     public $berat_badan = '';
+    public $ukuran_baju = '';
 
     // Bantuan sosial
     public $penerima_bantuan_sosial = [];
@@ -142,6 +143,7 @@ class EditSiswa extends Component
         // Kondisi fisik
         $this->tinggi_badan = $siswa->tinggi_badan ?? '';
         $this->berat_badan = $siswa->berat_badan ?? '';
+        $this->ukuran_baju = $siswa->ukuran_baju ?? '';
 
         // Bantuan sosial: teks menjadi array untuk checkbox
         $this->penerima_bantuan_sosial = array_values(
@@ -283,6 +285,8 @@ class EditSiswa extends Component
                 'max:300',
             ],
 
+            'ukuran_baju' => 'required|in:XS,S,M,L,XL,XXL',
+
             // Bantuan sosial
             'penerima_bantuan_sosial' => [
                 'nullable',
@@ -373,6 +377,9 @@ class EditSiswa extends Component
         'berat_badan.numeric' => 'Berat badan harus berupa angka.',
         'berat_badan.gt' => 'Berat badan harus lebih dari 0.',
         'berat_badan.max' => 'Berat badan maksimal 300 kg.',
+
+        'ukuran_baju.required' => 'Ukuran baju siswa wajib dipilih.',
+        'ukuran_baju.in' => 'Ukuran baju yang dipilih tidak valid.',
 
         'penerima_bantuan_sosial.array' =>
             'Format pilihan bantuan sosial tidak valid.',

@@ -104,21 +104,34 @@
                     <div class="card-body">
                         <div class="row align-items-center g-4">
                             {{-- NOMOR DAN AKSI --}}
+                            
                             <div class="col-lg-7">
                                 <div class="mb-3">
                                     <small class="text-muted d-block mb-1">
                                         Nomor Pendaftaran
                                     </small>
 
-                                    <h4 class="fw-bold text-primary mb-0">
-                                        {{ $pendaftaran->nomor_pendaftaran }}
-                                    </h4>
+                                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                                        <h4 class="fw-bold text-primary mb-0">
+                                            {{ $pendaftaran->nomor_pendaftaran ?? '-' }}
+                                        </h4>
+
+                                        @if (!empty($pendaftaran->nomor_pendaftaran))
+                                            <button type="button"
+                                                class="btn btn-sm btn-light btn-icon rounded-circle"
+                                                title="Salin nomor pendaftaran"
+                                                onclick="copyToClipboard(@js($pendaftaran->nomor_pendaftaran))">
+                                                <i class="ri-file-copy-line"></i>
+                                            </button>
+                                        @endif
+                                    </div>
                                 </div>
 
                                 <p class="text-muted mb-4">
                                     Gunakan nomor pendaftaran ini untuk memantau perkembangan
                                     proses PPDB dan melihat informasi pendaftaran Anda.
                                 </p>
+
 
                                 @if ($pendaftaran->status === 'perbaikan' && filled($pendaftaran->catatan_perbaikan))
                                     <div class="border rounded-4 p-3 my-3">
@@ -240,21 +253,21 @@
 
                             <div>
                                 <h5 class="fw-bold mb-1">
-                                    Jadwal Proses PPDB
+                                    Jadwal Proses SPMB
                                 </h5>
                                 <small class="text-muted">
-                                    Informasi tahapan penerimaan peserta didik baru.
+                                    Tahapan penerimaan peserta didik baru Tahun Ajaran 2027/2028.
                                 </small>
                             </div>
                         </div>
                     </div>
 
                     <div class="card-body">
-                        {{-- PENDAFTARAN DIBUKA --}}
+                        {{-- PENDAFTARAN --}}
                         <div class="d-flex gap-3">
                             <div class="flex-shrink-0 text-center" style="width: 64px;">
-                                <h4 class="fw-bold text-primary mb-0">01</h4>
-                                <small class="text-muted">Okt</small>
+                                <h4 class="fw-bold text-primary mb-0">Nov</h4>
+                                <small class="text-muted">2026</small>
                             </div>
 
                             <div class="pb-4 border-bottom w-100">
@@ -262,7 +275,9 @@
                                     Pendaftaran Dibuka
                                 </h6>
                                 <small class="text-muted">
-                                    Pendaftaran dimulai secara online.
+                                    Pendaftaran dimulai pada November 2026.
+                                    Calon peserta didik mengikuti proses pendaftaran
+                                    sesuai arahan pihak sekolah.
                                 </small>
                             </div>
                         </div>
@@ -270,67 +285,51 @@
                         {{-- PENDAFTARAN DITUTUP --}}
                         <div class="d-flex gap-3 pt-4">
                             <div class="flex-shrink-0 text-center" style="width: 64px;">
-                                <h4 class="fw-bold text-primary mb-0">30</h4>
-                                <small class="text-muted">Nov</small>
+                                <i class="ri-flag-line fs-3 text-primary"></i>
                             </div>
 
                             <div class="pb-4 border-bottom w-100">
                                 <h6 class="fw-semibold mb-1">
-                                    Pendaftaran Ditutup
+                                    Penutupan Pendaftaran
                                 </h6>
                                 <small class="text-muted">
-                                    Batas waktu pengiriman formulir pendaftaran.
+                                    Pendaftaran ditutup apabila kuota peserta didik
+                                    telah terpenuhi.
                                 </small>
                             </div>
                         </div>
 
-                        {{-- VERIFIKASI BERKAS --}}
+                        {{-- SKRINING PSIKOLOGI --}}
                         <div class="d-flex gap-3 pt-4">
                             <div class="flex-shrink-0 text-center" style="width: 64px;">
-                                <h4 class="fw-bold text-primary mb-0">05</h4>
-                                <small class="text-muted">Des</small>
+                                <h4 class="fw-bold text-primary mb-0">Apr</h4>
+                                <small class="text-muted">2027</small>
                             </div>
 
                             <div class="pb-4 border-bottom w-100">
                                 <h6 class="fw-semibold mb-1">
-                                    Verifikasi Berkas
+                                    Skrining Psikologi
                                 </h6>
                                 <small class="text-muted">
-                                    Penilaian dan validasi dokumen pendaftaran.
+                                    Calon peserta didik mengikuti skrining psikologi
+                                    sesuai jadwal yang diinformasikan oleh sekolah.
                                 </small>
                             </div>
                         </div>
 
-                        {{-- PENGUMUMAN --}}
+                        {{-- PENGUMUMAN HASIL --}}
                         <div class="d-flex gap-3 pt-4">
                             <div class="flex-shrink-0 text-center" style="width: 64px;">
-                                <h4 class="fw-bold text-primary mb-0">10</h4>
-                                <small class="text-muted">Des</small>
-                            </div>
-
-                            <div class="pb-4 border-bottom w-100">
-                                <h6 class="fw-semibold mb-1">
-                                    Pengumuman
-                                </h6>
-                                <small class="text-muted">
-                                    Hasil seleksi calon peserta didik diumumkan.
-                                </small>
-                            </div>
-                        </div>
-
-                        {{-- DAFTAR ULANG --}}
-                        <div class="d-flex gap-3 pt-4">
-                            <div class="flex-shrink-0 text-center" style="width: 64px;">
-                                <h4 class="fw-bold text-primary mb-0">11–15</h4>
-                                <small class="text-muted">Des</small>
+                                <i class="ri-notification-3-line fs-3 text-primary"></i>
                             </div>
 
                             <div class="w-100">
                                 <h6 class="fw-semibold mb-1">
-                                    Daftar Ulang
+                                    Pengumuman Hasil Seleksi
                                 </h6>
                                 <small class="text-muted">
-                                    Konfirmasi pendaftaran bagi calon siswa yang diterima.
+                                    Hasil seleksi calon peserta didik diumumkan pada
+                                    April 2027.
                                 </small>
                             </div>
                         </div>

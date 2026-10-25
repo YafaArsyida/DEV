@@ -160,6 +160,10 @@ Route::prefix('ppdb/{jenjang}')
         Route::get('/dashboard', [PPDBOrangTuaController::class, 'dashboard'])
             ->name('dashboard');
 
+        // PROFIL ORANG TUA
+        Route::get('/profil', [PPDBOrangTuaController::class, 'profil'])
+            ->name('profil');
+
         // PREVIEW BERKAS
         Route::get('/berkas/preview/{berkasId}', [PPDBOrangTuaController::class, 'show'])
             ->name('berkas.preview');

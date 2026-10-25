@@ -70,6 +70,7 @@ class PPDBDataSiswaService
         // Kondisi fisik
         $calonSiswa->tinggi_badan = self::nilaiOpsional($data['tinggi_badan'] ?? null);
         $calonSiswa->berat_badan = self::nilaiOpsional($data['berat_badan'] ?? null);
+        $calonSiswa->ukuran_baju = $data['ukuran_baju'];
 
         // Bantuan sosial disimpan sebagai teks.
         $bantuanSosial = $data['penerima_bantuan_sosial'] ?? [];

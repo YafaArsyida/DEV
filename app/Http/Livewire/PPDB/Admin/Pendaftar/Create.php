@@ -5,8 +5,9 @@ namespace App\Http\Livewire\PPDB\Admin\Pendaftar;
 use App\Models\PPDBGelombang;
 use App\Models\PPDBPeriode;
 use App\Models\PPDBJalur;
+use App\Models\PPDBJawaban;
 use App\Models\PPDBPendaftaran;
-
+use App\Models\PPDBPertanyaan;
 use App\Services\PPDB\PPDBPendaftaranService;
 use App\Services\PPDB\PPDBDataSiswaService;
 use App\Services\PPDB\PPDBOrangTuaService;
@@ -60,6 +61,7 @@ class Create extends Component
 
     public $tinggi_badan = '';
     public $berat_badan = '';
+    public $ukuran_baju = '';
 
     public $penerima_bantuan_sosial = [];
     public $nomor_bantuan_sosial = '';
@@ -139,6 +141,11 @@ class Create extends Component
     public $filePasFoto = null;
     public $fileDokumenPendukung = null;
 
+    // PERTANYAAN TAMBAHAN
+    public $pertanyaan = [];
+    public $jawaban = [];
+
+    public $pernyataan = false;
 
     public function pindahTab($tab)
     {
@@ -149,6 +156,7 @@ class Create extends Component
             'alamat',
             'pendidikan',
             'berkas',
+            'pertanyaan'
         ];
 
         if (in_array($tab, $tabValid, true)) {
@@ -159,6 +167,57 @@ class Create extends Component
     protected $listeners = [
         'bukaBantuPendaftaran' => 'bukaForm',
     ];
+
+    /**
+     * Memuat pertanyaan tambahan berdasarkan periode PPDB.
+     */
+    public function muatPertanyaanTambahan($periodeId = null)
+    {
+        $periodeId = $periodeId ?? $this->periodeId;
+
+        // Reset jika periode belum dipilih.
+        if (empty($periodeId)) {
+            $this->pertanyaan = [];
+            $this->jawaban = [];
+
+            return;
+        }
+
+        $this->pertanyaan = PPDBPertanyaan::query()
+            ->where('ppdb_periode_id', $periodeId)
+            ->where('status', 'aktif')
+            ->orderBy('urutan')
+            ->get()
+            ->map(function ($item) {
+                $item->opsi_jawaban = is_array($item->opsi_jawaban)
+                    ? $item->opsi_jawaban
+                    : (json_decode($item->opsi_jawaban ?? '[]', true) ?: []);
+
+                return $item;
+            });
+
+        // Siapkan jawaban tanpa menghapus jawaban yang sudah diisi.
+        foreach ($this->pertanyaan as $item) {
+            $id = $item->ppdb_pertanyaan_id;
+
+            if (!array_key_exists($id, $this->jawaban)) {
+                $this->jawaban[$id] = '';
+            }
+        }
+
+        // Hapus jawaban dari pertanyaan yang sudah tidak aktif
+        // atau bukan milik periode terpilih.
+        $idAktif = collect($this->pertanyaan)
+            ->pluck('ppdb_pertanyaan_id')
+            ->map(fn ($id) => (string) $id)
+            ->all();
+
+        foreach (array_keys($this->jawaban) as $id) {
+            if (!in_array((string) $id, $idAktif, true)) {
+                unset($this->jawaban[$id]);
+            }
+        }
+    }
 
     protected function rulesDraft()
     {
@@ -256,6 +315,8 @@ class Create extends Component
             'berat_badan' => [
                 'nullable', 'numeric', 'gt:0', 'max:300',
             ],
+
+            'ukuran_baju' => 'required|in:XS,S,M,L,XL,XXL',
 
             'penerima_bantuan_sosial' => [
                 'nullable', 'array',
@@ -438,6 +499,10 @@ class Create extends Component
 
             // Berkas
             ...$this->rulesBerkas(),
+
+            // pertanyaan
+            ...$this->aturanJawaban(),
+
         ];
     }
 
@@ -469,6 +534,55 @@ class Create extends Component
                 'max:2048',
             ],
         ];
+    }
+
+    /**
+     * Aturan validasi jawaban pertanyaan tambahan.
+     */
+    protected function aturanJawaban()
+    {
+        $rules = [];
+
+        foreach ($this->pertanyaan as $item) {
+            $id = $item->ppdb_pertanyaan_id;
+            $field = 'jawaban.' . $id;
+
+            $rules[$field] = [
+                $item->wajib_diisi ? 'required' : 'nullable',
+            ];
+
+            switch ($item->jenis) {
+                case 'teks':
+                    $rules[$field][] = 'string';
+                    $rules[$field][] = 'max:255';
+                    break;
+
+                case 'textarea':
+                    $rules[$field][] = 'string';
+                    $rules[$field][] = 'max:5000';
+                    break;
+
+                case 'angka':
+                    $rules[$field][] = 'numeric';
+                    break;
+
+                case 'pilihan':
+                    $rules[$field][] = 'string';
+                    $rules[$field][] = Rule::in(
+                        $item->opsi_jawaban ?? []
+                    );
+                    break;
+
+                case 'ya_tidak':
+                    $rules[$field][] = Rule::in([
+                        'ya',
+                        'tidak',
+                    ]);
+                    break;
+            }
+        }
+
+        return $rules;
     }
 
     protected $messages = [
@@ -545,6 +659,9 @@ class Create extends Component
         'berat_badan.numeric' => 'Berat badan harus berupa angka.',
         'berat_badan.gt' => 'Berat badan harus lebih dari 0.',
         'berat_badan.max' => 'Berat badan maksimal 300 kg.',
+
+        'ukuran_baju.required' => 'Ukuran baju siswa wajib dipilih.',
+        'ukuran_baju.in' => 'Ukuran baju yang dipilih tidak valid.',
 
         'penerima_bantuan_sosial.array' => 'Pilihan bantuan sosial tidak valid.',
         'penerima_bantuan_sosial.*.required' => 'Pilihan bantuan sosial tidak boleh kosong.',
@@ -714,6 +831,25 @@ class Create extends Component
         'fileDokumenPendukung.max' =>
             'Ukuran dokumen pendukung maksimal 2 MB.',
 
+        // PERTANYAAN TAMBAHAN 
+        'jawaban.*.required' =>
+            'Pertanyaan ini wajib dijawab.',
+
+        'jawaban.*.string' =>
+            'Jawaban harus berupa teks.',
+
+        'jawaban.*.numeric' =>
+            'Jawaban harus berupa angka.',
+
+        'jawaban.*.max' =>
+            'Jawaban melebihi batas karakter yang diizinkan.',
+
+        'jawaban.*.in' =>
+            'Pilihan jawaban tidak valid.',
+
+        'pernyataan.accepted' =>
+            'Anda harus menyetujui pernyataan kebenaran data.',
+            
         // =========================================================
         // PESAN UMUM
         // =========================================================
@@ -778,6 +914,7 @@ class Create extends Component
 
             'tinggi_badan',
             'berat_badan',
+            'ukuran_baju',
 
             'penerima_bantuan_sosial',
             'nomor_bantuan_sosial',
@@ -876,6 +1013,20 @@ class Create extends Component
         ]);
     }
 
+    public function errorTabPertanyaan()
+    {
+        foreach (array_keys($this->getErrorBag()->toArray()) as $field) {
+            if (
+                $field === 'pernyataan' ||
+                str_starts_with($field, 'jawaban.')
+            ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 
     protected function adaIsian(array $data, array $fields): bool
     {
@@ -963,6 +1114,7 @@ class Create extends Component
             'alergi',
             'tinggi_badan',
             'berat_badan',
+            'ukuran_baju',
             'penerima_bantuan_sosial',
             'nomor_bantuan_sosial',
 
@@ -1039,6 +1191,7 @@ class Create extends Component
         }
 
         $this->periodeId = $periode->ppdb_periode_id;
+        $this->muatPertanyaanTambahan($this->periodeId);
     }
 
     public function simpanDraft()
@@ -1298,6 +1451,68 @@ class Create extends Component
                         $metadata
                     );
                 }
+                // -------------------------------------------------
+                // 3I. SIMPAN JAWABAN PERTANYAAN TAMBAHAN
+                // -------------------------------------------------
+
+                // Ambil ulang pertanyaan aktif berdasarkan periode pendaftaran.
+                $pertanyaanAktif = PPDBPertanyaan::query()
+                    ->where(
+                        'ppdb_periode_id',
+                        $pendaftaran->ppdb_periode_id
+                    )
+                    ->where('status', 'aktif')
+                    ->orderBy('urutan')
+                    ->get()
+                    ->map(function ($item) {
+                        $item->opsi_jawaban = is_array($item->opsi_jawaban)
+                            ? $item->opsi_jawaban
+                            : (
+                                json_decode($item->opsi_jawaban ?? '[]', true) ?: []
+                            );
+
+                        return $item;
+                    })
+                    ->all();
+
+                // Gunakan pertanyaan terbaru untuk validasi.
+                $this->pertanyaan = $pertanyaanAktif;
+
+                // Validasi jawaban.
+                // Simpan draft tidak mewajibkan persetujuan final.
+                $this->validate($this->aturanJawaban());
+
+                foreach ($pertanyaanAktif as $item) {
+                    $id = $item->ppdb_pertanyaan_id;
+                    $nilai = $this->jawaban[$id] ?? null;
+
+                    if (is_string($nilai)) {
+                        $nilai = trim($nilai);
+                    }
+
+                    if ($nilai === '') {
+                        $nilai = null;
+                    }
+
+                    $kondisi = [
+                        'ppdb_periode_id' => $pendaftaran->ppdb_periode_id,
+                        'ppdb_pendaftaran_id' => $pendaftaran->ppdb_pendaftaran_id,
+                        'ppdb_pertanyaan_id' => $id,
+                    ];
+
+                    // Jawaban opsional kosong tidak perlu disimpan.
+                    if ($nilai === null && ! $item->wajib_diisi) {
+                        PPDBJawaban::query()
+                            ->where($kondisi)
+                            ->delete();
+
+                        continue;
+                    }
+
+                    PPDBJawaban::updateOrCreate(
+                        $kondisi, ['jawaban' => $nilai]
+                    );
+                }
             }, 3);
 
             // =====================================================
@@ -1351,6 +1566,9 @@ class Create extends Component
 
         $this->tabAktif = 'jalur';
         $this->jalurTerpilih = null;
+
+        // Muat kembali pertanyaan untuk periode aktif
+        $this->muatPertanyaanTambahan($this->periodeId);
     }
 
     public function render()

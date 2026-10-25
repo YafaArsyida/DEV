@@ -426,7 +426,7 @@
 
                 <div class="card-body">
                     <div class="row g-3">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label" for="tinggi-badan">
                                 Tinggi Badan (cm)
                             </label>
@@ -440,14 +440,13 @@
                                     step="0.01"
                                     placeholder="Contoh: 120">
                                 <span class="input-group-text">cm</span>
-
                                 @error('tinggi_badan')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
                         </div>
 
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label" for="berat-badan">
                                 Berat Badan (kg)
                             </label>
@@ -461,11 +460,30 @@
                                     step="0.01"
                                     placeholder="Contoh: 25">
                                 <span class="input-group-text">kg</span>
-
                                 @error('berat_badan')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label" for="ukuran-baju">
+                                Ukuran Baju <span class="text-danger">*</span>
+                            </label>
+                            <select
+                                id="ukuran-baju"
+                                wire:model.defer="ukuran_baju"
+                                class="form-select @error('ukuran_baju') is-invalid @enderror">
+                                <option value="">Pilih ukuran baju</option>
+                                @foreach (['XS', 'S', 'M', 'L', 'XL', 'XXL'] as $ukuran)
+                                    <option value="{{ $ukuran }}">
+                                        {{ $ukuran }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('ukuran_baju')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
                 </div>

@@ -192,6 +192,28 @@
                     </button>
                 </li>
 
+                {{-- PERTANYAAN TAMBAHAN --}}
+                <li class="nav-item" role="presentation">
+                    <button
+                        type="button"
+                        class="nav-link rounded-pill {{ $tabAktif === 'pertanyaan' ? 'active' : '' }}"
+                        id="tab-pertanyaan"
+                        role="tab"
+                        aria-controls="content-pertanyaan"
+                        aria-selected="{{ $tabAktif === 'pertanyaan' ? 'true' : 'false' }}"
+                        wire:click="pindahTab('pertanyaan')">
+
+                        <i class="ri-question-answer-line me-1"></i>
+                        Pertanyaan Tambahan
+
+                        @if ($this->errorTabPertanyaan())
+                            <i
+                                class="ri-error-warning-fill ms-1 text-danger"
+                                title="Terdapat kesalahan pada pertanyaan tambahan">
+                            </i>
+                        @endif
+                    </button>
+                </li>
             </ul>
         </div>
 
@@ -289,6 +311,17 @@
                         tabindex="0"
                     >
                         @include('livewire.p-p-d-b.admin.pendaftar.partial.tab-berkas')
+                    </div>
+
+                    {{-- TAB 7: PERTANYAAN TAMBAHAN --}}
+                    <div
+                        class="tab-pane fade {{ $tabAktif === 'pertanyaan' ? 'show active' : '' }}"
+                        id="content-pertanyaan"
+                        role="tabpanel"
+                        aria-labelledby="tab-pertanyaan"
+                        tabindex="0"
+                    >
+                        @include('livewire.p-p-d-b.admin.pendaftar.partial.tab-pertanyaan')
                     </div>
 
                 </div>

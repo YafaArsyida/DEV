@@ -418,7 +418,9 @@
 
             <div class="card-body">
                 <div class="row g-3">
-                    <div class="col-md-6">
+
+                    {{-- Tinggi Badan --}}
+                    <div class="col-md-4">
                         <label class="form-label" for="bantu-tinggi-badan">
                             Tinggi Badan
                         </label>
@@ -440,7 +442,8 @@
                         </div>
                     </div>
 
-                    <div class="col-md-6">
+                    {{-- Berat Badan --}}
+                    <div class="col-md-4">
                         <label class="form-label" for="bantu-berat-badan">
                             Berat Badan
                         </label>
@@ -461,6 +464,29 @@
                             @enderror
                         </div>
                     </div>
+
+                    {{-- Ukuran Baju --}}
+                    <div class="col-md-4">
+                        <label class="form-label" for="bantu-ukuran-baju">
+                            Ukuran Baju
+                        </label>
+                        <select
+                            id="bantu-ukuran-baju"
+                            class="form-select @error('ukuran_baju') is-invalid @enderror"
+                            wire:model.defer="ukuran_baju"
+                        >
+                            <option value="">Pilih ukuran</option>
+                            <option value="S">S</option>
+                            <option value="M">M</option>
+                            <option value="L">L</option>
+                            <option value="XL">XL</option>
+                            <option value="XXL">XXL</option>
+                        </select>
+                        @error('ukuran_baju')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
                 </div>
             </div>
         </div>

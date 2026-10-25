@@ -115,6 +115,15 @@
                     </li>
 
                     {{-- Status Pendaftaran --}}
+                    {{-- Profil Akun --}}
+                    <li class="nav-item">
+                        <a href="{{ route('ppdb.profil', ['jenjang' => request()->route('jenjang')]) }}"
+                            class="nav-link menu-link {{ request()->routeIs('ppdb.profil') ? 'active' : '' }}">
+                            <i class="ri-user-settings-line"></i>
+                            <span>Profil Akun</span>
+                        </a>
+                    </li>
+                    
                     <li class="nav-item">
                         <a href="{{ route('ppdb.pendaftaran.status', ['jenjang' => request()->route('jenjang')]) }}"
                             class="nav-link menu-link {{ request()->routeIs('ppdb.pendaftaran.status') ? 'active' : '' }}">

@@ -250,6 +250,13 @@
                             </span>
                         </div>
 
+                        <div class="col-md-4">
+                            <small class="text-muted d-block mb-1">Ukuran Baju</small>
+                            <span class="fw-semibold">
+                                {{ $siswa->ukuran_baju ?: '-' }}
+                            </span>
+                        </div>
+
                     </div>
                 </div>
             </div>

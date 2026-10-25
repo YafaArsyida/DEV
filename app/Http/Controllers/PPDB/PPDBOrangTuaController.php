@@ -76,6 +76,14 @@ class PPDBOrangTuaController extends Controller
         ]);
     }
 
+    public function profil($jenjang)
+    {
+        $jenjang = Jenjang::where('slug', $jenjang)
+        ->firstOrFail();
+
+        return view('ppdb.orang-tua.profil', compact('jenjang'));
+    }
+
     
     public function show(Request $request, $jenjang, $berkasId)
     {

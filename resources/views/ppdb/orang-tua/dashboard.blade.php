@@ -83,9 +83,20 @@
                                             Nomor Pendaftaran
                                         </div>
 
-                                        <h4 class="text-primary fw-bold mb-3">
-                                            {{ $pendaftaran->nomor_pendaftaran ?? '-' }}
-                                        </h4>
+                                        <div class="d-flex align-items-center gap-2 flex-wrap mb-3">
+                                            <h4 class="text-primary fw-bold mb-0">
+                                                {{ $pendaftaran->nomor_pendaftaran ?? '-' }}
+                                            </h4>
+
+                                            @if (!empty($pendaftaran->nomor_pendaftaran))
+                                                <button type="button"
+                                                    class="btn btn-sm btn-light btn-icon rounded-circle"
+                                                    title="Salin nomor pendaftaran"
+                                                    onclick="copyToClipboard(@js($pendaftaran->nomor_pendaftaran))">
+                                                    <i class="ri-file-copy-line"></i>
+                                                </button>
+                                            @endif
+                                        </div>
 
                                         <div class="d-flex align-items-center gap-2 mb-3">
                                             <div class="avatar-xs flex-shrink-0">
@@ -137,13 +148,20 @@
                                                 Lihat Status
                                             </a>
 
-                                            <a href="{{ route('ppdb.pendaftaran.review', [
-                                                'jenjang' => $jenjang->slug,
-                                            ]) }}"
-                                                class="btn btn-light rounded-pill">
-                                                <i class="ri-eye-line me-1"></i>
-                                                Preview Data
-                                            </a>
+                                            @if ($pendaftaran->status === 'diterima')
+                                                <a class="btn btn-danger rounded-pill">
+                                                    <i class="ri-printer-line me-1"></i>
+                                                    Cetak Kartu Aljabar
+                                                </a>
+                                            @else
+                                                <a href="{{ route('ppdb.pendaftaran.review', [
+                                                    'jenjang' => $jenjang->slug,
+                                                ]) }}"
+                                                    class="btn btn-light rounded-pill">
+                                                    <i class="ri-eye-line me-1"></i>
+                                                    Preview Data
+                                                </a>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
@@ -502,7 +520,7 @@
                 @endif
 
                 {{-- BANTUAN PANITIA --}}
-                <div class="card border-0 shadow-sm rounded-4">
+                {{-- <div class="card border-0 shadow-sm rounded-4">
                     <div class="card-body p-4">
                         <div class="d-flex flex-column flex-md-row align-items-md-center gap-3">
                             <div class="avatar-sm flex-shrink-0">
@@ -523,7 +541,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> --}}
 
             </div>
         </div>

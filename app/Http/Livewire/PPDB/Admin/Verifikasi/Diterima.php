@@ -68,7 +68,10 @@ class Diterima extends Component
         $pendaftaran->update([
             'status' => 'diterima',
             'catatan_perbaikan' => null,
-            'current_step' => 8
+            'current_step' => 8,
+
+            'submitted_by' => auth()->user()->ms_pengguna_id,
+            'submitted_at' => now(),
         ]);
 
         $this->dispatchBrowserEvent('hide-modal', [
