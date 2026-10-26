@@ -134,7 +134,7 @@
                                 </div>
                             </div>
 
-                            {{-- KODE POS --}}
+                        {{-- KODE POS --}}
                             <div class="col-12 col-md-6">
                                 <small class="text-muted d-block mb-1">
                                     Kode Pos
