@@ -115,24 +115,24 @@
                             </div>
 
                             {{-- RT --}}
-                            {{-- <div class="col-12 col-sm-4">
+                            <div class="col-12 col-sm-6">
                                 <small class="text-muted d-block mb-1">
                                     RT
                                 </small>
                                 <div class="fw-semibold">
                                     {{ $alamat->rt ?: '-' }}
                                 </div>
-                            </div> --}}
+                            </div>
 
                             {{-- RW --}}
-                            {{-- <div class="col-12 col-sm-4">
+                            <div class="col-12 col-sm-6">
                                 <small class="text-muted d-block mb-1">
                                     RW
                                 </small>
                                 <div class="fw-semibold">
                                     {{ $alamat->rw ?: '-' }}
                                 </div>
-                            </div> --}}
+                            </div>
 
                             {{-- KODE POS --}}
                             <div class="col-12 col-md-6">

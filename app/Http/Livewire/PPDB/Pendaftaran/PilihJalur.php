@@ -129,6 +129,7 @@ class PilihJalur extends Component
                 'ppdb_periode_id' => $periode->ppdb_periode_id,
                 'ppdb_gelombang_id' => $gelombang->ppdb_gelombang_id,
                 'ppdb_jalur_id' => $jalur->ppdb_jalur_id,
+                'status' => 'draft'
             ]);
         });
 

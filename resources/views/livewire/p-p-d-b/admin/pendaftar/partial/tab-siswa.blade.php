@@ -468,7 +468,7 @@
                     {{-- Ukuran Baju --}}
                     <div class="col-md-4">
                         <label class="form-label" for="bantu-ukuran-baju">
-                            Ukuran Baju
+                            Ukuran Baju <span class="text-danger">*</span>
                         </label>
                         <select
                             id="bantu-ukuran-baju"

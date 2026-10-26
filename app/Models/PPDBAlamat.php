@@ -23,6 +23,8 @@ class PPDBAlamat extends Model
         'kabupaten',
         'kecamatan',
         'kelurahan_desa',
+        'rt',
+        'rw',
         'kode_pos',
         'jenis_tempat_tinggal',
 

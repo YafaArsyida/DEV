@@ -143,10 +143,25 @@
                                 {{-- Calon siswa --}}
                                 <td>
                                     <div class="d-flex align-items-center gap-3">
+                                        @php
+                                            $pasFoto = $item->ppdb_berkas
+                                                ->firstWhere('jenis_berkas', 'PAS_FOTO');
+                                        @endphp
+
                                         <div class="avatar-sm flex-shrink-0">
-                                            <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
-                                                <i class="ri-user-line fs-18"></i>
-                                            </div>
+                                            @if ($pasFoto && $pasFoto->path_file)
+                                                <img
+                                                    src="{{ url('/ppdb/berkas/preview/' . $pasFoto->ppdb_berkas_id) }}"
+                                                    alt="Pas foto {{ $item->ppdb_calon_siswa->nama_siswa ?? 'calon siswa' }}"
+                                                    class="rounded-circle object-fit-cover"
+                                                    style="width: 40px; height: 40px;"
+                                                    loading="lazy"
+                                                >
+                                            @else
+                                                <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
+                                                    <i class="ri-user-line fs-18"></i>
+                                                </div>
+                                            @endif
                                         </div>
 
                                         <div>
@@ -241,7 +256,7 @@
                                         {{-- PERIKSA --}}
                                         <button
                                             type="button"
-                                            class="btn btn-soft-primary btn-sm rounded-pill px-3 text-nowrap"
+                                            class="btn btn-primary btn-sm rounded-pill px-3 text-nowrap"
                                             data-bs-toggle="offcanvas"
                                             data-bs-target="#offcanvasPemeriksaanPendaftaran"
                                             title="Periksa Dokumen Pendaftaran"
@@ -249,6 +264,19 @@
 
                                             <i class="ri-eye-line align-bottom me-1"></i>
                                             Periksa
+                                        </button>
+
+                                        {{-- EDIT --}}
+                                        <button
+                                            type="button"
+                                            class="btn btn-outline-danger btn-sm rounded-pill px-3 text-nowrap"
+                                            data-bs-toggle="offcanvas"
+                                            data-bs-target="#offcanvasEditPendaftaran"
+                                            title="Edit Data Pendaftaran"
+                                            wire:click.prevent="$emit('bukaEditPendaftaran', {{ $item->ppdb_pendaftaran_id }})"
+                                        >
+                                            <i class="ri-edit-line align-bottom me-1"></i>
+                                            Edit
                                         </button>
 
                                         {{-- KONTAK WHATSAPP --}}

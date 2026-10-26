@@ -168,6 +168,116 @@ class Create extends Component
         'bukaBantuPendaftaran' => 'bukaForm',
     ];
 
+    public function bukaForm($periodeId)
+    {
+        // Bersihkan validasi dan file dari form sebelumnya.
+        $this->resetValidation();
+        $this->resetErrorBag();
+
+        $this->reset([
+            'jalurTerpilih',
+
+            'nama_siswa',
+            'nama_panggilan',
+            'nik',
+            'nisn',
+            'tempat_lahir',
+            'tanggal_lahir',
+            'jenis_kelamin',
+            'agama',
+            'kewarganegaraan',
+            'cita_cita',
+            'hobi',
+
+            'anak_ke',
+            'jumlah_saudara_kandung',
+            'jumlah_saudara_tiri',
+            'status_yatim_piatu',
+            'berkebutuhan_khusus',
+            'penyakit',
+            'alergi',
+            'tinggi_badan',
+            'berat_badan',
+            'ukuran_baju',
+            'penerima_bantuan_sosial',
+            'nomor_bantuan_sosial',
+
+            'ayah_nama',
+            'ayah_nik',
+            'ayah_tempat_lahir',
+            'ayah_tanggal_lahir',
+            'ayah_berkebutuhan_khusus',
+            'ayah_pendidikan',
+            'ayah_pekerjaan',
+            'ayah_penghasilan',
+            'ayah_whatsapp',
+
+            'ibu_nama',
+            'ibu_nik',
+            'ibu_tempat_lahir',
+            'ibu_tanggal_lahir',
+            'ibu_berkebutuhan_khusus',
+            'ibu_pendidikan',
+            'ibu_pekerjaan',
+            'ibu_penghasilan',
+            'ibu_whatsapp',
+
+            'gunakan_wali',
+            'wali_hubungan',
+            'wali_nama',
+            'wali_nik',
+            'wali_tempat_lahir',
+            'wali_tanggal_lahir',
+            'wali_berkebutuhan_khusus',
+            'wali_pekerjaan',
+            'wali_whatsapp',
+
+            'alamat_lengkap',
+            'provinsi',
+            'kabupaten',
+            'kecamatan',
+            'kelurahan_desa',
+            'rt',
+            'rw',
+            'kode_pos',
+            'jenis_tempat_tinggal',
+
+            'jarak_ke_sekolah',
+            'waktu_tempuh_ke_sekolah',
+            'moda_transportasi',
+
+            'jenjang_asal',
+            'asal_sekolah',
+            'npsn_asal_sekolah',
+            'alamat_asal_sekolah',
+            'tahun_lulus',
+            'nomor_ijazah',
+
+            'fileKartuKeluarga',
+            'fileAktaKelahiran',
+            'filePasFoto',
+            'fileDokumenPendukung',
+        ]);
+
+        $periode = PPDBPeriode::query()
+            ->whereKey($periodeId)
+            ->where('status', 'aktif')
+            ->first();
+
+        if (! $periode) {
+            $this->periodeId = null;
+
+            $this->dispatchBrowserEvent('alertify-error', [
+                'message' => 'Periode PPDB tidak tersedia atau sudah tidak aktif.',
+            ]);
+
+            return;
+        }
+
+        $this->periodeId = $periode->ppdb_periode_id;
+        $this->muatPertanyaanTambahan($this->periodeId);
+    }
+    
     /**
      * Memuat pertanyaan tambahan berdasarkan periode PPDB.
      */
@@ -1079,119 +1189,6 @@ class Create extends Component
             'fileDokumenPendukung',
             $this->rulesBerkas()
         );
-    }
-
-    /**
-     * Dipanggil ketika tombol Bantu Pendaftaran ditekan.
-     */
-    public function bukaForm($periodeId)
-    {
-        // Bersihkan validasi dan file dari form sebelumnya.
-        $this->resetValidation();
-        $this->resetErrorBag();
-
-        $this->reset([
-            'jalurTerpilih',
-
-            'nama_siswa',
-            'nama_panggilan',
-            'nik',
-            'nisn',
-            'tempat_lahir',
-            'tanggal_lahir',
-            'jenis_kelamin',
-            'agama',
-            'kewarganegaraan',
-            'cita_cita',
-            'hobi',
-
-            'anak_ke',
-            'jumlah_saudara_kandung',
-            'jumlah_saudara_tiri',
-            'status_yatim_piatu',
-            'berkebutuhan_khusus',
-            'penyakit',
-            'alergi',
-            'tinggi_badan',
-            'berat_badan',
-            'ukuran_baju',
-            'penerima_bantuan_sosial',
-            'nomor_bantuan_sosial',
-
-            'ayah_nama',
-            'ayah_nik',
-            'ayah_tempat_lahir',
-            'ayah_tanggal_lahir',
-            'ayah_berkebutuhan_khusus',
-            'ayah_pendidikan',
-            'ayah_pekerjaan',
-            'ayah_penghasilan',
-            'ayah_whatsapp',
-
-            'ibu_nama',
-            'ibu_nik',
-            'ibu_tempat_lahir',
-            'ibu_tanggal_lahir',
-            'ibu_berkebutuhan_khusus',
-            'ibu_pendidikan',
-            'ibu_pekerjaan',
-            'ibu_penghasilan',
-            'ibu_whatsapp',
-
-            'gunakan_wali',
-            'wali_hubungan',
-            'wali_nama',
-            'wali_nik',
-            'wali_tempat_lahir',
-            'wali_tanggal_lahir',
-            'wali_berkebutuhan_khusus',
-            'wali_pekerjaan',
-            'wali_whatsapp',
-
-            'alamat_lengkap',
-            'provinsi',
-            'kabupaten',
-            'kecamatan',
-            'kelurahan_desa',
-            'rt',
-            'rw',
-            'kode_pos',
-            'jenis_tempat_tinggal',
-
-            'jarak_ke_sekolah',
-            'waktu_tempuh_ke_sekolah',
-            'moda_transportasi',
-
-            'jenjang_asal',
-            'asal_sekolah',
-            'npsn_asal_sekolah',
-            'alamat_asal_sekolah',
-            'tahun_lulus',
-            'nomor_ijazah',
-
-            'fileKartuKeluarga',
-            'fileAktaKelahiran',
-            'filePasFoto',
-            'fileDokumenPendukung',
-        ]);
-
-        $periode = PPDBPeriode::query()
-            ->whereKey($periodeId)
-            ->where('status', 'aktif')
-            ->first();
-
-        if (! $periode) {
-            $this->periodeId = null;
-
-            $this->dispatchBrowserEvent('alertify-error', [
-                'message' => 'Periode PPDB tidak tersedia atau sudah tidak aktif.',
-            ]);
-
-            return;
-        }
-
-        $this->periodeId = $periode->ppdb_periode_id;
-        $this->muatPertanyaanTambahan($this->periodeId);
     }
 
     public function simpanDraft()

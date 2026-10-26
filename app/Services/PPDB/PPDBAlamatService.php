@@ -41,59 +41,33 @@ class PPDBAlamatService
         PPDBAlamat $alamat,
         array $data
     ): void {
-        $alamat->alamat_lengkap = self::buatAlamatLengkap($data);
+        $alamat->alamat_lengkap = trim($data['alamat_lengkap']);
+
+        // Informasi RT/RW disimpan pada kolom tersendiri.
+        $alamat->rt = self::nilaiOpsional($data['rt'] ?? null);
+        $alamat->rw = self::nilaiOpsional($data['rw'] ?? null);
+
         $alamat->provinsi = trim($data['provinsi']);
         $alamat->kabupaten = trim($data['kabupaten']);
         $alamat->kecamatan = trim($data['kecamatan']);
         $alamat->kelurahan_desa = trim($data['kelurahan_desa']);
 
-        $alamat->kode_pos = self::nilaiOpsional($data['kode_pos'] ?? null);
+        $alamat->kode_pos = self::nilaiOpsional(
+            $data['kode_pos'] ?? null
+        );
 
-        $alamat->jenis_tempat_tinggal = $data['jenis_tempat_tinggal'];
+        $alamat->jenis_tempat_tinggal =
+            $data['jenis_tempat_tinggal'];
 
-        // Informasi perjalanan ke sekolah
-        $alamat->jarak_ke_sekolah = $data['jarak_ke_sekolah'] ?? null;
+        // Informasi perjalanan ke sekolah.
+        $alamat->jarak_ke_sekolah =
+            $data['jarak_ke_sekolah'] ?? null;
 
-        $alamat->waktu_tempuh_ke_sekolah = $data['waktu_tempuh_ke_sekolah'] ?? null;
+        $alamat->waktu_tempuh_ke_sekolah =
+            $data['waktu_tempuh_ke_sekolah'] ?? null;
 
-        $alamat->moda_transportasi = $data['moda_transportasi'] ?? null;
-    }
-
-    /**
-     * Menggabungkan RT/RW jika field-nya tersedia.
-     */
-    private static function buatAlamatLengkap(array $data): string
-    {
-        $alamatLengkap = trim($data['alamat_lengkap']);
-
-        // Jika RT/RW tidak dikirim, gunakan alamat apa adanya.
-        // Ini mencegah RT/RW ditambahkan ulang saat edit.
-        if (
-            !array_key_exists('rt', $data)
-            && !array_key_exists('rw', $data)
-        ) {
-            return $alamatLengkap;
-        }
-
-        $rtRw = [];
-
-        $rt = trim((string) ($data['rt'] ?? ''));
-
-        if ($rt !== '') {
-            $rtRw[] = 'RT ' . str_pad($rt, 3, '0', STR_PAD_LEFT);
-        }
-
-        $rw = trim((string) ($data['rw'] ?? ''));
-
-        if ($rw !== '') {
-            $rtRw[] = 'RW ' . str_pad($rw, 3, '0', STR_PAD_LEFT);
-        }
-
-        if (!empty($rtRw)) {
-            $alamatLengkap .= ', ' . implode('/', $rtRw);
-        }
-
-        return $alamatLengkap;
+        $alamat->moda_transportasi =
+            $data['moda_transportasi'] ?? null;
     }
 
     /**

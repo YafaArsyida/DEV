@@ -36,10 +36,15 @@
             </div>
         </div>
 
+        
         {{-- KARTU KELUARGA --}}
         <div class="border rounded-4 p-3 mb-3">
+
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3">
-                <div class="d-flex align-items-start gap-3 flex-grow-1">
+
+                {{-- INFORMASI BERKAS --}}
+                <div class="d-flex align-items-start gap-3 flex-grow-1 min-w-0">
+
                     <div class="avatar-sm flex-shrink-0">
                         <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
                             <i class="ri-file-text-line"></i>
@@ -47,20 +52,66 @@
                     </div>
 
                     <div class="flex-grow-1 min-w-0">
+
                         <h6 class="fw-semibold mb-1">
-                            Kartu Keluarga <span class="text-danger">*</span>
+                            Kartu Keluarga
+                            <span class="text-danger">*</span>
                         </h6>
+
                         <p class="text-muted small mb-2">
                             Unggah scan atau foto Kartu Keluarga yang terbaca jelas.
                         </p>
 
+                        {{-- STATUS BERKAS LAMA: MODE EDIT --}}
+                        @if (isset($berkasKartuKeluarga) && $berkasKartuKeluarga)
+
+                            <div class="mb-2">
+                                <span class="text-success small">
+                                    <i class="ri-checkbox-circle-line me-1"></i>
+                                    Sudah diunggah
+                                </span>
+
+                                <div class="small text-muted text-break mt-1">
+                                    <i class="ri-attachment-2 me-1"></i>
+                                    {{ $berkasKartuKeluarga->nama_file ?: 'Nama file tidak tersedia' }}
+                                </div>
+                            </div>
+
+                        @else
+
+                            <span class="text-warning small">
+                                <i class="ri-information-line me-1"></i>
+
+                                {{ isset($berkasKartuKeluarga)
+                                    ? 'Belum ada berkas tersimpan'
+                                    : 'Silakan pilih berkas untuk diunggah' }}
+                            </span>
+
+                        @endif
+
+                        {{-- ================================================= --}}
+                        {{-- FILE BARU / FILE PENGGANTI --}}
+                        {{-- Berlaku untuk create dan edit --}}
+                        {{-- ================================================= --}}
+
                         @if ($fileKartuKeluarga)
+
                             <div class="small text-primary mt-2">
+
                                 <i class="ri-file-check-line me-1"></i>
+
+                                <span class="fw-semibold">
+                                    {{ isset($berkasKartuKeluarga) && $berkasKartuKeluarga
+                                        ? 'File pengganti:'
+                                        : 'File dipilih:' }}
+                                </span>
+
                                 <span class="text-break">
                                     {{ $fileKartuKeluarga->getClientOriginalName() }}
                                 </span>
+
                                 ({{ number_format($fileKartuKeluarga->getSize() / 1024, 0) }} KB)
+
                             </div>
 
                             @php
@@ -69,12 +120,18 @@
                                 );
                             @endphp
 
+                            {{-- PREVIEW GAMBAR BARU --}}
                             @if (in_array($ekstensiKK, ['jpg', 'jpeg', 'png', 'webp']))
+
                                 <div class="mt-2">
-                                    <a href="{{ $fileKartuKeluarga->temporaryUrl() }}"
+
+                                    <a
+                                        href="{{ $fileKartuKeluarga->temporaryUrl() }}"
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        title="Lihat preview Kartu Keluarga">
+                                        class="d-inline-block"
+                                        title="Lihat preview gambar yang dipilih"
+                                    >
                                         <img
                                             src="{{ $fileKartuKeluarga->temporaryUrl() }}"
                                             alt="Preview Kartu Keluarga"
@@ -82,63 +139,129 @@
                                             style="max-width: 180px; max-height: 140px; object-fit: contain;"
                                         >
                                     </a>
+
                                 </div>
+
+                            {{-- INDIKATOR PDF BARU --}}
                             @elseif ($ekstensiKK === 'pdf')
+
                                 <div class="d-flex align-items-center gap-2 mt-2">
-                                    <div class="d-flex align-items-center justify-content-center rounded border bg-light"
-                                        style="width: 44px; height: 44px;">
+
+                                    <div
+                                        class="d-flex align-items-center justify-content-center rounded border bg-light"
+                                        style="width: 44px; height: 44px;"
+                                    >
                                         <i class="ri-file-pdf-2-line text-danger fs-24"></i>
                                     </div>
+
                                     <span class="small text-muted">
-                                        Dokumen PDF siap disimpan.
+                                        Dokumen PDF siap diunggah.
                                     </span>
+
                                 </div>
+
                             @endif
 
-                            <button type="button"
+                            {{-- BATALKAN FILE BARU --}}
+                            <button
+                                type="button"
                                 wire:click="$set('fileKartuKeluarga', null)"
-                                class="btn btn-sm btn-light text-danger rounded-pill mt-2">
+                                class="btn btn-sm btn-light text-danger rounded-pill mt-2"
+                            >
                                 <i class="ri-delete-bin-line me-1"></i>
-                                Hapus pilihan
+                                Batalkan file {{ isset($berkasKartuKeluarga) && $berkasKartuKeluarga
+                                    ? 'pengganti'
+                                    : 'pilihan' }}
                             </button>
-                        @else
-                            <span class="text-muted small">
-                                <i class="ri-information-line me-1"></i>
-                                Belum memilih file
-                            </span>
+
                         @endif
 
+                        {{-- VALIDASI --}}
                         @error('fileKartuKeluarga')
-                            <div class="text-danger small mt-2">{{ $message }}</div>
+                            <div class="text-danger small mt-2">
+                                {{ $message }}
+                            </div>
                         @enderror
+
                     </div>
                 </div>
 
-                <div class="flex-shrink-0">
-                    <label for="file-kk"
-                        class="btn btn-outline-primary rounded-pill px-4 mb-0">
+                {{-- ================================================= --}}
+                {{-- TOMBOL AKSI --}}
+                {{-- ================================================= --}}
+
+                <div class="flex-shrink-0 d-flex flex-wrap align-items-center gap-2">
+
+                    {{-- PREVIEW BERKAS LAMA: MODE EDIT --}}
+                    @if (isset($berkasKartuKeluarga) && $berkasKartuKeluarga)
+
+                        <button
+                            type="button"
+                            class="btn btn-outline-secondary rounded-pill px-3"
+                            data-bs-toggle="modal"
+                            data-bs-target="#ModalPreviewBerkas"
+                            wire:click="$emit(
+                                'showPreviewBerkas',
+                                {{ $berkasKartuKeluarga->ppdb_berkas_id }}
+                            )"
+                            title="Lihat berkas lama yang sudah tersimpan"
+                        >
+                            <i class="ri-eye-line me-1"></i>
+                            Berkas Lama
+                        </button>
+
+                    @endif
+
+                    {{-- PILIH / GANTI FILE --}}
+                    <label
+                        for="{{ isset($berkasKartuKeluarga) ? 'edit-file-kk' : 'create-file-kk' }}"
+                        class="btn btn-outline-primary rounded-pill px-4 mb-0"
+                        wire:loading.class="disabled"
+                        wire:target="fileKartuKeluarga"
+                    >
                         <i class="ri-upload-2-line me-1"></i>
-                        {{ $fileKartuKeluarga ? 'Ganti File' : 'Pilih File' }}
+
+                        {{ $fileKartuKeluarga
+                            ? 'Pilih Ulang'
+                            : (isset($berkasKartuKeluarga) && $berkasKartuKeluarga
+                                ? 'Ganti File'
+                                : 'Pilih File') }}
                     </label>
-                    <input id="file-kk"
+
+                    {{-- INPUT FILE --}}
+                    <input
+                        id="{{ isset($berkasKartuKeluarga) ? 'edit-file-kk' : 'create-file-kk' }}"
                         type="file"
                         class="d-none"
                         wire:model="fileKartuKeluarga"
-                        accept=".jpg,.jpeg,.png,.webp,.pdf">
+                        accept=".jpg,.jpeg,.png,.webp,.pdf"
+                    >
+
                 </div>
+
             </div>
 
-            <div wire:loading wire:target="fileKartuKeluarga"
-                class="small text-primary mt-2">
+            {{-- INDIKATOR UPLOAD --}}
+            <div
+                wire:loading
+                wire:target="fileKartuKeluarga"
+                class="small text-primary mt-2"
+            >
                 <span class="spinner-border spinner-border-sm me-1"></span>
                 Memuat file...
             </div>
+
         </div>
 
+
+        
         {{-- AKTA KELAHIRAN --}}
         <div class="border rounded-4 p-3 mb-3">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3">
-                <div class="d-flex align-items-start gap-3 flex-grow-1">
+
+                {{-- INFORMASI BERKAS --}}
+                <div class="d-flex align-items-start gap-3 flex-grow-1 min-w-0">
+
                     <div class="avatar-sm flex-shrink-0">
                         <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
                             <i class="ri-file-text-line"></i>
@@ -146,20 +269,64 @@
                     </div>
 
                     <div class="flex-grow-1 min-w-0">
+
                         <h6 class="fw-semibold mb-1">
-                            Akta Kelahiran <span class="text-danger">*</span>
+                            Akta Kelahiran
+                            <span class="text-danger">*</span>
                         </h6>
+
                         <p class="text-muted small mb-2">
                             Unggah scan atau foto akta kelahiran calon siswa.
                         </p>
 
+                        {{-- STATUS BERKAS LAMA: MODE EDIT --}}
+                        @if (isset($berkasAktaKelahiran) && $berkasAktaKelahiran)
+
+                            <div class="mb-2">
+
+                                <span class="text-success small">
+                                    <i class="ri-checkbox-circle-line me-1"></i>
+                                    Sudah diunggah
+                                </span>
+
+                                <div class="small text-muted text-break mt-1">
+                                    <i class="ri-attachment-2 me-1"></i>
+                                    {{ $berkasAktaKelahiran->nama_file ?: 'Nama file tidak tersedia' }}
+                                </div>
+
+                            </div>
+
+                        @else
+
+                            <span class="text-warning small">
+                                <i class="ri-information-line me-1"></i>
+
+                                {{ isset($berkasAktaKelahiran)
+                                    ? 'Belum ada berkas tersimpan'
+                                    : 'Silakan pilih berkas untuk diunggah' }}
+                            </span>
+
+                        @endif
+
+                        {{-- FILE BARU / PENGGANTI --}}
                         @if ($fileAktaKelahiran)
+
                             <div class="small text-primary mt-2">
+
                                 <i class="ri-file-check-line me-1"></i>
+
+                                <span class="fw-semibold">
+                                    {{ isset($berkasAktaKelahiran) && $berkasAktaKelahiran
+                                        ? 'File pengganti:'
+                                        : 'File dipilih:' }}
+                                </span>
+
                                 <span class="text-break">
                                     {{ $fileAktaKelahiran->getClientOriginalName() }}
                                 </span>
+
                                 ({{ number_format($fileAktaKelahiran->getSize() / 1024, 0) }} KB)
+
                             </div>
 
                             @php
@@ -168,12 +335,18 @@
                                 );
                             @endphp
 
+                            {{-- PREVIEW GAMBAR BARU --}}
                             @if (in_array($ekstensiAkta, ['jpg', 'jpeg', 'png', 'webp']))
+
                                 <div class="mt-2">
-                                    <a href="{{ $fileAktaKelahiran->temporaryUrl() }}"
+
+                                    <a
+                                        href="{{ $fileAktaKelahiran->temporaryUrl() }}"
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        title="Lihat preview Akta Kelahiran">
+                                        class="d-inline-block"
+                                        title="Lihat preview Akta Kelahiran"
+                                    >
                                         <img
                                             src="{{ $fileAktaKelahiran->temporaryUrl() }}"
                                             alt="Preview Akta Kelahiran"
@@ -181,54 +354,113 @@
                                             style="max-width: 180px; max-height: 140px; object-fit: contain;"
                                         >
                                     </a>
+
                                 </div>
+
+                            {{-- INDIKATOR PDF BARU --}}
                             @elseif ($ekstensiAkta === 'pdf')
+
                                 <div class="d-flex align-items-center gap-2 mt-2">
-                                    <div class="d-flex align-items-center justify-content-center rounded border bg-light"
-                                        style="width: 44px; height: 44px;">
+
+                                    <div
+                                        class="d-flex align-items-center justify-content-center rounded border bg-light"
+                                        style="width: 44px; height: 44px;"
+                                    >
                                         <i class="ri-file-pdf-2-line text-danger fs-24"></i>
                                     </div>
+
                                     <span class="small text-muted">
-                                        Dokumen PDF siap disimpan.
+                                        Dokumen PDF siap diunggah.
                                     </span>
+
                                 </div>
+
                             @endif
 
-                            <button type="button"
+                            {{-- BATALKAN FILE BARU --}}
+                            <button
+                                type="button"
                                 wire:click="$set('fileAktaKelahiran', null)"
-                                class="btn btn-sm btn-light text-danger rounded-pill mt-2">
+                                class="btn btn-sm btn-light text-danger rounded-pill mt-2"
+                            >
                                 <i class="ri-delete-bin-line me-1"></i>
-                                Hapus pilihan
+
+                                Batalkan file
+                                {{ isset($berkasAktaKelahiran) && $berkasAktaKelahiran
+                                    ? 'pengganti'
+                                    : 'pilihan' }}
                             </button>
-                        @else
-                            <span class="text-muted small">
-                                <i class="ri-information-line me-1"></i>
-                                Belum memilih file
-                            </span>
+
                         @endif
 
+                        {{-- VALIDASI --}}
                         @error('fileAktaKelahiran')
-                            <div class="text-danger small mt-2">{{ $message }}</div>
+                            <div class="text-danger small mt-2">
+                                {{ $message }}
+                            </div>
                         @enderror
+
                     </div>
                 </div>
 
-                <div class="flex-shrink-0">
-                    <label for="file-akta"
-                        class="btn btn-outline-primary rounded-pill px-4 mb-0">
+                {{-- TOMBOL AKSI --}}
+                <div class="flex-shrink-0 d-flex flex-wrap align-items-center gap-2">
+
+                    {{-- PREVIEW BERKAS LAMA: MODE EDIT --}}
+                    @if (isset($berkasAktaKelahiran) && $berkasAktaKelahiran)
+
+                        <button
+                            type="button"
+                            class="btn btn-outline-secondary rounded-pill px-3"
+                            data-bs-toggle="modal"
+                            data-bs-target="#ModalPreviewBerkas"
+                            wire:click="$emit(
+                                'showPreviewBerkas',
+                                {{ $berkasAktaKelahiran->ppdb_berkas_id }}
+                            )"
+                            title="Lihat berkas lama yang sudah tersimpan"
+                        >
+                            <i class="ri-eye-line me-1"></i>
+                            Berkas Lama
+                        </button>
+
+                    @endif
+
+                    {{-- PILIH / GANTI FILE --}}
+                    <label
+                        for="{{ isset($berkasAktaKelahiran) ? 'edit-file-akta' : 'create-file-akta' }}"
+                        class="btn btn-outline-primary rounded-pill px-4 mb-0"
+                        wire:loading.class="disabled"
+                        wire:target="fileAktaKelahiran"
+                    >
                         <i class="ri-upload-2-line me-1"></i>
-                        {{ $fileAktaKelahiran ? 'Ganti File' : 'Pilih File' }}
+
+                        {{ $fileAktaKelahiran
+                            ? 'Pilih Ulang'
+                            : (isset($berkasAktaKelahiran) && $berkasAktaKelahiran
+                                ? 'Ganti File'
+                                : 'Pilih File') }}
                     </label>
-                    <input id="file-akta"
+
+                    {{-- INPUT FILE --}}
+                    <input
+                        id="{{ isset($berkasAktaKelahiran) ? 'edit-file-akta' : 'create-file-akta' }}"
                         type="file"
                         class="d-none"
                         wire:model="fileAktaKelahiran"
-                        accept=".jpg,.jpeg,.png,.webp,.pdf">
+                        accept=".jpg,.jpeg,.png,.webp,.pdf"
+                    >
+
                 </div>
+
             </div>
 
-            <div wire:loading wire:target="fileAktaKelahiran"
-                class="small text-primary mt-2">
+            {{-- INDIKATOR UPLOAD --}}
+            <div
+                wire:loading
+                wire:target="fileAktaKelahiran"
+                class="small text-primary mt-2"
+            >
                 <span class="spinner-border spinner-border-sm me-1"></span>
                 Memuat file...
             </div>
@@ -236,8 +468,12 @@
 
         {{-- PAS FOTO --}}
         <div class="border rounded-4 p-3 mb-3">
+
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3">
-                <div class="d-flex align-items-start gap-3 flex-grow-1">
+
+                {{-- INFORMASI BERKAS --}}
+                <div class="d-flex align-items-start gap-3 flex-grow-1 min-w-0">
+
                     <div class="avatar-sm flex-shrink-0">
                         <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
                             <i class="ri-image-line"></i>
@@ -245,27 +481,76 @@
                     </div>
 
                     <div class="flex-grow-1 min-w-0">
+
                         <h6 class="fw-semibold mb-1">
-                            Pas Foto <span class="text-danger">*</span>
+                            Pas Foto
+                            <span class="text-danger">*</span>
                         </h6>
+
                         <p class="text-muted small mb-2">
                             Unggah pas foto calon siswa. Format PDF tidak diperbolehkan.
                         </p>
 
+                        {{-- STATUS BERKAS LAMA: MODE EDIT --}}
+                        @if (isset($berkasPasFoto) && $berkasPasFoto)
+
+                            <div class="mb-2">
+
+                                <span class="text-success small">
+                                    <i class="ri-checkbox-circle-line me-1"></i>
+                                    Sudah diunggah
+                                </span>
+
+                                <div class="small text-muted text-break mt-1">
+                                    <i class="ri-attachment-2 me-1"></i>
+                                    {{ $berkasPasFoto->nama_file ?: 'Nama file tidak tersedia' }}
+                                </div>
+
+                            </div>
+
+                        @else
+
+                            <span class="text-warning small">
+                                <i class="ri-information-line me-1"></i>
+
+                                {{ isset($berkasPasFoto)
+                                    ? 'Belum ada berkas tersimpan'
+                                    : 'Silakan pilih berkas untuk diunggah' }}
+                            </span>
+
+                        @endif
+
+                        {{-- FILE BARU / PENGGANTI --}}
                         @if ($filePasFoto)
+
                             <div class="small text-primary mt-2">
+
                                 <i class="ri-file-check-line me-1"></i>
+
+                                <span class="fw-semibold">
+                                    {{ isset($berkasPasFoto) && $berkasPasFoto
+                                        ? 'File pengganti:'
+                                        : 'File dipilih:' }}
+                                </span>
+
                                 <span class="text-break">
                                     {{ $filePasFoto->getClientOriginalName() }}
                                 </span>
+
                                 ({{ number_format($filePasFoto->getSize() / 1024, 0) }} KB)
+
                             </div>
 
+                            {{-- PREVIEW GAMBAR BARU --}}
                             <div class="mt-2">
-                                <a href="{{ $filePasFoto->temporaryUrl() }}"
+
+                                <a
+                                    href="{{ $filePasFoto->temporaryUrl() }}"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    title="Lihat preview Pas Foto">
+                                    class="d-inline-block"
+                                    title="Lihat preview Pas Foto"
+                                >
                                     <img
                                         src="{{ $filePasFoto->temporaryUrl() }}"
                                         alt="Preview Pas Foto"
@@ -273,52 +558,107 @@
                                         style="max-width: 180px; max-height: 180px; object-fit: contain;"
                                     >
                                 </a>
+
                             </div>
 
-                            <button type="button"
+                            {{-- BATALKAN FILE BARU --}}
+                            <button
+                                type="button"
                                 wire:click="$set('filePasFoto', null)"
-                                class="btn btn-sm btn-light text-danger rounded-pill mt-2">
+                                class="btn btn-sm btn-light text-danger rounded-pill mt-2"
+                            >
                                 <i class="ri-delete-bin-line me-1"></i>
-                                Hapus pilihan
+
+                                Batalkan file
+                                {{ isset($berkasPasFoto) && $berkasPasFoto
+                                    ? 'pengganti'
+                                    : 'pilihan' }}
                             </button>
-                        @else
-                            <span class="text-muted small">
-                                <i class="ri-information-line me-1"></i>
-                                Belum memilih file
-                            </span>
+
                         @endif
 
+                        {{-- VALIDASI --}}
                         @error('filePasFoto')
-                            <div class="text-danger small mt-2">{{ $message }}</div>
+                            <div class="text-danger small mt-2">
+                                {{ $message }}
+                            </div>
                         @enderror
+
                     </div>
                 </div>
 
-                <div class="flex-shrink-0">
-                    <label for="file-foto"
-                        class="btn btn-outline-primary rounded-pill px-4 mb-0">
+                {{-- TOMBOL AKSI --}}
+                <div class="flex-shrink-0 d-flex flex-wrap align-items-center gap-2">
+
+                    {{-- PREVIEW BERKAS LAMA: MODE EDIT --}}
+                    @if (isset($berkasPasFoto) && $berkasPasFoto)
+
+                        <button
+                            type="button"
+                            class="btn btn-outline-secondary rounded-pill px-3"
+                            data-bs-toggle="modal"
+                            data-bs-target="#ModalPreviewBerkas"
+                            wire:click="$emit(
+                                'showPreviewBerkas',
+                                {{ $berkasPasFoto->ppdb_berkas_id }}
+                            )"
+                            title="Lihat berkas Pas Foto lama"
+                        >
+                            <i class="ri-eye-line me-1"></i>
+                            Berkas Lama
+                        </button>
+
+                    @endif
+
+                    {{-- PILIH / GANTI FILE --}}
+                    <label
+                        for="{{ isset($berkasPasFoto) ? 'edit-file-foto' : 'create-file-foto' }}"
+                        class="btn btn-outline-primary rounded-pill px-4 mb-0"
+                        wire:loading.class="disabled"
+                        wire:target="filePasFoto"
+                    >
                         <i class="ri-upload-2-line me-1"></i>
-                        {{ $filePasFoto ? 'Ganti File' : 'Pilih File' }}
+
+                        {{ $filePasFoto
+                            ? 'Pilih Ulang'
+                            : (isset($berkasPasFoto) && $berkasPasFoto
+                                ? 'Ganti File'
+                                : 'Pilih File') }}
                     </label>
-                    <input id="file-foto"
+
+                    {{-- INPUT FILE --}}
+                    <input
+                        id="{{ isset($berkasPasFoto) ? 'edit-file-foto' : 'create-file-foto' }}"
                         type="file"
                         class="d-none"
                         wire:model="filePasFoto"
-                        accept=".jpg,.jpeg,.png,.webp">
+                        accept=".jpg,.jpeg,.png,.webp"
+                    >
+
                 </div>
+
             </div>
 
-            <div wire:loading wire:target="filePasFoto"
-                class="small text-primary mt-2">
+            {{-- INDIKATOR UPLOAD --}}
+            <div
+                wire:loading
+                wire:target="filePasFoto"
+                class="small text-primary mt-2"
+            >
                 <span class="spinner-border spinner-border-sm me-1"></span>
                 Memuat file...
             </div>
+
         </div>
 
         {{-- DOKUMEN PENDUKUNG --}}
         <div class="border rounded-4 p-3">
+
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3">
-                <div class="d-flex align-items-start gap-3 flex-grow-1">
+
+                {{-- INFORMASI BERKAS --}}
+                <div class="d-flex align-items-start gap-3 flex-grow-1 min-w-0">
+
                     <div class="avatar-sm flex-shrink-0">
                         <div class="avatar-title bg-light text-muted rounded-circle fs-20">
                             <i class="ri-attachment-2"></i>
@@ -326,21 +666,64 @@
                     </div>
 
                     <div class="flex-grow-1 min-w-0">
+
                         <h6 class="fw-semibold mb-1">
                             Dokumen Pendukung
                             <span class="text-muted small fw-normal">(Opsional)</span>
                         </h6>
+
                         <p class="text-muted small mb-2">
                             Unggah dokumen tambahan jika diperlukan.
                         </p>
 
+                        {{-- STATUS BERKAS LAMA: MODE EDIT --}}
+                        @if (isset($berkasDokumenPendukung) && $berkasDokumenPendukung)
+
+                            <div class="mb-2">
+
+                                <span class="text-success small">
+                                    <i class="ri-checkbox-circle-line me-1"></i>
+                                    Sudah diunggah
+                                </span>
+
+                                <div class="small text-muted text-break mt-1">
+                                    <i class="ri-attachment-2 me-1"></i>
+                                    {{ $berkasDokumenPendukung->nama_file ?: 'Nama file tidak tersedia' }}
+                                </div>
+
+                            </div>
+
+                        @else
+
+                            <span class="text-warning small">
+                                <i class="ri-information-line me-1"></i>
+
+                                {{ isset($berkasDokumenPendukung)
+                                    ? 'Belum ada berkas tersimpan'
+                                    : 'Belum memilih file (opsional)' }}
+                            </span>
+
+                        @endif
+
+                        {{-- FILE BARU / PENGGANTI --}}
                         @if ($fileDokumenPendukung)
+
                             <div class="small text-primary mt-2">
+
                                 <i class="ri-file-check-line me-1"></i>
+
+                                <span class="fw-semibold">
+                                    {{ isset($berkasDokumenPendukung) && $berkasDokumenPendukung
+                                        ? 'File pengganti:'
+                                        : 'File dipilih:' }}
+                                </span>
+
                                 <span class="text-break">
                                     {{ $fileDokumenPendukung->getClientOriginalName() }}
                                 </span>
+
                                 ({{ number_format($fileDokumenPendukung->getSize() / 1024, 0) }} KB)
+
                             </div>
 
                             @php
@@ -349,12 +732,18 @@
                                 );
                             @endphp
 
+                            {{-- PREVIEW GAMBAR BARU --}}
                             @if (in_array($ekstensiDokumen, ['jpg', 'jpeg', 'png', 'webp']))
+
                                 <div class="mt-2">
-                                    <a href="{{ $fileDokumenPendukung->temporaryUrl() }}"
+
+                                    <a
+                                        href="{{ $fileDokumenPendukung->temporaryUrl() }}"
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        title="Lihat preview Dokumen Pendukung">
+                                        class="d-inline-block"
+                                        title="Lihat preview Dokumen Pendukung"
+                                    >
                                         <img
                                             src="{{ $fileDokumenPendukung->temporaryUrl() }}"
                                             alt="Preview Dokumen Pendukung"
@@ -362,57 +751,118 @@
                                             style="max-width: 180px; max-height: 140px; object-fit: contain;"
                                         >
                                     </a>
+
                                 </div>
+
+                            {{-- INDIKATOR PDF BARU --}}
                             @elseif ($ekstensiDokumen === 'pdf')
+
                                 <div class="d-flex align-items-center gap-2 mt-2">
-                                    <div class="d-flex align-items-center justify-content-center rounded border bg-light"
-                                        style="width: 44px; height: 44px;">
+
+                                    <div
+                                        class="d-flex align-items-center justify-content-center rounded border bg-light"
+                                        style="width: 44px; height: 44px;"
+                                    >
                                         <i class="ri-file-pdf-2-line text-danger fs-24"></i>
                                     </div>
+
                                     <span class="small text-muted">
-                                        Dokumen PDF siap disimpan.
+                                        Dokumen PDF siap diunggah.
                                     </span>
+
                                 </div>
+
                             @endif
 
-                            <button type="button"
+                            {{-- BATALKAN FILE BARU --}}
+                            <button
+                                type="button"
                                 wire:click="$set('fileDokumenPendukung', null)"
-                                class="btn btn-sm btn-light text-danger rounded-pill mt-2">
+                                class="btn btn-sm btn-light text-danger rounded-pill mt-2"
+                            >
                                 <i class="ri-delete-bin-line me-1"></i>
-                                Hapus pilihan
+
+                                Batalkan file
+                                {{ isset($berkasDokumenPendukung) && $berkasDokumenPendukung
+                                    ? 'pengganti'
+                                    : 'pilihan' }}
                             </button>
-                        @else
-                            <span class="text-muted small">
-                                <i class="ri-information-line me-1"></i>
-                                Belum memilih file (opsional)
-                            </span>
+
                         @endif
 
+                        {{-- VALIDASI --}}
                         @error('fileDokumenPendukung')
-                            <div class="text-danger small mt-2">{{ $message }}</div>
+                            <div class="text-danger small mt-2">
+                                {{ $message }}
+                            </div>
                         @enderror
+
                     </div>
                 </div>
 
-                <div class="flex-shrink-0">
-                    <label for="file-pendukung"
-                        class="btn btn-outline-primary rounded-pill px-4 mb-0">
+                {{-- TOMBOL AKSI --}}
+                <div class="flex-shrink-0 d-flex flex-wrap align-items-center gap-2">
+
+                    {{-- PREVIEW BERKAS LAMA: MODE EDIT --}}
+                    @if (isset($berkasDokumenPendukung) && $berkasDokumenPendukung)
+
+                        <button
+                            type="button"
+                            class="btn btn-outline-secondary rounded-pill px-3"
+                            data-bs-toggle="modal"
+                            data-bs-target="#ModalPreviewBerkas"
+                            wire:click="$emit(
+                                'showPreviewBerkas',
+                                {{ $berkasDokumenPendukung->ppdb_berkas_id }}
+                            )"
+                            title="Lihat Dokumen Pendukung lama"
+                        >
+                            <i class="ri-eye-line me-1"></i>
+                            Berkas Lama
+                        </button>
+
+                    @endif
+
+                    {{-- PILIH / GANTI FILE --}}
+                    <label
+                        for="{{ isset($berkasDokumenPendukung) ? 'edit-file-pendukung' : 'create-file-pendukung' }}"
+                        class="btn btn-outline-primary rounded-pill px-4 mb-0"
+                        wire:loading.class="disabled"
+                        wire:target="fileDokumenPendukung"
+                    >
                         <i class="ri-upload-2-line me-1"></i>
-                        {{ $fileDokumenPendukung ? 'Ganti File' : 'Pilih File' }}
+
+                        {{ $fileDokumenPendukung
+                            ? 'Pilih Ulang'
+                            : (isset($berkasDokumenPendukung) && $berkasDokumenPendukung
+                                ? 'Ganti File'
+                                : 'Pilih File') }}
                     </label>
-                    <input id="file-pendukung"
+
+                    {{-- INPUT FILE --}}
+                    <input
+                        id="{{ isset($berkasDokumenPendukung) ? 'edit-file-pendukung' : 'create-file-pendukung' }}"
                         type="file"
                         class="d-none"
                         wire:model="fileDokumenPendukung"
-                        accept=".jpg,.jpeg,.png,.webp,.pdf">
+                        accept=".jpg,.jpeg,.png,.webp,.pdf"
+                    >
+
                 </div>
+
             </div>
 
-            <div wire:loading wire:target="fileDokumenPendukung"
-                class="small text-primary mt-2">
+            {{-- INDIKATOR UPLOAD --}}
+            <div
+                wire:loading
+                wire:target="fileDokumenPendukung"
+                class="small text-primary mt-2"
+            >
                 <span class="spinner-border spinner-border-sm me-1"></span>
                 Memuat file...
             </div>
+
         </div>
+
     </div>
 </div>

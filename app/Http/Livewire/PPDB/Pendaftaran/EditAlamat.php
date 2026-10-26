@@ -20,6 +20,8 @@ class EditAlamat extends Component
     public $kabupaten = '';
     public $kecamatan = '';
     public $kelurahan_desa = '';
+    public $rt = '';
+    public $rw = '';
     public $kode_pos = '';
     public $jenis_tempat_tinggal = '';
 
@@ -92,6 +94,8 @@ class EditAlamat extends Component
         $this->kabupaten = $alamat->kabupaten ?? '';
         $this->kecamatan = $alamat->kecamatan ?? '';
         $this->kelurahan_desa = $alamat->kelurahan_desa ?? '';
+        $this->rt = $alamat->rt ?? '';
+        $this->rw = $alamat->rw ?? '';
         $this->kode_pos = $alamat->kode_pos ?? '';
         $this->jenis_tempat_tinggal = $alamat->jenis_tempat_tinggal ?? '';
 
@@ -128,6 +132,8 @@ class EditAlamat extends Component
                 'string',
                 'max:100',
             ],
+            'rt' => 'nullable|digits_between:1,3',
+            'rw' => 'nullable|digits_between:1,3',
             'kode_pos' => [
                 'nullable',
                 'digits:5',
@@ -165,6 +171,8 @@ class EditAlamat extends Component
         'kecamatan.required' => 'Kecamatan wajib diisi.',
         'kelurahan_desa.required' => 'Kelurahan atau desa wajib diisi.',
 
+        'rt.digits_between' => 'RT maksimal terdiri dari 3 digit.',
+        'rw.digits_between' => 'RW maksimal terdiri dari 3 digit.',
         'kode_pos.digits' => 'Kode pos harus terdiri dari 5 digit.',
 
         'jenis_tempat_tinggal.required' => 'Jenis tempat tinggal wajib dipilih.',

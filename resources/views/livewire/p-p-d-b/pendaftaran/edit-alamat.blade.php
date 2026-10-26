@@ -157,6 +157,42 @@
                                     @enderror
                                 </div>
 
+                                {{-- RT --}}
+                                <div class="col-12 col-md-4">
+                                    <label class="form-label" for="rt">RT</label>
+
+                                    <input
+                                        type="text"
+                                        class="form-control @error('rt') is-invalid @enderror"
+                                        id="rt"
+                                        wire:model.defer="rt"
+                                        maxlength="3"
+                                        inputmode="numeric"
+                                        placeholder="Contoh: 003">
+
+                                    @error('rt')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                {{-- RW --}}
+                                <div class="col-12 col-md-4">
+                                    <label class="form-label" for="rw">RW</label>
+
+                                    <input
+                                        type="text"
+                                        class="form-control @error('rw') is-invalid @enderror"
+                                        id="rw"
+                                        wire:model.defer="rw"
+                                        maxlength="3"
+                                        inputmode="numeric"
+                                        placeholder="Contoh: 005">
+
+                                    @error('rw')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
                                 {{-- KODE POS --}}
                                 <div class="col-12 col-md-6">
                                     <label for="edit-kode-pos" class="form-label">
