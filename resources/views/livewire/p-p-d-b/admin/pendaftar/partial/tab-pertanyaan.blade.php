@@ -27,7 +27,7 @@
                 @foreach ($pertanyaan as $item)
                     <div
                         class="col-12"
-                        wire:key="pertanyaan-create-{{ $item->ppdb_pertanyaan_id }}"
+                        wire:key="pertanyaan-{{ $item->ppdb_pertanyaan_id }}"
                     >
                         <label
                             for="jawaban-{{ $item->ppdb_pertanyaan_id }}"
@@ -152,7 +152,7 @@
         @endif
 
         {{-- PERNYATAAN KEBENARAN DATA --}}
-        <div class="border-top border-dashed my-4"></div>
+        {{-- <div class="border-top border-dashed my-4"></div>
 
         <div class="form-check">
             <input
@@ -174,6 +174,6 @@
                     {{ $message }}
                 </div>
             @enderror
-        </div>
+        </div> --}}
     </div>
 </div>

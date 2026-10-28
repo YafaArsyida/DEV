@@ -131,4 +131,10 @@ class PPDBPendaftaran extends Model
             PPDBBerkas::class, 'ppdb_pendaftaran_id', 'ppdb_pendaftaran_id'
         );
     }
+    public function ppdb_jawaban(): HasMany
+    {
+        return $this->hasMany(
+            PPDBJawaban::class, 'ppdb_pendaftaran_id', 'ppdb_pendaftaran_id'
+        );
+    }
 }

@@ -4,7 +4,11 @@ namespace App\Http\Controllers\PPDB;
 
 use App\Http\Controllers\Controller;
 use App\Models\PPDBBerkas;
+use App\Models\PPDBPendaftaran;
+use App\Services\PPDB\PPDBKartuAljabarService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
 
 class PPDBBerkasController extends Controller
@@ -56,4 +60,54 @@ class PPDBBerkasController extends Controller
             'Cache-Control' => 'private, no-store',
         ]);
     }
+
+    
+    
+    public function cetak(
+        $pendaftaranId,
+        PPDBKartuAljabarService $kartuService
+    ) {
+        $pendaftaran = PPDBPendaftaran::query()
+            ->with([
+                'ppdb_calon_siswa',
+                'ppdb_orangtua',
+                'ppdb_jalur',
+                'ppdb_periode',
+            ])
+            ->findOrFail($pendaftaranId);
+
+        $user = Auth::user();
+
+        $peran = strtoupper($user->peran ?? '');
+
+        $peranAdmin = [
+            'SUPERADMIN',
+            'ADMIN',
+            'PANITIA_PPDB',
+        ];
+
+        $isAdmin = in_array($peran, $peranAdmin, true);
+
+        $isPemilik = (string) $pendaftaran->ms_pengguna_id
+            === (string) $user->getAuthIdentifier();
+
+        abort_unless($isPemilik || $isAdmin, 403);
+
+        // Kartu hanya tersedia bagi calon siswa yang diterima.
+        abort_unless($pendaftaran->status !== 'draft', 403);
+
+        // Ambil data berdasarkan pendaftaran yang dipilih.
+        $data = $kartuService->getData($pendaftaran);
+
+        $pdf = Pdf::loadView(
+            'reports.ppdb.kartu-aljabar',
+            $data
+        )->setPaper('a4', 'landscape');
+
+        return $pdf->stream(
+            'kartu-aljabar-' . $pendaftaran->getKey() . '.pdf'
+        );
+    }
+
+
 }

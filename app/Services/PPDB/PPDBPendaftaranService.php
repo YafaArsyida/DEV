@@ -31,6 +31,60 @@ class PPDBPendaftaranService
     }
 
     /**
+     * Menghapus pendaftaran beserta seluruh data formulirnya.
+     *
+     * Data database di-soft-delete dalam satu transaksi.
+     * File fisik dihapus setelah transaksi berhasil.
+     */
+    public static function delete(PPDBPendaftaran $pendaftaran): void
+    {
+        $pendaftaranId = (int) $pendaftaran->ppdb_pendaftaran_id;
+
+        // Kumpulkan path berkas sebelum menghapus data relasi.
+        $paths = $pendaftaran->ppdb_berkas()
+            ->withTrashed()
+            ->pluck('path_file')
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
+        DB::transaction(function () use ($pendaftaran) {
+            // Data formulir calon siswa.
+            $pendaftaran->ppdb_calon_siswa?->delete();
+
+            // Data orang tua/wali.
+            $pendaftaran->ppdb_orangtua?->delete();
+
+            // Data alamat.
+            $pendaftaran->ppdb_alamat?->delete();
+
+            // Data pendidikan.
+            $pendaftaran->ppdb_pendidikan?->delete();
+
+            // Berkas dan jawaban formulir.
+            $pendaftaran->ppdb_berkas()->delete();
+            $pendaftaran->ppdb_jawaban()->delete();
+
+            // Pendaftaran utama.
+            $pendaftaran->delete();
+        });
+
+        // Hanya dijalankan jika transaksi database berhasil.
+        PPDBBerkasService::hapusFileLama(
+            array_filter(
+                $paths,
+                fn ($path) => is_string($path)
+                    && str_starts_with(
+                        $path,
+                        'ppdb/berkas/' . $pendaftaranId . '/'
+                    )
+                    && ! preg_match('#(?:^|/)\.\.(?:/|$)#', $path)
+            )
+        );
+    }
+
+    /**
      * Memperbarui jalur pendaftaran yang sudah ada.
      */
     public static function updateJalur(PPDBPendaftaran $pendaftaran, int $jalurId): PPDBPendaftaran 

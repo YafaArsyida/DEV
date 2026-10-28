@@ -131,7 +131,7 @@
                             class="form-control pe-5 @error('password') is-invalid @enderror"
                             id="password"
                             wire:model.defer="password"
-                            placeholder="Minimal 8 karakter"
+                            placeholder="Minimal 6 karakter"
                             autocomplete="new-password">
 
                         <button

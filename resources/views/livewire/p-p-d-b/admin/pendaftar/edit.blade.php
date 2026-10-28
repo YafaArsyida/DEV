@@ -65,6 +65,12 @@
                         wire:click="pindahTab('jalur')">
                         <i class="ri-route-line me-1"></i>
                         Jalur
+                        @if ($this->errorTabJalur())
+                            <i
+                                class="ri-error-warning-fill ms-1 text-danger"
+                                title="Terdapat kesalahan pada jalur">
+                            </i>
+                        @endif
                     </button>
                 </li>
 
@@ -80,6 +86,13 @@
                         wire:click="pindahTab('siswa')">
                         <i class="ri-user-line me-1"></i>
                         Siswa
+
+                        @if ($this->errorTabSiswa())
+                            <i
+                                class="ri-error-warning-fill ms-1 text-danger"
+                                title="Terdapat kesalahan pada data siswa">
+                            </i>
+                        @endif
                     </button>
                 </li>
 
@@ -95,6 +108,13 @@
                         wire:click="pindahTab('orang-tua')">
                         <i class="ri-team-line me-1"></i>
                         Orang Tua / Wali
+                         
+                        @if ($this->errorTabOrangTua())
+                            <i
+                                class="ri-error-warning-fill ms-1 text-danger"
+                                title="Terdapat kesalahan pada data orang tua">
+                            </i>
+                        @endif
                     </button>
                 </li>
 
@@ -110,6 +130,13 @@
                         wire:click="pindahTab('alamat')">
                         <i class="ri-map-pin-line me-1"></i>
                         Alamat
+
+                        @if ($this->errorTabAlamat())
+                            <i
+                                class="ri-error-warning-fill ms-1 text-danger"
+                                title="Terdapat kesalahan pada data alamat">
+                            </i>
+                        @endif
                     </button>
                 </li>
 
@@ -125,6 +152,13 @@
                         wire:click="pindahTab('pendidikan')">
                         <i class="ri-graduation-cap-line me-1"></i>
                         Pendidikan
+
+                        @if ($this->errorTabPendidikan())
+                            <i
+                                class="ri-error-warning-fill ms-1 text-danger"
+                                title="Terdapat kesalahan pada data pendidikan">
+                            </i>
+                        @endif
                     </button>
                 </li>
 
@@ -140,6 +174,13 @@
                         wire:click="pindahTab('berkas')">
                         <i class="ri-folder-line me-1"></i>
                         Berkas
+
+                        @if ($this->errorTabBerkas())
+                            <i
+                                class="ri-error-warning-fill ms-1 text-danger"
+                                title="Terdapat kesalahan pada berkas">
+                            </i>
+                        @endif
                     </button>
                 </li>
 
@@ -155,6 +196,13 @@
                         wire:click="pindahTab('pertanyaan')">
                         <i class="ri-question-answer-line me-1"></i>
                         Pertanyaan Tambahan
+
+                        @if ($this->errorTabPertanyaan())
+                            <i
+                                class="ri-error-warning-fill ms-1 text-danger"
+                                title="Terdapat kesalahan pada pertanyaan tambahan">
+                            </i>
+                        @endif
                     </button>
                 </li>
 
@@ -276,7 +324,9 @@
                         aria-labelledby="edit-tab-berkas"
                         tabindex="0">
 
-                        @include('livewire.p-p-d-b.admin.pendaftar.partial.tab-berkas')
+                        @include('livewire.p-p-d-b.admin.pendaftar.partial.tab-berkas',[
+                            'modeEdit' => true,
+                        ])
                     </div>
 
                     {{-- TAB 7: PERTANYAAN TAMBAHAN --}}

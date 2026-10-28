@@ -53,9 +53,12 @@ class PreviewBerkas extends Component
             'jenis'     => $berkas->jenis_berkas,
             'nama_file' => $berkas->nama_file,
             'mime_type' => $berkas->mime_type,
-            'url' => route('ppdb.berkas.preview', [
+            // 'url' => route('ppdb.berkas.preview', [
+            //     'berkasId' => $berkas->ppdb_berkas_id,
+            // ]),
+            'url'       => route('ppdb.berkas.preview', [
                 'berkasId' => $berkas->ppdb_berkas_id,
-            ]),
+            ]) . '?v=' . ($berkas->updated_at?->timestamp ?? time()),
         ];
     }
 

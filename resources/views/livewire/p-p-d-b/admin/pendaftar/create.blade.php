@@ -310,7 +310,9 @@
                         aria-labelledby="tab-berkas"
                         tabindex="0"
                     >
-                        @include('livewire.p-p-d-b.admin.pendaftar.partial.tab-berkas')
+                        @include('livewire.p-p-d-b.admin.pendaftar.partial.tab-berkas',[
+                            'modeEdit' => false,
+                        ])
                     </div>
 
                     {{-- TAB 7: PERTANYAAN TAMBAHAN --}}

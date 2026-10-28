@@ -1,5 +1,6 @@
-<div class="card border-0 shadow-sm rounded-4">
-    <div class="card-header">
+<div class="card border-0 shadow-sm rounded-4 mb-4">
+    {{-- Header --}}
+    <div class="card-header bg-transparent border-bottom p-3 p-lg-4">
         <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4">
 
             {{-- TITLE --}}
@@ -268,22 +269,21 @@
                                     </div>
 
                                     {{-- RESET PASSWORD --}}
-                                    @if ($item->ms_pengguna && $item->ms_pengguna->peran === 'ORANG_TUA')
-                                        <button
-                                            type="button"
-                                            class="btn btn-soft-danger btn-sm rounded-pill px-3 text-nowrap"
-                                            title="Reset Password"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#ModalKonfirmasiReset"
-                                            wire:click="$emit(
-                                                'resetPassword',
-                                                {{ $item->ms_pengguna->ms_pengguna_id }}
-                                            )">
-
-                                            <i class="ri-lock-unlock-line me-1"></i>
-                                            Reset
-                                        </button>
-                                    @endif
+@if ($item->ms_pengguna && $item->ms_pengguna->peran === 'ORANG_TUA')
+    <a
+        href="#ModalKonfirmasiReset"
+        data-bs-toggle="modal"
+        class="btn btn-soft-danger btn-sm rounded-pill px-3 text-nowrap"
+        title="Reset Password"
+        wire:click.prevent="$emit(
+            'resetPassword',
+            {{ $item->ms_pengguna->ms_pengguna_id }}
+        )"
+    >
+        <i class="ri-lock-unlock-line me-1"></i>
+        Reset
+    </a>
+@endif
 
                                 </div>
                             </td>

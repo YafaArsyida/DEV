@@ -212,10 +212,15 @@ Route::prefix('ppdb/{jenjang}')
 */
 Route::middleware(['auth'])->group(function () {
     Route::get('/ppdb/berkas/preview/{berkasId}', [
-        PPDBBerkasController::class, 'preview',
+        PPDBBerkasController::class,
+        'preview',
     ])->name('ppdb.berkas.preview');
-});
 
+    Route::get('/ppdb/kartu-aljabar/{pendaftaranId}', [
+        PPDBBerkasController::class,
+        'cetak',
+    ])->name('ppdb.kartu-aljabar.pdf');
+});
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'index'])

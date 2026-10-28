@@ -115,7 +115,7 @@
                             </div>
 
                             {{-- RT --}}
-                            <div class="col-12 col-sm-6">
+                        <div class="col-12 col-sm-6">
                                 <small class="text-muted d-block mb-1">
                                     RT
                                 </small>

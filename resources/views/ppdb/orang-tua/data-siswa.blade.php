@@ -32,7 +32,6 @@
                     </div>
 
                 @elseif (!$pendaftaran)
-                    {{-- Belum memilih jalur dan membuat pendaftaran --}}
                     <div class="card border-0 shadow-sm rounded-4">
                         <div class="card-body p-4 text-center">
                             <div class="avatar-md mx-auto mb-3">
@@ -50,7 +49,7 @@
                             </p>
 
                             <a href="{{ route('ppdb.pendaftaran.jalur', [
-                                    'jenjang' => $pendaftaran->ppdb_periode->ms_jenjang->slug,
+                                    'jenjang' => $jenjang->slug,
                                 ]) }}"
                                 class="btn btn-primary rounded-pill px-4">
                                 <i class="ri-route-line me-1"></i>

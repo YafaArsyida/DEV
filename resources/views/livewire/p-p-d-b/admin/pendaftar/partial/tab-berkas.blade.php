@@ -62,8 +62,8 @@
                             Unggah scan atau foto Kartu Keluarga yang terbaca jelas.
                         </p>
 
-                        {{-- STATUS BERKAS LAMA: MODE EDIT --}}
-                        @if (isset($berkasKartuKeluarga) && $berkasKartuKeluarga)
+                        {{-- STATUS BERKAS LAMA --}}
+                        @if ($berkasKartuKeluarga ?? null)
 
                             <div class="mb-2">
                                 <span class="text-success small">
@@ -81,27 +81,21 @@
 
                             <span class="text-warning small">
                                 <i class="ri-information-line me-1"></i>
-
-                                {{ isset($berkasKartuKeluarga)
+                                {{ $modeEdit
                                     ? 'Belum ada berkas tersimpan'
                                     : 'Silakan pilih berkas untuk diunggah' }}
                             </span>
 
                         @endif
 
-                        {{-- ================================================= --}}
-                        {{-- FILE BARU / FILE PENGGANTI --}}
-                        {{-- Berlaku untuk create dan edit --}}
-                        {{-- ================================================= --}}
-
+                        {{-- FILE BARU / PENGGANTI --}}
                         @if ($fileKartuKeluarga)
 
                             <div class="small text-primary mt-2">
-
                                 <i class="ri-file-check-line me-1"></i>
 
                                 <span class="fw-semibold">
-                                    {{ isset($berkasKartuKeluarga) && $berkasKartuKeluarga
+                                    {{ ($berkasKartuKeluarga ?? null)
                                         ? 'File pengganti:'
                                         : 'File dipilih:' }}
                                 </span>
@@ -111,7 +105,6 @@
                                 </span>
 
                                 ({{ number_format($fileKartuKeluarga->getSize() / 1024, 0) }} KB)
-
                             </div>
 
                             @php
@@ -124,7 +117,6 @@
                             @if (in_array($ekstensiKK, ['jpg', 'jpeg', 'png', 'webp']))
 
                                 <div class="mt-2">
-
                                     <a
                                         href="{{ $fileKartuKeluarga->temporaryUrl() }}"
                                         target="_blank"
@@ -139,14 +131,12 @@
                                             style="max-width: 180px; max-height: 140px; object-fit: contain;"
                                         >
                                     </a>
-
                                 </div>
 
                             {{-- INDIKATOR PDF BARU --}}
                             @elseif ($ekstensiKK === 'pdf')
 
                                 <div class="d-flex align-items-center gap-2 mt-2">
-
                                     <div
                                         class="d-flex align-items-center justify-content-center rounded border bg-light"
                                         style="width: 44px; height: 44px;"
@@ -157,7 +147,6 @@
                                     <span class="small text-muted">
                                         Dokumen PDF siap diunggah.
                                     </span>
-
                                 </div>
 
                             @endif
@@ -169,7 +158,7 @@
                                 class="btn btn-sm btn-light text-danger rounded-pill mt-2"
                             >
                                 <i class="ri-delete-bin-line me-1"></i>
-                                Batalkan file {{ isset($berkasKartuKeluarga) && $berkasKartuKeluarga
+                                Batalkan file {{ ($berkasKartuKeluarga ?? null)
                                     ? 'pengganti'
                                     : 'pilihan' }}
                             </button>
@@ -186,24 +175,18 @@
                     </div>
                 </div>
 
-                {{-- ================================================= --}}
                 {{-- TOMBOL AKSI --}}
-                {{-- ================================================= --}}
-
                 <div class="flex-shrink-0 d-flex flex-wrap align-items-center gap-2">
 
-                    {{-- PREVIEW BERKAS LAMA: MODE EDIT --}}
-                    @if (isset($berkasKartuKeluarga) && $berkasKartuKeluarga)
+                    {{-- PREVIEW BERKAS LAMA --}}
+                    @if ($berkasKartuKeluarga ?? null)
 
                         <button
                             type="button"
                             class="btn btn-outline-secondary rounded-pill px-3"
                             data-bs-toggle="modal"
                             data-bs-target="#ModalPreviewBerkas"
-                            wire:click="$emit(
-                                'showPreviewBerkas',
-                                {{ $berkasKartuKeluarga->ppdb_berkas_id }}
-                            )"
+                            wire:click="$emit('showPreviewBerkas', {{ $berkasKartuKeluarga->ppdb_berkas_id }})"
                             title="Lihat berkas lama yang sudah tersimpan"
                         >
                             <i class="ri-eye-line me-1"></i>
@@ -214,7 +197,7 @@
 
                     {{-- PILIH / GANTI FILE --}}
                     <label
-                        for="{{ isset($berkasKartuKeluarga) ? 'edit-file-kk' : 'create-file-kk' }}"
+                        for="{{ $modeEdit ? 'edit-file-kk' : 'create-file-kk' }}"
                         class="btn btn-outline-primary rounded-pill px-4 mb-0"
                         wire:loading.class="disabled"
                         wire:target="fileKartuKeluarga"
@@ -223,14 +206,14 @@
 
                         {{ $fileKartuKeluarga
                             ? 'Pilih Ulang'
-                            : (isset($berkasKartuKeluarga) && $berkasKartuKeluarga
+                            : (($berkasKartuKeluarga ?? null)
                                 ? 'Ganti File'
                                 : 'Pilih File') }}
                     </label>
 
                     {{-- INPUT FILE --}}
                     <input
-                        id="{{ isset($berkasKartuKeluarga) ? 'edit-file-kk' : 'create-file-kk' }}"
+                        id="{{ $modeEdit ? 'edit-file-kk' : 'create-file-kk' }}"
                         type="file"
                         class="d-none"
                         wire:model="fileKartuKeluarga"
@@ -252,8 +235,6 @@
             </div>
 
         </div>
-
-
         
         {{-- AKTA KELAHIRAN --}}
         <div class="border rounded-4 p-3 mb-3">
@@ -279,11 +260,10 @@
                             Unggah scan atau foto akta kelahiran calon siswa.
                         </p>
 
-                        {{-- STATUS BERKAS LAMA: MODE EDIT --}}
-                        @if (isset($berkasAktaKelahiran) && $berkasAktaKelahiran)
+                        {{-- STATUS BERKAS LAMA --}}
+                        @if ($berkasAktaKelahiran ?? null)
 
                             <div class="mb-2">
-
                                 <span class="text-success small">
                                     <i class="ri-checkbox-circle-line me-1"></i>
                                     Sudah diunggah
@@ -293,15 +273,13 @@
                                     <i class="ri-attachment-2 me-1"></i>
                                     {{ $berkasAktaKelahiran->nama_file ?: 'Nama file tidak tersedia' }}
                                 </div>
-
                             </div>
 
                         @else
 
                             <span class="text-warning small">
                                 <i class="ri-information-line me-1"></i>
-
-                                {{ isset($berkasAktaKelahiran)
+                                {{ $modeEdit
                                     ? 'Belum ada berkas tersimpan'
                                     : 'Silakan pilih berkas untuk diunggah' }}
                             </span>
@@ -312,11 +290,10 @@
                         @if ($fileAktaKelahiran)
 
                             <div class="small text-primary mt-2">
-
                                 <i class="ri-file-check-line me-1"></i>
 
                                 <span class="fw-semibold">
-                                    {{ isset($berkasAktaKelahiran) && $berkasAktaKelahiran
+                                    {{ ($berkasAktaKelahiran ?? null)
                                         ? 'File pengganti:'
                                         : 'File dipilih:' }}
                                 </span>
@@ -326,7 +303,6 @@
                                 </span>
 
                                 ({{ number_format($fileAktaKelahiran->getSize() / 1024, 0) }} KB)
-
                             </div>
 
                             @php
@@ -339,7 +315,6 @@
                             @if (in_array($ekstensiAkta, ['jpg', 'jpeg', 'png', 'webp']))
 
                                 <div class="mt-2">
-
                                     <a
                                         href="{{ $fileAktaKelahiran->temporaryUrl() }}"
                                         target="_blank"
@@ -354,14 +329,12 @@
                                             style="max-width: 180px; max-height: 140px; object-fit: contain;"
                                         >
                                     </a>
-
                                 </div>
 
                             {{-- INDIKATOR PDF BARU --}}
                             @elseif ($ekstensiAkta === 'pdf')
 
                                 <div class="d-flex align-items-center gap-2 mt-2">
-
                                     <div
                                         class="d-flex align-items-center justify-content-center rounded border bg-light"
                                         style="width: 44px; height: 44px;"
@@ -372,7 +345,6 @@
                                     <span class="small text-muted">
                                         Dokumen PDF siap diunggah.
                                     </span>
-
                                 </div>
 
                             @endif
@@ -384,9 +356,8 @@
                                 class="btn btn-sm btn-light text-danger rounded-pill mt-2"
                             >
                                 <i class="ri-delete-bin-line me-1"></i>
-
                                 Batalkan file
-                                {{ isset($berkasAktaKelahiran) && $berkasAktaKelahiran
+                                {{ ($berkasAktaKelahiran ?? null)
                                     ? 'pengganti'
                                     : 'pilihan' }}
                             </button>
@@ -406,18 +377,15 @@
                 {{-- TOMBOL AKSI --}}
                 <div class="flex-shrink-0 d-flex flex-wrap align-items-center gap-2">
 
-                    {{-- PREVIEW BERKAS LAMA: MODE EDIT --}}
-                    @if (isset($berkasAktaKelahiran) && $berkasAktaKelahiran)
+                    {{-- PREVIEW BERKAS LAMA --}}
+                    @if ($berkasAktaKelahiran ?? null)
 
                         <button
                             type="button"
                             class="btn btn-outline-secondary rounded-pill px-3"
                             data-bs-toggle="modal"
                             data-bs-target="#ModalPreviewBerkas"
-                            wire:click="$emit(
-                                'showPreviewBerkas',
-                                {{ $berkasAktaKelahiran->ppdb_berkas_id }}
-                            )"
+                            wire:click="$emit('showPreviewBerkas', {{ $berkasAktaKelahiran->ppdb_berkas_id }})"
                             title="Lihat berkas lama yang sudah tersimpan"
                         >
                             <i class="ri-eye-line me-1"></i>
@@ -428,7 +396,7 @@
 
                     {{-- PILIH / GANTI FILE --}}
                     <label
-                        for="{{ isset($berkasAktaKelahiran) ? 'edit-file-akta' : 'create-file-akta' }}"
+                        for="{{ $modeEdit ? 'edit-file-akta' : 'create-file-akta' }}"
                         class="btn btn-outline-primary rounded-pill px-4 mb-0"
                         wire:loading.class="disabled"
                         wire:target="fileAktaKelahiran"
@@ -437,14 +405,14 @@
 
                         {{ $fileAktaKelahiran
                             ? 'Pilih Ulang'
-                            : (isset($berkasAktaKelahiran) && $berkasAktaKelahiran
+                            : (($berkasAktaKelahiran ?? null)
                                 ? 'Ganti File'
                                 : 'Pilih File') }}
                     </label>
 
                     {{-- INPUT FILE --}}
                     <input
-                        id="{{ isset($berkasAktaKelahiran) ? 'edit-file-akta' : 'create-file-akta' }}"
+                        id="{{ $modeEdit ? 'edit-file-akta' : 'create-file-akta' }}"
                         type="file"
                         class="d-none"
                         wire:model="fileAktaKelahiran"
@@ -452,7 +420,6 @@
                     >
 
                 </div>
-
             </div>
 
             {{-- INDIKATOR UPLOAD --}}
@@ -491,11 +458,10 @@
                             Unggah pas foto calon siswa. Format PDF tidak diperbolehkan.
                         </p>
 
-                        {{-- STATUS BERKAS LAMA: MODE EDIT --}}
-                        @if (isset($berkasPasFoto) && $berkasPasFoto)
+                        {{-- STATUS BERKAS LAMA --}}
+                        @if ($berkasPasFoto ?? null)
 
                             <div class="mb-2">
-
                                 <span class="text-success small">
                                     <i class="ri-checkbox-circle-line me-1"></i>
                                     Sudah diunggah
@@ -505,15 +471,13 @@
                                     <i class="ri-attachment-2 me-1"></i>
                                     {{ $berkasPasFoto->nama_file ?: 'Nama file tidak tersedia' }}
                                 </div>
-
                             </div>
 
                         @else
 
                             <span class="text-warning small">
                                 <i class="ri-information-line me-1"></i>
-
-                                {{ isset($berkasPasFoto)
+                                {{ $modeEdit
                                     ? 'Belum ada berkas tersimpan'
                                     : 'Silakan pilih berkas untuk diunggah' }}
                             </span>
@@ -524,11 +488,10 @@
                         @if ($filePasFoto)
 
                             <div class="small text-primary mt-2">
-
                                 <i class="ri-file-check-line me-1"></i>
 
                                 <span class="fw-semibold">
-                                    {{ isset($berkasPasFoto) && $berkasPasFoto
+                                    {{ ($berkasPasFoto ?? null)
                                         ? 'File pengganti:'
                                         : 'File dipilih:' }}
                                 </span>
@@ -538,12 +501,10 @@
                                 </span>
 
                                 ({{ number_format($filePasFoto->getSize() / 1024, 0) }} KB)
-
                             </div>
 
                             {{-- PREVIEW GAMBAR BARU --}}
                             <div class="mt-2">
-
                                 <a
                                     href="{{ $filePasFoto->temporaryUrl() }}"
                                     target="_blank"
@@ -558,7 +519,6 @@
                                         style="max-width: 180px; max-height: 180px; object-fit: contain;"
                                     >
                                 </a>
-
                             </div>
 
                             {{-- BATALKAN FILE BARU --}}
@@ -568,9 +528,8 @@
                                 class="btn btn-sm btn-light text-danger rounded-pill mt-2"
                             >
                                 <i class="ri-delete-bin-line me-1"></i>
-
                                 Batalkan file
-                                {{ isset($berkasPasFoto) && $berkasPasFoto
+                                {{ ($berkasPasFoto ?? null)
                                     ? 'pengganti'
                                     : 'pilihan' }}
                             </button>
@@ -590,18 +549,15 @@
                 {{-- TOMBOL AKSI --}}
                 <div class="flex-shrink-0 d-flex flex-wrap align-items-center gap-2">
 
-                    {{-- PREVIEW BERKAS LAMA: MODE EDIT --}}
-                    @if (isset($berkasPasFoto) && $berkasPasFoto)
+                    {{-- PREVIEW BERKAS LAMA --}}
+                    @if ($berkasPasFoto ?? null)
 
                         <button
                             type="button"
                             class="btn btn-outline-secondary rounded-pill px-3"
                             data-bs-toggle="modal"
                             data-bs-target="#ModalPreviewBerkas"
-                            wire:click="$emit(
-                                'showPreviewBerkas',
-                                {{ $berkasPasFoto->ppdb_berkas_id }}
-                            )"
+                            wire:click="$emit('showPreviewBerkas', {{ $berkasPasFoto->ppdb_berkas_id }})"
                             title="Lihat berkas Pas Foto lama"
                         >
                             <i class="ri-eye-line me-1"></i>
@@ -612,7 +568,7 @@
 
                     {{-- PILIH / GANTI FILE --}}
                     <label
-                        for="{{ isset($berkasPasFoto) ? 'edit-file-foto' : 'create-file-foto' }}"
+                        for="{{ $modeEdit ? 'edit-file-foto' : 'create-file-foto' }}"
                         class="btn btn-outline-primary rounded-pill px-4 mb-0"
                         wire:loading.class="disabled"
                         wire:target="filePasFoto"
@@ -621,14 +577,14 @@
 
                         {{ $filePasFoto
                             ? 'Pilih Ulang'
-                            : (isset($berkasPasFoto) && $berkasPasFoto
+                            : (($berkasPasFoto ?? null)
                                 ? 'Ganti File'
                                 : 'Pilih File') }}
                     </label>
 
                     {{-- INPUT FILE --}}
                     <input
-                        id="{{ isset($berkasPasFoto) ? 'edit-file-foto' : 'create-file-foto' }}"
+                        id="{{ $modeEdit ? 'edit-file-foto' : 'create-file-foto' }}"
                         type="file"
                         class="d-none"
                         wire:model="filePasFoto"
@@ -676,11 +632,10 @@
                             Unggah dokumen tambahan jika diperlukan.
                         </p>
 
-                        {{-- STATUS BERKAS LAMA: MODE EDIT --}}
-                        @if (isset($berkasDokumenPendukung) && $berkasDokumenPendukung)
+                        {{-- STATUS BERKAS LAMA --}}
+                        @if ($berkasDokumenPendukung ?? null)
 
                             <div class="mb-2">
-
                                 <span class="text-success small">
                                     <i class="ri-checkbox-circle-line me-1"></i>
                                     Sudah diunggah
@@ -690,15 +645,13 @@
                                     <i class="ri-attachment-2 me-1"></i>
                                     {{ $berkasDokumenPendukung->nama_file ?: 'Nama file tidak tersedia' }}
                                 </div>
-
                             </div>
 
                         @else
 
                             <span class="text-warning small">
                                 <i class="ri-information-line me-1"></i>
-
-                                {{ isset($berkasDokumenPendukung)
+                                {{ $modeEdit
                                     ? 'Belum ada berkas tersimpan'
                                     : 'Belum memilih file (opsional)' }}
                             </span>
@@ -709,11 +662,10 @@
                         @if ($fileDokumenPendukung)
 
                             <div class="small text-primary mt-2">
-
                                 <i class="ri-file-check-line me-1"></i>
 
                                 <span class="fw-semibold">
-                                    {{ isset($berkasDokumenPendukung) && $berkasDokumenPendukung
+                                    {{ ($berkasDokumenPendukung ?? null)
                                         ? 'File pengganti:'
                                         : 'File dipilih:' }}
                                 </span>
@@ -723,7 +675,6 @@
                                 </span>
 
                                 ({{ number_format($fileDokumenPendukung->getSize() / 1024, 0) }} KB)
-
                             </div>
 
                             @php
@@ -736,7 +687,6 @@
                             @if (in_array($ekstensiDokumen, ['jpg', 'jpeg', 'png', 'webp']))
 
                                 <div class="mt-2">
-
                                     <a
                                         href="{{ $fileDokumenPendukung->temporaryUrl() }}"
                                         target="_blank"
@@ -751,14 +701,12 @@
                                             style="max-width: 180px; max-height: 140px; object-fit: contain;"
                                         >
                                     </a>
-
                                 </div>
 
                             {{-- INDIKATOR PDF BARU --}}
                             @elseif ($ekstensiDokumen === 'pdf')
 
                                 <div class="d-flex align-items-center gap-2 mt-2">
-
                                     <div
                                         class="d-flex align-items-center justify-content-center rounded border bg-light"
                                         style="width: 44px; height: 44px;"
@@ -769,7 +717,6 @@
                                     <span class="small text-muted">
                                         Dokumen PDF siap diunggah.
                                     </span>
-
                                 </div>
 
                             @endif
@@ -781,9 +728,8 @@
                                 class="btn btn-sm btn-light text-danger rounded-pill mt-2"
                             >
                                 <i class="ri-delete-bin-line me-1"></i>
-
                                 Batalkan file
-                                {{ isset($berkasDokumenPendukung) && $berkasDokumenPendukung
+                                {{ ($berkasDokumenPendukung ?? null)
                                     ? 'pengganti'
                                     : 'pilihan' }}
                             </button>
@@ -803,18 +749,15 @@
                 {{-- TOMBOL AKSI --}}
                 <div class="flex-shrink-0 d-flex flex-wrap align-items-center gap-2">
 
-                    {{-- PREVIEW BERKAS LAMA: MODE EDIT --}}
-                    @if (isset($berkasDokumenPendukung) && $berkasDokumenPendukung)
+                    {{-- PREVIEW BERKAS LAMA --}}
+                    @if ($berkasDokumenPendukung ?? null)
 
                         <button
                             type="button"
                             class="btn btn-outline-secondary rounded-pill px-3"
                             data-bs-toggle="modal"
                             data-bs-target="#ModalPreviewBerkas"
-                            wire:click="$emit(
-                                'showPreviewBerkas',
-                                {{ $berkasDokumenPendukung->ppdb_berkas_id }}
-                            )"
+                            wire:click="$emit('showPreviewBerkas', {{ $berkasDokumenPendukung->ppdb_berkas_id }})"
                             title="Lihat Dokumen Pendukung lama"
                         >
                             <i class="ri-eye-line me-1"></i>
@@ -825,7 +768,7 @@
 
                     {{-- PILIH / GANTI FILE --}}
                     <label
-                        for="{{ isset($berkasDokumenPendukung) ? 'edit-file-pendukung' : 'create-file-pendukung' }}"
+                        for="{{ $modeEdit ? 'edit-file-pendukung' : 'create-file-pendukung' }}"
                         class="btn btn-outline-primary rounded-pill px-4 mb-0"
                         wire:loading.class="disabled"
                         wire:target="fileDokumenPendukung"
@@ -834,14 +777,14 @@
 
                         {{ $fileDokumenPendukung
                             ? 'Pilih Ulang'
-                            : (isset($berkasDokumenPendukung) && $berkasDokumenPendukung
+                            : (($berkasDokumenPendukung ?? null)
                                 ? 'Ganti File'
                                 : 'Pilih File') }}
                     </label>
 
                     {{-- INPUT FILE --}}
                     <input
-                        id="{{ isset($berkasDokumenPendukung) ? 'edit-file-pendukung' : 'create-file-pendukung' }}"
+                        id="{{ $modeEdit ? 'edit-file-pendukung' : 'create-file-pendukung' }}"
                         type="file"
                         class="d-none"
                         wire:model="fileDokumenPendukung"
@@ -863,6 +806,7 @@
             </div>
 
         </div>
+
 
     </div>
 </div>

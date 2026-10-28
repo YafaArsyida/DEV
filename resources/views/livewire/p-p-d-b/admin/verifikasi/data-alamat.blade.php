@@ -120,6 +120,25 @@
                                     </div>
                                 </div>
 
+                                {{-- RT --}}
+                                <div class="col-12 col-md-6">
+                                    <small class="text-muted d-block mb-1">
+                                        RT
+                                    </small>
+                                    <div class="fw-semibold">
+                                        {{ $alamat->rt ?: '-' }}
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <small class="text-muted d-block mb-1">
+                                        RW
+                                    </small>
+                                    <div class="fw-semibold">
+                                        {{ $alamat->rw ?: '-' }}
+                                    </div>
+                                </div>
+
                                 {{-- KODE POS --}}
                                 <div class="col-12 col-md-6">
                                     <small class="text-muted d-block mb-1">

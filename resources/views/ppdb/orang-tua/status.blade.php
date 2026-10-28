@@ -187,9 +187,15 @@
                                     @endif
 
                                     {{-- CETAK KARTU --}}
-                                    @if ($status === 'diterima')
-                                        <a href="#"
-                                            class="btn btn-success rounded-pill px-4">
+                                    @if ($pendaftaran->status !== 'draft')
+                                        <a
+                                            href="{{ route('ppdb.kartu-aljabar.pdf', [
+                                                'pendaftaranId' => $pendaftaran->ppdb_pendaftaran_id,
+                                            ]) }}"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="btn btn-danger rounded-pill px-4"
+                                        >
                                             <i class="ri-printer-line me-1"></i>
                                             Cetak Kartu Aljabar
                                         </a>

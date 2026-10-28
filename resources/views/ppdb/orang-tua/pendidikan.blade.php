@@ -33,6 +33,32 @@
                             </p>
                         </div>
                     </div>
+                @elseif (!$pendaftaran)
+                    <div class="card border-0 shadow-sm rounded-4">
+                        <div class="card-body p-4 text-center">
+                            <div class="avatar-md mx-auto mb-3">
+                                <div class="avatar-title bg-primary-subtle text-primary rounded-circle fs-2">
+                                    <i class="ri-route-line"></i>
+                                </div>
+                            </div>
+
+                            <h5 class="mb-2">Pilih Jalur Pendaftaran</h5>
+
+                            <p class="text-muted mb-4">
+                                Anda belum memilih jalur pendaftaran.
+                                Silakan pilih jalur terlebih dahulu sebelum
+                                mengisi data calon siswa.
+                            </p>
+
+                            <a href="{{ route('ppdb.pendaftaran.jalur', [
+                                    'jenjang' => $jenjang->slug,
+                                ]) }}"
+                                class="btn btn-primary rounded-pill px-4">
+                                <i class="ri-route-line me-1"></i>
+                                Pilih Jalur Pendaftaran
+                            </a>
+                        </div>
+                    </div>
                 @elseif (!$alamat)
                     <div class="card border-0 shadow-sm rounded-4">
                         <div class="card-body p-4 text-center">

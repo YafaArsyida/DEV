@@ -39,6 +39,7 @@
 
                 @livewire('p-p-d-b.admin.pendaftar.create')   
                 @livewire('p-p-d-b.admin.pendaftar.edit')   
+                @livewire('p-p-d-b.admin.pendaftar.delete')   
                 
                 @livewire('p-p-d-b.pendaftaran.preview-berkas')
                 @livewire('p-p-d-b.admin.verifikasi.diterima')   

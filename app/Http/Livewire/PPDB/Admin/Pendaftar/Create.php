@@ -145,7 +145,7 @@ class Create extends Component
     public $pertanyaan = [];
     public $jawaban = [];
 
-    public $pernyataan = false;
+    // public $pernyataan = false;
 
     public function pindahTab($tab)
     {
@@ -957,8 +957,8 @@ class Create extends Component
         'jawaban.*.in' =>
             'Pilihan jawaban tidak valid.',
 
-        'pernyataan.accepted' =>
-            'Anda harus menyetujui pernyataan kebenaran data.',
+        // 'pernyataan.accepted' =>
+        //     'Anda harus menyetujui pernyataan kebenaran data.',
             
         // =========================================================
         // PESAN UMUM
@@ -1126,17 +1126,13 @@ class Create extends Component
     public function errorTabPertanyaan()
     {
         foreach (array_keys($this->getErrorBag()->toArray()) as $field) {
-            if (
-                $field === 'pernyataan' ||
-                str_starts_with($field, 'jawaban.')
-            ) {
+            if (str_starts_with($field, 'jawaban.')) {
                 return true;
             }
         }
 
         return false;
     }
-
 
     protected function adaIsian(array $data, array $fields): bool
     {
