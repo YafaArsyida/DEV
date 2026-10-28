@@ -148,8 +148,15 @@
                                                 Lihat Status
                                             </a>
 
-                                            @if ($pendaftaran->status === 'diterima')
-                                                <a class="btn btn-danger rounded-pill">
+                                            @if ($pendaftaran->status !== 'draft')
+                                                <a
+                                                    href="{{ route('ppdb.kartu-aljabar.pdf', [
+                                                        'pendaftaranId' => $pendaftaran->ppdb_pendaftaran_id,
+                                                    ]) }}"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    class="btn btn-danger rounded-pill px-4"
+                                                >
                                                     <i class="ri-printer-line me-1"></i>
                                                     Cetak Kartu Aljabar
                                                 </a>

@@ -1576,6 +1576,10 @@ class Edit extends Component
                 // Jangan mengubah periode, gelombang, jalur, atau status.
                 $periodeId = $pendaftaran->ppdb_periode_id;
 
+                // Jalur boleh diubah oleh admin.
+                $pendaftaran->ppdb_jalur_id = $this->jalurTerpilih;
+                $pendaftaran->save();
+
                 // -------------------------------------------------
                 // 5A. PERBARUI DATA CALON SISWA
                 // -------------------------------------------------

@@ -295,6 +295,21 @@
                                         Edit
                                     </button>
 
+                                    {{-- CETAK KARTU ALJABAR --}}
+                                    @if ($item->status !== 'draft')
+                                        <a
+                                            href="{{ route('ppdb.kartu-aljabar.pdf', [
+                                                'pendaftaranId' => $item->ppdb_pendaftaran_id,
+                                            ]) }}"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="btn btn-danger btn-sm rounded-pill px-3 text-nowrap"
+                                            title="Cetak Kartu Aljabar"
+                                        >
+                                            <i class="ri-printer-line align-bottom me-1"></i>
+                                            Kartu
+                                        </a>
+                                    @endif
                                     {{-- KONTAK WHATSAPP --}}
                                     @php
                                         $orangTua = $item->ppdb_orangtua;
