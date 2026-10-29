@@ -13,12 +13,12 @@
                         <div class="d-flex align-items-center">
                             <div class="navbar-brand-box horizontal-logo">
                                 <a href="{{ route('ppdb.admin.dashboard') }}" class="logo logo-dark">
-                                    <span class="logo-sm fw-bold">PPDB</span>
-                                    <span class="logo-lg fw-bold">PPDB {{ config('app.name') }}</span>
+                                    <span class="logo-sm fw-bold">SPMB</span>
+                                    <span class="logo-lg fw-bold">SPMB {{ config('app.name') }}</span>
                                 </a>
                                 <a href="{{ route('ppdb.admin.dashboard') }}" class="logo logo-light">
-                                    <span class="logo-sm fw-bold">PPDB</span>
-                                    <span class="logo-lg fw-bold">PPDB {{ config('app.name') }}</span>
+                                    <span class="logo-sm fw-bold">SPMB</span>
+                                    <span class="logo-lg fw-bold">SPMB {{ config('app.name') }}</span>
                                 </a>
                             </div>
 
@@ -28,7 +28,7 @@
 
                             <div class="app-search d-none d-md-flex header-item">
                                 <div class="position-relative">
-                                    <h3 class="mb-0">Admin PPDB {{ config('app.name') }}</h3>
+                                    <h3 class="mb-0">Admin SPMB {{ config('app.name') }}</h3>
                                 </div>
                             </div>
                         </div>

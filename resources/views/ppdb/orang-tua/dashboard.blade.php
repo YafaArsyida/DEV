@@ -21,7 +21,7 @@
                                 </h5>
 
                                 <small class="text-muted">
-                                    Pantau perkembangan pendaftaran putra-putri Anda melalui portal PPDB.
+                                    Pantau perkembangan pendaftaran putra-putri Anda melalui portal SPMB.
                                 </small>
                             </div>
                         </div>
@@ -186,7 +186,7 @@
                                 </h5>
 
                                 <p class="text-muted mb-4 mx-auto" style="max-width: 380px;">
-                                    Mulai proses PPDB dengan memilih jalur pendaftaran yang tersedia.
+                                    Mulai proses SPMB dengan memilih jalur pendaftaran yang tersedia.
                                 </p>
 
                                 @if ($periode)
@@ -200,7 +200,7 @@
                                 @else
                                     <div class="d-inline-flex align-items-center gap-2 text-muted small">
                                         <i class="ri-information-line"></i>
-                                        <span>Belum ada periode PPDB yang dibuka saat ini.</span>
+                                        <span>Belum ada periode SPMB yang dibuka saat ini.</span>
                                     </div>
                                 @endif
                             </div>
@@ -470,7 +470,7 @@
 
                                 <div>
                                     <h5 class="fw-bold mb-1">
-                                        Informasi PPDB
+                                        Informasi SPMB
                                     </h5>
 
                                     <small class="text-muted">

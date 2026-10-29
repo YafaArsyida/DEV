@@ -360,7 +360,7 @@
                     <a class="ppdb-brand d-flex align-items-center gap-2 fw-bold text-body text-decoration-none"
                         href="{{ route('ppdb.sd') }}">
                         <img class="avatar-sm rounded-3 object-fit-cover"
-                            src="{{ asset('assets/logo/logo.jpg') }}"
+                            src="{{ asset('assets/logo/logo.webp') }}"
                             alt="Logo sekolah">
 
                         <div class="lh-sm">

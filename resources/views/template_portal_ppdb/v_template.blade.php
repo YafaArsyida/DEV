@@ -44,7 +44,7 @@
 
                             <div class="app-search d-none d-md-flex header-item">
                                 <div class="position-relative">
-                                    <h3 class="mb-0">PPDB {{ $jenjang->nama_jenjang ?? config('app.name') }}</h3>
+                                    <h3 class="mb-0">SPMB {{ $jenjang->nama_jenjang ?? config('app.name') }}</h3>
                                 </div>
                             </div>
                         </div>

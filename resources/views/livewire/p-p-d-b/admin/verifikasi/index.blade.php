@@ -47,32 +47,42 @@
     </div>
 
     <div class="card-body">
-        {{-- Filter --}}
-        <div class="row g-3 mb-4">
-            {{-- Pencarian --}}
-            <div class="col-xl-5 col-md-6">
-                <label class="form-label small text-muted text-uppercase fw-medium mb-2">
+        {{-- FILTER --}}
+        <div class="row g-3 mb-3">
+
+            {{-- PENCARIAN --}}
+            <div class="col-xxl-5 col-md-6">
+                <label
+                    for="searchData"
+                    class="form-label small text-muted text-uppercase fw-medium mb-2">
                     Pencarian
                 </label>
 
                 <div class="search-box">
                     <input
-                        type="search"
+                        type="text"
+                        id="searchData"
                         class="form-control search"
-                        placeholder="Nama atau nomor pendaftaran"
+                        placeholder="Cari nama atau nomor pendaftaran..."
                         wire:model.debounce.400ms="cari">
 
-                    <i class="mdi mdi-magnify search-icon"></i>
+                    <i class="ri-search-line search-icon"></i>
                 </div>
             </div>
 
-            {{-- Status --}}
-            <div class="col-xl-3 col-md-6">
-                <label class="form-label small text-muted text-uppercase fw-medium mb-2">
+            {{-- FILTER STATUS --}}
+            <div class="col-xxl-3 col-md-6">
+                <label
+                    for="filterStatus"
+                    class="form-label small text-muted text-uppercase fw-medium mb-2">
                     Status Verifikasi
                 </label>
 
-                <select class="form-select" wire:model="filterStatus">
+                <select
+                    id="filterStatus"
+                    class="form-select"
+                    wire:model="filterStatus">
+
                     <option value="">Semua Status</option>
                     <option value="pengecekan">Pengecekan</option>
                     <option value="perbaikan">Perlu Perbaikan</option>
@@ -80,352 +90,372 @@
                 </select>
             </div>
 
-            {{-- Kelengkapan dokumen --}}
-            <div class="col-xl-2 col-md-6">
-                <label class="form-label small text-muted text-uppercase fw-medium mb-2">
+            {{-- FILTER KELENGKAPAN DOKUMEN --}}
+            <div class="col-xxl-2 col-md-6">
+                <label
+                    for="filterDokumen"
+                    class="form-label small text-muted text-uppercase fw-medium mb-2">
                     Kelengkapan Dokumen
                 </label>
 
-                <select class="form-select" wire:model="filterDokumen">
+                <select
+                    id="filterDokumen"
+                    class="form-select"
+                    wire:model="filterDokumen">
+
                     <option value="">Semua Dokumen</option>
                     <option value="lengkap">Lengkap</option>
                     <option value="belum_lengkap">Belum Lengkap</option>
                 </select>
             </div>
 
-            {{-- Reset --}}
-            <div class="col-xl-2 col-md-6 d-flex align-items-end">
+            {{-- RESET FILTER --}}
+            <div class="col-xxl-2 col-md-6 d-flex align-items-end">
                 <button
                     type="button"
-                    class="btn btn-light w-100"
+                    class="btn btn-light rounded-pill px-3"
                     wire:click="resetFilter">
+
                     <i class="ri-refresh-line me-1"></i>
                     Reset Filter
                 </button>
             </div>
-        </div>
 
-        {{-- Indikator loading --}}
+        </div>
+        {{-- END FILTER --}}
+
+        {{-- INDIKATOR LOADING --}}
         <div
             wire:loading.delay
             wire:target="cari,filterStatus,filterDokumen,resetFilter,gotoPage,nextPage,previousPage"
             class="text-muted small mb-3">
+
             <span class="spinner-border spinner-border-sm me-1"></span>
             Memuat antrean verifikasi...
         </div>
 
         {{-- Tabel --}}
-        <div class="table-responsive">
-            <table class="table table-hover table-nowrap align-middle">
-                <thead class="table-light">
-                    <tr class="text-uppercase">
-                        <th class="text-center" style="width: 60px;">No.</th>
-                        <th class="text-center" style="width: 70px;">Hapus</th>
-                        <th>Calon Siswa</th>
-                        <th>Nomor Pendaftaran</th>
-                        <th>Jalur</th>
-                        <th>Dokumen</th>
-                        <th>Tanggal Dikirim</th>
-                        <th>Status</th>
-                        <th class="text-center">Aksi</th>
-                    </tr>
-                </thead>
+        <div class="live-preview">
+            <div class="table-responsive">
+                <table class="table table-hover table-nowrap align-middle">
+                    <thead class="table-light">
+                        <tr class="text-uppercase">
+                            <th class="text-center" style="width: 60px;">No.</th>
+                            <th class="text-center" style="width: 70px;">Hapus</th>
+                            <th>Calon Siswa</th>
+                            <th>Nomor Pendaftaran</th>
+                            <th>Jalur</th>
+                            <th>Dokumen</th>
+                            <th>Tanggal Dikirim</th>
+                            <th>Status</th>
+                            <th class="text-center">Aksi</th>
+                        </tr>
+                    </thead>
 
-                <tbody>
-                    @forelse ($antrean as $item)
-                        <tr wire:key="verifikasi-{{ $item->ppdb_pendaftaran_id }}">
-                            {{-- Nomor --}}
-                            <td class="text-center text-muted">
-                                {{ $antrean->firstItem() + $loop->index }}
-                            </td>
+                    <tbody>
+                        @forelse ($antrean as $item)
+                            <tr wire:key="verifikasi-{{ $item->ppdb_pendaftaran_id }}">
+                                {{-- Nomor --}}
+                                <td class="text-center text-muted">
+                                    {{ $antrean->firstItem() + $loop->index }}
+                                </td>
 
-                            <td class="text-center">
-                                <a href="#ModalDeletePendaftaran"
-                                    data-bs-toggle="modal"
-                                    class="text-danger d-inline-block remove-item-btn"
-                                    wire:click.prevent="$emit(
-                                        'confirmDeletePendaftaran',
-                                        {{ $item->ppdb_pendaftaran_id }}
-                                    )"
-                                    data-bs-trigger="hover"
-                                    data-bs-placement="top"
-                                    title="Hapus Pendaftaran">
+                                <td class="text-center">
+                                    <a href="#ModalDeletePendaftaran"
+                                        data-bs-toggle="modal"
+                                        class="text-danger d-inline-block remove-item-btn"
+                                        wire:click.prevent="$emit(
+                                            'confirmDeletePendaftaran',
+                                            {{ $item->ppdb_pendaftaran_id }}
+                                        )"
+                                        data-bs-trigger="hover"
+                                        data-bs-placement="top"
+                                        title="Hapus Pendaftaran">
 
-                                    <i class="ri-delete-bin-5-fill fs-14"></i>
-                                </a>
-                            </td>
+                                        <i class="ri-delete-bin-5-fill fs-14"></i>
+                                    </a>
+                                </td>
 
-                            {{-- Calon siswa --}}
-                            <td>
-                                <div class="d-flex align-items-center gap-3">
+                                {{-- Calon siswa --}}
+                                <td>
+                                    <div class="d-flex align-items-center gap-3">
+                                        @php
+                                            $pasFoto = $item->ppdb_berkas
+                                                ->firstWhere('jenis_berkas', 'PAS_FOTO');
+                                        @endphp
+
+                                        <div class="avatar-sm flex-shrink-0">
+                                            @if ($pasFoto && $pasFoto->path_file)
+                                                <img
+                                                    src="{{ url('/ppdb/berkas/preview/' . $pasFoto->ppdb_berkas_id) }}?v={{ $pasFoto->updated_at?->timestamp }}"
+                                                    alt="Pas foto {{ $item->ppdb_calon_siswa->nama_siswa ?? 'calon siswa' }}"
+                                                    class="rounded-circle object-fit-cover"
+                                                    style="width: 40px; height: 40px;"
+                                                    loading="lazy"
+                                                >
+                                            @else
+                                                <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
+                                                    <i class="ri-user-line fs-18"></i>
+                                                </div>
+                                            @endif
+                                        </div>
+
+                                        <div>
+                                            <h6 class="mb-1 fw-semibold">
+                                                {{ $item->ppdb_calon_siswa->nama_siswa ?? 'Nama belum tersedia' }}
+                                            </h6>
+
+                                            <small class="text-muted">
+                                                Calon peserta didik
+                                            </small>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                {{-- Nomor pendaftaran --}}
+                                <td>
+                                    <span class="fw-medium">
+                                        {{ $item->nomor_pendaftaran }}
+                                    </span>
+                                </td>
+
+                                {{-- Jalur --}}
+                                <td>
+                                    <span>
+                                        {{ $item->ppdb_jalur->nama_jalur ?? '-' }}
+                                    </span>
+                                </td>
+
+                                {{-- Dokumen --}}
+                                <td>
                                     @php
-                                        $pasFoto = $item->ppdb_berkas
-                                            ->firstWhere('jenis_berkas', 'PAS_FOTO');
+                                        $jumlahBerkas = $item->ppdb_berkas->count();
                                     @endphp
 
-                                    <div class="avatar-sm flex-shrink-0">
-                                        @if ($pasFoto && $pasFoto->path_file)
-                                            <img
-                                                src="{{ url('/ppdb/berkas/preview/' . $pasFoto->ppdb_berkas_id) }}?v={{ $pasFoto->updated_at?->timestamp }}"
-                                                alt="Pas foto {{ $item->ppdb_calon_siswa->nama_siswa ?? 'calon siswa' }}"
-                                                class="rounded-circle object-fit-cover"
-                                                style="width: 40px; height: 40px;"
-                                                loading="lazy"
-                                            >
-                                        @else
-                                            <div class="avatar-title bg-primary-subtle text-primary rounded-circle">
-                                                <i class="ri-user-line fs-18"></i>
-                                            </div>
-                                        @endif
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <i class="ri-file-list-3-line text-primary fs-18"></i>
+
+                                        <span class="fw-medium">
+                                            {{ $jumlahBerkas }} berkas
+                                        </span>
                                     </div>
+                                </td>
 
-                                    <div>
-                                        <h6 class="mb-1 fw-semibold">
-                                            {{ $item->ppdb_calon_siswa->nama_siswa ?? 'Nama belum tersedia' }}
-                                        </h6>
+                                {{-- Tanggal dikirim --}}
+                                <td>
+                                    {{\App\Http\Controllers\HelperController::formatTanggalIndonesia($item->updated_at, 'd F Y') }}
+                                </td>
 
-                                        <small class="text-muted">
-                                            Calon peserta didik
-                                        </small>
-                                    </div>
-                                </div>
-                            </td>
-
-                            {{-- Nomor pendaftaran --}}
-                            <td>
-                                <span class="fw-medium">
-                                    {{ $item->nomor_pendaftaran }}
-                                </span>
-                            </td>
-
-                            {{-- Jalur --}}
-                            <td>
-                                <span>
-                                    {{ $item->ppdb_jalur->nama_jalur ?? '-' }}
-                                </span>
-                            </td>
-
-                            {{-- Dokumen --}}
-                            <td>
-                                @php
-                                    $jumlahBerkas = $item->ppdb_berkas->count();
-                                @endphp
-
-                                <div class="d-flex align-items-center gap-2 mb-1">
-                                    <i class="ri-file-list-3-line text-primary fs-18"></i>
-
-                                    <span class="fw-medium">
-                                        {{ $jumlahBerkas }} berkas
-                                    </span>
-                                </div>
-                            </td>
-
-                            {{-- Tanggal dikirim --}}
-                            <td>
-                                {{\App\Http\Controllers\HelperController::formatTanggalIndonesia($item->updated_at, 'd F Y') }}
-                            </td>
-
-                            {{-- Status --}}
-                            <td>
-                                @php
-                                    $statusTampilan = [
-                                        'draft' => [
-                                            'label' => 'Draft',
-                                            'warna' => 'secondary',
-                                            'ikon' => 'ri-draft-line',
-                                        ],
-                                        'pengecekan' => [
-                                            'label' => 'Pengecekan',
-                                            'warna' => 'warning',
-                                            'ikon' => 'ri-time-line',
-                                        ],
-                                        'perbaikan' => [
-                                            'label' => 'Perlu Perbaikan',
-                                            'warna' => 'danger',
-                                            'ikon' => 'ri-error-warning-line',
-                                        ],
-                                        'diterima' => [
-                                            'label' => 'Diterima',
-                                            'warna' => 'success',
-                                            'ikon' => 'ri-checkbox-circle-line',
-                                        ],
-                                    ];
-
-                                    $tampilan = $statusTampilan[$item->status] ?? [
-                                        'label' => ucfirst($item->status ?? 'Tidak diketahui'),
-                                        'warna' => 'secondary',
-                                        'ikon' => 'ri-information-line',
-                                    ];
-                                @endphp
-
-                                <span class="badge bg-{{ $tampilan['warna'] }}-subtle text-{{ $tampilan['warna'] }} rounded-pill px-3 py-2">
-                                    <i class="{{ $tampilan['ikon'] }} me-1"></i>
-                                    {{ $tampilan['label'] }}
-                                </span>
-                            </td>
-
-                            {{-- Aksi --}}
-                            <td class="text-center">
-                                <div class="d-flex justify-content-center align-items-center gap-2 flex-nowrap">
-
-                                    {{-- PERIKSA --}}
-                                    <button
-                                        type="button"
-                                        class="btn btn-primary btn-sm rounded-pill px-3 text-nowrap"
-                                        data-bs-toggle="offcanvas"
-                                        data-bs-target="#offcanvasPemeriksaanPendaftaran"
-                                        title="Periksa Dokumen Pendaftaran"
-                                        wire:click.prevent="$emit('bukaPemeriksaan', {{ $item->ppdb_pendaftaran_id }})">
-
-                                        <i class="ri-eye-line align-bottom me-1"></i>
-                                        Periksa
-                                    </button>
-
-                                    {{-- EDIT --}}
-                                    <button
-                                        type="button"
-                                        class="btn {{ $item->status === 'diterima' ? 'btn-outline-dark' : 'btn-outline-danger' }} btn-sm rounded-pill px-3 text-nowrap"
-                                        data-bs-toggle="offcanvas"
-                                        data-bs-target="#offcanvasEditPendaftaran"
-                                        title="{{ $item->status === 'diterima' ? 'Pendaftaran sudah diterima dan tidak dapat diedit' : 'Edit Data Pendaftaran' }}"
-                                        wire:click.prevent="$emit('bukaEditPendaftaran', {{ $item->ppdb_pendaftaran_id }})"
-                                        @disabled($item->status === 'diterima')
-                                    >
-                                        <i class="ri-edit-line align-bottom me-1"></i>
-                                        Edit
-                                    </button>
-
-                                    {{-- CETAK KARTU ALJABAR --}}
-                                    @if ($item->status !== 'draft')
-                                        <a
-                                            href="{{ route('ppdb.kartu-aljabar.pdf', [
-                                                'pendaftaranId' => $item->ppdb_pendaftaran_id,
-                                            ]) }}"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            class="btn btn-danger btn-sm rounded-pill px-3 text-nowrap"
-                                            title="Cetak Kartu Aljabar"
-                                        >
-                                            <i class="ri-printer-line align-bottom me-1"></i>
-                                            Kartu
-                                        </a>
-                                    @endif
-                                    {{-- KONTAK WHATSAPP --}}
+                                {{-- Status --}}
+                                <td>
                                     @php
-                                        $orangTua = $item->ppdb_orangtua;
-
-                                        $kontakWhatsApp = [
-                                            'Ayah' => $orangTua->telepon_ayah ?? null,
-                                            'Ibu' => $orangTua->telepon_ibu ?? null,
-                                            'Wali' => $orangTua->telepon_wali ?? null,
+                                        $statusTampilan = [
+                                            'draft' => [
+                                                'label' => 'Draft',
+                                                'warna' => 'secondary',
+                                                'ikon' => 'ri-draft-line',
+                                            ],
+                                            'pengecekan' => [
+                                                'label' => 'Pengecekan',
+                                                'warna' => 'warning',
+                                                'ikon' => 'ri-time-line',
+                                            ],
+                                            'perbaikan' => [
+                                                'label' => 'Perlu Perbaikan',
+                                                'warna' => 'danger',
+                                                'ikon' => 'ri-error-warning-line',
+                                            ],
+                                            'diterima' => [
+                                                'label' => 'Diterima',
+                                                'warna' => 'success',
+                                                'ikon' => 'ri-checkbox-circle-line',
+                                            ],
                                         ];
 
-                                        $kontakTersedia = collect($kontakWhatsApp)
-                                            ->filter(fn ($nomor) => filled($nomor));
+                                        $tampilan = $statusTampilan[$item->status] ?? [
+                                            'label' => ucfirst($item->status ?? 'Tidak diketahui'),
+                                            'warna' => 'secondary',
+                                            'ikon' => 'ri-information-line',
+                                        ];
                                     @endphp
 
-                                    <div class="dropdown">
+                                    <span class="badge bg-{{ $tampilan['warna'] }}-subtle text-{{ $tampilan['warna'] }} rounded-pill px-3 py-2">
+                                        <i class="{{ $tampilan['ikon'] }} me-1"></i>
+                                        {{ $tampilan['label'] }}
+                                    </span>
+                                </td>
+
+                                {{-- Aksi --}}
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center align-items-center gap-2 flex-nowrap">
+
+                                        {{-- PERIKSA --}}
                                         <button
                                             type="button"
-                                            class="btn btn-soft-success btn-sm rounded-pill px-3 text-nowrap"
-                                            data-bs-toggle="dropdown"
-                                            aria-expanded="false"
-                                            title="Hubungi orang tua">
+                                            class="btn btn-primary btn-sm rounded-pill px-3 text-nowrap"
+                                            data-bs-toggle="offcanvas"
+                                            data-bs-target="#offcanvasPemeriksaanPendaftaran"
+                                            title="Periksa Dokumen Pendaftaran"
+                                            wire:click.prevent="$emit('bukaPemeriksaan', {{ $item->ppdb_pendaftaran_id }})">
 
-                                            <i class="ri-whatsapp-line me-1"></i>
-                                            Hubungi
-                                            <i class="ri-arrow-down-s-line ms-1"></i>
+                                            <i class="ri-eye-line align-bottom me-1"></i>
+                                            Periksa
                                         </button>
 
-                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                                            <li>
-                                                <h6 class="dropdown-header">
-                                                    Hubungi Orang Tua
-                                                </h6>
-                                            </li>
+                                        {{-- EDIT --}}
+                                        <button
+                                            type="button"
+                                            class="btn {{ $item->status === 'diterima' ? 'btn-outline-dark' : 'btn-outline-danger' }} btn-sm rounded-pill px-3 text-nowrap"
+                                            data-bs-toggle="offcanvas"
+                                            data-bs-target="#offcanvasEditPendaftaran"
+                                            title="{{ $item->status === 'diterima' ? 'Pendaftaran sudah diterima dan tidak dapat diedit' : 'Edit Data Pendaftaran' }}"
+                                            wire:click.prevent="$emit('bukaEditPendaftaran', {{ $item->ppdb_pendaftaran_id }})"
+                                            @disabled($item->status === 'diterima')
+                                        >
+                                            <i class="ri-edit-line align-bottom me-1"></i>
+                                            Edit
+                                        </button>
 
-                                            @forelse ($kontakTersedia as $label => $nomor)
-                                                @php
-                                                    $nomorBersih = preg_replace('/\D/', '', $nomor);
+                                        {{-- CETAK KARTU ALJABAR --}}
+                                        @if ($item->status !== 'draft')
+                                            <a
+                                                href="{{ route('ppdb.kartu-aljabar.pdf', [
+                                                    'pendaftaranId' => $item->ppdb_pendaftaran_id,
+                                                ]) }}"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                class="btn btn-danger btn-sm rounded-pill px-3 text-nowrap"
+                                                title="Cetak Kartu Aljabar"
+                                            >
+                                                <i class="ri-printer-line align-bottom me-1"></i>
+                                                Kartu
+                                            </a>
+                                        @endif
+                                        {{-- KONTAK WHATSAPP --}}
+                                        @php
+                                            $orangTua = $item->ppdb_orangtua;
 
-                                                    if (str_starts_with($nomorBersih, '0')) {
-                                                        $nomorBersih = '62' . substr($nomorBersih, 1);
-                                                    } elseif (str_starts_with($nomorBersih, '8')) {
-                                                        $nomorBersih = '62' . $nomorBersih;
-                                                    }
-                                                @endphp
+                                            $kontakWhatsApp = [
+                                                'Ayah' => $orangTua->telepon_ayah ?? null,
+                                                'Ibu' => $orangTua->telepon_ibu ?? null,
+                                                'Wali' => $orangTua->telepon_wali ?? null,
+                                            ];
 
-                                                @if ($nomorBersih)
-                                                    <li>
-                                                        <a
-                                                            href="https://wa.me/{{ $nomorBersih }}"
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            class="dropdown-item py-2">
+                                            $kontakTersedia = collect($kontakWhatsApp)
+                                                ->filter(fn ($nomor) => filled($nomor));
+                                        @endphp
 
-                                                            <i class="ri-whatsapp-line text-success me-2"></i>
-                                                            WhatsApp {{ $label }}
-                                                        </a>
-                                                    </li>
-                                                @endif
-                                            @empty
+                                        <div class="dropdown">
+                                            <button
+                                                type="button"
+                                                class="btn btn-soft-success btn-sm rounded-pill px-3 text-nowrap"
+                                                data-bs-toggle="dropdown"
+                                                aria-expanded="false"
+                                                title="Hubungi orang tua">
+
+                                                <i class="ri-whatsapp-line me-1"></i>
+                                                Hubungi
+                                                <i class="ri-arrow-down-s-line ms-1"></i>
+                                            </button>
+
+                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
                                                 <li>
-                                                    <span class="dropdown-item-text text-muted small">
-                                                        Nomor kontak belum tersedia.
-                                                    </span>
+                                                    <h6 class="dropdown-header">
+                                                        Hubungi Orang Tua
+                                                    </h6>
                                                 </li>
-                                            @endforelse
-                                        </ul>
+
+                                                @forelse ($kontakTersedia as $label => $nomor)
+                                                    @php
+                                                        $nomorBersih = preg_replace('/\D/', '', $nomor);
+
+                                                        if (str_starts_with($nomorBersih, '0')) {
+                                                            $nomorBersih = '62' . substr($nomorBersih, 1);
+                                                        } elseif (str_starts_with($nomorBersih, '8')) {
+                                                            $nomorBersih = '62' . $nomorBersih;
+                                                        }
+                                                    @endphp
+
+                                                    @if ($nomorBersih)
+                                                        <li>
+                                                            <a
+                                                                href="https://wa.me/{{ $nomorBersih }}"
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                class="dropdown-item py-2">
+
+                                                                <i class="ri-whatsapp-line text-success me-2"></i>
+                                                                WhatsApp {{ $label }}
+                                                            </a>
+                                                        </li>
+                                                    @endif
+                                                @empty
+                                                    <li>
+                                                        <span class="dropdown-item-text text-muted small">
+                                                            Nomor kontak belum tersedia.
+                                                        </span>
+                                                    </li>
+                                                @endforelse
+                                            </ul>
+                                        </div>
+
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="9" class="text-center py-5">
+                                    <div class="avatar-lg mx-auto mb-3">
+                                        <div class="avatar-title bg-light text-muted rounded-circle fs-1">
+                                            <i class="ri-file-search-line"></i>
+                                        </div>
                                     </div>
 
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="9" class="text-center py-5">
-                                <div class="avatar-lg mx-auto mb-3">
-                                    <div class="avatar-title bg-light text-muted rounded-circle fs-1">
-                                        <i class="ri-file-search-line"></i>
-                                    </div>
-                                </div>
+                                    <h6 class="fw-semibold mb-1">
+                                        Pendaftar tidak ditemukan
+                                    </h6>
 
-                                <h6 class="fw-semibold mb-1">
-                                    Pendaftar tidak ditemukan
-                                </h6>
+                                    <p class="text-muted mb-3">
+                                        Tidak ada pendaftar yang sesuai dengan pencarian atau filter.
+                                    </p>
 
-                                <p class="text-muted mb-3">
-                                    Tidak ada pendaftar yang sesuai dengan pencarian atau filter.
-                                </p>
+                                    <button
+                                        type="button"
+                                        class="btn btn-sm btn-light"
+                                        wire:click="resetFilter">
+                                        <i class="ri-refresh-line me-1"></i>
+                                        Reset Filter
+                                    </button>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+                <div class="mt-3">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
 
-                                <button
-                                    type="button"
-                                    class="btn btn-sm btn-light"
-                                    wire:click="resetFilter">
-                                    <i class="ri-refresh-line me-1"></i>
-                                    Reset Filter
-                                </button>
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+                        <div class="text-muted fs-13">
+                            Menampilkan
+                            <span class="fw-semibold">
+                                {{ $antrean->firstItem() ?? 0 }}
+                            </span>
+                            -
+                            <span class="fw-semibold">
+                                {{ $antrean->lastItem() ?? 0 }}
+                            </span>
+                            dari
+                            <span class="fw-semibold">
+                                {{ $antrean->total() }}
+                            </span>
+                            pendaftar
+                        </div>
 
-        {{-- Footer dan pagination --}}
-        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mt-3">
-            <div class="text-muted small">
-                Menampilkan
-                <span class="fw-medium">{{ $antrean->firstItem() ?? 0 }}</span>
-                –
-                <span class="fw-medium">{{ $antrean->lastItem() ?? 0 }}</span>
-                dari
-                <span class="fw-medium">{{ $antrean->total() }}</span>
-                pendaftar.
-            </div>
+                        <div>
+                            {{ $antrean->links() }}
+                        </div>
 
-            <div>
-                {{ $antrean->links() }}
+                    </div>
+                </div>
             </div>
         </div>
     </div>

@@ -274,7 +274,7 @@
 
                                     <p class="text-muted mb-0 fs-13">
                                         Setelah dikirim, pendaftaran akan memasuki
-                                        proses verifikasi panitia PPDB. Perubahan
+                                        proses verifikasi panitia SPMB. Perubahan
                                         data selanjutnya mengikuti ketentuan yang
                                         berlaku di sekolah.
                                     </p>

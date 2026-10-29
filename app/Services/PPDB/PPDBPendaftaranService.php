@@ -103,7 +103,7 @@ class PPDBPendaftaranService
     private static function buatNomorPendaftaran(): string
     {
         do {
-            $nomor = 'PPDB-' . now()->format('Y') . '-'
+            $nomor = 'SPMB-' . now()->format('Y') . '-'
                 . Str::upper(Str::random(6));
 
             $sudahAda = PPDBPendaftaran::query()

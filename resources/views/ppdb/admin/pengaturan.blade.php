@@ -42,10 +42,10 @@
                     </div>
 
                     <div>
-                        <h5 class="fw-bold mb-1">Pengaturan PPDB</h5>
+                        <h5 class="fw-bold mb-1">Pengaturan SPMB</h5>
                         <small class="text-muted">
                             Atur jadwal penerimaan dan persyaratan
-                            yang akan ditampilkan pada portal PPDB.
+                            yang akan ditampilkan pada portal SPMB.
                         </small>
                     </div>
                 </div>

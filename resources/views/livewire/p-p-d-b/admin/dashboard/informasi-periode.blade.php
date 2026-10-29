@@ -45,7 +45,7 @@
 
             <div>
                 <h5 class="fw-bold mb-1">
-                    Belum Ada Periode PPDB
+                    Belum Ada Periode SPMB
                 </h5>
 
                 <p class="text-muted mb-0">

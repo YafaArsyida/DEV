@@ -5,6 +5,7 @@ namespace App\Http\Controllers\PPDB;
 use App\Http\Controllers\Controller;
 use App\Models\PPDBBerkas;
 use App\Models\PPDBPendaftaran;
+use App\Services\PPDB\PPDBFormulirPendaftaranService;
 use App\Services\PPDB\PPDBKartuAljabarService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -109,5 +110,48 @@ class PPDBBerkasController extends Controller
         );
     }
 
+    public function cetakFormulir(
+        $pendaftaranId,
+        PPDBFormulirPendaftaranService $formulirService
+    ) {
+        $pendaftaran = PPDBPendaftaran::query()
+            ->with([
+                'ppdb_calon_siswa',
+                'ppdb_orangtua',
+                'ppdb_jalur',
+                'ppdb_periode',
+            ])
+            ->findOrFail($pendaftaranId);
+
+        $user = Auth::user();
+
+        $peran = strtoupper($user->peran ?? '');
+
+        $peranAdmin = [
+            'SUPERADMIN',
+            'ADMIN',
+            'PANITIA_PPDB',
+        ];
+
+        $isAdmin = in_array($peran, $peranAdmin, true);
+
+        $isPemilik = (string) $pendaftaran->ms_pengguna_id
+            === (string) $user->getAuthIdentifier();
+
+        abort_unless($isPemilik || $isAdmin, 403);
+
+        // Formulir laporan ini hanya tersedia untuk siswa diterima.
+        // abort_unless($pendaftaran->status === 'diterima', 403);
+
+        $data = $formulirService->getData($pendaftaran);
+
+        $pdf = Pdf::loadView('reports.ppdb.formulir-pendaftaran',
+            $data
+        )->setPaper('a4', 'portrait');
+
+        return $pdf->stream(
+            'formulir-pendaftaran-' . $pendaftaran->getKey() . '.pdf'
+        );
+    }
 
 }

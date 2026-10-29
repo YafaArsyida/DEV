@@ -18,7 +18,7 @@
                     </h5>
 
                     <p class="text-muted mb-0">
-                        Modul PPDB Orang Tua
+                        Modul SPMB Orang Tua
                     </p>
                 </div>
             </a>
@@ -66,7 +66,7 @@
                         Login Berhasil!
                     </h6>
                     <p class="mb-1">
-                        Anda berhasil masuk ke akun PPDB.
+                        Anda berhasil masuk ke akun SPMB.
                     </p>
                     <small>
                         Anda akan dialihkan ke dashboard orang tua

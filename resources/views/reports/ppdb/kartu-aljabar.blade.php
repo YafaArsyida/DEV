@@ -561,7 +561,7 @@
         {{-- BACKGROUND DIGUNAKAN PADA SEMUA HALAMAN --}}
         <div class="page-background">
             <img
-                src="{{ public_path('assets/pdf/kartu-aljabar-background.png') }}"
+                src="{{ public_path('assets/pdf/kartu-aljabar-background.webp') }}"
                 alt=""
             >
         </div>
@@ -576,7 +576,7 @@
                     {{-- LOGO SEKOLAH --}}
                     <td class="logo-cell">
                         <img
-                            src="{{ public_path('assets/logo/logo.png') }}"
+                            src="{{ public_path('assets/logo/logo.webp') }}"
                             class="school-logo"
                             alt="Logo sekolah"
                         >

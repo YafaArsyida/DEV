@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Buat Akun PPDB {{ $jenjang->nama_jenjang }}</title>
+    <title>Buat Akun SPMB {{ $jenjang->nama_jenjang }}</title>
 
     <link rel="shortcut icon" href="{{asset('assets')}}/logo/yayasan.webp">
     <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />

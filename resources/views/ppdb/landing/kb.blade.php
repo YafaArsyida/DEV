@@ -299,7 +299,7 @@
                     <a class="ppdb-brand d-flex align-items-center gap-2 fw-bold text-body text-decoration-none"
                     href="{{ route('ppdb.kb') }}">
                         <img class="avatar-sm rounded-3 object-fit-cover"
-                            src="{{ asset('assets/logo/logo.jpg') }}"
+                            src="{{ asset('assets/logo/yayasan.webp') }}"
                             alt="Logo {{ $jenjang->nama_jenjang }}">
 
                         <div class="lh-sm">
@@ -1321,7 +1321,7 @@
                         <div class="col-lg-5 col-md-6">
                             <div>
                                 <div class="mb-4">
-                                    <img src="{{ asset('assets/logo/hero.png') }}"
+                                    <img src="{{ asset('assets/logo/yayasan.webp') }}"
                                         alt="Logo {{ $jenjang->nama_jenjang }}"
                                         height="50"
                                         class="rounded-2">

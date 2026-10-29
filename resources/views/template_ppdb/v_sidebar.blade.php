@@ -54,11 +54,11 @@
                 <li class="nav-item">
                     <a href="{{ route('ppdb.admin.pengaturan') }}" class="nav-link menu-link {{ request()->routeIs('ppdb.admin.pengaturan') ? 'active' : '' }}">
                         <i class="mdi mdi-cog-outline"></i>
-                        <span>Pengaturan PPDB</span>
+                        <span>Pengaturan SPMB</span>
                     </a>
                 </li>
 
-                <li class="menu-title"><span>OPERASIONAL PPDB</span></li>
+                <li class="menu-title"><span>OPERASIONAL SPMB</span></li>
 
                 <li class="nav-item">
                     <a href="{{ route('ppdb.admin.pendaftar') }}" class="nav-link menu-link {{ request()->routeIs('ppdb.admin.pendaftar') ? 'active' : '' }}">
@@ -77,7 +77,7 @@
                     </a>
                 </li>
 
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <a href="{{ route('ppdb.admin.pengumuman') }}" class="nav-link menu-link {{ request()->routeIs('ppdb.admin.pengumuman') ? 'active' : '' }}">
                         <i class="mdi mdi-bullhorn-outline"></i>
                         <span>
@@ -85,7 +85,7 @@
                             <small class="d-block text-muted">Publikasi hasil seleksi</small>
                         </span>
                     </a>
-                </li>
+                </li> --}}
 
                 {{-- <li class="nav-item">
                     <a href="{{ route('ppdb.admin.daftar-ulang') }}" class="nav-link menu-link {{ request()->routeIs('ppdb.admin.daftar-ulang') ? 'active' : '' }}">

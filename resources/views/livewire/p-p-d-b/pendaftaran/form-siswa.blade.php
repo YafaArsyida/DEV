@@ -468,7 +468,8 @@
 
                         <div class="col-md-4">
                             <label class="form-label" for="ukuran-baju">
-                                Ukuran Baju <span class="text-danger">*</span>
+                                {{-- Ukuran Baju <span class="text-danger">*</span> --}}
+                                Ukuran Baju
                             </label>
                             <select
                                 id="ukuran-baju"

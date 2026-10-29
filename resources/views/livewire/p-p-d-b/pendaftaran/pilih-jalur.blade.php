@@ -138,7 +138,7 @@
                             </p>
 
                             {{-- INFORMASI BIAYA DAN KUOTA --}}
-                            <div class="mt-auto pt-3 border-top">
+                            {{-- <div class="mt-auto pt-3 border-top">
                                 <div class="d-flex justify-content-between align-items-start gap-3 mb-2">
                                     <span class="text-muted small">
                                         Biaya pendaftaran
@@ -168,7 +168,7 @@
                                         @endif
                                     </span>
                                 </div>
-                            </div>
+                            </div> --}}
 
                             {{-- STATUS JALUR --}}
                             <div class="mt-3 pt-3 border-top">

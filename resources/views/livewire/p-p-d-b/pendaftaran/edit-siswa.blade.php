@@ -404,7 +404,8 @@
                         {{-- Ukuran Baju --}}
                         <div class="col-12 col-md-4">
                             <label for="edit-ukuran-baju" class="form-label">
-                                Ukuran Baju <span class="text-danger">*</span>
+                                {{-- Ukuran Baju <span class="text-danger">*</span> --}}
+                                Ukuran Baju
                             </label>
                             <select id="edit-ukuran-baju"
                                 class="form-select @error('ukuran_baju') is-invalid @enderror"

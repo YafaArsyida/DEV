@@ -733,8 +733,12 @@ class Edit extends Component
             'berat_badan' => [
                 'nullable', 'numeric', 'gt:0', 'max:300',
             ],
+            // 'ukuran_baju' => [
+            //     'required',
+            //     Rule::in(['XS', 'S', 'M', 'L', 'XL', 'XXL']),
+            // ],
             'ukuran_baju' => [
-                'required',
+                // 'required',
                 Rule::in(['XS', 'S', 'M', 'L', 'XL', 'XXL']),
             ],
             'penerima_bantuan_sosial' => [
@@ -1107,7 +1111,7 @@ class Edit extends Component
         'berat_badan.gt' => 'Berat badan harus lebih dari 0.',
         'berat_badan.max' => 'Berat badan maksimal 300 kg.',
 
-        'ukuran_baju.required' => 'Ukuran baju siswa wajib dipilih.',
+        // 'ukuran_baju.required' => 'Ukuran baju siswa wajib dipilih.',
         'ukuran_baju.in' => 'Ukuran baju yang dipilih tidak valid.',
 
         'penerima_bantuan_sosial.array' => 'Pilihan bantuan sosial tidak valid.',

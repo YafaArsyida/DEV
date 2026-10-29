@@ -17,7 +17,7 @@
                         {{ $namaJenjang }}
                     </h5>
                     <p class="text-muted mb-0">
-                        Modul PPDB Orang Tua
+                        Modul SPMB Orang Tua
                     </p>
                 </div>
             </a>
@@ -89,7 +89,7 @@
 
                         @if ($message === 'Email ini sudah terdaftar. Silakan login menggunakan akun yang sudah ada.')
                             <div class="mt-2 small">
-                                <a href="{{ route('ppdb.login') }}"
+                                <a href="{{ route('ppdb.login', ['jenjang' => $jenjangSlug]) }}"
                                     class="fw-semibold text-primary">
                                     Login ke akun yang sudah ada
                                     <i class="ri-arrow-right-line align-middle"></i>
@@ -197,7 +197,7 @@
                     <label class="form-check-label text-muted"
                         for="agreement">
                         Saya menyetujui syarat dan ketentuan
-                        pendaftaran PPDB.
+                        pendaftaran SPMB.
                     </label>
 
                     @error('agreement')

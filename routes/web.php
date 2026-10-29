@@ -220,6 +220,11 @@ Route::middleware(['auth'])->group(function () {
         PPDBBerkasController::class,
         'cetak',
     ])->name('ppdb.kartu-aljabar.pdf');
+
+    Route::get('/ppdb/formulir-pendaftaran/{pendaftaranId}', [
+        PPDBBerkasController::class,
+        'cetakFormulir',
+    ])->name('ppdb.formulir-pendaftaran.pdf');
 });
 
 Route::middleware('guest')->group(function () {
