@@ -8,7 +8,6 @@ use App\Models\Kelas;
 use App\Models\MataPelajaran;
 use App\Models\Pegawai;
 use App\Models\PenugasanGuru;
-use App\Models\PeriodeAkademik;
 use App\Models\TahunAjar;
 use Illuminate\Validation\ValidationException;
 
@@ -70,16 +69,6 @@ trait InteractsWithPenugasanGuru
             ->orderBy('nama_mapel');
     }
 
-    protected function periodOptions($jenjangId, $tahunAjarId, bool $activeOnly = true)
-    {
-        return PeriodeAkademik::query()
-            ->where('ms_jenjang_id', $jenjangId)
-            ->where('ms_tahun_ajar_id', $tahunAjarId)
-            ->when($activeOnly, fn ($query) => $query->where('status', 'AKTIF'))
-            ->orderBy('urutan')
-            ->orderBy('tanggal_mulai');
-    }
-
     protected function assignmentsForContext($jenjangId, $tahunAjarId)
     {
         return PenugasanGuru::query()
@@ -88,16 +77,15 @@ trait InteractsWithPenugasanGuru
                 $query->where('ms_jenjang_id', $jenjangId)
                     ->where('ms_tahun_ajar_id', $tahunAjarId);
             })
-            ->whereHas('ms_mata_pelajaran', fn ($query) => $query->where('ms_jenjang_id', $jenjangId))
-            ->whereHas('ms_periode_akademik', function ($query) use ($jenjangId, $tahunAjarId) {
-                $query->where('ms_jenjang_id', $jenjangId)
-                    ->where('ms_tahun_ajar_id', $tahunAjarId);
+            ->where(function ($query) use ($jenjangId) {
+                $query->whereNull('ms_mata_pelajaran_id')
+                    ->orWhereHas('ms_mata_pelajaran', fn ($related) => $related->where('ms_jenjang_id', $jenjangId));
             });
     }
 
     protected function assertValidContext($jenjangId, $tahunAjarId): void
     {
-        if (!$this->hasValidContext($jenjangId, $tahunAjarId)) {
+        if (! $this->hasValidContext($jenjangId, $tahunAjarId)) {
             throw ValidationException::withMessages([
                 'context' => 'Pilih jenjang dan tahun ajar yang valid dan memiliki akses.',
             ]);
@@ -109,30 +97,28 @@ trait InteractsWithPenugasanGuru
         $this->assertValidContext($jenjangId, $tahunAjarId);
 
         $keepTeacher = $existing && (int) $existing->ms_pegawai_id === (int) $data['ms_pegawai_id'];
-        if (!$this->teacherOptions($jenjangId, !$keepTeacher)->whereKey($data['ms_pegawai_id'])->exists()) {
+        if (! $this->teacherOptions($jenjangId, ! $keepTeacher)->whereKey($data['ms_pegawai_id'])->exists()) {
             throw ValidationException::withMessages([
                 'ms_pegawai_id' => 'Guru tidak aktif atau bukan bagian dari jenjang yang dipilih.',
             ]);
         }
 
-        if (!$this->classOptions($jenjangId, $tahunAjarId)->whereKey($data['ms_kelas_id'])->exists()) {
+        if (! $this->classOptions($jenjangId, $tahunAjarId)->whereKey($data['ms_kelas_id'])->exists()) {
             throw ValidationException::withMessages([
                 'ms_kelas_id' => 'Kelas tidak termasuk dalam jenjang dan tahun ajar yang dipilih.',
             ]);
         }
 
-        $keepSubject = $existing && (int) $existing->ms_mata_pelajaran_id === (int) $data['ms_mata_pelajaran_id'];
-        if (!$this->subjectOptions($jenjangId, !$keepSubject)->whereKey($data['ms_mata_pelajaran_id'])->exists()) {
-            throw ValidationException::withMessages([
-                'ms_mata_pelajaran_id' => 'Mata pelajaran tidak aktif atau bukan bagian dari jenjang yang dipilih.',
-            ]);
-        }
+        $subjectId = $data['ms_mata_pelajaran_id'] ?? null;
 
-        $keepPeriod = $existing && (int) $existing->ms_periode_akademik_id === (int) $data['ms_periode_akademik_id'];
-        if (!$this->periodOptions($jenjangId, $tahunAjarId, !$keepPeriod)->whereKey($data['ms_periode_akademik_id'])->exists()) {
-            throw ValidationException::withMessages([
-                'ms_periode_akademik_id' => 'Periode tidak aktif atau bukan bagian dari jenjang dan tahun ajar yang dipilih.',
-            ]);
+        if ($subjectId !== null && $subjectId !== '') {
+            $keepSubject = $existing && (int) $existing->ms_mata_pelajaran_id === (int) $subjectId;
+
+            if (! $this->subjectOptions($jenjangId, ! $keepSubject)->whereKey($subjectId)->exists()) {
+                throw ValidationException::withMessages([
+                    'ms_mata_pelajaran_id' => 'Mata pelajaran tidak aktif atau bukan bagian dari jenjang yang dipilih.',
+                ]);
+            }
         }
     }
 }

@@ -24,8 +24,11 @@
                     </span>
                     <h3 class="fw-bold mb-2" id="deletePenugasanGuruLabel">Hapus Penugasan Guru</h3>
                     <p class="text-muted mb-0 lh-lg px-lg-4">
-                        Penugasan <strong>{{ $namaGuru }}</strong> untuk
-                        <strong>{{ $namaMapel }}</strong> di kelas <strong>{{ $namaKelas }}</strong>
+                        Penugasan <strong>{{ $namaGuru }}</strong>
+                        @if ($namaMapel)
+                            untuk <strong>{{ $namaMapel }}</strong>
+                        @endif
+                        di kelas <strong>{{ $namaKelas }}</strong>
                         akan dihapus.
                     </p>
 

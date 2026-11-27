@@ -12,7 +12,7 @@
                         </div>
                         <div>
                             <h5 class="fw-bold mb-1" id="ModalEditPenugasanGuruLabel">Ubah Penugasan Guru</h5>
-                            <small class="text-muted">Perbarui pengampu, kelas, mapel, atau periode.</small>
+                            <small class="text-muted">Perbarui pengampu, kelas, mapel, atau status penugasan.</small>
                         </div>
                     </div>
                     <button type="button" class="btn btn-light btn-icon rounded-circle ms-auto"
@@ -51,10 +51,10 @@
                                     @error('ms_kelas_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="edit_penugasan_mapel" class="form-label">Mata Pelajaran <span class="text-danger">*</span></label>
+                                    <label for="edit_penugasan_mapel" class="form-label">Mata Pelajaran <span class="text-muted fw-normal">(Opsional)</span></label>
                                     <select id="edit_penugasan_mapel" class="form-select @error('ms_mata_pelajaran_id') is-invalid @enderror"
                                         wire:model.defer="ms_mata_pelajaran_id">
-                                        <option value="">Pilih mata pelajaran</option>
+                                        <option value="">Tanpa mata pelajaran</option>
                                         @foreach ($subjects as $subject)
                                             <option value="{{ $subject->ms_mata_pelajaran_id }}">
                                                 {{ $subject->nama_mapel }}{{ $subject->kode_mapel ? ' (' . $subject->kode_mapel . ')' : '' }}{{ $subject->status === 'AKTIF' ? '' : ' (nonaktif; penugasan ini)' }}
@@ -66,19 +66,11 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="edit_penugasan_periode" class="form-label">Periode Akademik <span class="text-danger">*</span></label>
-                                <select id="edit_penugasan_periode" class="form-select @error('ms_periode_akademik_id') is-invalid @enderror"
-                                    wire:model.defer="ms_periode_akademik_id">
-                                    <option value="">Pilih periode</option>
-                                    @foreach ($periods as $period)
-                                        <option value="{{ $period->ms_periode_akademik_id }}">
-                                            {{ $period->nama_periode }}
-                                            ({{ $period->tanggal_mulai?->format('d/m/Y') ?? '-' }} - {{ $period->tanggal_selesai?->format('d/m/Y') ?? '-' }})
-                                            {{ $period->status === 'AKTIF' ? '' : '(nonaktif; penugasan ini)' }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('ms_periode_akademik_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                <label for="edit_penugasan_tahun_ajar" class="form-label">Tahun Ajaran</label>
+                                <input type="text" id="edit_penugasan_tahun_ajar" class="form-control"
+                                    value="{{ $tahunAjar?->nama_tahun_ajar ?? '-' }}" readonly>
+                                <small class="text-muted">Mengikuti filter tahun ajaran yang dipilih.</small>
+                                @error('ms_tahun_ajar_id') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                             </div>
 
                             <div class="mb-3">

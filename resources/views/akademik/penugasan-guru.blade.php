@@ -23,6 +23,7 @@
                 @livewire('akademik.penugasan-guru.index')
                 @livewire('akademik.penugasan-guru.create')
                 @livewire('akademik.penugasan-guru.edit')
+                @livewire('akademik.penugasan-guru.detail')
                 @livewire('akademik.penugasan-guru.delete')
             </div>
         </div>

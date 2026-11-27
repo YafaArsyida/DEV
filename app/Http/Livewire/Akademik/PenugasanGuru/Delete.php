@@ -2,7 +2,6 @@
 
 namespace App\Http\Livewire\Akademik\PenugasanGuru;
 
-use App\Models\PenugasanGuru;
 use App\Http\Livewire\Akademik\PenugasanGuru\Concerns\InteractsWithPenugasanGuru;
 use Livewire\Component;
 
@@ -11,10 +10,15 @@ class Delete extends Component
     use InteractsWithPenugasanGuru;
 
     public $penugasanGuruId;
+
     public $namaGuru = '';
+
     public $namaKelas = '';
+
     public $namaMapel = '';
+
     public $selectedJenjang = null;
+
     public $selectedTahunAjar = null;
 
     protected $listeners = ['confirmDeletePenugasanGuru'];
@@ -31,7 +35,7 @@ class Delete extends Component
         $this->selectedTahunAjar = $tahunAjar;
         $this->namaGuru = $assignment->ms_pegawai->nama_pegawai;
         $this->namaKelas = $assignment->ms_kelas->nama_kelas;
-        $this->namaMapel = $assignment->ms_mata_pelajaran->nama_mapel;
+        $this->namaMapel = $assignment->ms_mata_pelajaran?->nama_mapel;
     }
 
     public function deletePenugasanGuru()
