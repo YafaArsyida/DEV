@@ -15,4 +15,12 @@ class JadwalMengajarController extends Controller
     {
         return view('akademik.jadwal-mengajar');
     }
+
+    /**
+     * Display the authenticated teacher's own schedule.
+     */
+    public function saya()
+    {
+        return view('akademik.jadwal-mengajar-saya');
+    }
 }

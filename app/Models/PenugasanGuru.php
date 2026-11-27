@@ -19,7 +19,7 @@ class PenugasanGuru extends Model
         'ms_pegawai_id',
         'ms_kelas_id',
         'ms_mata_pelajaran_id',
-        'ms_periode_akademik_id',
+        'ms_tahun_ajar_id',
         'status',
         'deskripsi',
     ];
@@ -51,12 +51,12 @@ class PenugasanGuru extends Model
         );
     }
 
-    public function ms_periode_akademik()
+    public function ms_tahun_ajar()
     {
         return $this->belongsTo(
-            PeriodeAkademik::class,
-            'ms_periode_akademik_id',
-            'ms_periode_akademik_id'
+            TahunAjar::class,
+            'ms_tahun_ajar_id',
+            'ms_tahun_ajar_id'
         );
     }
 

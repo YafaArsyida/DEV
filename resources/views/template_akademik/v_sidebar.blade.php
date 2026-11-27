@@ -169,24 +169,24 @@
                     </a>
                 </li>
 
-                {{-- WALI KELAS --}}
-                <li class="nav-item">
-                    <a href="{{ route('akademik.penugasan-guru') }}"
-                        class="nav-link menu-link {{ request()->routeIs('akademik.penugasan-guru') ? 'active' : '' }}">
-                        <i class="mdi mdi-account-star-outline"></i>
-                        <span data-key="t-wali-kelas">
-                            Wali Kelas
-                        </span>
-                    </a>
-                </li>
-
                 {{-- PENGAMPU MATA PELAJARAN --}}
                 <li class="nav-item">
                     <a href="{{ route('akademik.penugasan-guru') }}"
                         class="nav-link menu-link {{ request()->routeIs('akademik.penugasan-guru') ? 'active' : '' }}">
                         <i class="mdi mdi-book-account-outline"></i>
                         <span data-key="t-pengampu-mata-pelajaran">
-                            Pengampu Mata Pelajaran
+                            Penugasan Guru
+                        </span>
+                    </a>
+                </li>
+
+                {{-- WALI KELAS --}}
+                <li class="nav-item">
+                    <a href="{{ route('akademik.penugasan-guru') }}"
+                        class="nav-link menu-link {{ request()->routeIs('akademik.penugasan-guru') ? 'active' : '' }}">
+                        <i class="mdi mdi-account-star-outline"></i>
+                        <span data-key="t-wali-kelas">
+                            Penugasan Wali Kelas
                         </span>
                     </a>
                 </li>

@@ -21,6 +21,9 @@
         <div class="row">
             <div class="col-xxl-12">
                 @livewire('akademik.jadwal-mengajar.index')
+                @livewire('akademik.jadwal-mengajar.create')
+                @livewire('akademik.jadwal-mengajar.edit')
+                @livewire('akademik.jadwal-mengajar.delete')
             </div>
         </div>
     </div>

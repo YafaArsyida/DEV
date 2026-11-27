@@ -309,6 +309,20 @@ Route::post('/logout', [
 //     Route::middleware(['auth'])->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
 //     Route::get('/administrasi/manajemen-kepegawaian',  [ManajemenKepegawaian::class, 'index'])->name('administrasi.manajemen-kepegawaian');
+
+/*
+|--------------------------------------------------------------------------
+| Jadwal Mengajar (Guru)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'peran:GURU'])
+    ->prefix('akademik')
+    ->name('akademik.')
+    ->group(function () {
+        Route::get('/jadwal-mengajar-saya', [JadwalMengajarController::class, 'saya'])
+            ->name('jadwal-mengajar-saya');
+    });
+
 Route::middleware(['auth', 'peran:SUPERADMIN,ADMIN,KEUANGAN,PETUGAS_PPDB'])->group(function () {
     /*
     |--------------------------------------------------------------------------

@@ -31,4 +31,23 @@ class JadwalMengajar extends Model
         'tanggal_mulai' => 'date',
         'tanggal_selesai' => 'date',
     ];
+
+    public function ms_penugasan_guru()
+    {
+        return $this->belongsTo(
+            PenugasanGuru::class,
+            'ms_penugasan_guru_id',
+            'ms_penugasan_guru_id'
+        );
+    }
+
+    public function scopeAktif($query)
+    {
+        return $query->where('status', 'AKTIF');
+    }
+
+    public function scopeHari($query, string $hari)
+    {
+        return $query->where('hari', strtoupper($hari));
+    }
 }
